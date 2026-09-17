@@ -944,16 +944,15 @@ const wb = WORLD_BOX;
     list-style: none;
     margin: 0;
     padding: 0;
-    border-top: 1px solid var(--wp--custom--color--border--subtle);
-  }
-  /* The open/focused row gets its own rounded pill (below); its top hairline would cut
-     across that shape, so drop it when that row is first. */
-  .live-ops__regions:has(> .live-ops__region:first-child:is(.is-open, :has(.live-ops__region-toggle:focus-visible))) {
-    border-top-color: transparent;
   }
   .live-ops__region {
     border-bottom: 1px solid var(--wp--custom--color--border--subtle);
     transition: background-color 200ms var(--wp--custom--motion--easing);
+  }
+  /* Only between rows — nothing above the first or below the last, both already bounded by
+     other spacing (the head above, "See our assets" below). */
+  .live-ops__region:last-child {
+    border-bottom: none;
   }
   .live-ops__region.is-hover {
     background-color: var(--wp--custom--color--alpha--navy-8);
