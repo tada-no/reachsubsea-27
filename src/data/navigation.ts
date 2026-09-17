@@ -94,8 +94,8 @@ export const navSections: NavSection[] = [
       { label: 'Survey & monitoring equipment', href: '/assets/survey-monitoring-equipment/' },
     ],
     feature: {
-      media: 'none',
-      surface: 'tint',
+      media: 'image-bg',
+      image: { src: `${import.meta.env.BASE_URL}images/vessel-olympic-zeus.jpg`, alt: 'Olympic Zeus, a Reach Subsea construction support vessel, at sea', focalPoint: { x: 0.35, y: 0.55 } },
       eyebrow: 'Reach Remote',
       badge: { label: 'In build', tone: 'navy' },
       title: 'Reach Remote 3 & 4',
@@ -133,8 +133,8 @@ export const navSections: NavSection[] = [
       { label: 'Sustainability', href: '/company/sustainability/' },
     ],
     feature: {
-      media: 'none',
-      surface: 'tint',
+      media: 'image-bg',
+      image: { src: `${import.meta.env.BASE_URL}images/windfarm-turbine-install.jpg`, alt: 'Vessel installing turbines at an offshore wind farm', focalPoint: { x: 0.6, y: 0.55 } },
       eyebrow: 'Sustainability',
       badge: { label: 'PDF', tone: 'neutral' },
       title: 'Sustainability report 2025',
@@ -156,8 +156,8 @@ export const navSections: NavSection[] = [
       { label: 'Share information', href: '/investors/share-information/' },
     ],
     feature: {
-      media: 'none',
-      surface: 'tint',
+      media: 'image-bg',
+      image: { src: `${import.meta.env.BASE_URL}images/ocean-horizon-calm.jpg`, alt: 'Calm open ocean at the horizon', focalPoint: { x: 0.5, y: 0.4 } },
       eyebrow: 'Next event',
       badge: { label: 'Upcoming', tone: 'navy' },
       title: 'Next results presentation',
@@ -177,8 +177,8 @@ export const navSections: NavSection[] = [
       { label: 'Why work with us', href: '/careers/why-work-with-us/' },
     ],
     feature: {
-      media: 'none',
-      surface: 'tint',
+      media: 'image-bg',
+      image: { src: `${import.meta.env.BASE_URL}images/team-lounge-harbour.jpg`, alt: 'Colleagues talking in a lounge overlooking the harbour', focalPoint: { x: 0.4, y: 0.45 } },
       eyebrow: 'Join us',
       title: 'Open positions',
       description: 'Current vacancies are listed on HR-Manager.',
