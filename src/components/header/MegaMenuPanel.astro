@@ -130,6 +130,14 @@ const { section, open = false } = Astro.props;
   .mega-menu__feature .card--media-image-bg {
     min-height: 0;
   }
+  /* Stronger scrim (17 Sep 2026): Card's default overlay is tuned for its usual 520px-tall card, where
+     the bottom-pinned text never reaches the gradient's lighter stops. This feature card is only ~288px,
+     so the same text block sits much higher up, into stops as light as 0.22 — against a bright photo
+     (sky, turbine blades, window glass) the accent-green eyebrow nearly disappears. Same bottom-up
+     shape, higher floor throughout. */
+  .mega-menu__feature .card__overlay {
+    background: linear-gradient(to top, rgb(27 29 59 / 0.96) 0%, rgb(27 29 59 / 0.88) 30%, rgb(27 29 59 / 0.78) 60%, rgb(27 29 59 / 0.55) 100%);
+  }
   .mega-menu__strip {
     background-color: var(--wp--custom--color--bg--tint);
   }
