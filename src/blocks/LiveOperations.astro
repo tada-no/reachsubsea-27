@@ -488,6 +488,8 @@ const wb = WORLD_BOX;
                 const t = toggleFor(id);
                 if (!t) return;
                 select(t.getAttribute('aria-expanded') === 'true' ? null : id);
+                t.classList.add('js-focus-no-ring');
+                t.addEventListener('blur', () => t.classList.remove('js-focus-no-ring'), { once: true });
                 t.focus({ preventScroll: true });
                 if (window.matchMedia('(min-width: 900px)').matches)
                   t.closest('li')!.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
@@ -977,6 +979,11 @@ const wb = WORLD_BOX;
   .live-ops__region-toggle:focus-visible {
     outline: 2px solid var(--wp--custom--color--border--focus);
     outline-offset: -2px;
+  }
+  /* Focus moved here from a marker click (below), not a keyboard action: some browsers'
+     :focus-visible heuristic still rings it because the focused element isn't the one clicked. */
+  .live-ops__region-toggle.js-focus-no-ring:focus-visible {
+    outline: none;
   }
   .live-ops__region-name {
     grid-area: name;
