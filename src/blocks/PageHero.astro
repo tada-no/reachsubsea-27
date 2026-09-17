@@ -364,13 +364,15 @@ const objectPosition = image?.focalPoint
   }
   /* Below 900 the copy spans the full width, so the side fades give way to an even wash plus a
      deeper bottom ramp; the footage reads through the top half.
-     Monotonic, not a dip-then-recover (17 Sep 2026 fix): the old middle stop (0.3) was lighter than
-     the one above it, so on a tall 4-line mobile title the eyebrow could land in that lighter band
-     against bright footage (sky, fog) and nearly disappear. Never gets lighter as it goes up. */
+     A genuine solid panel now (17 Sep 2026 fix), not a gradient from the very bottom: the copy is
+     pinned to the bottom of the frame, so a flat navy block through ~36% guarantees full contrast
+     for it regardless of how many lines the title wraps to, and reads as a deliberate panel rather
+     than a wash. Above that it fades out monotonically (never lighter-then-darker) so the footage
+     clears fully by mid-frame and plays as a horizontal band across the top, not a tinted backdrop. */
   @media (max-width: 899px) {
     .page-hero--video .page-hero__scrim {
       background:
-        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0.85) 40%, rgb(27 29 59 / 0.65) 70%, rgb(27 29 59 / 0.55) 100%),
+        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, var(--wp--preset--color--navy-900) 40%, rgb(27 29 59 / 0.55) 72%, rgb(27 29 59 / 0.3) 100%),
         linear-gradient(to right, rgb(27 29 59 / 0.5) 0%, rgb(27 29 59 / 0) 12%, rgb(27 29 59 / 0) 88%, rgb(27 29 59 / 0.5) 100%);
     }
   }
