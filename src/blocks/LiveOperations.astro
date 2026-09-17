@@ -259,7 +259,7 @@ const wb = WORLD_BOX;
   import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const COUNTRIES_URL = '/data/world-countries.json';
+  const COUNTRIES_URL = `${import.meta.env.BASE_URL}data/world-countries.json`;
   /** Region level: never close enough to read as a position. */
   const MAX_ZOOM = 5;
   /** Zoom when a region is opened from the list or a marker: its sea area with context around it. */
