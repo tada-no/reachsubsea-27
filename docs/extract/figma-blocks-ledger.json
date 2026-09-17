@@ -26,7 +26,8 @@
     "Media gallery": "192:3619",
     "Data list": "195:3648",
     "Embed": "201:4459",
-    "Section subnav": "207:4710"
+    "Section subnav": "207:4710",
+    "Live operations": "269:4799"
   },
   "blocks": {
     "Page hero": {
@@ -46,7 +47,8 @@
         "Text Cards Desktop": "139:560",
         "Text Cards Mobile": "139:688",
         "Photo Cards Desktop": "139:798",
-        "Photo Cards Mobile": "139:910"
+        "Photo Cards Mobile": "139:910",
+        "Style=Video, Breakpoint=Desktop": "246:7829"
       },
       "keys": {
         "Title": "Title#141:0",
@@ -94,7 +96,8 @@
         "2 columns Mobile": "147:1100",
         "3 columns Mobile": "147:1191",
         "4 columns Mobile": "147:1302",
-        "Featured first Mobile": "147:1446"
+        "Featured first Mobile": "147:1446",
+        "Layout=Bento, Breakpoint=Desktop": "246:8454"
       },
       "keys": {
         "Show section header": "Show section header#148:0"
@@ -122,7 +125,8 @@
         "On Desktop": "152:1433",
         "Off Desktop": "154:1636",
         "On Mobile": "155:1803",
-        "Off Mobile": "155:1995"
+        "Off Mobile": "155:1995",
+        "Filters=Off, Breakpoint=Desktop, Layout=Editorial": "246:7643"
       },
       "keys": {
         "Show section header": "Show section header#156:0",
@@ -203,7 +207,8 @@
         "3 Plain Mobile": "168:2495",
         "3 Panel Mobile": "168:2521",
         "4 Plain Mobile": "168:2548",
-        "4 Panel Mobile": "168:2576"
+        "4 Panel Mobile": "168:2576",
+        "Count=5, Style=Feature, Breakpoint=Desktop": "253:4781"
       },
       "keys": {
         "Show section header": "Show section header#169:0"
@@ -255,7 +260,8 @@
         "Band Desktop": "178:2735",
         "Band Mobile": "178:2767",
         "Inline Desktop": "179:2742",
-        "Inline Mobile": "179:2774"
+        "Inline Mobile": "179:2774",
+        "Style=Panel, Breakpoint=Desktop": "246:9087"
       },
       "keys": {
         "Title": "Title#179:0",
@@ -470,6 +476,37 @@
         "Section pages Investors, Desktop": "207:4738",
         "In-page FAQ anchors, Mobile": "207:4761"
       }
+    },
+    "Live operations": {
+      "id": "269:4810",
+      "type": "COMPONENT_SET",
+      "variants": 3,
+      "axes": "State (Live, Stale, Unavailable). Breakpoint: Desktop only — Mobile not built (flagged below, same precedent as the Social feed block).",
+      "variantIds": {
+        "State=Live": "269:4804",
+        "State=Stale": "269:4806",
+        "State=Unavailable": "269:4808"
+      },
+      "keys": {},
+      "notes15th": "ADDED 17 Sep 2026 (follow-up session, per explicit user request — 15th block, outside the original 14-block budget in 05-blocks-spec.md §0). Ground truth was src/blocks/LiveOperations.astro, src/data/live-operations.ts, src/lib/world-dots.ts and src/pages/live-operations-review.astro, not just docs/07-live-operations.md (whose §1 'SAMPLE DATA badge on Home' line is stale — index.astro never passes `sample` to `<LiveOperations>`, so the badge is built as an available field on the component but hidden on the Home instance to match the real prop default).",
+      "layers": "Each State variant: 1440 wide, VERTICAL auto-layout, grid/margin × section/lg padding (spacing='lg' is the block's own default, not section/md), Navy Color mode forced on the component (background='navy' is also the block's default) — both overridden after blockVariant()'s usual bg/default + section/md skeleton. Head (status row: Beacon ellipse + 'Live' eyebrow (Live only) + status text (Live/Stale only) + Badge instance 'Sample data' Tone=Accent (Live/Stale only, isExposedInstance-style visible toggle per instance) · Title: 3-segment HORIZONTAL row (prefix/count/suffix text nodes, counterAxisAlignItems BASELINE) so the count can be text/accent inside a Heading/H2 sentence · Intro (Unavailable only, Body/Lead)). Toolbar (Live/Stale only): Filters (4 × Filter chip instances, set 92:337, 'All' State=Selected Show count true, rest State=Default) + Controls (custom 2-up zoom pill, minus/plus icon instances 24:33/23:96, not a reusable component). Body (HORIZONTAL, gap space/64) > Main (VERTICAL, gap space/24: Toolbar + Map) + Side (FIXED 420: Regions list + Foot). Map: FRAME 828×456 (≈ main column width at 1440), radius/md, clipsContent; 'Land dots' — a GROUP of ~300 real ELLIPSE nodes (3.6px) at a 18px offset-row grid, kept only inside a handful of hand-placed ellipse regions approximating continent silhouettes (stylised, per docs/07 §1's 'abstract dot scatter (no coastlines)' language and the Embed/3D World block's map treatment — NOT the build-time Equal Earth projection from world-dots.ts; see gotcha below), fill bound to text/disabled (NOT border/subtle — see gotcha). Pins (Live/Stale only, cloned as one group): halo ellipse (42Ø42, border/accent, opacity 0.25) + solid dot ellipse (14×14, border/accent) per region — the code's reduced-motion 'static halo' treatment, used here for every pin since Figma has no animation. Side/Regions: List (VERTICAL, border-top border/subtle) of Region rows (HORIZONTAL, padding space/16, border-bottom border/subtle) > Text (Name Heading/H5, Meta row: Area Body/Small + Types row of 24px circular Type-dot frames each holding a 14px icon instance recoloured to text/accent) + Chevron icon (23:67, collapsed/closed state only — the static first-paint has every row closed, matching aria-expanded=false in the code). Side/Fallback (Unavailable only): Body/Body paragraph. Foot: Link instance (68:326, 'Action=Page, Size=Medium, State=Default', label 'See our assets').",
+      "gotchas": [
+        "Figma's vectorPaths string parser rejects the SVG zero-length dot idiom the code itself uses ('M{x} {y}h0', from src/lib/world-dots.ts) with 'Invalid command at h0' — both the raw form and a version with an inserted space before the next M. It also rejected an arc-based filled-circle path ('M{x1} {y} A{r} {r} 0 1 0 {x2} {y} A... Z') with 'Invalid command at A1.8', so the Plugin API's path mini-language does not accept the 'A' command either. The reliable fix was to stop building a hand-written vector path entirely and instead create one real ELLIPSE node per dot (grouped with figma.group after), which always renders.",
+        "A degenerate/zero-area vectorPaths shape can be assigned without error and even reports correct bounds from getMetadata, but renders as literally nothing (confirmed by downloading the returned PNG and checking its actual pixel dimensions with `file` — it was a true 1×1 blank PNG, not just a display artifact). Structural success (no thrown error, correct bounding box) is not proof of visual correctness for hand-authored vector paths; always pixel-check a novel vector technique, ideally by downloading the PNG rather than trusting the inline preview.",
+        "The world-map dots were first bound to border/subtle, which is visually indistinguishable from the navy/900 panel behind it in Navy Color mode (near-zero contrast, invisible in a screenshot even though the binding itself was correct) — switched to text/disabled, which is the token already used for the Stale beacon precisely because it stays legibly muted-grey against a navy ground.",
+        "get_screenshot (and even the inline node.screenshot() called from within a use_figma script) served a stale, smaller cached render for 5+ consecutive calls after Body/Main/Map/Side were added — get_metadata's numbers were correct and live the whole time (confirmed by cross-checking against fresh get_metadata calls after every edit). This is a more persistent version of the stale-screenshot gotcha already on record from the original block-build session (see 'get_screenshot (the standalone MCP tool...)' note below); it eventually resolved on its own after further edits and a short wait, with no code change needed on this end. Prefer get_metadata as the source of truth for structural correctness when screenshots look implausibly small/old, and re-try the screenshot later rather than assuming the canvas is broken.",
+        "Do not attempt to reproduce world-dots.ts's exact build-time Equal Earth projection output inside a use_figma script or by shelling out to Node against the project — the module resolution context isn't available standalone and it isn't necessary. The static land-dot field only needs to read as 'a world of dots' at doc-review scale; a small set of hand-placed continent-shaped ellipse regions sampled on a grid (see layers above) is the establishment pattern for this kind of decorative/approximate map in this file (matches the original PDF's 'abstract dot scatter, no coastlines' description in docs/07 §1)."
+      ],
+      "openItems": [
+        "Mobile not built (Desktop only) — same precedent as the Social feed block (figma-blocks-ledger.json phase4HomeRedesign.openItems). The map/list two-column layout would need to restack per docs/07 §3 ('Mobile: the map crops... list is the control').",
+        "No 'radar' icon exists in the icon set (figma-icons-ledger.json) for the code's uncrewed/Reach-Remote asset type (src/data/live-operations.ts assetTypes[1].icon = 'radar'). Substituted 'drone' (27:142, a quadcopter glyph) throughout — reads reasonably as 'uncrewed' but is not a literal match. Same pattern as the Social feed block's missing 'thumb-up' icon.",
+        "The world map is a stylised approximation (hand-placed continent ellipses sampled on a dot grid), not a reproduction of world-dots.ts's actual Equal Earth projection output — acceptable for a static Figma doc per the 'abstract dot scatter' framing in docs/07 §1, but a pixel-accurate version would need the real projected coordinates (computed at build time in code, not reproducible inside the Figma plugin sandbox).",
+        "docs/07-live-operations.md §1's status line says Home shows the Live state 'with... SAMPLE DATA badge', but src/pages/index.astro's `<LiveOperations feed={liveOperations} />` call never passes `sample`, so the badge defaults off. Built the Badge as a real, visible field on the Live/Stale variants (documents the control) but hidden it on the Home instance (281:1002) to match the actual homepage code — flagging the doc/code mismatch rather than silently picking one.",
+        "Region rows are built in their closed/collapsed default state only (matching the no-JS/first-paint DOM: aria-expanded=false, panel hidden) — the expanded operations-list panel per row is not represented in Figma."
+      ],
+      "examples": {
+        "note": "No separate Group/Examples frame — the 3 State variants are themselves the full set of examples for this block (same harmless structural omission already on record for Accordion/CTA band/Statement)."
+      }
     }
   },
   "components": {
@@ -639,5 +676,59 @@
     ],
     "canvasOrder": "Doc frames re-stacked: shared parts, then blocks 1–14 by eyebrow number, 160 gaps",
     "componentsPage": "Tile/quote caption layer is named 'quote' like its siblings (the earlier 'lock' note was stale); no change needed"
+  },
+  "phase4HomeRedesign": {
+    "date": "2026-09-17",
+    "context": "Q49–Q53 (docs/00-questions.md). Pushed the 17 Sep coded Home redesign into Figma. Picked up mid-flight: container/wide, Card Media=Stat, CardGrid Layout=Bento, FeedGrid Layout=Editorial, CtaBand Style=Panel, PageHero Style=Video, Header Breakpoint=Desktop overlay + 6-link Nav, and the reimagined Site menu panel were already built in Figma before this session (see per-block variantIds above and figma-components-ledger.json). This session verified each against the current code, fixed two gaps, and did the remaining work: Stats band Style=Feature, the Embed 3D World no-eyebrow fix, the Card image-bg gradient scrim, the new Social feed block, and the Home page composition.",
+    "containerToken": "Foundations Layout collection container/wide (VariableID:9:56) was found ALREADY at 1440 on both Desktop and Mobile modes when checked — not 1600 as the task brief assumed. No change made; verified via figma.variables.getLocalVariableCollectionsAsync() rather than trusting the brief.",
+    "newPage": { "name": "Pages", "id": "250:22", "position": "after Blocks (12:25), before the second '---' divider (12:26)" },
+    "homeFrame": {
+      "id": "260:22",
+      "name": "Home",
+      "width": 1440,
+      "note": "Desktop-only composition on the Pages page, instances in the exact order/props of src/pages/index.astro.",
+      "sections": {
+        "Header (Breakpoint=Desktop overlay)": "260:228",
+        "Page hero (Style=Video, Breakpoint=Desktop)": "260:309",
+        "Stats band (Style=Feature, background=tint)": "285:5903",
+        "Live operations (State=Live instance, replacing the placeholder 17 Sep 2026 follow-up)": "281:1002",
+        "Card grid — Bento (Ocean operations, reimagined)": "260:344",
+        "Card grid — 4 columns (Four services, one partner)": "260:589",
+        "Embed — 3D World Poster": "260:732",
+        "Feed grid — Editorial (Reach Newsroom), cloned from the pre-built Home example 246:8887": "260:775",
+        "Social feed (Latest news from LinkedIn)": "260:870",
+        "Accordion — Split (FAQ)": "260:967",
+        "CTA band — Panel": "266:5452",
+        "Footer": "260:1048"
+      }
+    },
+    "statsBandFeature": {
+      "variantId": "253:4781",
+      "name": "Count=5, Style=Feature, Breakpoint=Desktop",
+      "clonedFrom": "167:2580 (Count=4, Style=Panel, Breakpoint=Desktop)",
+      "structure": "Panel (bg/default, radius/lg, Shadow/sm) > Feature (HORIZONTAL) > Lead (Navy mode forced, padding space/40: Value Heading/Display text/accent, Label Body/Small text/primary) + Rows (light, padding space/40, gap space/48, 4 × Row [Value Heading/H2, Label Body/Small FIXED 160] separated by 1px border/subtle Divider rects, counterAxisAlignItems MAX).",
+      "content": "Home's real figures: lead 500+ People offshore and onshore; rest 2008 Established, 11 Vessels in the fleet, 9 Countries reached, 15 ROV systems (pickFigures order from src/data/key-figures.ts). Section header hidden (Home passes no sectionHeader).",
+      "gotcha": "Setting primaryAxisSizingMode/counterAxisSizingMode on an auto-layout frame AFTER setting its layoutSizingHorizontal='FILL' silently resets it back to HUG (first build attempt produced a 398-wide Feature frame with content clipped/overlapping). Fix: never touch primaryAxisSizingMode/counterAxisSizingMode after setting FILL — leave createAutoLayout's HUG/HUG defaults and only set FILL, last, once."
+    },
+    "socialFeed": {
+      "componentId": "257:6971",
+      "name": "Social feed",
+      "docFrameId": "246:9109",
+      "deviation": "Built as a single plain COMPONENT (not a Block/<Name> COMPONENT_SET with Breakpoint variants), matching the doc frame's own pre-existing description ('Prototype only — not one of the 14 spec'd blocks... nothing here is a field contract', already written before this session). Desktop only; Mobile not built. Flagged as an open item below.",
+      "structure": "1440 wide, grid/margin × section/md padding, stack/xl gap > Header (title + Controls[Arrows, Button Primary+brand-linkedin 'Follow us']) > Rail (HORIZONTAL, grid/gutter gap, 5 × Post card FIXED 320: Byline [Avatar 40 circle Navy-mode + brand-linkedin icon, Name/Age], Text (Body/Small), optional Media placeholder (bg/disabled + photo icon, no real images available to this script), 'N reactions' caption). Component clips at 1440 so the rail bleeds off the right edge, matching the code's horizontal-scroll rail.",
+      "openItem": "No 'thumb-up' icon exists in the icon set (docs/extract/figma-icons-ledger.json) — the reactions row is plain text ('184 reactions') instead of an icon + number as in code. Flagged, not fixed (out of this task's scope; would need a new icon added to Components/Icons)."
+    },
+    "embedFix": "Embed 3D World Poster (Desktop 201:4464, Mobile 201:4536): hid the Eyebrow instance (was still visible) so the panel shows title + body + one CTA only, per the 'no eyebrow' spec. Zone names verified already correct and matching src/data/world.ts / Embed.astro defaults exactly (Subsea Infrastructure, Oil Field Operations, Offshore Wind & Renewables, Subsea Production & Monitoring). Home instance (260:732) also had its Title/Body text overridden to the Home copy ('See our operations in 3D' / 'Fly through four working zones...').",
+    "cardImageBgGradient": "Card set 103:1110, 'Media=Image bg' Overlay rectangles (Default 103:1044, Featured 103:1079) changed from a flat 64% navy SOLID fill to a 4-stop GRADIENT_LINEAR (bottom-up, alpha 0.96→0.86→0.5→0.22) approximating the code's new linear-gradient scrim (Card.astro, 17 Sep 2026 comment).",
+    "ctaBandPanelGap": "FIXED 17 Sep 2026 (follow-up session). The Style=Panel variant's (246:9087) Link instance (246:9100) now has componentPropertyReferences = { visible: 'Show secondary action#179:10' }, matching the other 4 CTA band variants. Verified bidirectionally on a live instance (setProperties true → Link reappears; false → removed) before and after. Gotcha: a layer that was deleted as a raw instance override (not merely hidden) on an existing instance — as the Home instance's Link (260:1025) turned out to be, despite the original note saying 'visible = false' — cannot be restored by re-binding the main component, nor by swapping the instance's own variant property away and back (Figma keeps the per-node-correspondence delete override even across a resync). The only fix was to create a brand-new instance from the (now-fixed) main component via mainComponent.createInstance(), reapply the Home-specific overrides (Title/Text/Button label/Show secondary action=false), and delete the old instance. Old id 260:1025 → new id 266:5452 (see homeFrame.sections above).",
+    "liveOperationsBlock": "DONE 17 Sep 2026 (follow-up session, per explicit user request — supersedes the openItems note below about it being out of budget). Built as the 15th block, docFrame 269:4799, component set 269:4810 (State=Live/Stale/Unavailable — see the 'Live operations' entry under `blocks` above for full structure, gotchas and open items). Home's placeholder (260:343) was deleted and replaced in place (same index, 3rd child of 260:22) with a State=Live instance (281:1002), its 'Sample data' badge hidden to match src/pages/index.astro's actual `<LiveOperations feed={liveOperations} />` call (no `sample` prop). docs/05-blocks-spec.md updated (§0 budget line + new §2.15) to record the 15th block.",
+    "openItems": [
+      "Social feed built Desktop-only, as a single component rather than a Breakpoint variant set (see socialFeed.deviation above) — matches its own doc frame's 'prototype, not a real block' framing but is a deliberate deviation from the Block/<Name> convention the task asked for.",
+      "No 'thumb-up' icon in the icon set for Social feed's reaction count (see socialFeed.openItem).",
+      "Home's Header/Site menu updates (6-link nav, Desktop-overlay variant, reimagined Site menu panel) were already in the file before this session; spot-checked structurally (Navy-mode-forced overlay bar, 6 correct nav labels, 3-column Site menu with large links + Card + news/events) but not re-verified pixel-for-pixel against Header.astro/SiteMenuPanel.astro line by line.",
+      "Live operations (15th block, follow-up session): Mobile not built, 'radar' icon substituted with 'drone', map is a stylised approximation not the real projection, and Home's 'Sample data' badge is hidden to match index.astro — see the 'Live operations' block entry's own openItems for details.",
+      "Home's Card grid/Feed grid/Embed/Accordion/CTA band sections (everything after Live operations) were already in the file before this session and were not re-verified in this follow-up pass; only the Header→Page hero→Live operations→Card grid seam was screenshot-checked to confirm the swap didn't disturb neighbouring sections."
+    ],
+    "statsBandGapFix": "FIXED 17 Sep 2026 (second follow-up session). A fresh instance of the existing Stats band Feature variant (253:4781, see statsBandFeature above — no new component needed) was created and inserted into Home (260:22) at index 2, between Page hero (260:309) and Live operations (281:1002), matching src/pages/index.astro's actual order. Its root fill was rebound from bg/default (VariableID:8:22) to bg/tint (VariableID:8:23) to match the code's `background=\"tint\"` prop — none of the block's existing content needed to change since it already carried Home's real figures. New instance id 285:5903."
   }
 }

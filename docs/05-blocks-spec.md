@@ -1,6 +1,6 @@
 # Reach Subsea 2027 — Blocks spec (Phase 3)
 
-_Status: **Figma built and QA'd**, 15 Sep 2026 (all 14 blocks; Phase 3b code next). Figma `HAvCQCXzWNFOKQ1AZxqNTX`, page **Blocks** (`12:25`). Decisions Q37–Q40 in [00-questions.md](00-questions.md): Figma first, then code (Phase 3b, Astro); photo hero = full photo + navy scrim; no forms in v1. Items marked **(proposed)** are defaults still open to change. Inputs: [01-discovery-brief.md](01-discovery-brief.md) §4, [03-client-pdf-review.md](03-client-pdf-review.md), [04-components-spec.md](04-components-spec.md), [extract/figma-components-ledger.json](extract/figma-components-ledger.json), [extract/dev-components.md](extract/dev-components.md). Build helpers: [`../figma/helpers.js`](../figma/helpers.js)._
+_Status: **Figma built and QA'd**, 15 Sep 2026 (all 14 blocks; Phase 3b code next). **17 Sep 2026 follow-up:** a 15th block, Live operations (§2.15), was added outside the original budget per explicit user request — see [07-live-operations.md](07-live-operations.md) and the `Live operations` entry in [extract/figma-blocks-ledger.json](extract/figma-blocks-ledger.json). Figma `HAvCQCXzWNFOKQ1AZxqNTX`, page **Blocks** (`12:25`). Decisions Q37–Q40 in [00-questions.md](00-questions.md): Figma first, then code (Phase 3b, Astro); photo hero = full photo + navy scrim; no forms in v1. Items marked **(proposed)** are defaults still open to change. Inputs: [01-discovery-brief.md](01-discovery-brief.md) §4, [03-client-pdf-review.md](03-client-pdf-review.md), [04-components-spec.md](04-components-spec.md), [extract/figma-components-ledger.json](extract/figma-components-ledger.json), [extract/dev-components.md](extract/dev-components.md). Build helpers: [`../figma/helpers.js`](../figma/helpers.js)._
 
 ## 0. Rules for every block
 
@@ -9,7 +9,7 @@ Phase 2 §0 still applies (binding, naming, states, focus ring, motion, code nam
 | Topic | Rule |
 |---|---|
 | What a block is | One full-width `<section>` an editor can add, reorder and configure. One Figma component set `Block/<Name>` = one WordPress block `reach/<slug>`. Its fields are the handoff contract (ACF or native, the developer's call). |
-| Budget | 14 custom blocks. Long-form copy (news body, legal pages, project write-ups) uses **core blocks** (Heading, Paragraph, List, Image, Table, Buttons) in the 880 column, styled by theme.json. Those don't count toward the 14. |
+| Budget | 14 custom blocks. Long-form copy (news body, legal pages, project write-ups) uses **core blocks** (Heading, Paragraph, List, Image, Table, Buttons) in the 880 column, styled by theme.json. Those don't count toward the 14. **17 Sep 2026:** Live operations (§2.15) was added as a 15th block, outside this budget, per explicit user request after the client PDF review raised it — see [07-live-operations.md](07-live-operations.md). |
 | Breakpoints | Every block has `Breakpoint` Desktop (1440) \| Mobile (375). The Mobile variant sets the Layout and Typography Mobile modes. Tablet is code-only: it interpolates, and grids drop to 2 columns at 600–1199. |
 | Container | Inner content max `container/wide` (1600), side padding `grid/margin`, 12-column grid (4 on mobile). Text-led blocks cap at `container/content` (880). |
 | Background | `White` (default `bg/default`) · `Tint` (`bg/tint`) · `Navy` (Navy Color mode; every token flips). Figma: override the instance fill to `bg/tint`, or set Navy mode on the instance. No background variants. Code: `.has-surface-tint`, `.has-surface-navy`. |
@@ -36,7 +36,7 @@ Phase 2 §0 still applies (binding, naming, states, focus ring, motion, code nam
 
 Tabs inside a block (Data list) reuse the **Subnav item** look with `role="tablist"`. Filters reuse **Filter chip**. No new tab or chip styles.
 
-## 2. The 14 blocks
+## 2. The 14 blocks (plus §2.15, added 17 Sep 2026)
 
 ### 2.1 Page hero · `reach/page-hero`
 `Style` Text · Photo × `Breakpoint` = **4**. Photo treatment = full photo + navy scrim (Q40). **16 Sep 2026: overlap variants removed** (Overlap Stats and Overlap Cards; reasoning in docs/06). Key figures go in a Stats band and latest items in a Card grid or Feed grid directly below the hero. Removed in code and Figma (the Home and Investors examples now use the plain hero).
@@ -168,11 +168,21 @@ Uses the Phase 2 **Subnav** set as is (no new Figma component; the Blocks page g
 - Placement: directly under the Page hero, sticky under the header, docks to `top: 0` while the header is hidden (Q34).
 - Replaces: the dev `.sidebar-hierarchy` and the PDF's dark and light pill bars.
 
+### 2.15 Live operations · `reach/live-operations` (added 17 Sep 2026, outside the 14-block budget)
+`State` Live · Stale · Unavailable × `Breakpoint` = **3 built** (Desktop only — Mobile flagged as an open item, same precedent as the Social feed block). Full spec, data model and decision log: [07-live-operations.md](07-live-operations.md); code: `src/blocks/LiveOperations.astro`, `src/data/live-operations.ts`, `src/lib/world-dots.ts`.
+
+- Where Reach's assets are actually working, by sea region — never a vessel position (region label points are whole degrees). Distinct from the 3D World embed's illustrative zones.
+- Status line (beacon + freshness) → title ("Active in N regions today" / "Recently active in N regions" / "Working across N countries") → asset-type filter chips + map zoom controls → a world map (dot-matrix land, region pins) beside a region list column → "See our assets" link.
+- Three states drive the whole block: **Live** (pulsing pins in code, "Updated N hours ago"), **Stale** (no pulse, "Last confirmed [date]", feed older than 72h), **Unavailable** (no feed: map with no pins, shorter fallback copy, no filters).
+- Reuses Filter chip, Badge ("Sample data", prototype-only) and Link. Map is a stylised dot-matrix world (brand dot motif); production ships an interactive MapLibre GL map with this as its static first-paint poster (docs/07 §3).
+- Home: straight after the Stats band, Live state, sample data — `<LiveOperations feed={liveOperations} />` (no `sample` prop, so no "Sample data" badge on the live page).
+- Open items: Mobile not built; the code's 'radar' icon (uncrewed asset type) doesn't exist in the icon set, substituted with 'drone'; the Figma map is a stylised approximation, not the real build-time Equal Earth projection. Full detail in `extract/figma-blocks-ledger.json` → `blocks["Live operations"]`.
+
 ## 3. Page coverage check
 
 | Page | Blocks, in order |
 |---|---|
-| Home | Hero Photo (Display) · Card grid Featured first (services) · Stats band · Embed 3D World · Feed Projects · Feed Latest · CTA Band |
+| Home | Hero Photo (Display) · Card grid Featured first (services) · Stats band · Live operations (§2.15, 17 Sep 2026) · Embed 3D World · Feed Projects · Feed Latest · CTA Band |
 | Services overview | Hero Text · Card grid 2 cols (Service preset) · Split media Image (crewed/uncrewed) · Feed Projects · CTA Band |
 | Service single | Hero Photo · Subnav In-page · Split media · Card grid 3 cols (capabilities) · Stats · Feed Projects (related) · Feed Assets (related) · Accordion (if FAQs exist) · CTA Band |
 | Asset single | Hero Photo (Badge status) · Split media Spec table · Gallery Photos · Feed Projects (related) · CTA Inline |

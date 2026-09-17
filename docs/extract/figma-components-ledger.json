@@ -163,7 +163,8 @@
     "Card": {
       "id": "103:1110",
       "type": "COMPONENT_SET",
-      "variants": 20,
+      "variants": 29,
+      "phase4Notes": "17 Sep 2026: Media gained a 'Stat' option (Media=Stat, Surface=White/Tint/Navy, Size=Default — 3 new variants, done prior to this session) with a new 'Stat value#246:0' TEXT property, matching Card.astro's media:'stat' variant. This session additionally changed the Media=Image bg Overlay rectangles (103:1044 Default, 103:1079 Featured) from a flat 64% navy SOLID fill to a 4-stop bottom-up GRADIENT_LINEAR, matching the 17 Sep 2026 gradient-scrim change in Card.astro.",
       "props": [
         "Title",
         "Description",
@@ -219,9 +220,10 @@
     "Header": {
       "id": "118:1065",
       "type": "COMPONENT_SET",
-      "variants": 4,
-      "variantIds": { "Desktop": "118:923", "Desktop scrolled": "118:982", "Compact": "118:1041", "Mobile": "118:1053" },
-      "layers": "Logo · Right > Nav (8 × Nav item instances) · Actions > Search, Menu (Icon button Ghost Medium)"
+      "variants": 5,
+      "variantIds": { "Desktop": "118:923", "Desktop scrolled": "118:982", "Compact": "118:1041", "Mobile": "118:1053", "Desktop overlay": "246:8985" },
+      "layers": "Logo · Right > Nav (6 × Nav item instances) · Actions > Search, Menu (Icon button Ghost Medium)",
+      "phase4Notes": "17 Sep 2026 (Q49/Q50, done prior to this session, verified in it): Nav dropped from 8 to 6 items (Services, Assets, Company, Investors, Careers, Contact — Projects and Newsroom moved into the Site menu). New 'Desktop overlay' variant added: transparent fill, Navy Color mode forced on the bar so text/icon tokens resolve white, matching Header.astro's `overlay` prop (transparent-over-hero, solid on scroll/panel-open)."
     },
     "Menu link": {
       "id": "119:1055",
@@ -241,7 +243,8 @@
       "id": "122:2417",
       "type": "COMPONENT_SET",
       "variants": 2,
-      "variantIds": { "Desktop": "122:1867", "Small desktop": "122:2143" }
+      "variantIds": { "Breakpoint=Desktop": "122:1867", "Breakpoint=1200": "122:2143" },
+      "phase4Notes": "17 Sep 2026 (Q49, done prior to this session, verified in it): reimagined per SiteMenuPanel.astro — no longer a flat sitemap. 3-column Main (Column/Links: Menu link/Large Projects, Newsroom, Events, FAQ · Card instance for the featured project · Column/Feeds: Section/Reach Newsroom + Section/Events) plus a Strip (Contact link + 3D World button). Starts at 1200 in code (900–1199 now uses the Mobile menu instead)."
     },
     "Menu accordion": {
       "id": "123:2521",
@@ -290,7 +293,8 @@
     "Variant swap sizing gotcha (verified 15 Sep on the Services mega example): a Card nested inside another component's instance, switched from a hug variant (Media=None) to the fixed-height Media=Image bg variant, keeps its hug height (264, not 520). resetOverrides, layoutSizingVertical FIXED + resize, resizeWithoutConstraints and fixed-width resize all leave it at 264, and minHeight throws 'This property cannot be overridden in an instance: min-size'. Use hug variants (None / Icon / Image top) for cards nested in panel instances; Image bg is fine as a direct instance.",
     "Header family: Nav item has 9 variants (Link has no Open). Header Nav items fill the header height (layoutSizingVertical FILL), so the bar sits on the bottom edge at 96 and 72. Menu link Current bar is absolute at x −12 (in the gutter); parent frames need clipsContent=false or it's clipped (fixed on the Menu link example group). Examples change nested instance variants with setProperties({ State: 'Open' }) / ({ Level: 'L2' }) and keep label overrides.",
     "Badge Tone=Neutral was 112×30 because its 1px inside stroke counted in layout; fixed with strokesIncludedInLayout=false (now 110×28 like the other tones).",
-    "QA audit 15 Sep: 157 top-level components/sets, 1457 nodes (instance internals skipped): 0 unbound solid fills/strokes, 0 text without a style, 0 effects without a style, 0 default layer names, 0 loose nodes at page root."
+    "QA audit 15 Sep: 157 top-level components/sets, 1457 nodes (instance internals skipped): 0 unbound solid fills/strokes, 0 text without a style, 0 effects without a style, 0 default layer names, 0 loose nodes at page root.",
+    "17 Sep 2026 (follow-up session, Live operations block — see figma-blocks-ledger.json 'blocks.Live operations'): no 'radar' icon exists in this set for the code's uncrewed-vessel asset type (src/data/live-operations.ts); substituted 'drone' (27:142). Same gap pattern as the Social feed block's missing 'thumb-up' (figma-blocks-ledger.json phase4HomeRedesign.socialFeed.openItem). No new shared components were added for this block — it reuses Badge (87:249), Filter chip (92:337), Link (68:326) and existing icons unchanged."
   ],
   "qaTodo": [
     "Client to confirm: LinkedIn URL (two on dev), street address (old Figma only), pictogram names that don't match their imagery (see figma-pictograms-ledger.json).",
