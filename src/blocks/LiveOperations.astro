@@ -488,8 +488,6 @@ const wb = WORLD_BOX;
                 const t = toggleFor(id);
                 if (!t) return;
                 select(t.getAttribute('aria-expanded') === 'true' ? null : id);
-                t.classList.add('js-focus-no-ring');
-                t.addEventListener('blur', () => t.classList.remove('js-focus-no-ring'), { once: true });
                 t.focus({ preventScroll: true });
                 if (window.matchMedia('(min-width: 900px)').matches)
                   t.closest('li')!.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
@@ -653,7 +651,7 @@ const wb = WORLD_BOX;
   /* Desktop: head across the top; filters + map in the main column, region list beside them */
   .live-ops__layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 384px;
+    grid-template-columns: minmax(0, 1fr) 420px;
     grid-template-rows: auto auto 1fr;
     grid-template-areas:
       'head head'
@@ -948,17 +946,37 @@ const wb = WORLD_BOX;
     padding: 0;
     border-top: 1px solid var(--wp--custom--color--border--subtle);
   }
+  /* The open/focused row gets its own rounded pill (below); its top hairline would cut
+     across that shape, so drop it when that row is first. */
+  .live-ops__regions:has(> .live-ops__region:first-child:is(.is-open, :has(.live-ops__region-toggle:focus-visible))) {
+    border-top-color: transparent;
+  }
   .live-ops__region {
     border-bottom: 1px solid var(--wp--custom--color--border--subtle);
     transition: background-color 200ms var(--wp--custom--motion--easing);
   }
-  .live-ops__region.is-hover,
-  .live-ops__region.is-open {
+  .live-ops__region.is-hover {
     background-color: var(--wp--custom--color--alpha--navy-8);
   }
-  .live-ops.has-surface-navy .live-ops__region.is-hover,
-  .live-ops.has-surface-navy .live-ops__region.is-open {
+  .live-ops.has-surface-navy .live-ops__region.is-hover {
     background-color: rgb(255 255 255 / 0.05);
+  }
+  /* Open (persistent) or keyboard-focused (transient, from Tab or a marker click moving
+     focus here): a solid fill reads better here than the sage focus outline, which looked
+     like a stray line rather than a highlighted row. Rounded on all four corners, so the
+     hairline above and below has to give way too (this rule and the two around it). */
+  .live-ops__region.is-open,
+  .live-ops__region:has(.live-ops__region-toggle:focus-visible) {
+    background-color: var(--wp--custom--color--alpha--navy-16);
+    border-radius: var(--wp--custom--radius--md);
+    border-bottom-color: transparent;
+  }
+  .live-ops.has-surface-navy .live-ops__region.is-open,
+  .live-ops.has-surface-navy .live-ops__region:has(.live-ops__region-toggle:focus-visible) {
+    background-color: var(--wp--preset--color--navy-900);
+  }
+  .live-ops__region:has(+ .live-ops__region:is(.is-open, :has(.live-ops__region-toggle:focus-visible))) {
+    border-bottom-color: transparent;
   }
   .live-ops__region-heading {
     margin: 0;
@@ -970,19 +988,16 @@ const wb = WORLD_BOX;
     grid-template-areas: 'name chevron' 'meta chevron';
     align-items: center;
     column-gap: var(--wp--preset--spacing--12);
-    row-gap: 2px;
+    row-gap: var(--wp--preset--spacing--4);
     width: 100%;
-    padding: var(--wp--preset--spacing--12);
+    padding: var(--wp--preset--spacing--16);
     text-align: start;
     color: var(--wp--custom--color--text--primary);
   }
+  /* The fill above (on .live-ops__region) is the focus indicator here, so the row's own
+     outline is off — including for the mismatched :focus-visible some browsers report when
+     a marker click moves focus in (harmless now: it paints the same fill as .is-open). */
   .live-ops__region-toggle:focus-visible {
-    outline: 2px solid var(--wp--custom--color--border--focus);
-    outline-offset: -2px;
-  }
-  /* Focus moved here from a marker click (below), not a keyboard action: some browsers'
-     :focus-visible heuristic still rings it because the focused element isn't the one clicked. */
-  .live-ops__region-toggle.js-focus-no-ring:focus-visible {
     outline: none;
   }
   .live-ops__region-name {
@@ -1031,7 +1046,7 @@ const wb = WORLD_BOX;
   .live-ops__ops {
     list-style: none;
     margin: 0;
-    padding: var(--wp--preset--spacing--4) var(--wp--preset--spacing--12) var(--wp--preset--spacing--16);
+    padding: var(--wp--preset--spacing--8) var(--wp--preset--spacing--16) var(--wp--preset--spacing--20);
     display: grid;
     gap: var(--wp--preset--spacing--16);
   }
@@ -1140,7 +1155,7 @@ const wb = WORLD_BOX;
 
   @media (max-width: 1199px) {
     .live-ops__layout {
-      grid-template-columns: minmax(0, 1fr) 320px;
+      grid-template-columns: minmax(0, 1fr) 352px;
       column-gap: var(--wp--preset--spacing--32);
     }
     .live-ops__region-meta {
