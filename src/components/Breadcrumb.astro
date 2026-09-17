@@ -1,0 +1,104 @@
+---
+// Breadcrumb (docs/04 §11): Desktop shows every crumb (links text/secondary, chevron-right 16
+// separators border/strong, current page text/primary aria-current). Mobile (<600) collapses to
+// chevron-left 16 + the immediate parent link only. Sits above the Page hero title (depth ≥ 3).
+import Icon from './Icon.astro';
+
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+  class?: string;
+}
+
+const { items, class: className } = Astro.props;
+const parent = items.length > 1 ? items[items.length - 2] : undefined;
+---
+
+{
+  items.length > 0 && (
+    <nav aria-label="Breadcrumb" class:list={['breadcrumb', className]}>
+      <ol class="breadcrumb__list">
+        {items.map((item, i) => {
+          const isCurrent = i === items.length - 1;
+          return (
+            <li class="breadcrumb__item">
+              {!isCurrent && item.href ? (
+                <a class="breadcrumb__link text-label" href={item.href}>
+                  {item.label}
+                </a>
+              ) : (
+                <span class="breadcrumb__current text-label" aria-current={isCurrent ? 'page' : undefined}>
+                  {item.label}
+                </span>
+              )}
+              {!isCurrent && <Icon name="chevron-right" size={16} class="breadcrumb__sep" />}
+            </li>
+          );
+        })}
+      </ol>
+      {parent && (
+        <a class="breadcrumb__mobile-link text-label" href={parent.href}>
+          <Icon name="chevron-left" size={16} />
+          <span>{parent.label}</span>
+        </a>
+      )}
+    </nav>
+  )
+}
+
+<style is:global>
+  .breadcrumb__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .breadcrumb__item {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    min-width: 0;
+  }
+  .breadcrumb__link {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .breadcrumb__link:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .breadcrumb__current {
+    color: var(--wp--custom--color--text--primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .breadcrumb__sep {
+    flex: none;
+    color: var(--wp--custom--color--border--strong);
+  }
+  .breadcrumb__mobile-link {
+    display: none;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .breadcrumb__mobile-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    color: var(--wp--custom--color--text--primary);
+  }
+
+  @media (max-width: 599px) {
+    .breadcrumb__list {
+      display: none;
+    }
+    .breadcrumb__mobile-link {
+      display: inline-flex;
+    }
+  }
+</style>

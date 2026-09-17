@@ -1,0 +1,79 @@
+---
+// Header review: every state of the header family, each in a Desktop 1440 iframe (scaled to fit,
+// like /blocks) and a genuine Mobile 375 iframe. Reuses src/review/ReviewLayout + review.css;
+// ReviewLayout's fit script scans the whole page for `.rv-vp__screen`, so this plain markup (shaped
+// like ReviewBlock's output) gets the same auto-fit behaviour without a bespoke component.
+// Source of truth: docs/04-components-spec.md §16, docs/extract/header-recommendation.md.
+import ReviewLayout from '../../review/ReviewLayout.astro';
+
+interface StateEntry {
+  id: string;
+  name: string;
+  query: string;
+}
+
+const states: StateEntry[] = [
+  { id: 'closed', name: 'Closed (current = Investors)', query: 'current=investors' },
+  { id: 'services', name: 'Services panel open', query: 'state=services&current=investors' },
+  { id: 'assets', name: 'Assets panel open', query: 'state=assets&current=investors' },
+  { id: 'projects', name: 'Projects panel open', query: 'state=projects&current=investors' },
+  { id: 'company', name: 'Company panel open', query: 'state=company&current=investors' },
+  { id: 'investors', name: 'Investors panel open', query: 'state=investors&current=investors' },
+  { id: 'careers', name: 'Careers panel open', query: 'state=careers&current=investors' },
+  { id: 'newsroom', name: 'Newsroom panel open', query: 'state=newsroom&current=investors' },
+  { id: 'site-menu', name: 'Site menu open (desktop)', query: 'state=site-menu&current=investors' },
+  { id: 'search', name: 'Search open (desktop + mobile)', query: 'state=search' },
+  { id: 'mobile-menu', name: 'Mobile menu open, Investors expanded', query: 'state=mobile-menu&current=investors' },
+  { id: 'scrolled', name: 'Scrolled (72, shadow)', query: 'state=scrolled&current=investors' },
+];
+---
+
+<ReviewLayout title="Header review · Reach Subsea 2027">
+  <header class="rv-intro">
+    <h1 class="text-h2">Header family</h1>
+    <p class="text-small">
+      Logo, primary nav, Mega menu (×7), Site menu, Mobile menu and Search — docs/04-components-spec.md §16. Each
+      state below is a query string on the same frame: the header itself always renders closed at build time (this
+      is a static site), and a small inline script in the frame opens the right panel client-side by clicking the
+      real trigger — see src/pages/header/frame.astro.
+    </p>
+  </header>
+  {
+    states.map((state) => {
+      const frame = `/header/frame/?${state.query}`;
+      return (
+        <section class="rv-block" id={state.id} aria-labelledby={`rv-title-${state.id}`}>
+          <header class="rv-block__header">
+            <div class="rv-block__heading">
+              <p class="rv-block__meta">
+                <code>?{state.query}</code>
+              </p>
+              <h2 id={`rv-title-${state.id}`} class="rv-block__title">
+                {state.name}
+              </h2>
+            </div>
+            <p class="rv-block__links">
+              <a href={frame} target="_blank">
+                Open frame
+              </a>
+            </p>
+          </header>
+          <div class="rv-block__viewports">
+            <figure class="rv-vp rv-vp--desktop">
+              <figcaption>Desktop · 1440</figcaption>
+              <div class="rv-vp__screen" data-width="1440">
+                <iframe src={frame} title={`${state.name}, Desktop 1440`} width="1440" loading="lazy" />
+              </div>
+            </figure>
+            <figure class="rv-vp rv-vp--mobile">
+              <figcaption>Mobile · 375</figcaption>
+              <div class="rv-vp__screen" data-width="375">
+                <iframe src={frame} title={`${state.name}, Mobile 375`} width="375" loading="lazy" />
+              </div>
+            </figure>
+          </div>
+        </section>
+      );
+    })
+  }
+</ReviewLayout>

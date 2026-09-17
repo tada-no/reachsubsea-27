@@ -1,0 +1,32 @@
+---
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/700.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+interface Props {
+  title: string;
+  bodyClass?: string;
+  /** Scroll reveal + count-up (src/scripts/motion.ts). Off for the block review pages. */
+  motion?: boolean;
+}
+
+const { title, bodyClass, motion = false } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{title}</title>
+    {/* Reveal styles only apply once JS is known to run, so content is never hidden without it. */}
+    {motion && <script is:inline>document.documentElement.classList.add('js');</script>}
+  </head>
+  <body class={bodyClass}>
+    <slot />
+    {motion && <script>import '../scripts/motion.ts';</script>}
+  </body>
+</html>

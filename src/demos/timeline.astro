@@ -1,0 +1,41 @@
+---
+import Timeline from '../blocks/Timeline.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+import type { MilestoneField } from '../blocks/Timeline.astro';
+
+const remote34Header = {
+  eyebrow: 'Fleet',
+  title: 'Building Reach Remote 3 & 4',
+  intro: 'A phased build programme from contract signature through sea trials to delivery.',
+};
+
+const remote34Milestones: MilestoneField[] = [
+  { date: 'Q3 2024', title: 'Contract signed', text: 'Construction contract signed with the shipyard for two new vessels.', status: 'done' },
+  { date: 'Q1 2025', title: 'Construction starts', text: 'Steel cutting and keel laying begin at the yard.', status: 'done' },
+  { date: 'Q2 2026', title: 'Sea trials', text: 'Vessels undergo sea trials ahead of handover.', status: 'current' },
+  { date: 'Q4 2026', title: 'Delivery', text: 'Vessels are delivered and prepared for operations.', status: 'upcoming' },
+  { date: 'Q1 2027', title: 'Into service', text: 'Reach Remote 3 & 4 enter service with clients.', status: 'upcoming' },
+];
+
+const historyHeader = {
+  title: 'Our story',
+  intro: 'From a single survey vessel to a fleet operating remotely across the North Sea and beyond.',
+};
+
+const historyMilestones: MilestoneField[] = [
+  { date: '2008', title: 'Company founded', text: 'Reach Subsea is established to deliver subsea survey and inspection services.', status: 'done' },
+  { date: '2013', title: 'First remote operations', text: 'Early trials of remotely operated survey work begin.', status: 'done' },
+  { date: '2019', title: 'Fleet expansion', text: 'The fleet grows to support larger offshore wind and oil & gas campaigns.', status: 'done' },
+  { date: '2021', title: 'Listed on Euronext Growth', text: 'Reach Subsea lists on Euronext Growth Oslo.', status: 'done' },
+  { date: '2024', title: 'Reach Remote programme', text: 'Construction begins on the next generation of remote-operations vessels.', status: 'done' },
+];
+---
+
+<VariantLabel name="Base" props="sectionHeader milestones (Done · Done · Current · Upcoming · Upcoming)" />
+<Timeline sectionHeader={remote34Header} milestones={remote34Milestones} />
+
+<VariantLabel name="Example · Reach Remote 3 & 4 on Tint" props='background="tint"' />
+<Timeline background="tint" sectionHeader={remote34Header} milestones={remote34Milestones} />
+
+<VariantLabel name="Example · Company history on Navy" props='background="navy" milestones (all Done)' />
+<Timeline background="navy" sectionHeader={historyHeader} milestones={historyMilestones} />

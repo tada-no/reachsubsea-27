@@ -1,0 +1,99 @@
+---
+// Timeline · reach/timeline (docs/05 §2.8). Section header cols 1–4 (416) beside the milestone
+// list cols 5–12 (752) on Desktop; stacked on Mobile, same markup throughout. Milestones render
+// the shared Milestone part (src/components/Milestone.astro); status may be given explicitly or
+// derived from `isoDate` against today.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Milestone from '../components/Milestone.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+
+export interface MilestoneField {
+  date: string;
+  title: string;
+  text?: string;
+  status?: 'done' | 'current' | 'upcoming';
+  /** Compared against today ("2026-09-15") to derive status when `status` is omitted. */
+  isoDate?: string;
+}
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  milestones: MilestoneField[];
+}
+
+const { sectionHeader, milestones = [], background, spacing, anchor } = Astro.props;
+
+const titleId = sectionHeader ? makeId('timeline', sectionHeader.title) : undefined;
+
+function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
+  if (m.status) return m.status;
+  if (!m.isoDate) return 'upcoming';
+  const today = new Date().toISOString().slice(0, 10);
+  if (m.isoDate < today) return 'done';
+  if (m.isoDate === today) return 'current';
+  return 'upcoming';
+}
+---
+
+{
+  milestones.length > 0 && (
+    <BlockSection
+      slug="timeline"
+      root="timeline"
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : 'Timeline'}
+    >
+      <div class="timeline__inner">
+        {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} class="timeline__header" />}
+        <ol class="timeline__list">
+          {milestones.map((m, i) => (
+            <Milestone
+              date={m.date}
+              title={m.title}
+              text={m.text}
+              status={deriveStatus(m)}
+              showLine={i !== milestones.length - 1}
+            />
+          ))}
+        </ol>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .timeline__inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .timeline__header {
+    flex: 0 0 416px;
+    max-width: 416px;
+  }
+  .timeline__list {
+    flex: 1 1 0%;
+    min-width: 0;
+    max-width: 752px;
+  }
+
+  @media (max-width: 899px) {
+    .timeline__inner {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--wp--custom--stack--xl);
+    }
+    .timeline__header,
+    .timeline__list {
+      flex: none;
+      max-width: none;
+      width: 100%;
+    }
+  }
+</style>

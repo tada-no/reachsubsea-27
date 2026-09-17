@@ -1,0 +1,232 @@
+---
+// Footer (docs/04 §17). Navy mode always, regardless of the page it sits on. Top row on the 12-col
+// grid: brand (4 cols: logo, tagline) + 4 link columns. LinkedIn/Facebook are text links under Get in touch (dev site).
+// (2 cols each). Divider, then a legal row (copyright + Transparency Act + Privacy & Cookie Policy).
+// Mobile: everything stacks (brand, then the 4 link columns, then the legal row).
+import fs from 'node:fs';
+import path from 'node:path';
+import Eyebrow from './Eyebrow.astro';
+import { socialLinks, legalLinks } from '../data/navigation';
+import { worldPath } from '../data/world';
+
+interface FooterLink {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+interface FooterColumn {
+  title: string;
+  links: FooterLink[];
+}
+
+const columns: FooterColumn[] = [
+  {
+    title: 'Services & Assets',
+    links: [
+      { label: 'Subsea', href: '/services/subsea/' },
+      { label: 'Survey', href: '/services/survey/' },
+      { label: 'Monitoring', href: '/services/monitoring/' },
+      { label: 'Explore 3D World', href: worldPath },
+      { label: 'Fleet overview', href: '/assets/' },
+      { label: 'Reach Remote', href: '/assets/reach-remote/' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About us', href: '/company/' },
+      { label: 'Leadership & Board', href: '/company/leadership-board/' },
+      { label: 'HSEQ', href: '/company/hseq/' },
+      { label: 'Sustainability', href: '/company/sustainability/' },
+      { label: 'Contact', href: '/contact/' },
+    ],
+  },
+  {
+    title: 'Explore',
+    links: [
+      { label: 'Projects', href: '/projects/' },
+      { label: 'Investors', href: '/investors/' },
+      { label: 'Careers', href: '/careers/' },
+      { label: 'Newsroom', href: '/newsroom/' },
+      { label: 'Events', href: '/newsroom/events/' },
+      { label: 'FAQ', href: '/faq/' },
+    ],
+  },
+];
+
+const logoSvg = fs.readFileSync(path.join(process.cwd(), 'src/assets/logo.svg'), 'utf8');
+const logoInner = logoSvg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+---
+
+<footer class="site-footer has-surface-navy">
+  <div class="container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <a class="site-footer__logo" href="/" aria-label="Reach Subsea, homepage">
+          <svg viewBox="0 0 147 32" aria-hidden="true" focusable="false" set:html={logoInner} />
+        </a>
+        <p class="text-h4 site-footer__tagline">Transforming the way we work <span class="site-footer__tagline-accent">in the ocean.</span></p>
+      </div>
+
+      {
+        columns.map((column) => (
+          <nav class="site-footer__column" aria-label={column.title}>
+            <Eyebrow text={column.title} as="p" />
+            <ul class="site-footer__list">
+              {column.links.map((link) => (
+                <li>
+                  <a
+                    class="text-small site-footer__link"
+                    href={link.href}
+                    target={link.external ? '_blank' : undefined}
+                    rel={link.external ? 'noopener noreferrer' : undefined}
+                  >
+                    {link.label}
+                    {link.external && <span class="visually-hidden"> (opens in a new tab)</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+
+      <div class="site-footer__column">
+        <Eyebrow text="Get in touch" as="p" />
+        <ul class="site-footer__list">
+          <li><a class="text-small site-footer__link" href="mailto:post@reachsubsea.com">post@reachsubsea.com</a></li>
+          {
+            socialLinks.map((social) => (
+              <li>
+                <a class="text-small site-footer__link" href={social.href} target="_blank" rel="noopener noreferrer">
+                  {social.label}
+                  <span class="visually-hidden"> (opens in a new tab)</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__legal">
+      <p class="text-caption">© 2027 Reach Subsea ASA. All rights reserved.</p>
+      <ul class="site-footer__legal-links">
+        {
+          legalLinks.map((link) => (
+            <li>
+              <a class="text-caption" href={link.url}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style is:global>
+  .site-footer.has-surface-navy {
+    /* navy/900 (Navy mode's bg/tint), a step darker than the navy/800 CTA above it (17 Sep 2026) */
+    background-color: var(--wp--custom--color--bg--tint);
+    padding-top: var(--wp--custom--section--md);
+    padding-bottom: var(--wp--preset--spacing--40);
+  }
+  .site-footer__top {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--wp--custom--stack--xl) var(--wp--custom--grid--gutter);
+    padding-bottom: var(--wp--custom--stack--xl);
+  }
+  .site-footer__brand {
+    grid-column: span 12;
+  }
+  .site-footer__column {
+    /* Mobile is a 2×2 grid of link columns, not one stacked column (docs/04 §17). */
+    grid-column: span 6;
+  }
+  .site-footer__brand {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .site-footer__logo {
+    display: block;
+    width: fit-content;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .site-footer__logo svg {
+    display: block;
+    width: 147px;
+    height: 32px;
+  }
+  /* Tagline as a statement (17 Sep 2026): H4, white, the last words in sage. On desktop it drops to
+     the bottom of the brand column, level with the last link of the longest column. */
+  .site-footer__tagline {
+    margin-top: var(--wp--preset--spacing--16);
+    max-width: 14ch;
+    color: var(--wp--custom--color--text--primary);
+    text-wrap: balance;
+  }
+  .site-footer__tagline-accent {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .site-footer__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+    margin-top: var(--wp--preset--spacing--16);
+  }
+  .site-footer__link {
+    display: inline-block;
+    color: var(--wp--custom--color--text--secondary);
+    text-decoration: none;
+  }
+  a.site-footer__link:hover {
+    color: var(--wp--custom--color--text--primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .site-footer__legal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--16);
+    padding-top: var(--wp--preset--spacing--32);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .site-footer__legal-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--24);
+  }
+  .site-footer__legal-links a {
+    color: var(--wp--custom--color--text--secondary);
+    text-decoration: none;
+  }
+  .site-footer__legal-links a:hover {
+    color: var(--wp--custom--color--text--primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  @media (min-width: 900px) {
+    .site-footer__brand {
+      grid-column: span 4;
+    }
+    .site-footer__tagline {
+      margin-top: auto;
+      /* Boxes align at the bottom; the larger type's baseline sits ~2px higher than the links' */
+      margin-bottom: -2px;
+    }
+    .site-footer__column {
+      grid-column: span 2;
+    }
+    .site-footer__legal {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+</style>

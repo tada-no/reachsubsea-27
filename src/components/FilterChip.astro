@@ -1,0 +1,75 @@
+---
+// Filter chip (docs/04 §10). Selected = aria-pressed="true" (navy fill + check icon).
+import Icon from './Icon.astro';
+
+interface Props {
+  label: string;
+  count?: number | string;
+  selected?: boolean;
+  disabled?: boolean;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { label, count, selected = false, disabled = false, class: className, ...attrs } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={['filter-chip', 'text-label', className]}
+  aria-pressed={String(selected)}
+  disabled={disabled}
+  {...attrs}
+>
+  <Icon name="check" size={16} class="filter-chip__check" />
+  <span class="filter-chip__label">{label}</span>
+  {count !== undefined && <span class="filter-chip__count">{count}</span>}
+</button>
+
+<style is:global>
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    min-height: 40px;
+    padding-inline: var(--wp--preset--spacing--16);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--bg--default);
+    color: var(--wp--custom--color--text--primary);
+    box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--default);
+    white-space: nowrap;
+    transition:
+      background-color var(--wp--custom--motion--duration) var(--wp--custom--motion--easing),
+      box-shadow var(--wp--custom--motion--duration) var(--wp--custom--motion--easing);
+  }
+  .filter-chip__check {
+    display: none;
+  }
+  .filter-chip__count {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .filter-chip[aria-pressed='true'] {
+    background-color: var(--wp--custom--color--action--primary--bg);
+    color: var(--wp--custom--color--action--primary--fg);
+    box-shadow: none;
+  }
+  .filter-chip[aria-pressed='true'] .filter-chip__check {
+    display: block;
+  }
+  .filter-chip[aria-pressed='true'] .filter-chip__count {
+    color: inherit;
+  }
+
+  @media (hover: hover) {
+    .filter-chip:not(:disabled, [aria-pressed='true']):hover {
+      background-color: var(--wp--custom--color--action--outline--bg-hover);
+      box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--strong);
+    }
+  }
+
+  .filter-chip:disabled {
+    cursor: not-allowed;
+    color: var(--wp--custom--color--text--disabled);
+    box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--subtle);
+  }
+</style>

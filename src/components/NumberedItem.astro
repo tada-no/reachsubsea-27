@@ -1,0 +1,59 @@
+---
+// Numbered item (docs/05 §1). Number is Heading/H4 text/accent from a CSS counter (01, 02…, via
+// decimal-leading-zero) — the parent list sets `counter-reset: numbered-item` once (Split media's
+// Numbered list media sets it on .split-media__list). Desktop: number column 80px + text.
+// Mobile (≤899): stacked. Top 1px border/subtle, padding y space/24.
+interface Props {
+  title: string;
+  text: string;
+  /** Visual style is independent of level (docs/05 §0); default h3 matches other item titles. */
+  headingLevel?: 'h3' | 'h4';
+  class?: string;
+}
+
+const { title, text, headingLevel: Heading = 'h3', class: className } = Astro.props;
+---
+
+<li class:list={['numbered-item', className]}>
+  <span class="numbered-item__number text-h4" aria-hidden="true"></span>
+  <div class="numbered-item__body">
+    <Heading class="numbered-item__title text-h5">{title}</Heading>
+    <p class="numbered-item__text text-small">{text}</p>
+  </div>
+</li>
+
+<style is:global>
+  .numbered-item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: var(--wp--preset--spacing--16);
+    padding-block: var(--wp--preset--spacing--24);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .numbered-item__number {
+    counter-increment: numbered-item;
+    color: var(--wp--custom--color--text--accent);
+  }
+  .numbered-item__number::before {
+    content: counter(numbered-item, decimal-leading-zero);
+  }
+  .numbered-item__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xs);
+    min-width: 0;
+  }
+  .numbered-item__title {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .numbered-item__text {
+    color: var(--wp--custom--color--text--secondary);
+  }
+
+  @media (max-width: 899px) {
+    .numbered-item {
+      grid-template-columns: 1fr;
+      gap: var(--wp--custom--stack--xs);
+    }
+  }
+</style>

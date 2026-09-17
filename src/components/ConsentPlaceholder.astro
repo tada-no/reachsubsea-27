@@ -1,0 +1,67 @@
+---
+// Consent placeholder (docs/05 §1, docs/04 shared parts). Stands in for a third-party embed until
+// the visitor accepts that provider: bg/tint, radius/lg, Pictogram 64, H5 title, Body/Small text
+// (max 560), Button Outline Small "Load …" + Link External Small "Open … in a new tab". Centred
+// (part-consent.png). The Load button carries `loadAttrs` (e.g. a `data-*` hook) so the block that
+// owns the real embed can wire the click; this component has no JS of its own.
+import Button from './Button.astro';
+import Link from './Link.astro';
+import Pictogram from './Pictogram.astro';
+
+interface Props {
+  pictogram?: string;
+  title: string;
+  text: string;
+  loadLabel?: string;
+  openLabel?: string;
+  openHref?: string;
+  loadAttrs?: Record<string, string>;
+  class?: string;
+}
+
+const {
+  pictogram = 'shield-tick',
+  title,
+  text,
+  loadLabel = 'Load content',
+  openLabel = 'Open in a new tab',
+  openHref,
+  loadAttrs = {},
+  class: className,
+} = Astro.props;
+---
+
+<div class:list={['consent-placeholder', className]}>
+  <Pictogram name={pictogram} size={64} />
+  <p class="consent-placeholder__title text-h5">{title}</p>
+  <p class="consent-placeholder__text text-small">{text}</p>
+  <div class="consent-placeholder__actions">
+    <Button label={loadLabel} variant="outline" size="small" {...loadAttrs} />
+    {openHref && <Link label={openLabel} href={openHref} action="external" size="small" />}
+  </div>
+</div>
+
+<style is:global>
+  .consent-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16);
+    padding: var(--wp--preset--spacing--48) var(--wp--preset--spacing--24);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--tint);
+    text-align: center;
+  }
+  .consent-placeholder__text {
+    max-width: 560px;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .consent-placeholder__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wp--preset--spacing--12) var(--wp--preset--spacing--24);
+    margin-top: var(--wp--preset--spacing--8);
+  }
+</style>

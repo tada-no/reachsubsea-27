@@ -1,0 +1,94 @@
+---
+// Icon button (docs/04 §5): round, same colours as Button, plus Ghost. `label` is required (aria-label).
+import Icon from './Icon.astro';
+
+interface Props {
+  icon: string;
+  label: string;
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  size?: 'medium' | 'small';
+  disabled?: boolean;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const {
+  icon,
+  label,
+  href,
+  variant = 'ghost',
+  size = 'medium',
+  disabled = false,
+  class: className,
+  ...attrs
+} = Astro.props;
+
+const Tag = href && !disabled ? 'a' : 'button';
+---
+
+<Tag
+  class:list={['icon-btn', `icon-btn--${variant}`, size === 'small' && 'icon-btn--small', className]}
+  href={Tag === 'a' ? href : undefined}
+  type={Tag === 'button' ? 'button' : undefined}
+  disabled={Tag === 'button' ? disabled : undefined}
+  aria-label={label}
+  {...attrs}
+>
+  <Icon name={icon} size={size === 'small' ? 20 : 24} />
+</Tag>
+
+<style is:global>
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: transparent;
+    color: var(--wp--custom--color--icon--primary);
+    transition: background-color var(--wp--custom--motion--duration) var(--wp--custom--motion--easing);
+  }
+  .icon-btn--small {
+    width: 40px;
+    height: 40px;
+  }
+  .icon-btn--primary {
+    background-color: var(--wp--custom--color--action--primary--bg);
+    color: var(--wp--custom--color--action--primary--fg);
+  }
+  .icon-btn--secondary {
+    background-color: var(--wp--custom--color--action--secondary--bg);
+    color: var(--wp--custom--color--action--secondary--fg);
+  }
+  .icon-btn--outline {
+    color: var(--wp--custom--color--action--outline--fg);
+    box-shadow: inset 0 0 0 2px var(--wp--custom--color--action--outline--border);
+  }
+
+  @media (hover: hover) {
+    .icon-btn--primary:not(:disabled):hover {
+      background-color: var(--wp--custom--color--action--primary--bg-hover);
+    }
+    .icon-btn--secondary:not(:disabled):hover {
+      background-color: var(--wp--custom--color--action--secondary--bg-hover);
+    }
+    .icon-btn--outline:not(:disabled):hover,
+    .icon-btn--ghost:not(:disabled):hover {
+      background-color: var(--wp--custom--color--action--outline--bg-hover);
+    }
+  }
+
+  .icon-btn:disabled {
+    cursor: not-allowed;
+    color: var(--wp--custom--color--text--disabled);
+  }
+  .icon-btn--primary:disabled,
+  .icon-btn--secondary:disabled {
+    background-color: var(--wp--custom--color--bg--disabled);
+  }
+  .icon-btn--outline:disabled {
+    box-shadow: inset 0 0 0 2px var(--wp--custom--color--border--default);
+  }
+</style>

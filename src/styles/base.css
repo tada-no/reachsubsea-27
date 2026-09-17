@@ -1,0 +1,329 @@
+/*
+ * Base styles: reset, Figma text styles as classes, container + grid, block surfaces and spacing.
+ * Breakpoints (docs/02 §6): <600 mobile · 600–899 tablet · 900–1199 small desktop · ≥1200 desktop.
+ */
+
+/* ── Reset ─────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--wp--preset--font-family--inter);
+  font-size: var(--wp--preset--font-size--body);
+  line-height: var(--wp--custom--line-height--body);
+  color: var(--wp--custom--color--text--primary);
+  background-color: var(--wp--custom--color--bg--default);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, ol, ul {
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: var(--wp--custom--font-weight--bold);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+ol, ul {
+  padding: 0;
+  list-style: none;
+}
+
+img, svg, video, iframe {
+  display: block;
+  max-width: 100%;
+}
+
+button, input, select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--wp--custom--color--border--focus);
+  outline-offset: 2px;
+}
+
+/* Scripts toggle `hidden`; component display rules must never override it */
+[hidden] {
+  display: none !important;
+}
+
+/* ── Text styles (Figma text style → class) ───────────────── */
+.text-display {
+  font-size: var(--wp--preset--font-size--display);
+  line-height: var(--wp--custom--line-height--display);
+  font-weight: var(--wp--custom--font-weight--bold);
+  letter-spacing: var(--wp--custom--letter-spacing--display);
+}
+.text-h1 {
+  font-size: var(--wp--preset--font-size--h1);
+  line-height: var(--wp--custom--line-height--h1);
+  font-weight: var(--wp--custom--font-weight--bold);
+  letter-spacing: var(--wp--custom--letter-spacing--h1);
+}
+.text-h2 {
+  font-size: var(--wp--preset--font-size--h2);
+  line-height: var(--wp--custom--line-height--h2);
+  font-weight: var(--wp--custom--font-weight--bold);
+  letter-spacing: var(--wp--custom--letter-spacing--h2);
+}
+.text-h3 {
+  font-size: var(--wp--preset--font-size--h3);
+  line-height: var(--wp--custom--line-height--h3);
+  font-weight: var(--wp--custom--font-weight--bold);
+  letter-spacing: var(--wp--custom--letter-spacing--h3);
+}
+.text-h4 {
+  font-size: var(--wp--preset--font-size--h4);
+  line-height: var(--wp--custom--line-height--h4);
+  font-weight: var(--wp--custom--font-weight--bold);
+}
+.text-h5 {
+  font-size: var(--wp--preset--font-size--h5);
+  line-height: var(--wp--custom--line-height--h5);
+  font-weight: var(--wp--custom--font-weight--bold);
+}
+.text-lead {
+  font-size: var(--wp--preset--font-size--lead);
+  line-height: var(--wp--custom--line-height--lead);
+  font-weight: var(--wp--custom--font-weight--regular);
+}
+.text-body {
+  font-size: var(--wp--preset--font-size--body);
+  line-height: var(--wp--custom--line-height--body);
+  font-weight: var(--wp--custom--font-weight--regular);
+}
+.text-small {
+  font-size: var(--wp--preset--font-size--body-sm);
+  line-height: var(--wp--custom--line-height--body-sm);
+  font-weight: var(--wp--custom--font-weight--regular);
+}
+.text-caption {
+  font-size: var(--wp--preset--font-size--caption);
+  line-height: var(--wp--custom--line-height--caption);
+  font-weight: var(--wp--custom--font-weight--regular);
+}
+.text-eyebrow {
+  font-size: var(--wp--preset--font-size--eyebrow);
+  line-height: var(--wp--custom--line-height--eyebrow);
+  font-weight: var(--wp--custom--font-weight--bold);
+  letter-spacing: var(--wp--custom--letter-spacing--eyebrow);
+  text-transform: uppercase;
+}
+.text-label {
+  font-size: var(--wp--preset--font-size--label);
+  line-height: var(--wp--custom--line-height--label);
+  font-weight: var(--wp--custom--font-weight--medium);
+}
+.text-button {
+  font-size: var(--wp--preset--font-size--button);
+  line-height: var(--wp--custom--line-height--button);
+  font-weight: var(--wp--custom--font-weight--bold);
+}
+.text-button-sm {
+  font-size: var(--wp--preset--font-size--button-sm);
+  line-height: var(--wp--custom--line-height--button-sm);
+  font-weight: var(--wp--custom--font-weight--bold);
+}
+
+.color-secondary {
+  color: var(--wp--custom--color--text--secondary);
+}
+.color-accent {
+  color: var(--wp--custom--color--text--accent);
+}
+
+/* ── Container + 12-column grid ────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: calc(
+    var(--wp--style--global--wide-size) + var(--wp--style--root--padding-left) +
+      var(--wp--style--root--padding-right)
+  );
+  margin-inline: auto;
+  padding-inline: var(--wp--style--root--padding-left) var(--wp--style--root--padding-right);
+}
+
+.content-width {
+  max-width: var(--wp--style--global--content-size);
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--wp--custom--grid--columns), minmax(0, 1fr));
+  column-gap: var(--wp--custom--grid--gutter);
+}
+
+@media (max-width: 599px) {
+  :root {
+    --wp--custom--grid--columns: 4;
+  }
+}
+
+/* ── Blocks: surfaces and vertical spacing (docs/05 §0) ───── */
+.block {
+  position: relative;
+  padding-block: var(--wp--custom--section--md);
+  background-color: var(--wp--custom--color--bg--default);
+  color: var(--wp--custom--color--text--primary);
+}
+
+.block.has-spacing-sm {
+  padding-block: var(--wp--custom--section--sm);
+}
+.block.has-spacing-lg {
+  padding-block: var(--wp--custom--section--lg);
+}
+
+.has-surface-tint {
+  background-color: var(--wp--custom--color--bg--tint);
+}
+.has-surface-navy {
+  background-color: var(--wp--custom--color--bg--default);
+  color: var(--wp--custom--color--text--primary);
+}
+
+/* Two adjacent Tint or Navy blocks: the second drops its top padding, so the colour band reads as one
+   section. Adjacent White blocks keep both paddings (17 Sep 2026): on white there is no colour change
+   to mark the break, so the doubled gap does it. `script` siblings (block scripts) are skipped. */
+.block.has-surface-tint + .block.has-surface-tint,
+.block.has-surface-tint + script + .block.has-surface-tint,
+.block.has-surface-navy + .block.has-surface-navy,
+.block.has-surface-navy + script + .block.has-surface-navy {
+  padding-top: 0;
+}
+
+/* Gap between a Section header and the block content */
+.block__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wp--custom--stack--xl);
+}
+
+/* ── Core content (Heading, Paragraph, List… in the 880 column) ── */
+.prose {
+  color: var(--wp--custom--color--text--secondary);
+}
+.prose > * + * {
+  margin-top: var(--wp--custom--stack--sm);
+}
+.prose p,
+.prose li {
+  font-size: var(--wp--preset--font-size--body);
+  line-height: var(--wp--custom--line-height--body);
+}
+.prose ul {
+  list-style: disc;
+  padding-left: 1.25em;
+}
+.prose ol {
+  list-style: decimal;
+  padding-left: 1.25em;
+}
+.prose strong {
+  color: var(--wp--custom--color--text--primary);
+}
+.prose a {
+  color: var(--wp--custom--color--text--primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.prose a:hover {
+  color: var(--wp--custom--color--text--accent);
+}
+
+/* ── Utilities ─────────────────────────────────────────────── */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Sideways-scrolling row (chips, tabs on mobile) */
+.scroll-row {
+  display: flex;
+  gap: var(--wp--preset--spacing--8);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--wp--style--root--padding-left);
+  scrollbar-width: none;
+  margin-inline: calc(-1 * var(--wp--style--root--padding-left));
+  padding-inline: var(--wp--style--root--padding-left);
+}
+.scroll-row::-webkit-scrollbar {
+  display: none;
+}
+.scroll-row > * {
+  flex: none;
+  scroll-snap-align: start;
+}
+
+/* ── Scroll reveal (src/scripts/motion.ts) ─────────────────────
+   Only active once the inline head script has set `html.js`, so content is never hidden without JS.
+   motion.ts tags elements with [data-reveal] and a --reveal-i stagger index, then adds .is-revealed
+   when they enter the viewport. Transform + opacity only. */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity var(--wp--custom--motion--duration-reveal) var(--wp--custom--motion--ease-out),
+    transform var(--wp--custom--motion--duration-reveal) var(--wp--custom--motion--ease-out);
+  transition-delay: calc(var(--reveal-i, 0) * var(--wp--custom--motion--stagger));
+}
+html.js [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+/* Once settled, drop the delay so hover transitions on the same element respond at once. */
+html.js [data-reveal].is-settled {
+  transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal] {
+    transform: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

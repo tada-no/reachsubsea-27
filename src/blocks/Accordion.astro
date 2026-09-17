@@ -1,0 +1,111 @@
+---
+// Accordion / FAQ · reach/accordion (docs/05 §2.6). Layout Stacked · Split (Split is Desktop only,
+// stacks below 900 to the Stacked layout). Source FAQ (query by topic, outputs FAQPage JSON-LD) or
+// manual items. More than one item may be open at once (AccordionItem's own script is per-item).
+// #faq-{slug} deep links open and scroll (handled by AccordionItem).
+// Figma hides the Section header eyebrow on this block, so it's dropped even if passed.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import AccordionItem from '../components/AccordionItem.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+
+interface FaqItem {
+  question: string;
+  answer: string;
+  slug: string;
+  /** Open by default (Figma's stacks show the 2nd item open). */
+  open?: boolean;
+}
+
+interface Props extends BlockFields {
+  sectionHeader: SectionHeaderField;
+  layout?: 'stacked' | 'split';
+  source?: 'faq' | 'manual';
+  /** FAQ source: the topic these items were queried by. */
+  topic?: string;
+  items: FaqItem[];
+}
+
+const { sectionHeader, layout = 'stacked', source = 'manual', topic, items, background, spacing, anchor } = Astro.props;
+
+const hasItems = items.length > 0;
+const titleId = makeId('accordion', sectionHeader?.title);
+
+const faqJsonLd =
+  source === 'faq' && hasItems
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: items.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: { '@type': 'Answer', text: item.answer },
+        })),
+      }
+    : null;
+---
+
+{
+  hasItems && (
+    <BlockSection
+      slug="accordion"
+      root="accordion"
+      class={`accordion--${layout}`}
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+    >
+      <div class="accordion__columns">
+        <div class="accordion__header">
+          <SectionHeader title={sectionHeader.title} intro={sectionHeader.intro} action={sectionHeader.action} align={sectionHeader.align} id={titleId} />
+        </div>
+        <div class="accordion__list">
+          {items.map((item) => (
+            <AccordionItem question={item.question} answer={item.answer} open={item.open} id={`faq-${item.slug}`} />
+          ))}
+        </div>
+      </div>
+      {faqJsonLd && <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />}
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .accordion__columns {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
+  }
+  .accordion__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--16);
+    max-width: var(--wp--style--global--content-size);
+  }
+
+  @media (min-width: 900px) {
+    .accordion--split .accordion__columns {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--wp--custom--grid--gutter);
+      align-items: start;
+    }
+    .accordion--split .accordion__header {
+      grid-column: 1 / span 5;
+      position: sticky;
+      top: calc(var(--header-offset, 96px) + var(--wp--preset--spacing--24));
+    }
+    /* In the narrow column the action stacks under the intro instead of sitting beside it */
+    .accordion--split .section-header.section-header--has-action {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--wp--custom--stack--sm);
+    }
+    .accordion--split .accordion__list {
+      grid-column: 7 / span 6;
+      max-width: none;
+    }
+  }
+</style>

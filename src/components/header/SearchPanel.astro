@@ -1,0 +1,140 @@
+---
+// Search panel (docs/04 §16): modal with scrim, opened from the header Search icon. One field that
+// submits to /?s=, plus 4–6 editor-set "Popular" links (a row at ≥900, a list on mobile). Live
+// suggestions and result-page type chips are a later phase (docs/extract/header-recommendation.md §3.6).
+import Icon from '../Icon.astro';
+import IconButton from '../IconButton.astro';
+import Button from '../Button.astro';
+import Eyebrow from '../Eyebrow.astro';
+import Link from '../Link.astro';
+import { popularSearchLinks } from '../../data/navigation';
+
+interface Props {
+  id: string;
+  open?: boolean;
+}
+
+const { id, open = false } = Astro.props;
+---
+
+<div class="search-panel" id={id} role="dialog" aria-modal="true" aria-label="Search" hidden={!open}>
+  <div class="container">
+    <form class="search-panel__form" action="/" method="get" role="search">
+      <label class="visually-hidden" for={`${id}-field`}>Search reachsubsea.com</label>
+      <Icon name="search" size={24} class="search-panel__icon" />
+      <input
+        class="search-panel__field"
+        id={`${id}-field`}
+        type="search"
+        name="s"
+        placeholder="Search reachsubsea.com"
+        autocomplete="off"
+        data-search-field
+      />
+      <IconButton icon="x" label="Clear search" type="button" variant="ghost" size="small" class="search-panel__clear" data-search-clear />
+      <Button label="Search" type="submit" class="search-panel__submit" />
+    </form>
+    {
+      popularSearchLinks.length > 0 && (
+        <div class="search-panel__popular">
+          <Eyebrow text="Popular" />
+          <ul class="search-panel__links">
+            {popularSearchLinks.map((link) => (
+              <li>
+                <Link label={link.label} href={link.url} action={link.external ? 'external' : 'page'} size="small" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+  </div>
+</div>
+
+<style is:global>
+  .search-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    background-color: var(--wp--custom--color--bg--default);
+    box-shadow: var(--wp--preset--shadow--lg);
+    padding-block: var(--wp--preset--spacing--32);
+  }
+  .search-panel__form {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--12);
+    height: 56px;
+    padding-inline: var(--wp--preset--spacing--16);
+    border: 1px solid var(--wp--custom--color--border--strong);
+    border-radius: var(--wp--custom--radius--md);
+  }
+  .search-panel__icon {
+    flex: none;
+    color: var(--wp--custom--color--icon--primary);
+  }
+  .search-panel__field {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    appearance: none;
+    font-size: var(--wp--preset--font-size--lead);
+    line-height: var(--wp--custom--line-height--lead);
+    color: var(--wp--custom--color--text--primary);
+  }
+  /* The whole field box takes the focus ring, not the bare input inside it */
+  .search-panel__field:focus-visible {
+    outline: none;
+  }
+  .search-panel__form:has(.search-panel__field:focus-visible) {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+  }
+  .search-panel__field::placeholder {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .search-panel__field::-webkit-search-cancel-button {
+    display: none;
+  }
+  .search-panel__clear {
+    flex: none;
+  }
+  .search-panel__submit {
+    display: none;
+    flex: none;
+  }
+
+  .search-panel__popular {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+    margin-top: var(--wp--preset--spacing--24);
+  }
+  .search-panel__links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+  }
+
+  @media (min-width: 900px) {
+    .search-panel__form {
+      height: 64px;
+    }
+    .search-panel__submit {
+      display: inline-flex;
+    }
+    .search-panel__links {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      column-gap: var(--wp--preset--spacing--32);
+      row-gap: var(--wp--preset--spacing--8);
+    }
+  }
+</style>

@@ -1,0 +1,299 @@
+{
+  "file": "HAvCQCXzWNFOKQ1AZxqNTX",
+  "page": {
+    "Components": "12:24"
+  },
+  "docFrames": {
+    "Icons": "22:22",
+    "Pictograms": "33:74",
+    "Logo": "54:22",
+    "Button": "56:28",
+    "Icon button": "60:74",
+    "Link": "67:134",
+    "Badge": "87:224",
+    "Eyebrow": "89:259",
+    "Stat": "90:263",
+    "Meta item": "91:281",
+    "Filter chip": "92:306",
+    "Breadcrumb": "93:345",
+    "Accordion item": "97:377",
+    "Subnav": "101:434",
+    "Card": "103:446",
+    "Card presets": "112:672",
+    "Nav item": "116:875",
+    "Header": "118:918",
+    "Menu link": "119:1014",
+    "Mega menu panel": "120:1040",
+    "Site menu panel": "122:1862",
+    "Mobile menu": "123:2493",
+    "Search panel": "124:2565",
+    "Footer": "125:2893"
+  },
+  "components": {
+    "Logo": {
+      "id": "54:29",
+      "type": "COMPONENT"
+    },
+    "Button": {
+      "id": "56:177",
+      "type": "COMPONENT_SET",
+      "variants": 24,
+      "props": [
+        "Label",
+        "Show leading icon",
+        "Leading icon",
+        "Show trailing icon",
+        "Trailing icon",
+        "Style",
+        "Size",
+        "State"
+      ]
+    },
+    "Icon button": {
+      "id": "63:210",
+      "type": "COMPONENT_SET",
+      "variants": 32,
+      "props": [
+        "Icon",
+        "Style",
+        "Size",
+        "State"
+      ]
+    },
+    "Link": {
+      "id": "68:326",
+      "type": "COMPONENT_SET",
+      "variants": 36,
+      "props": [
+        "Label",
+        "Show icon",
+        "Action",
+        "Size",
+        "State"
+      ]
+    },
+    "Badge": {
+      "id": "87:249",
+      "type": "COMPONENT_SET",
+      "variants": 5,
+      "props": [
+        "Label",
+        "Show icon",
+        "Icon",
+        "Tone"
+      ]
+    },
+    "Eyebrow": {
+      "id": "89:268",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "props": [
+        "Text",
+        "Tone"
+      ]
+    },
+    "Stat": {
+      "id": "90:284",
+      "type": "COMPONENT_SET",
+      "variants": 4,
+      "props": [
+        "Value",
+        "Label",
+        "Show note",
+        "Note",
+        "Size",
+        "Align"
+      ]
+    },
+    "Meta item": {
+      "id": "91:286",
+      "type": "COMPONENT",
+      "props": [
+        "Icon",
+        "Text"
+      ]
+    },
+    "Filter chip": {
+      "id": "92:337",
+      "type": "COMPONENT_SET",
+      "variants": 5,
+      "props": [
+        "Label",
+        "Show count",
+        "Count",
+        "State"
+      ]
+    },
+    "Breadcrumb": {
+      "id": "93:366",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "props": [
+        "Level 1",
+        "Show level 2",
+        "Level 2",
+        "Current",
+        "Parent",
+        "Breakpoint"
+      ]
+    },
+    "Accordion item": {
+      "id": "98:412",
+      "type": "COMPONENT_SET",
+      "variants": 6,
+      "props": [
+        "Question",
+        "Answer"
+      ]
+    },
+    "Subnav item": {
+      "id": "101:448",
+      "type": "COMPONENT_SET",
+      "variants": 4,
+      "props": [
+        "Label"
+      ]
+    },
+    "Subnav": {
+      "id": "102:460",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "props": []
+    },
+    "Card": {
+      "id": "103:1110",
+      "type": "COMPONENT_SET",
+      "variants": 20,
+      "props": [
+        "Title",
+        "Description",
+        "Show eyebrow",
+        "Show badge",
+        "Show description",
+        "Show meta",
+        "Show action",
+        "Pictogram (swap, 74 preferred)",
+        "Media",
+        "Surface",
+        "Size"
+      ],
+      "keys": {
+        "Title": "Title#104:168",
+        "Description": "Description#104:189",
+        "Show eyebrow": "Show eyebrow#104:210",
+        "Show badge": "Show badge#104:231",
+        "Show description": "Show description#104:252",
+        "Show meta": "Show meta#104:273",
+        "Show action": "Show action#104:294",
+        "Pictogram": "Pictogram#104:315"
+      },
+      "nested": {
+        "Eyebrow": "89:268 (Text#89:0)",
+        "Badge": "87:249 (Label#87:0, Tone)",
+        "Meta item": "91:286 (Text#91:1, Icon#91:0)",
+        "Action": "Link 68:326 (Label#68:0, Action, Size)"
+      },
+      "exposedInstances": [
+        "Eyebrow",
+        "Badge",
+        "Meta item ×3",
+        "Action"
+      ]
+    },
+    "Card presets": {
+      "Service": "113:672",
+      "Asset": "113:718",
+      "Project": "114:724",
+      "News": "114:772",
+      "Event": "114:809",
+      "Person": "115:801",
+      "Document": "115:844",
+      "Office": "115:889"
+    },
+    "Nav item": {
+      "id": "116:928",
+      "type": "COMPONENT_SET",
+      "variants": 9,
+      "props": ["Label#116:0", "Type (Trigger, Link)", "State (Default, Hover, Open (Trigger only), Current, Focus)"]
+    },
+    "Header": {
+      "id": "118:1065",
+      "type": "COMPONENT_SET",
+      "variants": 4,
+      "variantIds": { "Desktop": "118:923", "Desktop scrolled": "118:982", "Compact": "118:1041", "Mobile": "118:1053" },
+      "layers": "Logo · Right > Nav (8 × Nav item instances) · Actions > Search, Menu (Icon button Ghost Medium)"
+    },
+    "Menu link": {
+      "id": "119:1055",
+      "type": "COMPONENT_SET",
+      "variants": 6,
+      "props": ["Label#119:0", "Show external icon#119:7", "Level (L1, L2)", "State (Default, Hover, Current)"],
+      "variantIds": { "L1 Default": "119:1019", "L2 Default": "119:1037" }
+    },
+    "Mega menu panel": {
+      "id": "120:1045",
+      "type": "COMPONENT",
+      "props": ["Title#120:0", "Description#120:1", "Show group labels#120:2", "Show column 2#120:3", "Show feature#120:4", "Show strip#120:5"],
+      "exposedInstances": ["Overview link", "Card", "Strip link ×3"],
+      "examples": { "Services": "121:1152", "Assets": "121:1462", "Projects": "121:1668", "Company": "121:1865", "Investors": "121:2062", "Careers": "121:2263", "Newsroom": "121:2463" }
+    },
+    "Site menu panel": {
+      "id": "122:2417",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "variantIds": { "Desktop": "122:1867", "Small desktop": "122:2143" }
+    },
+    "Menu accordion": {
+      "id": "123:2521",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "props": ["Title#123:0", "Show chevron#123:3", "State (Closed, Open)"]
+    },
+    "Mobile menu panel": {
+      "id": "123:2522",
+      "type": "COMPONENT"
+    },
+    "Search panel": {
+      "id": "124:2645",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "variantIds": { "Desktop": "124:2570", "Mobile": "124:2611" }
+    },
+    "Footer": {
+      "id": "125:3011",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "variantIds": { "Desktop": "125:2898", "Mobile": "125:2953" },
+      "notes": "Navy mode on each variant; Mobile also sets Layout/Typography Mobile modes. No component properties: link text is edited in place."
+    }
+  },
+  "ledgers": {
+    "icons": "docs/extract/figma-icons-ledger.json",
+    "pictograms": "docs/extract/figma-pictograms-ledger.json"
+  },
+  "notes": [
+    "Focus ring = absolute child frame 'Focus ring' (4px outside, 2px inside stroke bound to border/focus, node radius token). Bound spread drop shadows don't render.",
+    "Pictogram/reach-remote (52:95) is unflattened on purpose (mixed strokes and fills).",
+    "TEXT component properties: every variant's text layer linked to the same TEXT property shares its default characters AND text style overrides such as textDecoration (verified 15 Sep: underlining one Hover label underlined all 36). Style differences set BEFORE linking (text style, fill) stay per variant (Button sizes/colours are fine). After linking, never change text decoration or characters on one variant.",
+    "Link Hover underline = 'Underline' hug auto-layout wrapper around Label with a 1px bottom stroke bound to text/primary; it follows label length (tested with a long label). Code uses text-decoration: underline.",
+    "Link focus ring is 8px outside horizontally, 4px vertically (focusRing(node, V.radius.sm, 8, 4)), because links have no side padding.",
+    "If a re-assigned bound paint renders black on an existing SET/FRAME, clear fills/strokes first, then assign the bound paint in a separate write.",
+    "Badge/Eyebrow/Stat/Filter chip/Breadcrumb all built as single-axis or two-axis variant sets with no State axis beyond what the spec lists (Badge = Tone only, Eyebrow = Tone only, Filter chip = State only, Breadcrumb = Breakpoint only) — matches the component notes, not the fuller State matrices Button/Link use.",
+    "Filter chip: fixed 40px height achieved via createComponent -> resize(w,40) -> counterAxisSizingMode='FIXED' -> append children -> primaryAxisSizingMode='AUTO' (hug width, keep fixed height). Check icon visibility is hardcoded per-variant (visible=true only on Selected), not linked to any component property, per spec.",
+    "Breadcrumb Desktop: 'Level 2 group' auto-layout wraps the second chevron + Level 2 text so 'Show level 2' hides both as one unit, leaving Home > Level 1 > Current > (chevron before Current stays outside the group, always visible). 'Home' text is static (not a component property) since the spec's Properties list omits it. 'Parent' TEXT property is linked only on the Mobile variant's Parent layer.",
+    "INSTANCE_SWAP gotcha (verified 15 Sep on Meta item examples): setting a swap property to the component it already shows resets the nested instance's overrides (the Glyph colour went back to icon/primary) and renames the layer to the component name. Never set a swap to its current value, and after any swap re-run recolorIcon() on the nested icon.",
+    "Stat doc examples stacked vertically (frame back to 1440 wide). Meta item example rows 1 re-bound to icon/accent.",
+    "Accordion item: width bound via item.setBoundVariable('width', await vr(V.layout.containerContent)) resolves to 880, so the State×Interaction grid (3 cols × 2 rows of 880px items) makes the doc frame hug to ~2880 wide instead of the usual 1440 — expected, not a bug (frame's counterAxisSizingMode is AUTO/hug and minWidth only sets a floor). Text property gotcha confirmed again: Question/Answer set identically on all 6 variants before combineAsVariants, then linked; instance overrides per example item done afterwards via instance.setProperties({[key]: text}) using the exact 'Name#id' key, which does not trip the shared-decoration issue since that only applies to editing a variant's own default text after linking.",
+    "Subnav item: fixed height 40 achieved the same way as Filter chip (resize(w,40) before setting primaryAxisSizingMode='AUTO'/counterAxisSizingMode='FIXED', per the resize-before-sizing-modes rule). Default/Focus share identical visuals (no fill, text/secondary); Focus adds only the ring.",
+    "Subnav: bottom-only stroke via strokeTopWeight/strokeLeftWeight/strokeRightWeight=0, strokeBottomWeight=1, strokeAlign INSIDE on the bar itself (not a separate divider layer). Both variants get setMode(bar, COLL.color, MODE.light) explicitly since the component must not react to an ancestor's Navy mode; Mobile additionally forces Layout and Typography Mobile modes and clipsContent=true so the 6 items overflow to the right. Subnav doc frame ends up ~1632 wide (Desktop variant is 1440 fixed + gridVariants padding + frame padding) — same expected over-1440 pattern as Accordion item, not a bug. Subnav has no component properties; its 6 example instances get labels via instance.setProperties on the Subnav item's inherited Label key, with the first instance built from the Active variant and the rest from Default.",
+    "Card presets (16 Sep): confirmed a new gotcha — a nested exposed instance inside a Card variant (Badge, Meta item ×3) returns children.length === 0 from the Plugin API while its ancestor's visibility chain is false (i.e. before 'Show badge'/'Show meta' is set true on the Card instance). Eyebrow and Action stayed populated because they're visible by default. Fix: call cardInstance.setProperties() to flip the relevant Show… booleans FIRST, then findOne/findAll into the now-visible nested instances in the same script — visibility gates child population, but only within one script run (verified it resolves synchronously, no extra call needed). Each 'Card preset/<Name>' component holds one Card instance named 'Card' with isExposedInstance=true; content set via cardInstance.setProperties() on the Card's own keys, then per-slot setProperties on the nested Eyebrow/Badge/Meta item/Action exposed instances found by layer name. Pictogram swap (Service, 38:104→52:135) needed no Glyph re-bind since Pictogram components carry their own icon/accent fill binding (unlike Tabler Icon instances). Meta item icon swaps did need the recolorIcon() re-bind per the hard rule; rows left at the default icon (no swap) were re-bound anyway as a cheap safety net. 8 presets nest as COMPONENT children (not instances) inside 'Surface/Tint' inside the 'Components / Card presets' doc frame — none sit at page root.",
+    "Variant swap sizing gotcha (verified 15 Sep on the Services mega example): a Card nested inside another component's instance, switched from a hug variant (Media=None) to the fixed-height Media=Image bg variant, keeps its hug height (264, not 520). resetOverrides, layoutSizingVertical FIXED + resize, resizeWithoutConstraints and fixed-width resize all leave it at 264, and minHeight throws 'This property cannot be overridden in an instance: min-size'. Use hug variants (None / Icon / Image top) for cards nested in panel instances; Image bg is fine as a direct instance.",
+    "Header family: Nav item has 9 variants (Link has no Open). Header Nav items fill the header height (layoutSizingVertical FILL), so the bar sits on the bottom edge at 96 and 72. Menu link Current bar is absolute at x −12 (in the gutter); parent frames need clipsContent=false or it's clipped (fixed on the Menu link example group). Examples change nested instance variants with setProperties({ State: 'Open' }) / ({ Level: 'L2' }) and keep label overrides.",
+    "Badge Tone=Neutral was 112×30 because its 1px inside stroke counted in layout; fixed with strokesIncludedInLayout=false (now 110×28 like the other tones).",
+    "QA audit 15 Sep: 157 top-level components/sets, 1457 nodes (instance internals skipped): 0 unbound solid fills/strokes, 0 text without a style, 0 effects without a style, 0 default layer names, 0 loose nodes at page root."
+  ],
+  "qaTodo": [
+    "Client to confirm: LinkedIn URL (two on dev), street address (old Figma only), pictogram names that don't match their imagery (see figma-pictograms-ledger.json).",
+    "Mega menu example copy (section lines, feature cards) is placeholder until ACF content exists."
+  ]
+}

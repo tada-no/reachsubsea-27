@@ -1,0 +1,54 @@
+---
+import Accordion from '../blocks/Accordion.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+
+const sectionHeader = {
+  title: 'Frequently asked questions',
+  intro: 'Answers to what we hear most often, from remote operations to mobilisation.',
+};
+
+const items = [
+  { question: 'How do remote operations work?', answer: 'Our onshore operations centre pilots uncrewed and lightly crewed vessels, with a small team offshore for launch, recovery and maintenance.', slug: 'remote-operations' },
+  {
+    question: 'Which regions do you operate in?',
+    answer: 'We run projects across the North Sea, the Norwegian Sea and further afield, mobilising vessels and crews to wherever a campaign needs them.',
+    slug: 'regions',
+    open: true,
+  },
+  { question: 'Can you mobilise at short notice?', answer: 'Yes. Several vessels are kept campaign-ready, and our operations team can typically confirm mobilisation within days for emergency response work.', slug: 'short-notice' },
+  { question: 'How do I get a vessel spec sheet?', answer: 'Spec sheets are available on each vessel’s asset page, or contact our fleet team directly and we will send the latest PDF.', slug: 'spec-sheet' },
+];
+
+const faqItems = [
+  { question: 'How deep can your ROVs operate?', answer: 'Our work-class ROVs are rated to 3,000 metres and our survey ROVs to 4,000 metres. Depth ratings for each vehicle are listed on the asset pages.', slug: 'rov-depth', open: true },
+  { question: 'What certifications do your survey vessels hold?', answer: 'All survey vessels carry DP2 certification and IMCA membership, with class surveys renewed annually. Certificates for each vessel are listed on its asset page.', slug: 'certifications' },
+  { question: 'Do you support long-term charter contracts?', answer: 'Yes, alongside project-based work we offer long-term charter agreements with dedicated crews and maintenance schedules.', slug: 'charter' },
+  { question: 'How quickly can a vessel mobilise for an emergency response job?', answer: 'Campaign-ready vessels can typically mobilise within 48–72 hours, depending on port and weather conditions.', slug: 'emergency-mobilise' },
+];
+---
+
+<VariantLabel name="Stacked" props='layout="stacked" source="manual"' />
+<Accordion layout="stacked" source="manual" sectionHeader={sectionHeader} items={items} />
+
+<VariantLabel name="Split" props='layout="split" source="manual"' />
+<Accordion layout="split" source="manual" sectionHeader={sectionHeader} items={items} />
+
+<VariantLabel name="Example · FAQ page topic block, Stacked, on Tint" props='layout="stacked" source="faq" topic="Fleet & operations" background="tint"' />
+<Accordion
+  layout="stacked"
+  source="faq"
+  topic="Fleet & operations"
+  background="tint"
+  sectionHeader={{ title: 'Fleet & operations', intro: 'Questions about how our vessels and ROVs run day to day.' }}
+  items={faqItems}
+/>
+
+<VariantLabel name="Example · Split on Navy" props='layout="split" source="faq" topic="Fleet & operations" background="navy"' />
+<Accordion
+  layout="split"
+  source="faq"
+  topic="Fleet & operations"
+  background="navy"
+  sectionHeader={{ title: 'Fleet & operations', intro: 'Questions about how our vessels and ROVs run day to day.' }}
+  items={faqItems}
+/>

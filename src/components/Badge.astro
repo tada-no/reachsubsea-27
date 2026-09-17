@@ -1,0 +1,66 @@
+---
+// Badge (docs/04 §7). Success and Error force Light mode so they read on Navy.
+import Icon from './Icon.astro';
+import type { BadgeTone } from '../lib/types';
+
+interface Props {
+  label: string;
+  tone?: BadgeTone;
+  icon?: string;
+  class?: string;
+}
+
+const { label, tone = 'neutral', icon, class: className } = Astro.props;
+const forceLight = tone === 'success' || tone === 'error';
+---
+
+<span class:list={['badge', 'text-eyebrow', `badge--${tone}`, forceLight && 'has-surface-light', className]}>
+  {icon && <Icon name={icon} size={16} />}
+  <span class="badge__label">{label}</span>
+</span>
+
+<style is:global>
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--4);
+    min-height: 28px;
+    /* Caps-only label: the line box reserves descender space, so the text reads high. Where supported,
+       text-box-trim cuts the box to cap height and baseline so the caps sit dead centre; elsewhere
+       (Firefox for now) a half-pixel optical shift. */
+    padding: 4.5px var(--wp--preset--spacing--12) 3.5px;
+    border-radius: var(--wp--custom--radius--full);
+    width: fit-content;
+    white-space: nowrap;
+  }
+  /* Trim on the label: text-box-trim applies to block containers, and the label is a flex item */
+  @supports (text-box: trim-both cap alphabetic) {
+    .badge {
+      padding: var(--wp--preset--spacing--4) var(--wp--preset--spacing--12);
+    }
+    .badge__label {
+      text-box: trim-both cap alphabetic;
+    }
+  }
+  .badge--neutral {
+    background-color: var(--wp--custom--color--bg--tint);
+    box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--subtle);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .badge--accent {
+    background-color: var(--wp--custom--color--bg--accent-subtle);
+    color: var(--wp--custom--color--text--accent);
+  }
+  .badge--navy {
+    background-color: var(--wp--custom--color--action--primary--bg);
+    color: var(--wp--custom--color--action--primary--fg);
+  }
+  .badge--success {
+    background-color: var(--wp--custom--color--bg--success-subtle);
+    color: var(--wp--custom--color--text--success);
+  }
+  .badge--error {
+    background-color: var(--wp--custom--color--bg--error-subtle);
+    color: var(--wp--custom--color--text--error);
+  }
+</style>

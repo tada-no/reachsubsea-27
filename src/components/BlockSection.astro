@@ -1,0 +1,61 @@
+---
+// Outer wrapper for every block (docs/05 §0): one full-width <section> with the WordPress block
+// class (wp-block-reach-<slug>), a short BEM root class, surface + spacing modifiers, optional
+// anchor and aria-labelledby. Content goes inside .container unless `bleed` is set.
+import { surfaceClass } from '../lib/ids';
+import type { Background, Spacing } from '../lib/types';
+
+interface Props {
+  /** Block slug without the namespace: `page-hero` for reach/page-hero. */
+  slug: string;
+  /** BEM root class used inside the block. Defaults to the slug. */
+  root?: string;
+  background?: Background;
+  spacing?: Spacing;
+  anchor?: string;
+  labelledBy?: string;
+  label?: string;
+  /** Skip the inner .container (full-bleed blocks handle their own). */
+  bleed?: boolean;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const {
+  slug,
+  root = slug,
+  background = 'white',
+  spacing = 'md',
+  anchor,
+  labelledBy,
+  label,
+  bleed = false,
+  class: className,
+  ...attrs
+} = Astro.props;
+---
+
+<section
+  id={anchor}
+  class:list={[
+    `wp-block-reach-${slug}`,
+    root,
+    'block',
+    surfaceClass(background),
+    spacing !== 'md' && `has-spacing-${spacing}`,
+    className,
+  ]}
+  aria-labelledby={labelledBy}
+  aria-label={labelledBy ? undefined : label}
+  {...attrs}
+>
+  {
+    bleed ? (
+      <slot />
+    ) : (
+      <div class="container">
+        <slot />
+      </div>
+    )
+  }
+</section>

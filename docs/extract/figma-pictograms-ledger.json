@@ -1,0 +1,377 @@
+{
+  "docFrameId": "33:74",
+  "pictograms": {
+    "reach-way": {
+      "id": "31:89",
+      "original": "Reach way 1",
+      "flattened": true
+    },
+    "oil-gas": {
+      "id": "32:76",
+      "original": "Oil Gas 1",
+      "flattened": true
+    },
+    "offshore-cables": {
+      "id": "32:83",
+      "original": "Offshore cables 1",
+      "flattened": true
+    },
+    "offshore-wind": {
+      "id": "32:98",
+      "original": "Offshore wind 1",
+      "flattened": true
+    },
+    "seabed-scanner": {
+      "id": "34:109",
+      "original": "Monitoring copy 4",
+      "flattened": true
+    },
+    "subsea-telemetry": {
+      "id": "35:105",
+      "original": "Monitoring copy 9",
+      "flattened": true
+    },
+    "goals": {
+      "id": "36:81",
+      "original": "goals",
+      "flattened": true
+    },
+    "increase-percent-arrows": {
+      "id": "36:99",
+      "original": "increase percent arrows",
+      "flattened": true
+    },
+    "lighthouse": {
+      "id": "36:124",
+      "original": "lighthouse",
+      "flattened": true
+    },
+    "seabed-repair": {
+      "id": "37:102",
+      "original": "IMR 2",
+      "flattened": true
+    },
+    "sonar-vessel": {
+      "id": "37:127",
+      "original": "Monitoring copy",
+      "flattened": true
+    },
+    "survey-rov": {
+      "id": "38:104",
+      "original": "Survey ROV",
+      "flattened": true
+    },
+    "marine": {
+      "id": "39:89",
+      "original": "Marine",
+      "flattened": true
+    },
+    "global-monitoring": {
+      "id": "39:102",
+      "original": "Monitoring",
+      "flattened": true
+    },
+    "eye-settings": {
+      "id": "39:113",
+      "original": "Eye settings",
+      "flattened": true
+    },
+    "maintenance-repair": {
+      "id": "40:78",
+      "original": "IMR",
+      "flattened": true
+    },
+    "survey": {
+      "id": "40:96",
+      "original": "survey",
+      "flattened": true
+    },
+    "reduce-percent-arrows": {
+      "id": "40:114",
+      "original": "reduce percent arrows",
+      "flattened": true
+    },
+    "reduce-percent-coins": {
+      "id": "41:89",
+      "original": "reduce percent coins",
+      "flattened": true
+    },
+    "money-stack-dollars": {
+      "id": "41:112",
+      "original": "money stack dollars",
+      "flattened": true
+    },
+    "reduce-spend-dollars": {
+      "id": "41:130",
+      "original": "reduce spend dollars",
+      "flattened": true
+    },
+    "fingerprint": {
+      "id": "41:153",
+      "original": "fingerprint",
+      "flattened": true
+    },
+    "business": {
+      "id": "42:101",
+      "original": "business",
+      "flattened": true
+    },
+    "settings-screen": {
+      "id": "42:115",
+      "original": "settings screen",
+      "flattened": true
+    },
+    "fingerprint-mobile": {
+      "id": "42:127",
+      "original": "fingerprint mobile",
+      "flattened": true
+    },
+    "password": {
+      "id": "42:142",
+      "original": "password",
+      "flattened": true
+    },
+    "time": {
+      "id": "42:155",
+      "original": "time",
+      "flattened": true
+    },
+    "tools": {
+      "id": "43:80",
+      "original": "tools",
+      "flattened": true
+    },
+    "settings-hand": {
+      "id": "43:99",
+      "original": "settings hand",
+      "flattened": true
+    },
+    "shield-tick": {
+      "id": "43:108",
+      "original": "shield tick",
+      "flattened": true
+    },
+    "teach-people": {
+      "id": "43:125",
+      "original": "teach people",
+      "flattened": true
+    },
+    "settings": {
+      "id": "44:84",
+      "original": "settings",
+      "flattened": true
+    },
+    "shield-stop": {
+      "id": "44:94",
+      "original": "shield stop",
+      "flattened": true
+    },
+    "technology": {
+      "id": "44:110",
+      "original": "technology",
+      "flattened": true
+    },
+    "chat": {
+      "id": "44:118",
+      "original": "chat",
+      "flattened": true
+    },
+    "brain": {
+      "id": "44:125",
+      "original": "brain",
+      "flattened": true
+    },
+    "chat-active": {
+      "id": "45:82",
+      "original": "chat active",
+      "flattened": true
+    },
+    "head-puzzle": {
+      "id": "45:92",
+      "original": "head puzzle",
+      "flattened": true
+    },
+    "classroom": {
+      "id": "45:109",
+      "original": "classroom",
+      "flattened": true
+    },
+    "profile-laptop": {
+      "id": "45:126",
+      "original": "profile laptop",
+      "flattened": true
+    },
+    "learn-screen": {
+      "id": "45:139",
+      "original": "learn screen",
+      "flattened": true
+    },
+    "book": {
+      "id": "45:151",
+      "original": "book",
+      "flattened": true
+    },
+    "head-time": {
+      "id": "47:84",
+      "original": "head time",
+      "flattened": true
+    },
+    "head-heart": {
+      "id": "47:95",
+      "original": "head heart",
+      "flattened": true
+    },
+    "head-cog": {
+      "id": "47:106",
+      "original": "head cog",
+      "flattened": true
+    },
+    "head-light": {
+      "id": "47:124",
+      "original": "head light",
+      "flattened": true
+    },
+    "head-question": {
+      "id": "47:136",
+      "original": "head question",
+      "flattened": true
+    },
+    "globe-profile": {
+      "id": "48:86",
+      "original": "globe profile",
+      "flattened": true
+    },
+    "profile-stars": {
+      "id": "48:97",
+      "original": "profile stars",
+      "flattened": true
+    },
+    "heart-hand": {
+      "id": "48:108",
+      "original": "heart hand",
+      "flattened": true
+    },
+    "profile-connect": {
+      "id": "48:125",
+      "original": "profile connect",
+      "flattened": true
+    },
+    "lecture": {
+      "id": "48:144",
+      "original": "lecture",
+      "flattened": true
+    },
+    "profile-hand": {
+      "id": "48:159",
+      "original": "profile hand",
+      "flattened": true
+    },
+    "profile-route": {
+      "id": "48:171",
+      "original": "profile route",
+      "flattened": true
+    },
+    "worker": {
+      "id": "49:85",
+      "original": "worker",
+      "flattened": true
+    },
+    "cog-man": {
+      "id": "49:97",
+      "original": "cog man",
+      "flattened": true
+    },
+    "team": {
+      "id": "49:109",
+      "original": "team",
+      "flattened": true
+    },
+    "life-ring": {
+      "id": "49:127",
+      "original": "life ring",
+      "flattened": true
+    },
+    "health": {
+      "id": "49:138",
+      "original": "health",
+      "flattened": true
+    },
+    "globe-leaf": {
+      "id": "49:155",
+      "original": "globe leaf",
+      "flattened": true
+    },
+    "leaf-recycle": {
+      "id": "49:171",
+      "original": "leaf recycle",
+      "flattened": true
+    },
+    "co2": {
+      "id": "50:82",
+      "original": "co2",
+      "flattened": true
+    },
+    "leaf-hand": {
+      "id": "50:96",
+      "original": "leaf hand",
+      "flattened": true
+    },
+    "globe-hand": {
+      "id": "50:105",
+      "original": "globe hand",
+      "flattened": true
+    },
+    "globe-pins": {
+      "id": "50:112",
+      "original": "globe pins",
+      "flattened": true
+    },
+    "heart": {
+      "id": "50:120",
+      "original": "heart",
+      "flattened": true
+    },
+    "cog-profile": {
+      "id": "50:130",
+      "original": "cog profile",
+      "flattened": true
+    },
+    "eye": {
+      "id": "50:138",
+      "original": "eye",
+      "flattened": true
+    },
+    "mountain": {
+      "id": "51:77",
+      "original": "mountain",
+      "flattened": true
+    },
+    "whistle": {
+      "id": "51:92",
+      "original": "whistle",
+      "flattened": true
+    },
+    "planner": {
+      "id": "51:112",
+      "original": "planner",
+      "flattened": true
+    },
+    "handshake": {
+      "id": "51:131",
+      "original": "handshake",
+      "flattened": true
+    },
+    "reach-remote": {
+      "id": "52:95",
+      "original": "Reach Remote 1",
+      "flattened": false
+    },
+    "subsea-infrastructure": {
+      "id": "52:135",
+      "original": "Subsea infrastructure 1",
+      "flattened": true
+    }
+  },
+  "skipped": [],
+  "notes": "All 74 pictograms imported from the OLD file's 'Icons Flat' frame (IqEKofKVdD06iF3A1Dlzrz, page 4104:21222, frame 4316:4571). Every component flattened cleanly via figma.flatten() into a single 'Glyph' vector (no unflattened/failed items). Fill (and, for reach-remote and subsea-infrastructure, stroke) colour bound to icon/accent (VariableID:8:43). Documentation frame 'Components / Pictograms' (node 33:74) is 1440 wide x 2760 tall, positioned at x=0 y=1392 (160px below Components / Icons), containing Header and a Grid (33:79) with 74 Tile/<name> children in build order. Six original layer names were vague or duplicated and were renamed based on visual inspection: 'Monitoring copy 4' -> seabed-scanner (crane+box with scan beams over seabed), 'Monitoring copy 9' -> subsea-telemetry (crane+box with wifi signals top and bottom), 'IMR 2' -> seabed-repair (crane+box with wrench tools at seabed), 'Monitoring copy' -> sonar-vessel (vessel over sonar ripples), 'Monitoring' -> global-monitoring (split globe/circle shape), 'IMR' -> maintenance-repair (gear with wrench). Per coordinator correction: each Pictogram/<name> COMPONENT was inserted directly as tile.insertChild(0, comp) rather than instanced, so no Pictogram/* component was ever left loose at the page root; verified at completion via figma.currentPage.findAll filtering top-level COMPONENT nodes named 'Pictogram/*' -> empty array, and Grid child count == 74. | 15 Sep: reach-remote rebuilt unflattened (20 vectors, strokes 2.5/2.28 + fills, bound to icon/accent) because flatten dropped the stroked hull. Names from old layer names may not match imagery: offshore-cables shows a lightning bolt, reach-way shows a head with cycle arrows."
+}

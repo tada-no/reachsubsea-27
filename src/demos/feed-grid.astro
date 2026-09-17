@@ -1,0 +1,77 @@
+---
+import FeedGrid from '../blocks/FeedGrid.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+import { feedSamples, projectFacets } from '../data/feed-samples';
+
+const projectsHeader = {
+  title: 'Projects',
+  intro: 'Recent subsea, survey and monitoring work across the fleet.',
+  action: { label: 'All projects', url: '#' },
+};
+---
+
+<VariantLabel name="Filters Off · Projects" props='source="projects" filters={false}' />
+<FeedGrid
+  sectionHeader={projectsHeader}
+  source="projects"
+  count={6}
+  filters={false}
+  items={feedSamples.projects.slice(0, 6)}
+/>
+
+<VariantLabel
+  name="Filters On · Projects, 12 items, count 6"
+  props='source="projects" filters count={6} facets={[service, region]}'
+/>
+<FeedGrid
+  sectionHeader={projectsHeader}
+  source="projects"
+  count={6}
+  filters
+  facets={projectFacets}
+  items={feedSamples.projects}
+/>
+
+<VariantLabel name="Example · Latest, on Tint" props='source="latest" background="tint"' />
+<FeedGrid
+  sectionHeader={{ title: 'Latest from Reach', intro: 'The newest report, news and event, in one place.' }}
+  source="latest"
+  columns={3}
+  showLoadMore={false}
+  background="tint"
+  items={feedSamples.latest}
+/>
+
+<VariantLabel
+  name="Example · Empty state"
+  props='source="projects" filters initialFilters={{ service: "monitoring", region: "baltic-sea" }}'
+/>
+<FeedGrid
+  sectionHeader={projectsHeader}
+  source="projects"
+  count={6}
+  filters
+  facets={projectFacets}
+  initialFilters={{ service: 'monitoring', region: 'baltic-sea' }}
+  items={feedSamples.projects}
+/>
+
+<VariantLabel name="Example · Assets, 4 columns" props='source="assets" columns={4}' />
+<FeedGrid
+  sectionHeader={{ title: 'Fleet overview', intro: 'Vessels and uncrewed surface vessels supporting every operation.' }}
+  source="assets"
+  count={8}
+  columns={4}
+  showLoadMore={false}
+  items={feedSamples.assets}
+/>
+
+<VariantLabel name="Example · People, 4 columns" props='source="people" columns={4}' />
+<FeedGrid
+  sectionHeader={{ title: 'Leadership', intro: 'The team leading Reach Subsea.' }}
+  source="people"
+  count={4}
+  columns={4}
+  showLoadMore={false}
+  items={feedSamples.people}
+/>

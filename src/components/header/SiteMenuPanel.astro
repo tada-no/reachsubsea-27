@@ -1,0 +1,262 @@
+---
+// Site menu panel (docs/04 §16, reimagined 17 Sep 2026, Q49): what the hamburger opens at ≥1200.
+// No longer a flat sitemap (the bar's Mega menus and the footer already do that job). It now leads
+// with what the bar does not carry: Projects, Newsroom, Events and FAQ as large links, beside live
+// featured content: the latest project (Card, Image bg), the three latest news items, the next
+// events, and the 3D World. Modal under the header over the bg/overlay scrim, like before.
+// Below 1200 the hamburger opens the Mobile menu, which lists every section.
+// Motion: the panel settles in and its three columns follow 60 ms apart (occasional action, ~300 ms,
+// ease-out); closing is instant so it never feels like waiting.
+import Card from '../Card.astro';
+import Icon from '../Icon.astro';
+import Link from '../Link.astro';
+import { siteMenu } from '../../data/navigation';
+
+interface Props {
+  id: string;
+  open?: boolean;
+  current?: string;
+}
+
+const { id, open = false, current } = Astro.props;
+const currentHref = current ? `/${current}/` : undefined;
+---
+
+<div class="site-menu" id={id} role="dialog" aria-modal="true" aria-label="Site menu" hidden={!open}>
+  <div class="container">
+    <div class="site-menu__grid">
+      <nav class="site-menu__col site-menu__links" aria-label="More from Reach Subsea" style="--col-i: 0">
+        <ul>
+          {
+            siteMenu.links.map((link) => (
+              <li>
+                <a class="site-menu__link" href={link.href} aria-current={link.href === currentHref ? 'page' : undefined}>
+                  <span class="site-menu__link-label text-h2">{link.label}</span>
+                  <Icon name="arrow-right" size={24} class="site-menu__link-arrow" />
+                  <span class="site-menu__link-note text-small">{link.note}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="site-menu__col site-menu__project" style="--col-i: 1">
+        <Card {...siteMenu.project} headingLevel="h3" />
+      </div>
+
+      <div class="site-menu__col site-menu__feeds" style="--col-i: 2">
+        <section aria-labelledby={`${id}-news`}>
+          <a class="site-menu__feed-title text-eyebrow" id={`${id}-news`} href="/newsroom/">
+            Reach Newsroom
+            <Icon name="arrow-right" size={16} />
+          </a>
+          <ul class="site-menu__rows">
+            {
+              siteMenu.news.map((item) => (
+                <li>
+                  <a class="site-menu__row" href={item.href}>
+                    <span class="site-menu__row-meta text-caption">{item.date}</span>
+                    <span class="site-menu__row-title text-label">{item.title}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+        <section aria-labelledby={`${id}-events`}>
+          <a class="site-menu__feed-title text-eyebrow" id={`${id}-events`} href="/newsroom/events/">
+            Events
+            <Icon name="arrow-right" size={16} />
+          </a>
+          <ul class="site-menu__rows">
+            {
+              siteMenu.events.map((item) => (
+                <li>
+                  <a class="site-menu__row" href={item.href}>
+                    <span class="site-menu__row-meta text-caption">
+                      {item.date}, {item.place}
+                    </span>
+                    <span class="site-menu__row-title text-label">{item.title}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="site-menu__strip">
+    <div class="container site-menu__strip-row">
+      {/* Same strip as every Mega menu: Contact on the left, the 3D World on the right */}
+      <Link label="Contact us" href="/contact/" size="small" />
+      <a class="menu-world has-surface-navy" href={siteMenu.world.href}>
+        <span class="text-button-sm">{siteMenu.world.label}</span>
+        <Icon name="cube-3d-sphere" size={24} />
+      </a>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .site-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    max-height: calc(100dvh - var(--header-offset, 96px));
+    overflow-y: auto;
+    background-color: var(--wp--custom--color--bg--default);
+    box-shadow: var(--wp--preset--shadow--lg);
+  }
+  .site-menu__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    align-items: stretch;
+    padding-block: var(--wp--preset--spacing--48) var(--wp--preset--spacing--56);
+  }
+  .site-menu__links {
+    grid-column: 1 / span 4;
+  }
+  .site-menu__project {
+    grid-column: 5 / span 5;
+    display: flex;
+  }
+  .site-menu__feeds {
+    grid-column: 10 / span 3;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+  }
+
+  /* Large links */
+  .site-menu__link {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: var(--wp--preset--spacing--16);
+    padding-block: var(--wp--preset--spacing--16);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .site-menu__links li:first-child .site-menu__link {
+    padding-top: 0;
+  }
+  .site-menu__link-arrow {
+    color: var(--wp--custom--color--icon--accent);
+    opacity: 0;
+    transform: translate3d(-8px, 0, 0);
+    transition:
+      opacity 0.2s ease,
+      transform 0.3s var(--wp--custom--motion--ease-out);
+  }
+  .site-menu__link-note {
+    grid-column: 1 / -1;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .site-menu__link[aria-current='page'] .site-menu__link-label {
+    color: var(--wp--custom--color--text--accent);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .site-menu__link:hover .site-menu__link-arrow {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .site-menu__link:focus-visible .site-menu__link-arrow {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Featured project: the Card fills the column */
+  .site-menu__project .card {
+    min-height: 400px;
+  }
+
+  /* News + events rows */
+  .site-menu__feed-title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    margin-bottom: var(--wp--preset--spacing--8);
+    color: var(--wp--custom--color--text--accent);
+  }
+  .site-menu__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    padding-block: var(--wp--preset--spacing--12);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .site-menu__row-meta {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .site-menu__row-title {
+    color: var(--wp--custom--color--text--primary);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .site-menu__row:hover .site-menu__row-title,
+    .site-menu__feed-title:hover {
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.3em;
+    }
+  }
+
+  /* Strip */
+  .site-menu__strip {
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  .site-menu__strip-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--12) var(--wp--preset--spacing--32);
+    min-height: 80px;
+    padding-block: var(--wp--preset--spacing--16);
+  }
+  /* 3D World button: shared by the Site menu and every Mega menu strip */
+  .menu-world {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16);
+    min-height: 48px;
+    margin-left: auto;
+    padding-inline: var(--wp--preset--spacing--24) var(--wp--preset--spacing--16);
+    border-radius: var(--wp--custom--radius--md);
+    color: var(--wp--custom--color--text--primary);
+    transition: transform var(--wp--custom--motion--duration-fast) var(--wp--custom--motion--ease-out);
+  }
+  .menu-world .icon {
+    color: var(--wp--custom--color--icon--accent);
+  }
+  .menu-world:active {
+    transform: scale(0.98);
+  }
+
+  /* Opening choreography */
+  @media (prefers-reduced-motion: no-preference) {
+    .site-menu:not([hidden]) {
+      animation: site-menu-in 0.32s var(--wp--custom--motion--ease-out) both;
+    }
+    .site-menu:not([hidden]) .site-menu__col {
+      animation: site-menu-col-in 0.5s var(--wp--custom--motion--ease-out) both;
+      animation-delay: calc(0.06s + var(--col-i, 0) * 0.06s);
+    }
+  }
+  @keyframes site-menu-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -12px, 0);
+    }
+  }
+  @keyframes site-menu-col-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 16px, 0);
+    }
+  }
+</style>

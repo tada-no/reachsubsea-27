@@ -1,0 +1,48 @@
+---
+// Tabler Outline 3.46 icon (docs/04 §1). 1.5px stroke at every rendered size, colour = currentColor.
+import fs from 'node:fs';
+import path from 'node:path';
+
+interface Props {
+  name: string;
+  size?: number;
+  class?: string;
+  /** Accessible name. Omit for decorative icons (aria-hidden). */
+  label?: string;
+}
+
+const { name, size = 24, class: className, label } = Astro.props;
+
+const cache: Map<string, string> = ((globalThis as any).__reachIcons ??= new Map());
+let inner = cache.get(name);
+if (inner === undefined) {
+  const file = path.join(process.cwd(), 'node_modules/@tabler/icons/icons/outline', `${name}.svg`);
+  if (!fs.existsSync(file)) throw new Error(`Icon "${name}" is not in @tabler/icons outline`);
+  const svg = fs.readFileSync(file, 'utf8');
+  inner = svg
+    .replace(/^[\s\S]*?<svg[^>]*>/, '')
+    .replace(/<\/svg>\s*$/, '')
+    .replace(/<path stroke="none" d="M0 0h24v24H0z" fill="none"\s*\/>/, '');
+  cache.set(name, inner);
+}
+
+// Figma keeps the stroke at 1.5px when an icon is resized to 16 or 20.
+const strokeWidth = +((1.5 * 24) / size).toFixed(3);
+---
+
+<svg
+  class:list={['icon', `icon--${name}`, className]}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width={strokeWidth}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+  set:html={inner}
+/>

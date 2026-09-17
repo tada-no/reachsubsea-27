@@ -1,0 +1,320 @@
+---
+// Home (17 Sep 2026 redesign, Q49–Q53 in docs/00-questions.md). Same blocks and tokens, new composition:
+// Video hero (header overlays it) · Stats panel (counts up) · Live operations map (sample data) · Bento of mixed Card variants ·
+// Services, 4 portrait cards · 3D World stage with named zones · Newsroom (editorial feed) ·
+// LinkedIn rail (dummy) · FAQ · CTA panel straddling the darker footer.
+// Copy follows the client's Full Resolution Page Screens PDF (Home) where it has any.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/header/Header.astro';
+import Footer from '../components/Footer.astro';
+import PageHero from '../blocks/PageHero.astro';
+import CardGrid from '../blocks/CardGrid.astro';
+import StatsBand from '../blocks/StatsBand.astro';
+import Embed from '../blocks/Embed.astro';
+import FeedGrid from '../blocks/FeedGrid.astro';
+import SocialFeed from '../blocks/SocialFeed.astro';
+import Accordion from '../blocks/Accordion.astro';
+import CtaBand from '../blocks/CtaBand.astro';
+import LiveOperations from '../blocks/LiveOperations.astro';
+import { liveOperations } from '../data/live-operations';
+import { cardPresets } from '../data/card-presets';
+import { pickFigures } from '../data/key-figures';
+import { worldPath, worldSceneUrl } from '../data/world';
+import type { CardField } from '../lib/types';
+
+// Bento: 7 cards on a 12-column grid (6×2 · 3 · 3×2 / 3 · then 4 · 5 · 3).
+const bentoCards: CardField[] = [
+  {
+    media: 'image-bg',
+    size: 'featured',
+    span: { cols: 6, rows: 2 },
+    image: { src: `${import.meta.env.BASE_URL}images/vessel-agalas.jpg`, alt: 'Reach Subsea vessel at sea in evening light', focalPoint: { x: 0.55, y: 0.5 } },
+    eyebrow: 'Subsea services',
+    title: 'Subsea services, delivered worldwide',
+    description: 'Inspection, maintenance, construction support, survey and monitoring for offshore clients.',
+    action: { label: 'Explore subsea services', url: '/services/subsea/' },
+  },
+  {
+    media: 'stat',
+    surface: 'navy',
+    span: { cols: 3, rows: 1 },
+    statValue: '750+',
+    title: 'Uncrewed operational days, per quarter',
+    action: { label: 'Reach Remote', url: '/assets/reach-remote/' },
+  },
+  {
+    media: 'image-bg',
+    span: { cols: 3, rows: 2 },
+    image: { src: `${import.meta.env.BASE_URL}images/rov-supporter-launch.jpg`, alt: 'Work-class ROV being launched from a vessel', focalPoint: { x: 0.5, y: 0.4 } },
+    eyebrow: 'ROV & intervention',
+    title: 'Work-class ROVs for IMR, survey and monitoring',
+    action: { label: 'See our ROVs', url: '/assets/rovs/' },
+  },
+  cardPresets.news({
+    media: 'none',
+    surface: 'tint',
+    span: { cols: 3, rows: 1 },
+    eyebrow: '04.08.2026',
+    badge: { label: 'News', tone: 'accent' },
+    title: 'MoA signed for sale of Viking Reach and onboard WROV',
+    description: undefined,
+    action: { label: 'Read more', url: '/newsroom/' },
+  }),
+  cardPresets.event({
+    surface: 'white',
+    span: { cols: 4, rows: 1 },
+    title: 'Ocean Business 2027',
+    meta: [
+      { icon: 'calendar', text: '14-16 April 2027' },
+      { icon: 'map-pin', text: 'Southampton, UK' },
+    ],
+    action: { label: 'Event website', url: '#', action: 'external' },
+  }),
+  {
+    media: 'image-bg',
+    span: { cols: 5, rows: 1 },
+    image: { src: `${import.meta.env.BASE_URL}images/reach-remote-side.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel under way', focalPoint: { x: 0.5, y: 0.6 } },
+    eyebrow: 'Reach Remote',
+    title: 'Pioneering uncrewed operations',
+    description: "The world's first of its kind, controlled from shore.",
+    action: { label: 'Meet Reach Remote', url: '/assets/reach-remote/' },
+  },
+  {
+    media: 'none',
+    surface: 'tint',
+    span: { cols: 3, rows: 1 },
+    eyebrow: 'Careers',
+    title: 'Work with us',
+    description: 'Roles offshore and onshore.',
+    action: { label: 'Open positions', url: '/careers/' },
+  },
+];
+
+const serviceCards = [
+  cardPresets.service({
+    pictogram: 'subsea-infrastructure',
+    eyebrow: undefined,
+    title: 'Subsea services',
+    description: 'Inspection, maintenance and repair with work-class ROVs from our DP2 vessels.',
+    action: { label: 'Subsea', url: '/services/subsea/', action: 'page' },
+  }),
+  cardPresets.service({
+    pictogram: 'survey',
+    eyebrow: undefined,
+    title: 'Survey',
+    description: 'Geophysical, geotechnical and positioning survey across the asset lifecycle.',
+    action: { label: 'Survey', url: '/services/survey/', action: 'page' },
+  }),
+  cardPresets.service({
+    pictogram: 'global-monitoring',
+    eyebrow: undefined,
+    title: 'Monitoring',
+    description: 'Continuous asset and environmental monitoring, on the seabed or the surface.',
+    action: { label: 'Monitoring', url: '/services/monitoring/', action: 'page' },
+  }),
+  cardPresets.service({
+    pictogram: 'technology',
+    eyebrow: undefined,
+    title: 'Technology & Innovation',
+    description: 'Remote operations and in-house ROV technology, including Reach Remote.',
+    action: { label: 'Technology', url: '/services/technology-innovation/', action: 'page' },
+  }),
+];
+
+// Newsroom: one feed, mixed post types (Q52). Lead story + report + event + news.
+const newsroomItems: CardField[] = [
+  cardPresets.news({
+    media: 'image-bg',
+    size: 'featured',
+    image: { src: `${import.meta.env.BASE_URL}images/reach-remote-bow.jpg`, alt: 'Reach Remote 1 seen from the bow', focalPoint: { x: 0.6, y: 0.45 } },
+    eyebrow: '13.10.2025 · 2 min read',
+    badge: { label: 'News', tone: 'accent' },
+    title: 'Reach Remote 1 cleared for operations without supporting vessel',
+    description: 'The Norwegian Maritime Authority has granted a trading permit for fully remote operations, with technical validation from DNV.',
+    action: { label: 'Read the story', url: '/newsroom/' },
+  }),
+  cardPresets.document({
+    eyebrow: 'Investor update',
+    badge: { label: 'PDF', tone: 'neutral' },
+    title: 'Q2 2026 report',
+    meta: [{ icon: 'calendar', text: '20 Aug 2026' }],
+    action: { label: 'Download report (PDF)', url: '#', action: 'file' },
+  }),
+  cardPresets.news({
+    media: 'none',
+    surface: 'white',
+    eyebrow: '24.09.2025 · 4 min read',
+    badge: { label: 'News', tone: 'accent' },
+    title: 'Reach Subsea orders Reach Remote 3 and 4 from Kongsberg Maritime',
+    description: undefined,
+    action: { label: 'Read more', url: '/newsroom/' },
+  }),
+  cardPresets.event({
+    surface: 'white',
+    eyebrow: 'Conference',
+    title: 'Offshore Technology Conference',
+    meta: [{ icon: 'calendar', text: '15 Oct 2026, Stavanger' }],
+    action: { label: 'Event details', url: '/newsroom/events/', action: 'page' },
+  }),
+];
+
+// Dummy posts (SocialFeed is a stand-in for the live LinkedIn widget). Text from the client PDF's samples.
+const linkedInPosts = [
+  {
+    age: '2 days ago',
+    text: 'Our team completed another successful IMR campaign this week. Proud of the crews making it happen safely and efficiently.',
+    image: { src: `${import.meta.env.BASE_URL}images/rov-zeerov-wellhead.jpg`, alt: 'ROV working at a subsea wellhead' },
+    reactions: 184,
+    url: 'https://www.linkedin.com/company/reach-subsea/',
+  },
+  {
+    age: '1 week ago',
+    text: 'Reach Remote continues to log operational days without a supporting vessel. A milestone for uncrewed offshore operations.',
+    image: { src: `${import.meta.env.BASE_URL}images/reach-remote-side.jpg`, alt: 'Reach Remote 1 at sea' },
+    reactions: 312,
+    url: 'https://www.linkedin.com/company/reach-subsea/',
+  },
+  {
+    age: '2 weeks ago',
+    text: 'We are hiring across offshore and onshore roles. Check open positions on our candidate portal.',
+    reactions: 97,
+    url: 'https://www.linkedin.com/company/reach-subsea/',
+  },
+  {
+    age: '3 weeks ago',
+    text: 'Survey season in the North Sea: uncrewed survey vessels working alongside our crewed fleet on cable route surveys.',
+    image: { src: `${import.meta.env.BASE_URL}images/usv-drix-wind.jpg`, alt: 'Uncrewed survey vessel at an offshore wind farm' },
+    reactions: 141,
+    url: 'https://www.linkedin.com/company/reach-subsea/',
+  },
+  {
+    age: '1 month ago',
+    text: 'On the seabed with gWatch: long-term monitoring installed by ROV from the vessel above.',
+    image: { src: `${import.meta.env.BASE_URL}images/rov-zeerov-gwatch.jpg`, alt: 'ROV installing monitoring equipment on the seabed' },
+    reactions: 76,
+    url: 'https://www.linkedin.com/company/reach-subsea/',
+  },
+];
+
+const faqItems = [
+  {
+    slug: 'what-does-reach-subsea-do',
+    question: 'What does Reach Subsea do?',
+    answer:
+      'Reach Subsea delivers subsea survey, inspection, maintenance, intervention and data services for customers operating in offshore energy, infrastructure and other ocean industries.',
+    open: true,
+  },
+  {
+    slug: 'what-industries-do-you-serve',
+    question: 'What industries do you serve?',
+    answer:
+      'We primarily support offshore energy, offshore wind, subsea cables and emerging ocean industries with subsea services, technology and data solutions.',
+  },
+  {
+    slug: 'where-does-reach-subsea-operate',
+    question: 'Where does Reach Subsea operate?',
+    answer:
+      'We operate from Haugesund, Norway, with additional offices in Bergen, Sandnes, Harstad, Billingstad, West Perth, Singapore and Aberdeen, and further presence in Sweden, Brazil and Cyprus, reaching clients in nine countries worldwide.',
+  },
+  {
+    slug: 'what-makes-reach-subsea-different',
+    question: 'What makes Reach Subsea different?',
+    answer:
+      'A combination of deep offshore engineering experience, in-house ROV and monitoring technology, and Reach Remote: our uncrewed surface vessel platform operated from shore via Reach Horizon.',
+  },
+];
+---
+
+<BaseLayout title="Reach Subsea · Transforming the way we work in the ocean" motion>
+  <Header overlay />
+  <main id="main">
+    <PageHero
+      style="video"
+      titleStyle="display"
+      eyebrow="Subsea · Survey · Monitoring · Remote Operations"
+      title="Transforming the way we work in the ocean"
+      lead="Subsea survey, inspection, monitoring and intervention services worldwide, through crewed vessels, remote operations and uncrewed surface vessels."
+      video={{ src: `${import.meta.env.BASE_URL}video/promo.mp4`, poster: `${import.meta.env.BASE_URL}images/promo-poster.jpg`, loopStart: 1, loopEnd: 54.5 }}
+      actions={[
+        { label: 'Explore our services', url: '/services/', action: 'page' },
+        { label: 'Beyond the surface', url: '/company/', action: 'page' },
+      ]}
+    />
+
+    {/* Feature style leading on 500+ (chosen 17 Sep 2026 over the 4-across panel) */}
+    <StatsBand
+      style="feature"
+      featureKey="people"
+      background="tint"
+      animate
+      stats={pickFigures(['people', 'established', 'fleet', 'countries', 'rov-systems'])}
+    />
+
+    {/* Live operations (17 Sep 2026, Q56): straight after the figures, "9 countries" → where we are today.
+        SAMPLE DATA until the Current operations feed exists (docs/07-live-operations.md). */}
+    <LiveOperations feed={liveOperations} />
+
+    <CardGrid
+      sectionHeader={{
+        title: 'Ocean operations, reimagined',
+        action: { label: 'All services', url: '/services/' },
+      }}
+      layout="bento"
+      cards={bentoCards}
+    />
+
+    <CardGrid
+      sectionHeader={{ title: 'Four services, one partner' }}
+      layout="4-columns"
+      media="icon"
+      surface="tint"
+      cards={serviceCards}
+    />
+
+    <Embed
+      type="3d-world"
+      state="poster"
+      title="See our operations in 3D"
+      text="Fly through four working zones, from the vessel on the surface to the ROV on the seabed. An 18 MB scene, best on a tablet or computer."
+      worldUrl={worldSceneUrl}
+      fullScreenUrl={worldPath}
+      poster={{ src: `${import.meta.env.BASE_URL}images/3d-world-poster.jpg`, alt: 'An ROV surveying a pipeline on the seabed in the Reach Subsea 3D World' }}
+      posterVideo={{ src: `${import.meta.env.BASE_URL}video/promo.mp4`, start: 15, end: 45 }}
+      showZones
+    />
+
+    <FeedGrid
+      sectionHeader={{
+        title: 'Reach Newsroom',
+        action: { label: 'See all news & reports', url: '/newsroom/' },
+      }}
+      source="latest"
+      layout="editorial"
+      showLoadMore={false}
+      items={newsroomItems}
+    />
+
+    <SocialFeed title="Latest news from LinkedIn" followUrl="https://www.linkedin.com/company/reach-subsea/" posts={linkedInPosts} />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers to what we are asked most, plus every other topic, organised by subject.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      background="tint"
+      items={faqItems}
+    />
+
+    <CtaBand
+      style="panel"
+      background="tint"
+      title="Would you like to know more?"
+      text="Reach out to us today."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,174 @@
+---
+// Media gallery · reach/gallery (docs/05 §2.12). Type Photos · Videos.
+// Photos: 3-col grid of 3:2 Media frames (even columns — Figma's build settled to a plain 3-across
+// grid, not a spanning first tile), each a <button> opening the Lightbox dialog. visibleCount shown,
+// the rest stay in the DOM `hidden` (still in lightbox order) until "Show all N photos" reveals them.
+// Videos: a Card grid (Image top, White), action Video → the Video dialog. No carousels, no More link.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import MediaFrame from '../components/MediaFrame.astro';
+import Link from '../components/Link.astro';
+import Card from '../components/Card.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, ImageField, SectionHeaderField } from '../lib/types';
+
+interface GalleryPhoto {
+  image: ImageField;
+  caption?: string;
+}
+
+interface GalleryVideo {
+  title: string;
+  description?: string;
+  url: string;
+  image?: ImageField;
+}
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  type: 'photos' | 'videos';
+  photos?: GalleryPhoto[];
+  /** Photos shown before "Show all". */
+  visibleCount?: number;
+  videos?: GalleryVideo[];
+}
+
+const { sectionHeader, type, photos = [], visibleCount = 6, videos = [], background, spacing, anchor } = Astro.props;
+
+const hasContent = type === 'photos' ? photos.length > 0 : videos.length > 0;
+const titleId = sectionHeader ? makeId('gallery', sectionHeader.title) : undefined;
+const fallbackLabel = type === 'photos' ? 'Photo gallery' : 'Videos';
+const lightboxGroup = makeId('gallery-photos');
+const hiddenCount = Math.max(0, photos.length - visibleCount);
+---
+
+{
+  hasContent && (
+    <BlockSection
+      slug="gallery"
+      root="gallery"
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : fallbackLabel}
+    >
+      <div class="block__body">
+        {sectionHeader && (
+          <SectionHeader title={sectionHeader.title} intro={sectionHeader.intro} action={sectionHeader.action} align={sectionHeader.align} id={titleId} />
+        )}
+        {type === 'photos' ? (
+          <div class="gallery__photos-wrap" data-gallery>
+            <div class="gallery__photos">
+              {photos.map((photo, i) => (
+                <button
+                  type="button"
+                  class="gallery__photo"
+                  data-gallery-photo
+                  data-lightbox={lightboxGroup}
+                  data-src={photo.image.src}
+                  data-alt={photo.image.alt}
+                  data-caption={photo.caption}
+                  aria-label={`Open photo ${i + 1} of ${photos.length}: ${photo.caption || photo.image.alt}`}
+                  hidden={i >= visibleCount ? true : undefined}
+                >
+                  <MediaFrame ratio="3:2" image={photo.image} radius="lg" />
+                </button>
+              ))}
+            </div>
+            {hiddenCount > 0 && (
+              <div class="gallery__more">
+                <Link label={`Show all ${photos.length} photos`} action="expand" data-gallery-expand />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div class="gallery__videos">
+            {videos.map((video) => (
+              // Card sets its own colour mode, so White video cards stay white on a Navy block (Figma)
+              <Card
+                media="image-top"
+                surface="white"
+                image={video.image}
+                title={video.title}
+                description={video.description}
+                action={{ label: 'Watch video', url: video.url, action: 'video' }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </BlockSection>
+  )
+}
+
+<script>
+  document.addEventListener('click', (event) => {
+    const trigger = (event.target as Element).closest<HTMLElement>('[data-gallery-expand]');
+    const root = trigger?.closest('[data-gallery]');
+    if (!trigger || !root) return;
+
+    const hidden = [...root.querySelectorAll<HTMLElement>('[data-gallery-photo][hidden]')];
+    hidden.forEach((photo) => photo.removeAttribute('hidden'));
+    trigger.setAttribute('aria-expanded', 'true');
+    trigger.hidden = true;
+    hidden[0]?.focus();
+  });
+</script>
+
+<style is:global>
+  .gallery__photos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .gallery__photo {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-width: 0;
+    border-radius: var(--wp--custom--radius--lg);
+  }
+  .gallery__photo:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 4px;
+  }
+  /* .gallery__photo's own `display` would otherwise outrank the UA [hidden] rule (equal specificity, later in the cascade). */
+  .gallery__photo[hidden] {
+    display: none;
+  }
+  @media (hover: hover) {
+    .gallery__photo:hover .media-frame__image {
+      transform: scale(1.04);
+    }
+  }
+  .gallery__more {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--wp--custom--stack--md);
+  }
+
+  .gallery__videos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+    align-items: stretch;
+  }
+
+  @media (max-width: 899px) {
+    .gallery__photos {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 1199px) {
+    .gallery__videos {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 599px) {
+    .gallery__videos {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

@@ -1,0 +1,135 @@
+---
+// Section subnav · reach/subnav (docs/05 §2.14). No new component: places the Phase 2 Subnav pill
+// bar (docs/04 §15, Subnav item) directly under the Page hero. Two link sources —
+//   Section pages: children of the section landing page; `current` marks the active one, static
+//     `aria-current="page"`.
+//   In-page: block anchors on the same page; a scroll-spy sets `aria-current="location"` on the
+//     pill for the section in view (<script> below).
+// Not a `<section>` and carries no block padding, so it renders its own <nav> rather than going
+// through BlockSection. One style everywhere (`.has-surface-light` forces Light even on a Navy
+// page, per the spec note "a Navy section doesn't change it").
+//
+// Sticky: `position: sticky; top: var(--reach-subnav-top, 0px)`. On the real site the header sets
+// `--reach-subnav-top` as it shows/hides (96 → 72 → 0, docs/04 §16) so the subnav docks to the
+// header's current bottom edge and then to `top: 0` once the header is hidden; that header script
+// is out of this block's scope, so it's left as a custom property with a 0px fallback here.
+import SubnavItem from '../components/SubnavItem.astro';
+
+export interface SubnavLink {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  source: 'section-pages' | 'in-page';
+  /** nav aria-label, e.g. "Investors". */
+  label: string;
+  items: SubnavLink[];
+  /** Current page href — Section pages only. */
+  current?: string;
+}
+
+const { source, label, items, current } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <nav class="wp-block-reach-subnav subnav has-surface-light" aria-label={label} data-subnav data-subnav-source={source}>
+      <div class="subnav__row container">
+        {items.map((item) => (
+          <SubnavItem
+            label={item.label}
+            href={item.href}
+            aria-current={source === 'section-pages' && item.href === current ? 'page' : undefined}
+            data-subnav-target={source === 'in-page' ? item.href.replace(/^#/, '') : undefined}
+          />
+        ))}
+      </div>
+    </nav>
+  )
+}
+
+<style is:global>
+  .subnav {
+    position: sticky;
+    top: var(--reach-subnav-top, 0px);
+    z-index: 20;
+    background-color: var(--wp--custom--color--bg--default);
+    border-bottom: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .subnav__row {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    padding-block: var(--wp--preset--spacing--12);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .subnav__row::-webkit-scrollbar {
+    display: none;
+  }
+  .subnav-item {
+    flex: none;
+  }
+</style>
+
+<script>
+  // Section subnav (docs/05 §2.14): keeps the active pill in view inside the row — scrolling the
+  // row's own scrollLeft, never the page — and, for In-page sources, runs the scroll-spy.
+  function scrollPillIntoView(row: HTMLElement, pill: HTMLElement) {
+    const rowRect = row.getBoundingClientRect();
+    const pillRect = pill.getBoundingClientRect();
+    const margin = 16;
+    if (pillRect.left < rowRect.left) {
+      row.scrollLeft -= rowRect.left - pillRect.left + margin;
+    } else if (pillRect.right > rowRect.right) {
+      row.scrollLeft += pillRect.right - rowRect.right + margin;
+    }
+  }
+
+  function initSubnav(nav: HTMLElement) {
+    const row = nav.querySelector<HTMLElement>('.subnav__row');
+    if (!row) return;
+    const pills = Array.from(row.querySelectorAll<HTMLElement>('.subnav-item'));
+    if (pills.length === 0) return;
+
+    function setActive(pill: HTMLElement) {
+      pills.forEach((p) => {
+        if (p === pill) p.setAttribute('aria-current', 'location');
+        else p.removeAttribute('aria-current');
+      });
+      scrollPillIntoView(row as HTMLElement, pill);
+    }
+
+    const initialActive = pills.find((p) => p.getAttribute('aria-current') === 'page');
+    if (initialActive) scrollPillIntoView(row, initialActive);
+
+    if (nav.dataset.subnavSource !== 'in-page') return;
+
+    const targets = pills
+      .map((pill) => {
+        const id = pill.dataset.subnavTarget;
+        const section = id ? document.getElementById(id) : null;
+        return section && { pill, section };
+      })
+      .filter((t): t is { pill: HTMLElement; section: HTMLElement } => Boolean(t));
+    if (targets.length === 0) return;
+
+    // The review iframe doesn't scroll internally, so this only fires when the demo is opened on
+    // its own (/blocks/subnav/, or the "Open frame" link) rather than embedded in the /blocks page.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        const match = visible[0] && targets.find((t) => t.section === visible[0].target);
+        if (match) setActive(match.pill);
+      },
+      { rootMargin: '-20% 0px -70% 0px', threshold: 0 },
+    );
+    targets.forEach((t) => observer.observe(t.section));
+    setActive(targets[0].pill); // sensible default before the first scroll/observer callback
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-subnav]').forEach(initSubnav);
+</script>

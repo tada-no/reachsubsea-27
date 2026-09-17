@@ -1,0 +1,289 @@
+---
+// Stats band · reach/stats (docs/05 §2.5). Count 3 · 4 × Style Plain · Panel. Optional Section header,
+// Stat Large, Align Start (Center when the header is centred). 1px border/subtle rules between stats:
+// vertical on desktop, none for a 4-stat mobile 2×2 grid, horizontal for a 3-stat mobile column.
+// Panel = white panel in flow (bg/default, Light forced, radius lg, Shadow/sm).
+// Feature (17 Sep 2026, proposal v2): one figure leads in a navy tile, the others sit beside it as equal
+// columns with a rule between, all sharing one bottom line with the lead's label. Stacks below 900.
+// Max one Stats band per page (docs/05 §0).
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Stat from '../components/Stat.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField, StatField } from '../lib/types';
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  style?: 'plain' | 'panel' | 'feature';
+  /** Feature style: key of the figure that leads. Defaults to the first. */
+  featureKey?: string;
+  /** 3–4 figures; count is derived from the length. */
+  stats: StatField[];
+  /** Defaults to Center when the section header is centred, Start otherwise. */
+  align?: 'start' | 'center';
+  /** Stats enter one by one and count up from 0 when the band scrolls into view (17 Sep 2026). */
+  animate?: boolean;
+  class?: string;
+}
+
+const {
+  sectionHeader,
+  style = 'plain',
+  featureKey,
+  stats,
+  align,
+  animate = false,
+  background,
+  spacing,
+  anchor,
+  class: className,
+} = Astro.props;
+
+const panel = style === 'panel';
+const feature = style === 'feature';
+const leadIndex = Math.max(0, featureKey ? stats.findIndex((s) => s.key === featureKey) : 0);
+const lead = stats[leadIndex];
+const rest = stats.filter((_, i) => i !== leadIndex);
+const count = stats.length;
+const alignment = align ?? (sectionHeader?.align === 'center' ? 'center' : 'start');
+const titleId = sectionHeader ? makeId('stats', sectionHeader.title) : undefined;
+const rootClass = [`stats-band--${style}`, `stats-band--count-${count}`, animate && 'stats-band--animate', className].filter(Boolean).join(' ');
+const STAT_STAGGER = 160;
+---
+
+{
+  count > 0 && (
+    <BlockSection
+      slug="stats"
+      root="stats-band"
+      class={rootClass}
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : 'Key figures'}
+    >
+      <div class="stats-band__body">
+        {sectionHeader && <SectionHeader {...sectionHeader} align={alignment} id={titleId} />}
+        {feature ? (
+          <div class="stats-band__group stats-band__feature has-surface-light">
+            <div class="stats-band__lead has-surface-navy">
+              <p class="stats-band__lead-value text-display">
+                {animate ? <span data-count-up data-count-up-delay={150}>{lead.value}</span> : lead.value}
+              </p>
+              <p class="stats-band__lead-label text-small">{lead.label}</p>
+              {lead.note && <p class="stat__note text-small">{lead.note}</p>}
+            </div>
+            <ul class="stats-band__rows" style={`grid-template-columns: ${rest.map(() => 'max-content').join(' minmax(var(--rule-gap), 1fr) ')}`}>
+              {rest.map((stat, i) => (
+                <Fragment>
+                {i > 0 && <li class="stats-band__rule" role="presentation" aria-hidden="true" />}
+                <li class="stats-band__row" style={`--stat-i: ${i + 1}`}>
+                  <p class="stats-band__row-value text-h2">
+                    {animate ? <span data-count-up data-count-up-delay={150 + (i + 1) * STAT_STAGGER}>{stat.value}</span> : stat.value}
+                  </p>
+                  <p class="stats-band__row-label text-small">{stat.label}</p>
+                </li>
+                </Fragment>
+              ))}
+            </ul>
+          </div>
+        ) : (
+        <div class:list={['stats-band__group', panel && 'has-surface-light']}>
+          <ul class="stats-band__list">
+            {stats.map((stat, i) => (
+              <Stat
+                value={stat.value}
+                label={stat.label}
+                note={stat.note}
+                size="large"
+                align={alignment}
+                as="li"
+                countUp={animate}
+                countDelay={150 + i * STAT_STAGGER}
+                style={`--stat-i: ${i}`}
+              />
+            ))}
+          </ul>
+        </div>
+        )}
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .stats-band__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
+  }
+
+  .stats-band--panel .stats-band__group {
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--default);
+    box-shadow: var(--wp--preset--shadow--sm);
+    padding: var(--wp--preset--spacing--40);
+  }
+
+  .stats-band__list {
+    display: flex;
+  }
+
+  /* Feature (17 Sep 2026): navy lead tile + figures in one panel. It wraps rather than breakpoints:
+     the figures never shrink below their natural width, so the row stacks under the lead only when
+     it genuinely can't fit. Figures are content-width; spare space goes into the gaps, with each
+     rule centred in its gap. */
+  .stats-band__feature {
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--default);
+    box-shadow: var(--wp--preset--shadow--sm);
+  }
+  .stats-band__lead {
+    /* Grows only when it has the line to itself (stacked) */
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: var(--wp--preset--spacing--4);
+    padding: var(--wp--preset--spacing--40);
+  }
+  .stats-band__lead-value {
+    color: var(--wp--custom--color--text--accent);
+    font-variant-numeric: tabular-nums lining-nums;
+    font-size: clamp(3.5rem, 2.4rem + 2.2vw, 5rem);
+    line-height: 1;
+    /* Optical: pull the display digits back onto the label's left edge */
+    margin-left: -0.05em;
+  }
+  .stats-band__lead-label {
+    color: var(--wp--custom--color--text--primary);
+    white-space: nowrap;
+  }
+  .stats-band__rows {
+    --rule-gap: var(--wp--preset--spacing--48);
+    flex: 1000 1 max-content;
+    display: grid;
+    align-items: end;
+    padding: var(--wp--preset--spacing--40);
+  }
+  .stats-band__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+  }
+  .stats-band__rule {
+    justify-self: center;
+    align-self: stretch;
+    width: 1px;
+    background-color: var(--wp--custom--color--border--subtle);
+  }
+  .stats-band__row-value {
+    color: var(--wp--custom--color--text--primary);
+    font-variant-numeric: tabular-nums lining-nums;
+    line-height: 1;
+  }
+  .stats-band__row-label {
+    color: var(--wp--custom--color--text--secondary);
+    white-space: nowrap;
+  }
+  html.js .stats-band--animate .stats-band__row,
+  html.js .stats-band--animate .stats-band__lead > * {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+    transition:
+      opacity 0.7s var(--wp--custom--motion--ease-out),
+      transform 0.7s var(--wp--custom--motion--ease-out);
+    transition-delay: calc(0.15s + var(--stat-i, 0) * 0.16s);
+  }
+  html.js .stats-band--animate .is-revealed .stats-band__row,
+  html.js .stats-band--animate .is-revealed .stats-band__lead > * {
+    opacity: 1;
+    transform: none;
+  }
+  /* Phones and narrow tablets: figures in a 2×2 grid, no rules */
+  @media (max-width: 767px) {
+    .stats-band__lead {
+      padding: var(--wp--preset--spacing--24);
+    }
+    .stats-band__rows {
+      flex-basis: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: var(--wp--preset--spacing--24);
+      padding: var(--wp--preset--spacing--24);
+    }
+    .stats-band__rule {
+      display: none;
+    }
+    .stats-band__row-label {
+      white-space: normal;
+    }
+    .stats-band__row-value {
+      font-size: var(--wp--preset--font-size--h3);
+    }
+  }
+
+  .stats-band__list > li {
+    flex: 1;
+    min-width: 0;
+    padding-right: var(--wp--preset--spacing--40);
+  }
+  .stats-band__list > li:last-child {
+    padding-right: 0;
+  }
+  .stats-band__list > li + li {
+    padding-left: var(--wp--preset--spacing--40);
+    border-left: 1px solid var(--wp--custom--color--border--subtle);
+  }
+
+  /* Animate: each stat rises in after the previous one; motion.ts reveals the group (.is-revealed)
+     and runs the count-up with the same 160 ms step. */
+  html.js .stats-band--animate .stats-band__list > li {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+    transition:
+      opacity 0.7s var(--wp--custom--motion--ease-out),
+      transform 0.7s var(--wp--custom--motion--ease-out);
+    transition-delay: calc(0.15s + var(--stat-i, 0) * 0.16s);
+  }
+  html.js .stats-band--animate .is-revealed .stats-band__list > li {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .stats-band--animate .stats-band__list > li {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .stats-band__list > li,
+    .stats-band__list > li + li {
+      padding: 0;
+      border: 0;
+      margin: 0;
+    }
+    .stats-band--count-4 .stats-band__list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--wp--preset--spacing--24);
+    }
+    .stats-band--count-3 .stats-band__list {
+      flex-direction: column;
+    }
+    .stats-band--count-3 .stats-band__list > li + li {
+      margin-top: var(--wp--preset--spacing--24);
+      padding-top: var(--wp--preset--spacing--24);
+      border-top: 1px solid var(--wp--custom--color--border--subtle);
+    }
+  }
+
+  @media (max-width: 599px) {
+    .stats-band--panel .stats-band__group {
+      padding: var(--wp--preset--spacing--24);
+    }
+  }
+</style>

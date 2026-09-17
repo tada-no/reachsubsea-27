@@ -1,0 +1,64 @@
+---
+import LogoStrip from '../blocks/LogoStrip.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+
+const logos = Array.from({ length: 6 }, (_, i) => ({ label: `Partner organisation ${i + 1}` }));
+
+const certifications = [
+  { label: 'ISO 9001:2015', file: { label: 'Certificate (PDF)', url: '#' } },
+  { label: 'ISO 14001:2015', file: { label: 'Certificate (PDF)', url: '#' } },
+  { label: 'ISO 45001:2018', file: { label: 'Certificate (PDF)', url: '#' } },
+  { label: 'Achilles JQS', file: { label: 'Certificate (PDF)', url: '#' } },
+];
+
+const sdgs = [
+  { label: 'Affordable and clean energy', goal: 7 },
+  { label: 'Decent work and economic growth', goal: 8 },
+  { label: 'Industry, innovation and infrastructure', goal: 9 },
+  { label: 'Climate action', goal: 13 },
+  { label: 'Life below water', goal: 14 },
+  { label: 'Partnerships for the goals', goal: 17 },
+];
+---
+
+<VariantLabel name="Logos" props='type="logos"' />
+<LogoStrip type="logos" sectionHeader={{ title: 'Partners and clients' }} items={logos} />
+
+<VariantLabel name="Certifications" props='type="certifications"' />
+<LogoStrip type="certifications" sectionHeader={{ title: 'Certifications' }} items={certifications} />
+
+<VariantLabel name="SDGs" props='type="sdgs"' />
+<LogoStrip type="sdgs" sectionHeader={{ title: 'Our contribution to the UN goals' }} items={sdgs} />
+
+<VariantLabel name="Example · HSEQ certifications on Tint" props='type="certifications" background="tint"' />
+<LogoStrip
+  type="certifications"
+  background="tint"
+  sectionHeader={{ title: 'HSEQ certifications' }}
+  items={[
+    { label: 'ISO 9001:2015', file: { label: 'Certificate (PDF)', url: '#' } },
+    { label: 'ISO 14001:2015', file: { label: 'Certificate (PDF)', url: '#' } },
+    { label: 'ISO 45001:2018', file: { label: 'Certificate (PDF)', url: '#' } },
+    { label: 'Achilles JQS', file: { label: 'Certificate (PDF)', url: '#' } },
+  ]}
+/>
+
+<VariantLabel name="Example · SDGs" props='type="sdgs"' />
+<LogoStrip
+  type="sdgs"
+  sectionHeader={{ title: 'Our contribution to the UN goals' }}
+  items={[
+    { label: 'Affordable and clean energy', goal: 7 },
+    { label: 'Industry, innovation and infrastructure', goal: 9 },
+    { label: 'Climate action', goal: 13 },
+    { label: 'Life below water', goal: 14 },
+  ]}
+/>
+
+<VariantLabel name="Example · Partner logos on Navy" props='type="logos" background="navy"' />
+<LogoStrip
+  type="logos"
+  background="navy"
+  sectionHeader={{ title: 'Partners and clients' }}
+  items={Array.from({ length: 6 }, (_, i) => ({ label: `Partner organisation ${i + 1}` }))}
+/>

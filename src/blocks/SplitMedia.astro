@@ -1,0 +1,234 @@
+---
+// Split media · reach/split-media (docs/05 §2.4). Media Image · Video · Spec table · Numbered list ×
+// Position End · Start. Text side cols 1–5 (Eyebrow, H2/H3, rich text, 0–2 actions, gap stack/md),
+// media side cols 7–12, vertically centred; Position=Start swaps the sides.
+// Mobile (≤899): Image/Video stack above the text; Spec table/Numbered list stack below it (DOM order
+// is always text-then-media; only Image/Video get `order: -1` at the mobile breakpoint).
+import BlockSection from '../components/BlockSection.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Link from '../components/Link.astro';
+import MediaFrame from '../components/MediaFrame.astro';
+import SpecRow from '../components/SpecRow.astro';
+import NumberedItem from '../components/NumberedItem.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, ImageField, LinkField } from '../lib/types';
+
+interface VideoField {
+  url: string;
+  title: string;
+  /** Link label under the media frame, e.g. "Watch: remote operations explained (2:40)". */
+  label?: string;
+}
+
+interface SpecItem {
+  label: string;
+  value: string;
+}
+
+interface NumberedListItem {
+  title: string;
+  text: string;
+}
+
+interface Props extends BlockFields {
+  media?: 'image' | 'video' | 'spec-table' | 'numbered-list';
+  position?: 'end' | 'start';
+  eyebrow?: string;
+  title: string;
+  headingLevel?: 'h2' | 'h3';
+  /** Rich text HTML string, rendered in .prose via set:html. A default slot also renders in .prose. */
+  body?: string;
+  /** 0–2 action Links under the body copy. */
+  actions?: LinkField[];
+  image?: ImageField;
+  caption?: string;
+  video?: VideoField;
+  specHeading?: string;
+  specs?: SpecItem[];
+  /** Only renders when it has a url ("Download spec sheet (PDF)"). */
+  specFile?: LinkField;
+  /** 3–6 numbered items (Reach Remote oversight levels, HOP). */
+  items?: NumberedListItem[];
+  class?: string;
+}
+
+const {
+  media = 'image',
+  position = 'end',
+  eyebrow,
+  title,
+  headingLevel: Heading = 'h2',
+  body,
+  actions = [],
+  image,
+  caption,
+  video,
+  specHeading,
+  specs = [],
+  specFile,
+  items = [],
+  background,
+  spacing,
+  anchor,
+  class: className,
+} = Astro.props;
+
+const titleId = makeId('split-media', title);
+const shownActions = actions.slice(0, 2);
+const hasSpecFile = Boolean(specFile?.url);
+const rootClass = [`split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
+---
+
+<BlockSection
+  slug="split-media"
+  root="split-media"
+  class={rootClass}
+  background={background}
+  spacing={spacing}
+  anchor={anchor}
+  labelledBy={titleId}
+>
+  <div class="split-media__columns">
+    <div class="split-media__text">
+      {eyebrow && <Eyebrow text={eyebrow} />}
+      <Heading id={titleId} class:list={['split-media__title', Heading === 'h3' ? 'text-h3' : 'text-h2']}>
+        {title}
+      </Heading>
+      <div class="prose split-media__body">
+        {body && <Fragment set:html={body} />}
+        <slot />
+      </div>
+      {
+        shownActions.length > 0 && (
+          <div class="split-media__actions">
+            {shownActions.map((action) => (
+              <Link label={action.label} href={action.url} action={action.action ?? 'page'} context={action.context} />
+            ))}
+          </div>
+        )
+      }
+    </div>
+
+    <div class="split-media__media">
+      {media === 'image' && <MediaFrame ratio="4:3" image={image} caption={caption} />}
+
+      {
+        media === 'video' && video && (
+          <Fragment>
+            <MediaFrame
+              ratio="16:9"
+              image={image}
+              caption={caption}
+              showPlay
+              playLabel={`Play: ${video.title}`}
+              playAttrs={{ 'data-video-src': video.url, 'data-video-title': video.title }}
+            />
+            <Link
+              label={video.label ?? `Watch: ${video.title}`}
+              action="video"
+              data-video-src={video.url}
+              data-video-title={video.title}
+            />
+          </Fragment>
+        )
+      }
+
+      {
+        media === 'spec-table' && specs.length > 0 && (
+          <div class="split-media__spec-table">
+            {specHeading && <h3 class="split-media__spec-heading text-h5">{specHeading}</h3>}
+            <dl class="split-media__specs">
+              {specs.map((spec) => (
+                <SpecRow label={spec.label} value={spec.value} />
+              ))}
+            </dl>
+            {hasSpecFile && specFile && (
+              <Link label={specFile.label} href={specFile.url} action="file" size="small" context={specFile.context} />
+            )}
+          </div>
+        )
+      }
+
+      {
+        media === 'numbered-list' && items.length > 0 && (
+          <ol class="split-media__list">
+            {items.map((item) => (
+              <NumberedItem title={item.title} text={item.text} />
+            ))}
+          </ol>
+        )
+      }
+    </div>
+  </div>
+</BlockSection>
+
+<style is:global>
+  .split-media__columns {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    align-items: center;
+  }
+  /* Both sides on row 1: with Position start the media column comes before the text in the grid,
+     and auto-placement would otherwise push it to a second row */
+  .split-media__text {
+    grid-row: 1;
+    grid-column: 1 / span 5;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    min-width: 0;
+  }
+  .split-media__media {
+    grid-row: 1;
+    grid-column: 7 / span 6;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--16);
+    min-width: 0;
+  }
+  .split-media--start .split-media__text {
+    grid-column: 8 / span 5;
+  }
+  .split-media--start .split-media__media {
+    grid-column: 1 / span 6;
+  }
+
+  .split-media__body:empty {
+    display: none;
+  }
+
+  .split-media__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+  }
+
+  .split-media__spec-table,
+  .split-media__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .split-media__specs {
+    display: flex;
+    flex-direction: column;
+  }
+  .split-media__list {
+    counter-reset: numbered-item;
+    gap: 0;
+  }
+
+  @media (max-width: 899px) {
+    .split-media__columns {
+      display: flex;
+      flex-direction: column;
+      gap: var(--wp--custom--stack--xl);
+    }
+    .split-media--image .split-media__media,
+    .split-media--video .split-media__media {
+      order: -1;
+    }
+  }
+</style>

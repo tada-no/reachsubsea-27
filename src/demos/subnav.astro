@@ -1,0 +1,65 @@
+---
+// Section subnav demo (docs/05 §2.14). Section pages hrefs are distinct slugs rather than the
+// usual demo "#" (a plain "#" on every item would make `current` match every pill at once — the
+// whole point of this variant is to show one, and only one, pill active). In-page hrefs are real
+// anchors into the five demo sections below, so the scroll-spy has somewhere to point: the review
+// iframe doesn't scroll internally, so open this demo on its own (its "Open frame" link, or
+// /blocks/subnav/) to see the spy move as you scroll.
+import SectionSubnav from '../blocks/SectionSubnav.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+
+const investorItems = [
+  { label: 'Overview', href: '#overview' },
+  { label: 'Why invest', href: '#why-invest' },
+  { label: 'Reports & presentations', href: '#reports-and-presentations' },
+  { label: 'Governance & meetings', href: '#governance-and-meetings' },
+  { label: 'Financial calendar', href: '#financial-calendar' },
+  { label: 'Share information', href: '#share-information' },
+];
+
+const faqItems = [
+  { label: 'General', href: '#general' },
+  { label: 'Services', href: '#services' },
+  { label: 'Vessels', href: '#vessels' },
+  { label: 'Investors', href: '#investors' },
+  { label: 'Careers', href: '#careers' },
+];
+
+const demoSections = [
+  { id: 'general', title: 'General', text: 'Answers to common questions about Reach Subsea, our services and how to get in touch.' },
+  { id: 'services', title: 'Services', text: 'What subsea, survey and monitoring work we do, and how a typical project is scoped.' },
+  { id: 'vessels', title: 'Vessels', text: 'Our fleet, crewed and uncrewed, and how vessel availability is planned across a campaign.' },
+  { id: 'investors', title: 'Investors', text: 'Where to find share price data, reports and announcements for REACH on Euronext Oslo Børs.' },
+  { id: 'careers', title: 'Careers', text: 'Open positions, life at Reach Subsea and how to apply.' },
+];
+---
+
+<VariantLabel name="Section pages · Investors, current = Reports & presentations" props='source="section-pages" current="#reports-and-presentations"' />
+<SectionSubnav source="section-pages" label="Investors" items={investorItems} current="#reports-and-presentations" />
+
+<VariantLabel name="In-page · FAQ topics" props='source="in-page"' />
+<SectionSubnav source="in-page" label="FAQ topics" items={faqItems} />
+
+{
+  demoSections.map((section) => (
+    <section id={section.id} class="subnav-demo-section">
+      <h2 class="text-h3">{section.title}</h2>
+      <p class="text-body">{section.text}</p>
+    </section>
+  ))
+}
+
+<style>
+  .subnav-demo-section {
+    padding: var(--wp--custom--stack--xl) var(--wp--style--root--padding-left);
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+    border-bottom: 1px solid var(--wp--custom--color--border--subtle);
+    min-height: 400px;
+  }
+  .subnav-demo-section .text-body {
+    color: var(--wp--custom--color--text--secondary);
+    max-width: var(--wp--style--global--content-size);
+  }
+</style>

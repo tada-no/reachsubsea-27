@@ -1,0 +1,43 @@
+---
+import CtaBand from '../blocks/CtaBand.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+
+const title = 'Would you like to know more?';
+const text = 'Talk to our team about your next campaign, from survey planning to remote operations.';
+const actions = [
+  { label: 'Contact us', url: '#' },
+  { label: 'Explore the fleet', url: '#', action: 'page' as const },
+];
+---
+
+<VariantLabel name="Band (default Navy)" props='style="band"' />
+<CtaBand style="band" title={title} text={text} actions={actions} />
+
+<VariantLabel name="Inline" props='style="inline"' />
+<CtaBand style="inline" title={title} text={text} actions={actions} />
+
+<VariantLabel name="Example · Band on Tint" props='style="band" background="tint"' />
+<CtaBand style="band" background="tint" title={title} text={text} actions={actions} />
+
+<VariantLabel name="Example · Inline IR contact, Show contact, on White" props='style="inline" showContact' />
+<CtaBand
+  style="inline"
+  title="Investor relations"
+  text="Questions about the share, reporting or the financial calendar? Contact our investor relations team."
+  actions={[
+    { label: 'Email investor relations', url: 'mailto:post@reachsubsea.com' },
+    { label: 'Newsweb announcements', url: '#', action: 'external' },
+  ]}
+  showContact
+  contact={{ name: 'Kari Nordmann', role: 'Chief Financial Officer', phone: '+47 400 07 710', email: 'post@reachsubsea.com' }}
+/>
+
+<VariantLabel name="Example · Inline on Tint, accent callout" props='style="inline" background="tint" calloutBackground="accent"' />
+<CtaBand
+  style="inline"
+  background="tint"
+  calloutBackground="accent"
+  title="Explore the full fleet"
+  text="Vessels, ROVs and uncrewed surface vessels, with specifications for each."
+  actions={[{ label: 'Fleet overview', url: '#', type: 'link' }]}
+/>

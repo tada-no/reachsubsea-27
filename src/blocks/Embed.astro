@@ -1,0 +1,627 @@
+---
+// Embed · reach/embed (docs/05 §2.13). Type 3D World · Iframe · Map × State (3D World: Poster ·
+// Loaded; Iframe/Map: Consent · Loaded) × Breakpoint. No forms in v1 (Q39).
+//
+// 3D World: no Section header. Desktop and Mobile are different enough (a full-bleed Navy stage
+// with an overlaid panel vs. a plain Media frame above static-flow text) that they're rendered as
+// two separate, mutually exclusive blocks (`.embed__frame` / `.embed__mobile`), each `display:none`
+// at the other breakpoint — see the CSS note below for why. The iframe itself is never part of the
+// server markup (`data-embed-world-url` only): <script> creates it on "Launch 3D World" and removes
+// it again on "Exit", so the 18 MB scene is never preloaded. The `state="loaded"` prop is a static
+// stand-in for review/screenshots only (the same placeholder Figma uses, since Figma can't embed a
+// live iframe either) — it is not a real iframe.
+//
+// Iframe/Map: Section header, then either the Consent placeholder or the loaded frame. The loaded
+// iframe *is* real server markup when `state="loaded"` (e.g. `about:blank` in the demo); when the
+// initial state is Consent, the frame is pre-rendered `hidden` with the url on `data-embed-src`
+// (not `src`, so nothing loads) and <script> promotes it to `src` on "Load content".
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import MediaFrame from '../components/MediaFrame.astro';
+import ConsentPlaceholder from '../components/ConsentPlaceholder.astro';
+import Button from '../components/Button.astro';
+import Link from '../components/Link.astro';
+import IconButton from '../components/IconButton.astro';
+import Icon from '../components/Icon.astro';
+import Pictogram from '../components/Pictogram.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, ImageField, SectionHeaderField } from '../lib/types';
+
+export type EmbedType = '3d-world' | 'iframe' | 'map';
+export type EmbedState = 'poster' | 'consent' | 'loaded';
+
+interface Zone {
+  /** The zone's own name in the 3D World ("Subsea Infrastructure"), not "Zone 1". */
+  label: string;
+  /** Query value, `?zone=1`–`4`. */
+  zone: number;
+}
+
+interface Provider {
+  name: string;
+  domain: string;
+}
+
+interface Props extends BlockFields {
+  type: EmbedType;
+  /** Initial state, so the demo can show each without a click. */
+  state?: EmbedState;
+  // 3D World
+  eyebrow?: string;
+  title?: string;
+  text?: string;
+  worldUrl?: string;
+  /** Defaults to `worldUrl`. Used by "Open full screen" and, with `?zone=`, the zone links. */
+  fullScreenUrl?: string;
+  poster?: ImageField;
+  /** 3D World poster: a muted background loop of a segment of a film, over the poster image (17 Sep 2026). */
+  posterVideo?: { src: string; start?: number; end?: number };
+  showZones?: boolean;
+  zones?: Zone[];
+  // Iframe / Map
+  sectionHeader?: SectionHeaderField;
+  provider?: Provider;
+  consentTitle?: string;
+  consentText?: string;
+  /** Consent placeholder Button label. Defaults per type ("Load share data" / "Load map"). */
+  consentLoadLabel?: string;
+  /** Consent placeholder Link label. Defaults per type ("Open {domain}" / "Open map"). */
+  consentOpenLabel?: string;
+  // Iframe
+  url?: string;
+  iframeTitle?: string;
+  height?: { desktop?: number; mobile?: number };
+  // Map
+  mapImage?: ImageField;
+}
+
+const {
+  type,
+  state = type === '3d-world' ? 'poster' : 'consent',
+  eyebrow,
+  title = '',
+  text,
+  worldUrl = '',
+  fullScreenUrl = worldUrl,
+  poster,
+  posterVideo,
+  showZones = false,
+  zones = [],
+  sectionHeader,
+  provider,
+  consentTitle,
+  consentText,
+  consentLoadLabel,
+  consentOpenLabel,
+  url = '',
+  iframeTitle = '',
+  height,
+  mapImage,
+  background,
+  spacing,
+  anchor,
+} = Astro.props;
+
+const frameHeight = { desktop: 480, mobile: 560, ...height };
+const titleId = type !== '3d-world' && sectionHeader?.title ? makeId('embed', sectionHeader.title) : undefined;
+
+// Names and order from the 3D World build itself (reach-world `zones` in reach-ocean-realism.html).
+const defaultZones: Zone[] = [
+  { label: 'Subsea Infrastructure', zone: 1 },
+  { label: 'Oil Field Operations', zone: 2 },
+  { label: 'Offshore Wind & Renewables', zone: 3 },
+  { label: 'Subsea Production & Monitoring', zone: 4 },
+];
+const zoneList = zones.length > 0 ? zones : defaultZones;
+// In-site 3D World page (17 Sep 2026): world links stay in the tab
+const worldInSite = fullScreenUrl.startsWith('/');
+const zoneExternal = worldInSite ? {} : { target: '_blank', rel: 'noopener noreferrer' };
+const zoneHref = (zone: number) => `${fullScreenUrl}${fullScreenUrl.includes('?') ? '&' : '?'}zone=${zone}`;
+
+const providerName = provider?.name ?? 'this provider';
+const providerDomain = provider?.domain ?? '';
+const defaultConsentTitle = type === 'iframe' ? `Load share data from ${providerDomain}?` : 'Load the map?';
+const defaultConsentText =
+  type === 'iframe'
+    ? `The share data is provided by ${providerName}, which may set cookies. You can also open it in a new tab.`
+    : 'The map is provided by a third party, which may set cookies. You can also open it in a new tab.';
+const defaultLoadLabel = type === 'iframe' ? 'Load share data' : 'Load map';
+const defaultOpenLabel = type === 'iframe' ? `Open ${providerDomain}` : 'Open map';
+const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobile: ${frameHeight.mobile}px`;
+---
+
+<BlockSection
+  slug="embed"
+  root="embed"
+  class={`embed--${type}`}
+  background={background}
+  spacing={spacing}
+  anchor={anchor}
+  labelledBy={titleId}
+  label={type === '3d-world' ? title : undefined}
+  data-embed-type={type}
+  data-embed-state={state}
+  data-embed-world-url={type === '3d-world' ? worldUrl || undefined : undefined}
+>
+  {
+    type === '3d-world' ? (
+      <Fragment>
+        <div class="embed__frame has-surface-navy">
+          <div class="embed__poster">
+            {poster?.src ? (
+              <img class="embed__poster-image" src={poster.src} alt={poster.alt} loading="lazy" decoding="async" />
+            ) : null}
+            {posterVideo ? (
+              <video
+                class="embed__poster-video"
+                muted
+                playsinline
+                preload="none"
+                aria-hidden="true"
+                data-src={posterVideo.src}
+                data-start={posterVideo.start}
+                data-end={posterVideo.end}
+              />
+            ) : null}
+            {!poster?.src && !posterVideo && (
+              <div class="embed__poster-placeholder" role={poster?.alt ? 'img' : undefined} aria-label={poster?.alt || undefined}>
+                <Icon name="photo" size={24} />
+              </div>
+            )}
+          </div>
+          <div class="embed__scrim" aria-hidden="true" />
+          <div class="embed__mock" aria-hidden="true" hidden={state !== 'loaded'}>
+            <Pictogram name="global-monitoring" size={96} />
+            <p class="embed__mock-text text-small">
+              3D World running in place (iframe <code>?embed=1</code>, title "Reach Subsea 3D World")
+            </p>
+          </div>
+          <div class="embed__toolbar" hidden={state !== 'loaded'}>
+            <Link label="Open full screen" href={fullScreenUrl} action={worldInSite ? 'page' : 'external'} size="small" />
+            <IconButton icon="x" label="Exit 3D World" variant="ghost" size="small" data-embed-action="exit" />
+          </div>
+          <div class="embed__panel" hidden={state === 'loaded'}>
+            {eyebrow && <Eyebrow text={eyebrow} />}
+            <h2 class="embed__title text-h2">{title}</h2>
+            {text && <p class="embed__text text-body">{text}</p>}
+            {/* One action (17 Sep 2026). "Open full screen" lives in the toolbar once the scene runs;
+                touch devices, where Launch is hidden, get the zone links and the mobile layout's link. */}
+            <div class="embed__actions">
+              <Button label="Launch 3D World" variant="primary" type="button" data-embed-action="launch" />
+            </div>
+          </div>
+          {showZones && zoneList.length > 0 && (
+            <nav class="embed__zones" aria-label="Jump to a zone in the 3D World" hidden={state === 'loaded'}>
+              <p class="embed__zones-label text-eyebrow">Jump to a zone</p>
+              <ol class="embed__zones-list">
+                {zoneList.map((z) => (
+                  <li>
+                    <a class="embed__zone" href={zoneHref(z.zone)} {...zoneExternal}>
+                      <span class="embed__zone-number text-caption" aria-hidden="true">{String(z.zone).padStart(2, '0')}</span>
+                      <span class="embed__zone-label text-label">{z.label}</span>
+                      {!worldInSite && <span class="visually-hidden"> (opens in a new tab)</span>}
+                      <Icon name={worldInSite ? 'arrow-right' : 'arrow-up-right'} size={16} class="embed__zone-icon" />
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )}
+        </div>
+
+        <div class="embed__mobile">
+          <MediaFrame ratio="16:9" image={poster} radius="xl" />
+          <div class="embed__mobile-panel">
+            {eyebrow && <Eyebrow text={eyebrow} />}
+            <h2 class="embed__title text-h2">{title}</h2>
+            {text && <p class="embed__text text-body">{text}</p>}
+            <Link label="Open 3D World" href={fullScreenUrl} action={worldInSite ? 'page' : 'external'} />
+            <p class="embed__note text-caption">Opens the full-screen 3D World. Best on a tablet or computer.</p>
+            {showZones && zoneList.length > 0 && (
+              <ol class="embed__zones-list embed__zones-list--mobile" aria-label="Jump to a zone in the 3D World">
+                {zoneList.map((z) => (
+                  <li>
+                    <a class="embed__zone" href={zoneHref(z.zone)} {...zoneExternal}>
+                      <span class="embed__zone-number text-caption" aria-hidden="true">{String(z.zone).padStart(2, '0')}</span>
+                      <span class="embed__zone-label text-label">{z.label}</span>
+                      {!worldInSite && <span class="visually-hidden"> (opens in a new tab)</span>}
+                      <Icon name={worldInSite ? 'arrow-right' : 'arrow-up-right'} size={16} class="embed__zone-icon" />
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </div>
+
+      </Fragment>
+    ) : (
+      <div class="block__body">
+        {sectionHeader?.title && <SectionHeader {...sectionHeader} id={titleId} />}
+        <div class="embed__body">
+          {state === 'consent' ? (
+            <ConsentPlaceholder
+              title={consentTitle ?? defaultConsentTitle}
+              text={consentText ?? defaultConsentText}
+              loadLabel={consentLoadLabel ?? defaultLoadLabel}
+              openLabel={consentOpenLabel ?? defaultOpenLabel}
+              openHref={url || undefined}
+              loadAttrs={{ 'data-embed-action': 'load' }}
+            />
+          ) : null}
+          {type === 'iframe' && (
+            <div class="embed__iframe-frame" style={heightStyle} hidden={state !== 'loaded'}>
+              {state === 'loaded' ? (
+                <iframe class="embed__iframe" src={url} title={iframeTitle} loading="lazy" />
+              ) : (
+                <iframe class="embed__iframe" data-embed-src={url} title={iframeTitle} loading="lazy" />
+              )}
+            </div>
+          )}
+          {type === 'map' && (
+            <div class="embed__map" tabindex="-1" hidden={state !== 'loaded'}>
+              <MediaFrame ratio="16:9" image={mapImage} radius="xl" />
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+</BlockSection>
+
+<style is:global>
+  /* Toggling the `hidden` attribute always wins over any `display` a class below sets. */
+  .embed [hidden] {
+    display: none !important;
+  }
+
+  /* ── 3D World ──────────────────────────────────────────────── */
+  /* BlockSection wraps the slot in .container (a direct child of the <section>), so the stack gap
+     has to live there — a bare `.embed--3d-world { display: flex }` would only affect its one
+     child (.container) and do nothing for .embed__frame/__mobile/__zones inside it. */
+  .embed--3d-world > .container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+  }
+  .embed__frame {
+    display: none;
+  }
+  .embed__mobile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+  }
+  .embed__mobile-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .embed__note {
+    color: var(--wp--custom--color--text--secondary);
+    margin-top: calc(-1 * var(--wp--preset--spacing--8));
+  }
+
+  @media (min-width: 900px) {
+    .embed__frame {
+      display: block;
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--wp--custom--radius--xl);
+      aspect-ratio: 16 / 9;
+    }
+    .embed__mobile {
+      display: none;
+    }
+  }
+
+  /* Stage children (Poster / Loaded mock / Toolbar / Panel) stack absolutely inside the frame.
+     The frame carries .has-surface-navy itself (docs/05 §2.13: "Stage, Navy mode"), independent of
+     the block's own background — every token inside flips (README §4), so no token is hard-coded here. */
+  .embed__poster,
+  .embed__scrim,
+  .embed__mock,
+  .embed__toolbar,
+  .embed__panel,
+  .embed__iframe {
+    position: absolute;
+  }
+  .embed__poster {
+    overflow: hidden;
+  }
+  .embed__poster,
+  .embed__scrim,
+  .embed__iframe {
+    inset: 0;
+  }
+  .embed__poster-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .embed__poster-placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background-color: var(--wp--custom--color--bg--disabled);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* Gradient scrim (17 Sep 2026), same language as the video hero: navy from the left and the
+     bottom, plus a lighter ramp from the right behind the zone list. The scene stays visible top centre. */
+  .embed__scrim {
+    background:
+      linear-gradient(to right, rgb(27 29 59 / 0.88) 0%, rgb(27 29 59 / 0.5) 40%, rgb(27 29 59 / 0.1) 70%),
+      linear-gradient(to left, rgb(27 29 59 / 0.72) 0%, rgb(27 29 59 / 0.4) 26%, rgb(27 29 59 / 0) 48%),
+      linear-gradient(to top, rgb(27 29 59 / 0.9) 0%, rgb(27 29 59 / 0.35) 45%, rgb(27 29 59 / 0) 70%);
+  }
+  .embed__poster-image,
+  .embed__poster-video {
+    transition: transform 1.2s var(--wp--custom--motion--ease-out);
+  }
+  /* Background loop over the poster image; fades in once frames are actually playing */
+  .embed__poster-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition:
+      opacity 0.6s ease,
+      transform 1.2s var(--wp--custom--motion--ease-out);
+  }
+  .embed__poster-video.is-playing {
+    opacity: 1;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .embed__frame:hover .embed__poster-image,
+    .embed__frame:hover .embed__poster-video {
+      transform: scale(1.03);
+    }
+  }
+  .embed__mock {
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wp--preset--spacing--16);
+    padding: var(--wp--preset--spacing--24);
+    background-color: var(--wp--custom--color--bg--default);
+    text-align: center;
+  }
+  .embed__mock-text {
+    max-width: 480px;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .embed__iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .embed__toolbar {
+    top: var(--wp--preset--spacing--24);
+    right: var(--wp--preset--spacing--24);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    padding: var(--wp--preset--spacing--8) var(--wp--preset--spacing--8) var(--wp--preset--spacing--8)
+      var(--wp--preset--spacing--16);
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--custom--color--bg--overlay);
+  }
+  .embed__panel {
+    left: var(--wp--preset--spacing--48);
+    bottom: var(--wp--preset--spacing--48);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--custom--stack--sm);
+    /* Leaves the right third of the stage to the zone list */
+    max-width: min(640px, 54%);
+  }
+  .embed__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+    /* Same extra step above the action as the Page hero */
+    padding-top: var(--wp--preset--spacing--16);
+  }
+  /* Zones: part of the stage now, bottom right, level with the panel. Each row is the zone's own name. */
+  .embed__zones {
+    position: absolute;
+    right: var(--wp--preset--spacing--48);
+    bottom: var(--wp--preset--spacing--48);
+    z-index: 2;
+    width: min(360px, 32%);
+  }
+  .embed__zones-label {
+    margin-bottom: var(--wp--preset--spacing--8);
+    color: var(--wp--custom--color--text--accent);
+  }
+  .embed__zone {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16);
+    min-height: 48px;
+    border-top: 1px solid rgb(255 255 255 / 0.24);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .embed__zone-number {
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .embed__zone-icon {
+    color: var(--wp--custom--color--icon--accent);
+    transition: transform 0.3s var(--wp--custom--motion--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .embed__zone:hover .embed__zone-label {
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.3em;
+    }
+    .embed__zone:hover .embed__zone-icon {
+      transform: translate3d(2px, -2px, 0);
+    }
+  }
+  .embed__zones-list--mobile {
+    align-self: stretch;
+    margin-top: var(--wp--preset--spacing--8);
+  }
+  .embed__zones-list--mobile .embed__zone {
+    border-top-color: var(--wp--custom--color--border--subtle);
+  }
+
+  @media (max-width: 599px) {
+    .embed__panel {
+      left: var(--wp--preset--spacing--24);
+      right: var(--wp--preset--spacing--24);
+      bottom: var(--wp--preset--spacing--24);
+      max-width: none;
+    }
+  }
+
+  /* ── Iframe / Map ──────────────────────────────────────────── */
+  .embed__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .embed__iframe-frame {
+    position: relative;
+    height: var(--embed-h-mobile, 560px);
+    overflow: hidden;
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--default);
+    box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--subtle);
+  }
+  @media (min-width: 900px) {
+    .embed__iframe-frame {
+      height: var(--embed-h-desktop, 480px);
+    }
+  }
+</style>
+
+<script>
+  // Embed 3D World Launch/Exit and Iframe/Map consent Load (docs/05 §2.13). Progressive
+  // enhancement: without JS the poster/consent markup shows, with a working "Open …" fallback link.
+  function launchWorld(root: HTMLElement) {
+    const frame = root.querySelector<HTMLElement>('.embed__frame');
+    const mock = root.querySelector<HTMLElement>('.embed__mock');
+    const toolbar = root.querySelector<HTMLElement>('.embed__toolbar');
+    const panel = root.querySelector<HTMLElement>('.embed__panel');
+    const zones = root.querySelector<HTMLElement>('.embed__zones');
+    const launchBtn = root.querySelector<HTMLButtonElement>('[data-embed-action="launch"]');
+    const exitBtn = root.querySelector<HTMLButtonElement>('[data-embed-action="exit"]');
+    const worldUrl = root.dataset.embedWorldUrl || '';
+    if (!frame || !worldUrl) return;
+
+    let iframeEl: HTMLIFrameElement | null = null;
+
+    // Poster loop: plays a segment while the stage is on screen and the scene isn't running.
+    // Skipped for reduced motion and Save-Data, where the still poster image stays.
+    const loop = root.querySelector<HTMLVideoElement>('.embed__poster-video');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const loopData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+    if (loop?.dataset.src && !reduceMotion && !loopData) {
+      const start = Number(loop.dataset.start) || 0;
+      const end = Number(loop.dataset.end) || 0;
+      let started = false;
+      loop.addEventListener('playing', () => loop.classList.add('is-playing'));
+      loop.addEventListener('timeupdate', () => {
+        if (end > 0 && loop.currentTime >= end) loop.currentTime = start;
+      });
+      loop.addEventListener('ended', () => {
+        loop.currentTime = start;
+        loop.play().catch(() => undefined);
+      });
+      new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting && root.dataset.embedState !== 'loaded') {
+          if (!started) {
+            loop.src = loop.dataset.src!;
+            loop.currentTime = start;
+            started = true;
+          }
+          loop.play().catch(() => undefined);
+        } else {
+          loop.pause();
+        }
+      }, { threshold: 0.25 }).observe(frame);
+    }
+    const coarsePointer = window.matchMedia('(any-pointer: coarse)').matches;
+    const saveData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+    if (coarsePointer || saveData) {
+      // Never load the scene in place: hide Launch, keep the "Open 3D World" link as the only route in.
+      launchBtn?.setAttribute('hidden', '');
+    }
+
+    launchBtn?.addEventListener('click', () => {
+      if (!iframeEl) {
+        iframeEl = document.createElement('iframe');
+        iframeEl.className = 'embed__iframe';
+        iframeEl.src = worldUrl + (worldUrl.includes('?') ? '&' : '?') + 'embed=1';
+        iframeEl.title = 'Reach Subsea 3D World';
+        iframeEl.setAttribute('allow', 'fullscreen');
+        iframeEl.setAttribute('allowfullscreen', '');
+        frame.insertBefore(iframeEl, toolbar);
+      }
+      mock?.setAttribute('hidden', '');
+      panel?.setAttribute('hidden', '');
+      zones?.setAttribute('hidden', '');
+      toolbar?.removeAttribute('hidden');
+      root.dataset.embedState = 'loaded';
+      loop?.pause();
+      iframeEl.focus();
+    });
+
+    exitBtn?.addEventListener('click', () => {
+      iframeEl?.remove();
+      iframeEl = null;
+      mock?.setAttribute('hidden', '');
+      toolbar?.setAttribute('hidden', '');
+      panel?.removeAttribute('hidden');
+      zones?.removeAttribute('hidden');
+      root.dataset.embedState = 'poster';
+      if (loop?.src) loop.play().catch(() => undefined);
+      launchBtn?.focus();
+    });
+  }
+
+  function loadProviderEmbed(root: HTMLElement, type: 'iframe' | 'map') {
+    const loadBtn = root.querySelector<HTMLButtonElement>('[data-embed-action="load"]');
+    const consent = root.querySelector<HTMLElement>('.consent-placeholder');
+    if (!loadBtn) return;
+
+    loadBtn.addEventListener('click', () => {
+      consent?.setAttribute('hidden', '');
+      root.dataset.embedState = 'loaded';
+      if (type === 'iframe') {
+        const wrap = root.querySelector<HTMLElement>('.embed__iframe-frame');
+        const iframeEl = wrap?.querySelector<HTMLIFrameElement>('iframe');
+        if (iframeEl && !iframeEl.src && iframeEl.dataset.embedSrc) {
+          iframeEl.src = iframeEl.dataset.embedSrc;
+        }
+        wrap?.removeAttribute('hidden');
+        iframeEl?.focus();
+      } else {
+        const map = root.querySelector<HTMLElement>('.embed__map');
+        map?.removeAttribute('hidden');
+        map?.focus();
+      }
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-embed-type]').forEach((root) => {
+    const type = root.dataset.embedType;
+    if (type === '3d-world') launchWorld(root);
+    else if (type === 'iframe' || type === 'map') loadProviderEmbed(root, type);
+  });
+</script>

@@ -1,0 +1,54 @@
+---
+// Subnav item pill (docs/04 §15). Also the tab look inside blocks (Data list, role="tab").
+// Active = .is-active, aria-current (page/location) or aria-selected="true".
+interface Props {
+  label: string;
+  href?: string;
+  active?: boolean;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { label, href, active = false, class: className, ...attrs } = Astro.props;
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  class:list={['subnav-item', 'text-label', active && 'is-active', className]}
+  href={href}
+  type={href ? undefined : 'button'}
+  {...attrs}
+>
+  {label}
+</Tag>
+
+<style is:global>
+  .subnav-item {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    min-height: 40px;
+    padding-inline: var(--wp--preset--spacing--16);
+    border-radius: var(--wp--custom--radius--full);
+    color: var(--wp--custom--color--text--secondary);
+    white-space: nowrap;
+    transition:
+      background-color var(--wp--custom--motion--duration) var(--wp--custom--motion--easing),
+      color var(--wp--custom--motion--duration) var(--wp--custom--motion--easing);
+  }
+  .subnav-item.is-active,
+  .subnav-item[aria-current='page'],
+  .subnav-item[aria-current='location'],
+  .subnav-item[aria-current='true'],
+  .subnav-item[aria-selected='true'] {
+    background-color: var(--wp--custom--color--action--primary--bg);
+    color: var(--wp--custom--color--action--primary--fg);
+  }
+
+  @media (hover: hover) {
+    .subnav-item:not(.is-active, [aria-current='page'], [aria-current='location'], [aria-current='true'], [aria-selected='true']):hover {
+      background-color: var(--wp--custom--color--action--outline--bg-hover);
+      color: var(--wp--custom--color--text--primary);
+    }
+  }
+</style>

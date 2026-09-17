@@ -1,0 +1,112 @@
+---
+// Review shell for /blocks: block nav, viewport toggle, and iframes that fit their content.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { blocks } from './registry';
+import './review.css';
+
+interface Props {
+  title: string;
+  /** Slug of the block on a single-block page. */
+  current?: string;
+}
+
+const { title, current } = Astro.props;
+---
+
+<BaseLayout title={title} bodyClass="rv">
+  <div class="rv-shell" data-viewports="both">
+    <header class="rv-top">
+      <a class="rv-top__home" href="/blocks/">Reach Subsea 2027 <span>Blocks</span></a>
+      <div class="rv-top__toggle" role="group" aria-label="Viewports">
+        <button type="button" data-rv-viewports="both" aria-pressed="true">Desktop + Mobile</button>
+        <button type="button" data-rv-viewports="desktop" aria-pressed="false">Desktop</button>
+        <button type="button" data-rv-viewports="mobile" aria-pressed="false">Mobile</button>
+      </div>
+    </header>
+    <div class="rv-body">
+      <nav class="rv-nav" aria-label="Blocks">
+        <ol>
+          {
+            blocks.map((block, i) => (
+              <li>
+                <a
+                  href={current ? `/blocks/${block.slug}/` : `#${block.slug}`}
+                  aria-current={current === block.slug ? 'page' : undefined}
+                >
+                  <span>{String(i + 1).padStart(2, '0')}</span>
+                  {block.name}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+      <main class="rv-main">
+        <slot />
+      </main>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const shell = document.querySelector<HTMLElement>('.rv-shell')!;
+  const screens = [...document.querySelectorAll<HTMLElement>('.rv-vp__screen')];
+
+  function fit(screen: HTMLElement) {
+    const iframe = screen.querySelector('iframe');
+    if (!iframe || screen.offsetParent === null) return;
+    const width = Number(screen.dataset.width);
+    const scale = Math.min(1, screen.clientWidth / width);
+    let height = Number(iframe.dataset.height || 960);
+    try {
+      const body = iframe.contentDocument?.body;
+      if (body?.childElementCount) height = Math.ceil(body.getBoundingClientRect().height);
+    } catch {
+      /* cross-origin: keep the last height */
+    }
+    iframe.dataset.height = String(height);
+    iframe.style.height = `${height}px`;
+    iframe.style.transform = scale < 1 ? `scale(${scale})` : '';
+    screen.style.height = `${Math.ceil(height * scale)}px`;
+  }
+
+  const outer = new ResizeObserver((entries) => entries.forEach((entry) => fit(entry.target as HTMLElement)));
+
+  for (const screen of screens) {
+    const iframe = screen.querySelector('iframe')!;
+    const attach = () => {
+      fit(screen);
+      const doc = iframe.contentDocument;
+      if (!doc?.body) return;
+      new ResizeObserver(() => fit(screen)).observe(doc.body);
+      doc.fonts?.ready.then(() => fit(screen));
+    };
+    iframe.addEventListener('load', attach);
+    if (iframe.contentDocument?.readyState === 'complete' && iframe.contentDocument.body?.childElementCount) attach();
+    outer.observe(screen);
+  }
+
+  function setViewports(mode: string) {
+    shell.dataset.viewports = mode;
+    document.querySelectorAll<HTMLButtonElement>('[data-rv-viewports]').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.rvViewports === mode));
+    });
+    try {
+      localStorage.setItem('rv-viewports', mode);
+    } catch {
+      /* storage unavailable */
+    }
+    requestAnimationFrame(() => screens.forEach(fit));
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-rv-viewports]').forEach((button) => {
+    button.addEventListener('click', () => setViewports(button.dataset.rvViewports!));
+  });
+
+  try {
+    const saved = new URLSearchParams(location.search).get('viewports') ?? localStorage.getItem('rv-viewports');
+    if (saved) setViewports(saved);
+  } catch {
+    /* storage unavailable */
+  }
+</script>

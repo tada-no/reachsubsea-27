@@ -1,0 +1,48 @@
+---
+// Stat (docs/04 §9): Size Large (H1 value, Body label) | Medium (H3 value, Small label) × Align Start | Center.
+interface Props {
+  value: string;
+  label: string;
+  note?: string;
+  size?: 'large' | 'medium';
+  align?: 'start' | 'center';
+  as?: 'div' | 'li';
+  /** Count the value up from 0 once in view (motion.ts). `countDelay` in ms staggers a row of stats. */
+  countUp?: boolean;
+  countDelay?: number;
+  style?: string;
+  class?: string;
+}
+
+const { value, label, note, size = 'large', align = 'start', as: Tag = 'div', countUp = false, countDelay = 0, style, class: className } = Astro.props;
+const large = size === 'large';
+---
+
+<Tag class:list={['stat', `stat--${size}`, align === 'center' && 'stat--center', className]} style={style}>
+  <p class:list={['stat__value', large ? 'text-h1' : 'text-h3']}>
+    {countUp ? <span data-count-up data-count-up-delay={countDelay}>{value}</span> : value}
+  </p>
+  <p class:list={['stat__label', large ? 'text-body' : 'text-small']}>{label}</p>
+  {note && <p class="stat__note text-caption">{note}</p>}
+</Tag>
+
+<style is:global>
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xs);
+    min-width: 0;
+  }
+  .stat__value {
+    color: var(--wp--custom--color--text--primary);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .stat__label,
+  .stat__note {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .stat--center {
+    align-items: center;
+    text-align: center;
+  }
+</style>

@@ -1,0 +1,859 @@
+---
+// Data list · reach/data-list (docs/05 §2.7). Type Reports · Documents · Dates · Publications.
+// Latest is a Navy panel (not a Card instance, it holds several actions): 416 beside the table on
+// Desktop, full width on Mobile. Reports/Documents share the "newest N, then archive toggle"
+// pattern; Reports alone has tabs; Publications alone has filter chips + Load more. Row style is
+// shared everywhere: header UI/Eyebrow text/secondary, rows padding y space/16, 1px border/subtle
+// dividers, no zebra. Mobile drops the boxed table for plain top-rule rows, except Reports, whose
+// nested quarter groups become closed/open Accordion items instead (same underlying data).
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Badge from '../components/Badge.astro';
+import Link from '../components/Link.astro';
+import Button from '../components/Button.astro';
+import MetaItem from '../components/MetaItem.astro';
+import FilterChip from '../components/FilterChip.astro';
+import AccordionItem from '../components/AccordionItem.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, LinkField, SectionHeaderField } from '../lib/types';
+import type { CalendarDate, Meeting, Publication, ReportYear, SimpleDocument } from '../data/documents';
+
+export interface DataListTab {
+  id: string;
+  label: string;
+}
+
+export interface DataListLatest {
+  title: string;
+  date: string;
+  links: LinkField[];
+}
+
+export interface DataListFacetOption {
+  id: string;
+  label: string;
+}
+
+export interface DataListFacet {
+  id: string;
+  label: string;
+  options: DataListFacetOption[];
+}
+
+interface Props extends BlockFields {
+  type: 'reports' | 'documents' | 'dates' | 'publications';
+  sectionHeader?: SectionHeaderField;
+  showLatest?: boolean;
+  latest?: DataListLatest;
+  /** Reports only. */
+  tabs?: DataListTab[];
+  activeTab?: string;
+  /** Reports only: document lists for every tab besides "Quarterly reports". */
+  tabPanels?: Record<string, SimpleDocument[]>;
+  showArchiveToggle?: boolean;
+  /** Reports. */
+  years?: ReportYear[];
+  /** Newest rows shown before the archive toggle (years for Reports, meetings for Documents). */
+  visibleYears?: number;
+  /** Documents. */
+  meetings?: Meeting[];
+  /** Dates. */
+  dates?: CalendarDate[];
+  /** Publications. */
+  publications?: Publication[];
+  facets?: DataListFacet[];
+  /** Publications page size. */
+  count?: number;
+  showLoadMore?: boolean;
+}
+
+const {
+  type,
+  sectionHeader,
+  showLatest = false,
+  latest,
+  tabs = [],
+  activeTab,
+  tabPanels = {},
+  showArchiveToggle = true,
+  years = [],
+  visibleYears = 4,
+  meetings = [],
+  dates = [],
+  publications = [],
+  facets = [],
+  count = 4,
+  showLoadMore = true,
+  background,
+  spacing,
+  anchor,
+} = Astro.props;
+
+const titleId = sectionHeader ? makeId('data-list', sectionHeader.title) : undefined;
+const instanceId = makeId('data-list', type);
+
+const hasLatest = showLatest && Boolean(latest);
+const activeTabId = activeTab ?? tabs[0]?.id;
+
+// Reports: newest N years shown, the rest behind "Show all years (N)".
+const yearsShown = years.slice(0, visibleYears);
+const yearsHidden = showArchiveToggle ? years.slice(visibleYears) : [];
+const yearsArchiveCount = yearsHidden.length;
+
+// Documents: newest N meetings shown, same pattern.
+const meetingsShown = meetings.slice(0, visibleYears);
+const meetingsHidden = showArchiveToggle ? meetings.slice(visibleYears) : [];
+const meetingsArchiveCount = meetingsHidden.length;
+
+type QuarterEntry = { n: number; label: string; date: string; report?: { url: string }; presentation?: { url: string }; webcast?: { url: string } };
+
+function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
+  return [
+    y.q1 && { n: 1, label: 'Q1', ...y.q1 },
+    y.q2 && { n: 2, label: 'Q2', ...y.q2 },
+    y.q3 && { n: 3, label: 'Q3', ...y.q3 },
+    y.q4 && { n: 4, label: 'Q4', ...y.q4 },
+  ];
+}
+---
+
+<BlockSection
+  slug="data-list"
+  root="data-list"
+  class={`data-list--${type}`}
+  background={background}
+  spacing={spacing}
+  anchor={anchor}
+  labelledBy={titleId}
+  label={titleId ? undefined : 'Data list'}
+  data-type={type}
+  data-count={count}
+  id={instanceId}
+>
+  <div class="data-list__body">
+    {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} class="data-list__header" />}
+
+    {
+      tabs.length > 0 && (
+        <div class="data-list__tabs scroll-row" role="tablist" aria-label={sectionHeader?.title ?? 'Categories'}>
+          {tabs.map((tab) => (
+            <button
+              type="button"
+              class:list={['subnav-item', 'text-label', tab.id === activeTabId && 'is-active']}
+              role="tab"
+              id={`${instanceId}-tab-${tab.id}`}
+              aria-controls={`${instanceId}-panel-${tab.id}`}
+              aria-selected={String(tab.id === activeTabId)}
+              tabindex={tab.id === activeTabId ? 0 : -1}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )
+    }
+
+    {
+      /* ── Reports ─────────────────────────────────────────────── */
+      type === 'reports' &&
+        (tabs.length > 0 ? tabs : [{ id: 'quarterly', label: 'Quarterly reports' }]).map((tab) => (
+          <div
+            id={`${instanceId}-panel-${tab.id}`}
+            role={tabs.length > 0 ? 'tabpanel' : undefined}
+            aria-labelledby={tabs.length > 0 ? `${instanceId}-tab-${tab.id}` : undefined}
+            hidden={tabs.length > 0 && tab.id !== activeTabId}
+            class="data-list__panel"
+          >
+            {tab.id === 'quarterly' ? (
+              <div class="data-list__columns">
+                {hasLatest && (
+                  <div class="data-list__latest has-surface-navy">
+                    <Badge label="Latest" tone="navy" class="data-list__latest-badge" />
+                    <p class="data-list__latest-title text-h4">{latest!.title}</p>
+                    <MetaItem icon="calendar" text={latest!.date} class="data-list__latest-date" />
+                    <div class="data-list__latest-links">
+                      {latest!.links.map((link) => (
+                        <Link label={link.label} href={link.url} action={link.action ?? 'file'} size="small" context={link.context} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div class="data-list__main">
+                  <div class="data-list__table-wrap">
+                    <table class="data-list__table">
+                      <thead>
+                        <tr>
+                          <th scope="col" class="text-eyebrow">
+                            Year
+                          </th>
+                          <th scope="col" class="text-eyebrow">
+                            Q1
+                          </th>
+                          <th scope="col" class="text-eyebrow">
+                            Q2
+                          </th>
+                          <th scope="col" class="text-eyebrow">
+                            Q3
+                          </th>
+                          <th scope="col" class="text-eyebrow">
+                            Q4
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...yearsShown, ...yearsHidden].map((y, i) => (
+                          <tr data-archive-row hidden={i >= yearsShown.length}>
+                            <th scope="row" class="data-list__year text-h5">
+                              {y.year}
+                            </th>
+                            {quartersOf(y).map((q) => (
+                              <td>
+                                {q ? (
+                                  <Fragment>
+                                    <p class="data-list__cell-date text-caption">{q.date}</p>
+                                    <div class="data-list__cell-links">
+                                      {q.report && (
+                                        <Link
+                                          label="Report"
+                                          href={q.report.url}
+                                          action="file"
+                                          size="small"
+                                          context={`Q${q.n} ${y.year} report, PDF`}
+                                        />
+                                      )}
+                                      {q.presentation && (
+                                        <Link
+                                          label="Presentation"
+                                          href={q.presentation.url}
+                                          action="file"
+                                          size="small"
+                                          context={`Q${q.n} ${y.year} presentation, PDF`}
+                                        />
+                                      )}
+                                      {q.webcast && (
+                                        <Link
+                                          label="Webcast"
+                                          href={q.webcast.url}
+                                          action="external"
+                                          size="small"
+                                          context={`Q${q.n} ${y.year} webcast`}
+                                        />
+                                      )}
+                                    </div>
+                                  </Fragment>
+                                ) : (
+                                  <span class="data-list__empty text-caption">
+                                    – <span class="visually-hidden">Not published</span>
+                                  </span>
+                                )}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="data-list__mobile-years">
+                    {[...yearsShown, ...yearsHidden].map((y, i) => (
+                      <div data-archive-row hidden={i >= yearsShown.length}>
+                        <AccordionItem question={String(y.year)} open={i === 0} id={`${instanceId}-year-${y.year}`}>
+                          {quartersOf(y)
+                            .filter((q): q is QuarterEntry => Boolean(q))
+                            .reverse()
+                            .map((q) => (
+                              <div class="data-list__quarter">
+                                <p class="text-label">
+                                  {q.label} · {q.date}
+                                </p>
+                                <div class="data-list__mobile-links">
+                                  {q.report && <Link label={`${q.label} ${y.year} report (PDF)`} href={q.report.url} action="file" size="small" />}
+                                  {q.presentation && (
+                                    <Link label={`${q.label} ${y.year} presentation (PDF)`} href={q.presentation.url} action="file" size="small" />
+                                  )}
+                                  {q.webcast && <Link label={`${q.label} ${y.year} webcast`} href={q.webcast.url} action="external" size="small" />}
+                                </div>
+                              </div>
+                            ))}
+                        </AccordionItem>
+                      </div>
+                    ))}
+                  </div>
+
+                  {yearsArchiveCount > 0 && (
+                    <Link
+                      label={`Show all years (${yearsArchiveCount})`}
+                      action="expand"
+                      size="small"
+                      class="data-list__archive-toggle"
+                      data-archive-toggle
+                      aria-expanded="false"
+                    />
+                  )}
+                </div>
+              </div>
+            ) : (
+              <ul class="data-list__simple-list">
+                {(tabPanels[tab.id] ?? []).map((doc) => (
+                  <li class="data-list__row">
+                    <Link label={doc.label} href={doc.url} action="file" size="small" />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))
+    }
+
+    {
+      /* ── Documents (general meetings) ───────────────────────── */
+      type === 'documents' && (
+        <div class="data-list__columns">
+          {hasLatest && (
+            <div class="data-list__latest has-surface-navy">
+              <Badge label="Latest" tone="navy" class="data-list__latest-badge" />
+              <p class="data-list__latest-title text-h4">{latest!.title}</p>
+              <MetaItem icon="calendar" text={latest!.date} class="data-list__latest-date" />
+              <div class="data-list__latest-links">
+                {latest!.links.map((link) => (
+                  <Link label={link.label} href={link.url} action={link.action ?? 'file'} size="small" context={link.context} />
+                ))}
+              </div>
+            </div>
+          )}
+          <div class="data-list__main">
+            <div class="data-list__table-wrap">
+              <table class="data-list__table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-eyebrow">
+                      Year
+                    </th>
+                    <th scope="col" class="text-eyebrow">
+                      Meeting
+                    </th>
+                    <th scope="col" class="text-eyebrow">
+                      Documents
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...meetingsShown, ...meetingsHidden].map((m, i) => (
+                    <tr data-archive-row hidden={i >= meetingsShown.length}>
+                      <th scope="row" class="data-list__year text-h5">
+                        {m.year}
+                      </th>
+                      <td>
+                        <p class="text-small data-list__meeting-name">{m.name}</p>
+                        <p class="text-caption data-list__meeting-date">{m.date}</p>
+                      </td>
+                      <td>
+                        <div class="data-list__mobile-links">
+                          {m.documents.map((doc) => (
+                            <Link label={doc.label} href={doc.url} action="file" size="small" />
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="data-list__mobile-rows">
+              {[...meetingsShown, ...meetingsHidden].map((m, i) => (
+                <div class="data-list__row" data-archive-row hidden={i >= meetingsShown.length}>
+                  <p class="text-eyebrow data-list__row-eyebrow">
+                    {m.year} · {m.date}
+                  </p>
+                  <p class="text-h5">{m.name}</p>
+                  <div class="data-list__mobile-links">
+                    {m.documents.map((doc) => (
+                      <Link label={doc.label} href={doc.url} action="file" size="small" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {meetingsArchiveCount > 0 && (
+              <Link
+                label={`Show all years (${meetingsArchiveCount})`}
+                action="expand"
+                size="small"
+                class="data-list__archive-toggle"
+                data-archive-toggle
+                aria-expanded="false"
+              />
+            )}
+          </div>
+        </div>
+      )
+    }
+
+    {
+      /* ── Dates (financial calendar) ─────────────────────────── */
+      type === 'dates' && (
+        <div class="data-list__main data-list__main--capped">
+          <div class="data-list__table-wrap">
+            <table class="data-list__table">
+              <colgroup>
+                <col style="width: 160px" />
+                <col />
+                <col style="width: auto" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th scope="col" class="text-eyebrow">
+                    Date
+                  </th>
+                  <th scope="col" class="text-eyebrow">
+                    Event
+                  </th>
+                  <th scope="col">
+                    <span class="visually-hidden">Add to calendar</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {dates.map((d) => (
+                  <tr>
+                    <td class="text-label">{d.date}</td>
+                    <td class="text-body">{d.event}</td>
+                    <td>
+                      <Link label="Add to calendar (.ics)" href={d.icsHref ?? '#'} action="file" size="small" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="data-list__mobile-rows">
+            {dates.map((d) => (
+              <div class="data-list__row">
+                <p class="text-eyebrow data-list__row-eyebrow">{d.date}</p>
+                <p class="text-body">{d.event}</p>
+                <Link label="Add to calendar (.ics)" href={d.icsHref ?? '#'} action="file" size="small" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    {
+      /* ── Publications ────────────────────────────────────────── */
+      type === 'publications' && (
+        <div class="data-list__main data-list__main--capped">
+          {facets.length > 0 && (
+            <div class="data-list__facets">
+              {facets.map((facet) => (
+                <div class="data-list__facet">
+                  <span class="data-list__facet-label text-eyebrow">{facet.label}</span>
+                  <div class="data-list__facet-chips scroll-row">
+                    <FilterChip label="All" selected data-facet={facet.id} data-value="all" aria-pressed="true" />
+                    {facet.options.map((opt) => (
+                      <FilterChip label={opt.label} data-facet={facet.id} data-value={opt.id} aria-pressed="false" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <p class="data-list__count text-small" aria-live="polite" data-pub-count>
+            {publications.length} publication{publications.length === 1 ? '' : 's'}
+          </p>
+
+          <ul class="data-list__pub-list">
+            {publications.map((p, i) => (
+              <li class="data-list__row" data-pub-row data-year={p.yearId} data-topic={p.topicId} hidden={i >= count} tabindex="-1">
+                <div class="data-list__pub-main">
+                  <p class="text-eyebrow data-list__row-eyebrow">
+                    {p.year} · {p.topicLabel}
+                  </p>
+                  <h3 class="text-h5">{p.title}</h3>
+                  <p class="text-small data-list__pub-byline">{p.byline}</p>
+                </div>
+                <div class="data-list__pub-action">
+                  <Link label={p.link.label} href={p.link.url} action={p.link.action} size="small" />
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {showLoadMore && publications.length > count && (
+            <div class="data-list__load-more">
+              <Button label="Load more" variant="outline" data-load-more />
+            </div>
+          )}
+        </div>
+      )
+    }
+  </div>
+</BlockSection>
+
+<script>
+  function activateTab(tab: HTMLElement) {
+    const list = tab.closest('[role="tablist"]');
+    const root = tab.closest('.data-list');
+    if (!list || !root) return;
+    list.querySelectorAll('[role="tab"]').forEach((t) => {
+      const active = t === tab;
+      t.setAttribute('aria-selected', String(active));
+      t.setAttribute('tabindex', active ? '0' : '-1');
+      t.classList.toggle('is-active', active);
+    });
+    const panelId = tab.getAttribute('aria-controls');
+    root.querySelectorAll('[role="tabpanel"]').forEach((panel) => {
+      panel.toggleAttribute('hidden', panel.id !== panelId);
+    });
+  }
+
+  function activeFacetValue(root: Element, facet: string) {
+    const active = root.querySelector(`[data-facet="${facet}"][aria-pressed="true"]`);
+    return active?.getAttribute('data-value') ?? 'all';
+  }
+
+  function filterPublications(root: Element) {
+    const year = activeFacetValue(root, 'year');
+    const topic = activeFacetValue(root, 'topic');
+    const step = Number(root.getAttribute('data-count') || '4');
+    const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-pub-row]'));
+    let shown = 0;
+    let matched = 0;
+    rows.forEach((row) => {
+      const matches = (year === 'all' || row.dataset.year === year) && (topic === 'all' || row.dataset.topic === topic);
+      if (!matches) {
+        row.hidden = true;
+        return;
+      }
+      matched += 1;
+      row.hidden = shown >= step;
+      if (shown < step) shown += 1;
+    });
+    const countEl = root.querySelector('[data-pub-count]');
+    if (countEl) countEl.textContent = `${matched} publication${matched === 1 ? '' : 's'}`;
+    const loadMoreWrap = root.querySelector<HTMLElement>('.data-list__load-more');
+    if (loadMoreWrap) loadMoreWrap.hidden = shown >= matched;
+  }
+
+  function revealMore(button: HTMLElement) {
+    const root = button.closest('.data-list');
+    if (!root) return;
+    const year = activeFacetValue(root, 'year');
+    const topic = activeFacetValue(root, 'topic');
+    const step = Number(root.getAttribute('data-count') || '4');
+    const matching = Array.from(root.querySelectorAll<HTMLElement>('[data-pub-row]')).filter(
+      (row) => (year === 'all' || row.dataset.year === year) && (topic === 'all' || row.dataset.topic === topic),
+    );
+    const hiddenMatching = matching.filter((row) => row.hidden);
+    const toShow = hiddenMatching.slice(0, step);
+    toShow.forEach((row) => {
+      row.hidden = false;
+    });
+    if (hiddenMatching.length <= step) {
+      const loadMoreWrap = button.closest<HTMLElement>('.data-list__load-more');
+      if (loadMoreWrap) loadMoreWrap.hidden = true;
+    }
+    toShow[0]?.focus();
+  }
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as Element;
+
+    const archiveToggle = target.closest('[data-archive-toggle]');
+    if (archiveToggle) {
+      const expanded = archiveToggle.getAttribute('aria-expanded') === 'true';
+      archiveToggle.setAttribute('aria-expanded', String(!expanded));
+      const root = archiveToggle.closest('.data-list');
+      root?.querySelectorAll('[data-archive-row]').forEach((row) => {
+        row.toggleAttribute('hidden', expanded);
+      });
+      return;
+    }
+
+    const tab = target.closest<HTMLElement>('[role="tab"]');
+    if (tab) {
+      activateTab(tab);
+      return;
+    }
+
+    const chip = target.closest<HTMLElement>('[data-facet]');
+    if (chip) {
+      const facet = chip.getAttribute('data-facet');
+      const root = chip.closest('.data-list');
+      if (facet && root) {
+        root.querySelectorAll(`[data-facet="${facet}"]`).forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        filterPublications(root);
+      }
+      return;
+    }
+
+    const loadMore = target.closest<HTMLElement>('[data-load-more]');
+    if (loadMore) revealMore(loadMore);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    const tab = (event.target as Element)?.closest?.('[role="tab"]');
+    if (!tab) return;
+    const list = tab.closest('[role="tablist"]');
+    if (!list) return;
+    const tabs = Array.from(list.querySelectorAll<HTMLElement>('[role="tab"]'));
+    const i = tabs.indexOf(tab as HTMLElement);
+    let next: HTMLElement | undefined;
+    if (event.key === 'ArrowRight') next = tabs[(i + 1) % tabs.length];
+    else if (event.key === 'ArrowLeft') next = tabs[(i - 1 + tabs.length) % tabs.length];
+    else if (event.key === 'Home') next = tabs[0];
+    else if (event.key === 'End') next = tabs[tabs.length - 1];
+    if (next) {
+      event.preventDefault();
+      next.focus();
+      activateTab(next);
+    }
+  });
+</script>
+
+<style is:global>
+  .data-list__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
+  }
+
+  /* ── Tabs ──────────────────────────────────────────────────── */
+  .data-list__tabs {
+    padding-block: 0;
+  }
+
+  /* ── Columns: Latest (416) + main ─────────────────────────── */
+  .data-list__columns {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .data-list__main {
+    flex: 1 1 0%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+  }
+  .data-list__main--capped {
+    max-width: 880px;
+  }
+
+  /* ── Latest panel (always Navy mode: .has-surface-navy flips the tokens) ── */
+  .data-list__latest {
+    flex: 0 0 416px;
+    width: 416px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+    padding: var(--wp--preset--spacing--32);
+    border-radius: var(--wp--custom--radius--lg);
+  }
+  .data-list__latest-badge {
+    align-self: flex-start;
+  }
+  .data-list__latest-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    padding-top: var(--wp--preset--spacing--8);
+  }
+
+  /* ── Table (Reports / Documents / Dates) ──────────────────── */
+  .data-list__table-wrap {
+    background-color: var(--wp--custom--color--bg--default);
+    border: 1px solid var(--wp--custom--color--border--subtle);
+    border-radius: var(--wp--custom--radius--lg);
+    overflow: hidden;
+  }
+  .data-list__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .data-list__table th,
+  .data-list__table td {
+    padding: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+    text-align: left;
+    vertical-align: top;
+  }
+  .data-list--dates .data-list__table td {
+    vertical-align: middle;
+  }
+  .data-list--dates .data-list__table td:last-child {
+    white-space: nowrap;
+  }
+  .data-list__table thead th {
+    padding-block: var(--wp--preset--spacing--16);
+    color: var(--wp--custom--color--text--secondary);
+    border-bottom: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .data-list__table tbody tr:not(:first-child) {
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .data-list__table tbody th,
+  .data-list__year {
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .data-list__cell-date {
+    color: var(--wp--custom--color--text--secondary);
+    margin-bottom: var(--wp--preset--spacing--4);
+  }
+  .data-list__cell-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .data-list__empty {
+    color: var(--wp--custom--color--text--disabled);
+  }
+  .data-list__meeting-name {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .data-list__meeting-date {
+    color: var(--wp--custom--color--text--secondary);
+    margin-top: var(--wp--preset--spacing--4);
+  }
+  .data-list__mobile-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .data-list__archive-toggle {
+    align-self: flex-start;
+  }
+
+  /* ── Reports Mobile: Accordion years ──────────────────────── */
+  .data-list__mobile-years {
+    display: none;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+  }
+  .data-list__quarter + .data-list__quarter {
+    margin-top: var(--wp--custom--stack--sm);
+  }
+  .data-list__quarter > .text-label {
+    color: var(--wp--custom--color--text--secondary);
+    margin-bottom: var(--wp--preset--spacing--8);
+  }
+
+  /* ── Documents / Dates Mobile: plain rows ─────────────────── */
+  .data-list__mobile-rows {
+    display: none;
+    flex-direction: column;
+  }
+  .data-list__row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--4);
+    padding-block: var(--wp--preset--spacing--16);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .data-list__mobile-rows > .data-list__row:first-child {
+    border-top: none;
+  }
+  .data-list__row-eyebrow {
+    color: var(--wp--custom--color--text--secondary);
+  }
+
+  /* ── Publications ──────────────────────────────────────────── */
+  .data-list__facets {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+  }
+  .data-list__facet {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16);
+  }
+  .data-list__facet-label {
+    flex: none;
+    width: 56px;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .data-list__facet-chips {
+    padding-block: 0;
+  }
+  /* Figma: count, then the divider that opens the list (each row carries a top rule) */
+  .data-list__count {
+    color: var(--wp--custom--color--text--secondary);
+    padding-top: var(--wp--preset--spacing--8);
+  }
+  .data-list__pub-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .data-list__pub-list .data-list__row {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .data-list__pub-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    min-width: 0;
+  }
+  .data-list__pub-byline {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .data-list__pub-action {
+    flex: none;
+  }
+  .data-list__load-more {
+    display: flex;
+    justify-content: center;
+    padding-top: var(--wp--preset--spacing--8);
+  }
+
+  /* ── Breakpoints ───────────────────────────────────────────── */
+  @media (max-width: 899px) {
+    .data-list__columns {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .data-list__latest {
+      flex: none;
+      width: 100%;
+      padding: var(--wp--preset--spacing--24);
+    }
+  }
+
+  @media (max-width: 599px) {
+    .data-list__facet {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--wp--preset--spacing--8);
+    }
+    .data-list__facet-label {
+      width: auto;
+    }
+    .data-list--reports .data-list__table-wrap {
+      display: none;
+    }
+    .data-list__mobile-years {
+      display: flex;
+    }
+    .data-list--documents .data-list__table-wrap,
+    .data-list--dates .data-list__table-wrap {
+      display: none;
+    }
+    .data-list__mobile-rows {
+      display: flex;
+    }
+    .data-list__pub-list .data-list__row {
+      flex-direction: column;
+      gap: var(--wp--preset--spacing--8);
+    }
+  }
+</style>

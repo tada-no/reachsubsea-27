@@ -1,0 +1,17 @@
+---
+import ReviewLayout from '../../review/ReviewLayout.astro';
+import ReviewBlock from '../../review/ReviewBlock.astro';
+import { blocks } from '../../review/registry';
+---
+
+<ReviewLayout title="Blocks review · Reach Subsea 2027">
+  <header class="rv-intro">
+    <h1 class="text-h2">Blocks</h1>
+    <p class="text-small">
+      The 14 section blocks from docs/05-blocks-spec.md, each rendered live with every variant in a Desktop 1440
+      frame (scaled to fit) and a Mobile 375 frame. Tablet interpolates: open a frame and resize. Source of truth:
+      Figma page Blocks (12:25). See also the <a href="/header/">Header family review</a>.
+    </p>
+  </header>
+  {blocks.map((block, index) => <ReviewBlock block={block} index={index} />)}
+</ReviewLayout>

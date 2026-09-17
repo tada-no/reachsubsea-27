@@ -1,0 +1,175 @@
+---
+import SplitMedia from '../blocks/SplitMedia.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+
+const oversightLevels = [
+  {
+    title: 'Level 1 · Onboard crew',
+    text: 'A qualified crew operates the vessel and payload from onboard, with full local control of every system.',
+  },
+  {
+    title: 'Level 2 · Remote supervision',
+    text: 'An onshore team monitors the operation in real time and can step in whenever a situation calls for it.',
+  },
+  {
+    title: 'Level 3 · Remote control',
+    text: 'Operators onshore control the vessel and payload directly, with a reduced crew retained onboard.',
+  },
+  {
+    title: 'Level 4 · Autonomous operation',
+    text: 'The vessel completes pre-planned tasks independently, with onshore oversight throughout the mission.',
+  },
+];
+
+const hopPrinciples = [
+  {
+    title: 'People are not the problem',
+    text: 'We design our processes around how people actually work, not how we wish they worked.',
+  },
+  {
+    title: 'Blame fixes nothing',
+    text: 'When something goes wrong we look for the conditions that allowed it, not someone to point at.',
+  },
+  {
+    title: 'Context drives behaviour',
+    text: 'We shape the work environment so that doing the safe thing is also the easy thing to do.',
+  },
+  {
+    title: 'Learning never stops',
+    text: 'Every operation, successful or not, is a chance to improve how we work the next time.',
+  },
+];
+
+const vesselSpecs = [
+  { label: 'Length', value: '120 m' },
+  { label: 'Beam', value: '22 m' },
+  { label: 'Crane', value: '140 t AHC' },
+  { label: 'Accommodation', value: '120 POB' },
+  { label: 'DP class', value: 'DP2' },
+  { label: 'ROVs', value: '2 × work-class' },
+];
+---
+
+<VariantLabel name="Image · Media end" props='media="image" position="end"' />
+<SplitMedia
+  media="image"
+  position="end"
+  eyebrow="Our story"
+  title="Three decades of subsea experience"
+  body="<p>Reach Subsea has grown from a single vessel operation into an international subsea services provider, combining crewed and remote capability across survey, inspection and light construction work.</p>"
+  actions={[{ label: 'Read our story', url: '#' }]}
+  image={{ alt: 'Reach Subsea vessel under way in the North Sea' }}
+  caption="MV Reach Endurer on transit in the North Sea"
+/>
+
+<VariantLabel name="Image · Media start" props='media="image" position="start"' />
+<SplitMedia
+  media="image"
+  position="start"
+  eyebrow="Crewed and uncrewed"
+  title="One fleet, two ways of working"
+  body="<p>Every project is scoped to the right mix of crewed vessels and uncrewed surface vessels, so clients get the capability they need without paying for capacity they don't.</p>"
+  actions={[{ label: 'Explore our services', url: '#' }]}
+  image={{ alt: 'Uncrewed surface vessel launching from a Reach Subsea vessel' }}
+/>
+
+<VariantLabel name="Video · Media end" props='media="video" position="end"' />
+<SplitMedia
+  media="video"
+  position="end"
+  eyebrow="Remote operations"
+  title="Watch how remote operations work"
+  body="<p>Our remote operations centre lets qualified operators run survey and inspection missions from shore, cutting offshore personnel and emissions without cutting capability.</p>"
+  video={{ url: '#', title: 'Remote operations centre walkthrough', label: 'Watch: remote operations (2:40)' }}
+/>
+
+<VariantLabel name="Video · Media start" props='media="video" position="start"' />
+<SplitMedia
+  media="video"
+  position="start"
+  eyebrow="Survey & monitoring"
+  title="Inside a subsea survey campaign"
+  body="<p>From mobilisation to reporting, see how a survey team plans a campaign, deploys the right equipment and delivers data our clients can act on.</p>"
+  video={{ url: '#', title: 'Subsea survey campaign overview', label: 'Watch: survey overview (3:15)' }}
+/>
+
+<VariantLabel name="Spec table · Media end" props='media="spec-table" position="end"' />
+<SplitMedia
+  media="spec-table"
+  position="end"
+  eyebrow="Asset specifications"
+  title="MV Reach Endurer"
+  body="<p>A dynamically positioned construction support vessel built for subsea inspection, maintenance and light construction work in demanding conditions.</p>"
+  specHeading="Vessel specifications"
+  specs={vesselSpecs}
+  specFile={{ label: 'Download spec sheet (PDF)', url: '#' }}
+/>
+
+<VariantLabel name="Spec table · Media start" props='media="spec-table" position="start"' />
+<SplitMedia
+  media="spec-table"
+  position="start"
+  eyebrow="Fleet asset"
+  title="MV Reach Pioneer"
+  body="<p>A survey and ROV support vessel, well suited to inspection, monitoring and small-scale intervention work across the North Sea and beyond.</p>"
+  specHeading="Vessel specifications"
+  specs={vesselSpecs}
+  specFile={{ label: 'Download spec sheet (PDF)', url: '#' }}
+/>
+
+<VariantLabel name="Numbered list · Media end" props='media="numbered-list" position="end"' />
+<SplitMedia
+  media="numbered-list"
+  position="end"
+  eyebrow="Reach Remote"
+  title="Four levels of remote oversight"
+  body="<p>Reach Remote lets us dial capability to the task, moving work from onboard crew to full autonomy as confidence and conditions allow.</p>"
+  items={oversightLevels}
+/>
+
+<VariantLabel name="Numbered list · Media start" props='media="numbered-list" position="start"' />
+<SplitMedia
+  media="numbered-list"
+  position="start"
+  eyebrow="How we operate"
+  title="Our approach to human and organisational performance"
+  body="<p>Safe operations start with how work is designed, not just how it's carried out. These are the principles behind our HOP approach.</p>"
+  items={hopPrinciples}
+/>
+
+<VariantLabel
+  name="Example · Reach Remote: numbered list, media end, on Tint"
+  props='media="numbered-list" position="end" background="tint"'
+/>
+<SplitMedia
+  media="numbered-list"
+  position="end"
+  background="tint"
+  eyebrow="Reach Remote"
+  title="Built and operated for remote oversight"
+  body="<p>Reach Remote 3 & 4 are purpose-built for uncrewed operation, with every system designed to be monitored and controlled from our onshore centre.</p>"
+  items={oversightLevels}
+/>
+
+<VariantLabel name="Example · Asset single: spec table, media start" props='media="spec-table" position="start"' />
+<SplitMedia
+  media="spec-table"
+  position="start"
+  eyebrow="Vessel"
+  title="MV Reach Endurer"
+  body="<p>In service since 2021, MV Reach Endurer combines DP2 station-keeping with a heave-compensated crane for subsea construction support work.</p>"
+  specHeading="Vessel specifications"
+  specs={vesselSpecs}
+  specFile={{ label: 'Download spec sheet (PDF)', url: '#' }}
+/>
+
+<VariantLabel name="Example · Video on Navy" props='media="video" position="end" background="navy"' />
+<SplitMedia
+  media="video"
+  position="end"
+  background="navy"
+  eyebrow="3D World"
+  title="Explore our fleet in 3D"
+  body="<p>Step aboard a Reach Subsea vessel from your browser: walk the deck, open the moon pool and see where the remote operations team sits.</p>"
+  video={{ url: '#', title: 'Reach Subsea 3D World preview', label: 'Watch: 3D World preview (1:45)' }}
+/>

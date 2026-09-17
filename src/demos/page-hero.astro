@@ -1,0 +1,102 @@
+---
+import PageHero from '../blocks/PageHero.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+
+const breadcrumb = [
+  { label: 'Home', href: '#' },
+  { label: 'Services', href: '#' },
+  { label: 'Subsea', href: '#' },
+  { label: 'Subsea services' },
+];
+
+const lead =
+  'Inspection, maintenance, repair and survey work, delivered by crewed and uncrewed vessels run from shore.';
+
+const actions = [
+  { label: 'Contact us', url: '#' },
+  { label: 'Watch the film', url: '#', action: 'video' as const },
+];
+
+---
+
+<VariantLabel name="Text" props='style="text"' />
+<PageHero
+  style="text"
+  breadcrumb={breadcrumb}
+  eyebrow="Services"
+  title="Subsea services"
+  lead={lead}
+  actions={actions}
+/>
+
+<VariantLabel name="Photo" props='style="photo"' />
+<PageHero
+  style="photo"
+  breadcrumb={breadcrumb}
+  eyebrow="Services"
+  title="Subsea services"
+  lead={lead}
+  actions={actions}
+  credit="Photo: Reach Subsea"
+/>
+
+<VariantLabel
+  name="Example · Home (Photo, Display title)"
+  props='style="photo" titleStyle="display"'
+/>
+<PageHero
+  style="photo"
+  titleStyle="display"
+  title="Remote subsea operations, from shore to seabed"
+  lead="Survey, inspection and construction support for offshore energy, delivered by crewed vessels and uncrewed Reach Remote."
+  actions={[
+    { label: 'Explore our services', url: '#' },
+    { label: 'Watch the film', url: '#', action: 'video' as const },
+  ]}
+  credit="Photo: Reach Subsea"
+/>
+
+<VariantLabel name="Example · Asset single (Photo, badge + meta)" props='style="photo"' />
+<PageHero
+  style="photo"
+  breadcrumb={[
+    { label: 'Home', href: '#' },
+    { label: 'Assets', href: '#' },
+    { label: 'Reach Remote', href: '#' },
+    { label: 'Reach Remote 1' },
+  ]}
+  eyebrow="Uncrewed surface vessel"
+  badge={{ label: 'In service', tone: 'success' }}
+  title="Reach Remote 1"
+  lead="An uncrewed surface vessel operated from our onshore control centre in Haugesund."
+  meta={[
+    { icon: 'ruler-measure', text: '24 m length' },
+    { icon: 'anchor', text: 'Work-class ROV' },
+    { icon: 'clock', text: '30 days endurance' },
+  ]}
+  actions={[{ label: 'Contact us about this vessel', url: '#' }]}
+  credit="Photo: Reach Subsea"
+/>
+
+<VariantLabel name="Example · News single (Text on Tint)" props='style="text" background="tint"' />
+<PageHero
+  style="text"
+  background="tint"
+  breadcrumb={breadcrumb}
+  eyebrow="News"
+  title="Contract award for offshore wind survey"
+  lead="A multi-year survey and inspection contract in the North Sea starts in spring 2027."
+  meta={[
+    { icon: 'calendar', text: '12 Aug 2026' },
+    { icon: 'clock', text: '3 min read' },
+  ]}
+/>
+
+<VariantLabel name="Example · Investors overview (Text, Navy)" props='style="text" background="navy"' />
+<PageHero
+  style="text"
+  background="navy"
+  eyebrow="Investor relations"
+  title="Investors"
+  lead="Reach Subsea ASA is listed on Euronext Oslo Børs. Results, reports and share information in one place."
+/>

@@ -1,0 +1,267 @@
+---
+// Dialog (docs/05 §1): Lightbox · Video. Full viewport, Navy mode, solid bg/tint ground (navy/900).
+// Render each type once per page. Blocks open them with data attributes, no imports needed:
+//   Lightbox: [data-lightbox="<group>"] + data-src, data-alt, data-caption on each trigger (group order = gallery order)
+//   Video:    [data-video-src="<YouTube | Vimeo | mp4 url, or # for a placeholder>"] + data-video-title
+// Native <dialog>.showModal(): aria-modal, Escape closes, focus returns to the trigger.
+import Icon from './Icon.astro';
+import IconButton from './IconButton.astro';
+
+interface Props {
+  type: 'lightbox' | 'video';
+}
+
+const { type } = Astro.props;
+const titleId = `dialog-${type}-title`;
+---
+
+<dialog
+  class:list={['dialog', `dialog--${type}`, 'has-surface-navy']}
+  data-dialog={type}
+  aria-label={type === 'lightbox' ? 'Photo viewer' : undefined}
+  aria-labelledby={type === 'video' ? titleId : undefined}
+>
+  <div class="dialog__bar">
+    {
+      type === 'lightbox' ? (
+        <p class="dialog__counter text-small" data-dialog-counter aria-live="polite">
+          1 / 1
+        </p>
+      ) : (
+        <h2 id={titleId} class="dialog__title text-h5" data-dialog-title>
+          Video
+        </h2>
+      )
+    }
+    <IconButton icon="x" label="Close" variant="ghost" class="dialog__close" data-dialog-close />
+  </div>
+  <div class="dialog__stage">
+    {type === 'lightbox' && <IconButton icon="chevron-left" label="Previous photo" variant="outline" class="dialog__prev" data-dialog-prev />}
+    <div class="dialog__media" data-dialog-media></div>
+    {type === 'lightbox' && <IconButton icon="chevron-right" label="Next photo" variant="outline" class="dialog__next" data-dialog-next />}
+  </div>
+  <p class="dialog__caption text-small" data-dialog-caption></p>
+  <template data-dialog-placeholder>
+    <div class="dialog__placeholder" role="img">
+      <Icon name={type === 'lightbox' ? 'photo' : 'player-play'} size={24} />
+    </div>
+  </template>
+</dialog>
+
+<script>
+  type Photo = { src?: string; alt: string; caption?: string };
+
+  const lightbox = document.querySelector<HTMLDialogElement>('dialog[data-dialog="lightbox"]');
+  const video = document.querySelector<HTMLDialogElement>('dialog[data-dialog="video"]');
+  let trigger: HTMLElement | null = null;
+  let photos: Photo[] = [];
+  let index = 0;
+
+  const lockScroll = (lock: boolean) => {
+    document.documentElement.style.overflow = lock ? 'hidden' : '';
+  };
+
+  function placeholder(dialog: HTMLDialogElement, label: string) {
+    const template = dialog.querySelector<HTMLTemplateElement>('template[data-dialog-placeholder]');
+    const node = template?.content.firstElementChild?.cloneNode(true) as HTMLElement | undefined;
+    node?.setAttribute('aria-label', label);
+    return node;
+  }
+
+  function renderPhoto() {
+    if (!lightbox || !photos.length) return;
+    const photo = photos[index];
+    const media = lightbox.querySelector('[data-dialog-media]')!;
+    if (photo.src) {
+      const img = document.createElement('img');
+      img.src = photo.src;
+      img.alt = photo.alt;
+      media.replaceChildren(img);
+    } else {
+      const node = placeholder(lightbox, photo.alt);
+      media.replaceChildren(...(node ? [node] : []));
+    }
+    lightbox.querySelector('[data-dialog-counter]')!.textContent = `${index + 1} / ${photos.length}`;
+    lightbox.querySelector('[data-dialog-caption]')!.textContent = photo.caption ?? '';
+    const single = photos.length < 2;
+    lightbox.querySelectorAll<HTMLButtonElement>('[data-dialog-prev], [data-dialog-next]').forEach((button) => {
+      button.hidden = single;
+    });
+  }
+
+  function step(delta: number) {
+    if (photos.length < 2) return;
+    index = (index + delta + photos.length) % photos.length;
+    renderPhoto();
+  }
+
+  function videoNode(src: string, title: string): HTMLElement | undefined {
+    const youtube = src.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
+    const vimeo = src.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    if (youtube || vimeo) {
+      const frame = document.createElement('iframe');
+      frame.src = youtube
+        ? `https://www.youtube-nocookie.com/embed/${youtube[1]}?autoplay=1&rel=0`
+        : `https://player.vimeo.com/video/${vimeo![1]}?autoplay=1&dnt=1`;
+      frame.title = title;
+      frame.allow = 'autoplay; fullscreen; picture-in-picture';
+      frame.allowFullscreen = true;
+      return frame;
+    }
+    if (!src || src === '#') return placeholder(video!, title);
+    const player = document.createElement('video');
+    player.src = src;
+    player.controls = true;
+    player.autoplay = true;
+    player.playsInline = true;
+    return player;
+  }
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as Element;
+
+    const photoTrigger = target.closest<HTMLElement>('[data-lightbox]');
+    if (photoTrigger && lightbox) {
+      event.preventDefault();
+      const group = photoTrigger.dataset.lightbox ?? '';
+      const nodes = [...document.querySelectorAll<HTMLElement>(`[data-lightbox="${CSS.escape(group)}"]`)];
+      photos = nodes.map((node) => ({ src: node.dataset.src, alt: node.dataset.alt ?? '', caption: node.dataset.caption }));
+      index = Math.max(0, nodes.indexOf(photoTrigger));
+      trigger = photoTrigger;
+      renderPhoto();
+      lightbox.showModal();
+      lockScroll(true);
+      return;
+    }
+
+    const videoTrigger = target.closest<HTMLElement>('[data-video-src]');
+    if (videoTrigger && video) {
+      event.preventDefault();
+      const title = videoTrigger.dataset.videoTitle ?? 'Video';
+      video.querySelector('[data-dialog-title]')!.textContent = title;
+      const node = videoNode(videoTrigger.dataset.videoSrc ?? '', title);
+      video.querySelector('[data-dialog-media]')!.replaceChildren(...(node ? [node] : []));
+      trigger = videoTrigger;
+      video.showModal();
+      lockScroll(true);
+      return;
+    }
+
+    if (target.closest('[data-dialog-close]')) target.closest('dialog')?.close();
+    if (target.closest('[data-dialog-prev]')) step(-1);
+    if (target.closest('[data-dialog-next]')) step(1);
+  });
+
+  lightbox?.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft') step(-1);
+    if (event.key === 'ArrowRight') step(1);
+  });
+
+  for (const dialog of [lightbox, video]) {
+    dialog?.addEventListener('close', () => {
+      lockScroll(false);
+      if (dialog === video) dialog.querySelector('[data-dialog-media]')?.replaceChildren();
+      trigger?.focus();
+      trigger = null;
+    });
+  }
+</script>
+
+<style is:global>
+  .dialog {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background-color: var(--wp--custom--color--bg--tint);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .dialog[open] {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+  .dialog::backdrop {
+    background-color: var(--wp--preset--color--navy-900);
+  }
+  .dialog__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--16);
+    padding: var(--wp--preset--spacing--16) var(--wp--style--root--padding-right) var(--wp--preset--spacing--16)
+      var(--wp--style--root--padding-left);
+  }
+  .dialog__counter {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .dialog__stage {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'prev media next';
+    align-items: center;
+    gap: var(--wp--preset--spacing--24);
+    min-height: 0;
+    padding-inline: var(--wp--style--root--padding-left) var(--wp--style--root--padding-right);
+  }
+  .dialog--video .dialog__stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'media';
+  }
+  .dialog__prev {
+    grid-area: prev;
+  }
+  .dialog__next {
+    grid-area: next;
+  }
+  .dialog__media {
+    grid-area: media;
+    justify-self: center;
+    position: relative;
+    width: min(100%, 1008px);
+    max-height: 100%;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--disabled);
+  }
+  .dialog--video .dialog__media {
+    width: min(100%, 1120px);
+    aspect-ratio: 16 / 9;
+    border-radius: var(--wp--custom--radius--xl);
+  }
+  .dialog__media > img,
+  .dialog__media > iframe,
+  .dialog__media > video {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    border: 0;
+    object-fit: contain;
+  }
+  .dialog__placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .dialog__caption {
+    min-height: calc(var(--wp--custom--line-height--body-sm) + 2 * var(--wp--preset--spacing--24));
+    padding: var(--wp--preset--spacing--24) var(--wp--style--root--padding-right) var(--wp--preset--spacing--24)
+      var(--wp--style--root--padding-left);
+    color: var(--wp--custom--color--text--secondary);
+    text-align: center;
+  }
+
+  @media (max-width: 599px) {
+    .dialog__stage {
+      grid-template-columns: auto auto;
+      grid-template-areas: 'media media' 'prev next';
+      align-content: center;
+      justify-content: space-between;
+    }
+  }
+</style>

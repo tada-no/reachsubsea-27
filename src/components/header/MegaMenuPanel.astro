@@ -1,0 +1,145 @@
+---
+// Mega menu panel (docs/04 §16): one template shared by the 7 section triggers. Full width, 12
+// columns, opens under the header on click (never hover), non-modal (Escape / outside click closes,
+// focus returns to the trigger — handled in header/Header.astro's script). Content: WP `primary` menu
+// (links) + one ACF options row per section (intro description, feature, strip) — here, navigation.ts.
+import Link from '../Link.astro';
+import Card from '../Card.astro';
+import MenuLink from './MenuLink.astro';
+import Icon from '../Icon.astro';
+import type { NavSection } from '../../data/navigation';
+import { worldPath, worldLabel } from '../../data/world';
+
+interface Props {
+  section: NavSection;
+  /** Open on first paint (review only — JS drives this at runtime). */
+  open?: boolean;
+}
+
+const { section, open = false } = Astro.props;
+---
+
+<div
+  class="mega-menu"
+  id={`panel-${section.id}`}
+  data-mega-menu={section.id}
+  aria-label={section.label}
+  hidden={!open}
+>
+  <div class="container">
+    <div class="mega-menu__grid layout-grid">
+      <div class="mega-menu__intro">
+        <h2 class="mega-menu__title text-h4">{section.label}</h2>
+        <p class="mega-menu__description text-small">{section.description}</p>
+        <Link label={section.overview.label} href={section.overview.url} size="small" />
+      </div>
+      <ul class="mega-menu__links">
+        {
+          section.links.map((item) => (
+            <li>
+              <MenuLink label={item.label} href={item.href} level="l1" external={item.external} />
+              {item.children && item.children.length > 0 && (
+                <ul>
+                  {item.children.map((child) => (
+                    <li>
+                      <MenuLink label={child.label} href={child.href} level="l2" external={child.external} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+      {
+        section.feature && (
+          <div class="mega-menu__feature">
+            <Card {...section.feature} headingLevel="h3" />
+          </div>
+        )
+      }
+    </div>
+  </div>
+  {/* Same strip on every panel (17 Sep 2026): Contact on the left, the 3D World on the right */}
+  <div class="mega-menu__strip">
+    <div class="container mega-menu__strip-row">
+      <Link label="Contact us" href="/contact/" size="small" />
+      <a class="menu-world has-surface-navy" href={worldPath}>
+        <span class="text-button-sm">{worldLabel}</span>
+        <Icon name="cube-3d-sphere" size={24} />
+      </a>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    max-height: calc(100dvh - var(--header-offset, 96px));
+    overflow-y: auto;
+    background-color: var(--wp--custom--color--bg--default);
+    box-shadow: var(--wp--preset--shadow--lg);
+  }
+  .mega-menu__grid {
+    padding-block: var(--wp--preset--spacing--48);
+  }
+  .mega-menu__intro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--custom--stack--sm);
+    grid-column: 1 / span 3;
+  }
+  .mega-menu__description {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .mega-menu__links {
+    grid-column: 4 / span 5;
+    align-self: start;
+  }
+  /* L2 children share the L1 left edge and sit tight under their parent (17 Sep 2026) */
+  .mega-menu__links > li > ul {
+    margin-top: calc(-1 * var(--wp--preset--spacing--12));
+    margin-bottom: var(--wp--preset--spacing--4);
+  }
+  .mega-menu__links .menu-link--l2 {
+    min-height: 32px;
+    padding-left: 0;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* Uniform panels (17 Sep 2026): every panel is at least as tall as the longest allowed link list
+     (6 rows × 48), and the feature card fills that height, so switching menus never jumps. */
+  .mega-menu__grid {
+    --mega-menu-min: calc(6 * 48px);
+  }
+  .mega-menu__links,
+  .mega-menu__feature {
+    min-height: var(--mega-menu-min);
+  }
+  .mega-menu__feature {
+    grid-column: 9 / span 4;
+    display: flex;
+  }
+  .mega-menu__feature .card {
+    flex: 1;
+  }
+  .mega-menu__feature .card--media-image-bg {
+    min-height: 0;
+  }
+  .mega-menu__strip {
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  .mega-menu__strip-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--12) var(--wp--preset--spacing--32);
+    min-height: 80px;
+    padding-block: var(--wp--preset--spacing--16);
+  }
+</style>

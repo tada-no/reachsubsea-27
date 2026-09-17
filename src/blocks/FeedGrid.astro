@@ -1,0 +1,387 @@
+---
+// Feed grid (dynamic) · reach/feed-grid (docs/05 §2.3). Filters Off · On, plus one example per source.
+// Card look is set by source (the matching preset, White surface) — baked into the `items` the
+// query would return, so this block just renders CardField[]. Filters, paging (Load more) and the
+// empty state are vanilla JS, progressive enhancement: without JS every item shows (see <script>).
+// No items at all → render nothing; filtered-to-zero → the empty state (docs/05 §0).
+// Layout Editorial (17 Sep 2026): for a short mixed feed (Home's Newsroom). The first item leads,
+// 7 columns wide and as tall as the stack of the others beside it (5 columns). No filters or paging.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Card from '../components/Card.astro';
+import FilterChip from '../components/FilterChip.astro';
+import Link from '../components/Link.astro';
+import Button from '../components/Button.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+import type { FeedFacet, FeedItem } from '../data/feed-samples';
+
+export type FeedSource = 'news' | 'projects' | 'assets' | 'events' | 'people' | 'offices' | 'documents' | 'latest';
+
+interface ScopeField {
+  /** Taxonomy term to scope to, e.g. service = Survey. Documented, not functional in this prototype. */
+  term?: string;
+  /** Related-to-current-post (service ↔ project, asset ↔ project). Documented, not functional. */
+  related?: boolean;
+  excludeCurrent?: boolean;
+}
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  source?: FeedSource;
+  scope?: ScopeField;
+  /** Page size: how many items show initially and per "Load more". */
+  count?: 3 | 6 | 9 | 12;
+  columns?: 3 | 4;
+  layout?: 'grid' | 'editorial';
+  filters?: boolean;
+  facets?: FeedFacet[];
+  /** Facet key → selected option value, applied before the URL is read. */
+  initialFilters?: Record<string, string>;
+  showLoadMore?: boolean;
+  items?: FeedItem[];
+  emptyText?: string;
+}
+
+const sourceLabel: Record<FeedSource, string> = {
+  news: 'news',
+  projects: 'projects',
+  assets: 'assets',
+  events: 'events',
+  people: 'people',
+  offices: 'offices',
+  documents: 'documents',
+  latest: 'items',
+};
+
+const {
+  sectionHeader,
+  source = 'projects',
+  scope,
+  count = 6,
+  columns = source === 'assets' || source === 'people' ? 4 : 3,
+  layout = 'grid',
+  filters = false,
+  facets = [],
+  initialFilters = {},
+  showLoadMore = true,
+  items = [],
+  emptyText = `No ${sourceLabel[source]} match these filters`,
+  background,
+  spacing,
+  anchor,
+} = Astro.props;
+
+// `scope` is part of the WP field contract (query scoping) but has no effect on this static
+// prototype's fixed `items` list — referenced so the prop isn't flagged unused.
+void scope;
+
+const hasItems = items.length > 0;
+const showFilters = filters && facets.length > 0;
+const titleId = sectionHeader?.title ? makeId('feed-grid', sectionHeader.title) : undefined;
+const instanceId = makeId('feed-grid');
+---
+
+{
+  hasItems && (
+    <BlockSection
+      slug="feed-grid"
+      root="feed-grid"
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : 'Feed grid'}
+    >
+      <div class="block__body">
+        {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+        <div
+          class="feed-grid"
+          data-feed-grid
+          data-count={count}
+          data-label={sourceLabel[source]}
+          data-empty-text={emptyText}
+          data-initial-filters={JSON.stringify(initialFilters)}
+        >
+          {showFilters && (
+            <div class="feed-grid__filters">
+              {facets.map((facet) => (
+                <div class="feed-grid__facet" data-facet={facet.key}>
+                  <span class="feed-grid__facet-label text-eyebrow">{facet.label}</span>
+                  <div class="feed-grid__chips scroll-row" role="group" aria-label={facet.label}>
+                    <FilterChip
+                      label="All"
+                      selected={!initialFilters[facet.key]}
+                      data-value=""
+                    />
+                    {facet.options.map((option) => (
+                      <FilterChip
+                        label={option.label}
+                        selected={initialFilters[facet.key] === option.value}
+                        data-value={option.value}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <div class="feed-grid__results">
+                <p class="feed-grid__count text-small" aria-live="polite" id={`${instanceId}-count`}>
+                  {items.length} {sourceLabel[source]}
+                </p>
+                <Link label="Clear filters" size="small" showIcon={false} data-clear-filters />
+              </div>
+            </div>
+          )}
+
+          <ul class:list={['feed-grid__list', layout === 'editorial' && 'feed-grid__list--editorial']} style={`--feed-grid-columns: ${columns}`}>
+            {items.map((item) => (
+              <li class="feed-grid__item" data-facets={JSON.stringify(item.facets ?? {})}>
+                <Card {...item} />
+              </li>
+            ))}
+          </ul>
+
+          {showFilters && (
+            <div class="feed-grid__empty" hidden>
+              <h3 class="text-h5">{emptyText}</h3>
+              <Link label="Clear filters" size="small" showIcon={false} data-clear-filters />
+            </div>
+          )}
+
+          {showLoadMore && (
+            <div class="feed-grid__more">
+              <Button label="Load more" variant="outline" data-load-more />
+            </div>
+          )}
+        </div>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .feed-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+  }
+  /* .feed-grid__item/__list/__empty and the Load more button all set their own `display`, which
+     otherwise ties with the UA [hidden] rule and can win the cascade. This selector is more
+     specific than any of theirs, so toggling the `hidden` property always works. */
+  .feed-grid [hidden] {
+    display: none;
+  }
+
+  /* Filters */
+  .feed-grid__filters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--16);
+  }
+  .feed-grid__facet {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--16);
+  }
+  .feed-grid__facet-label {
+    color: var(--wp--custom--color--text--secondary);
+    flex: none;
+  }
+  .feed-grid__results {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--custom--grid--gutter);
+    padding-top: var(--wp--preset--spacing--8);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .feed-grid__count {
+    color: var(--wp--custom--color--text--secondary);
+  }
+
+  /* Grid */
+  .feed-grid__list {
+    display: grid;
+    grid-template-columns: repeat(var(--feed-grid-columns, 3), minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+    align-items: stretch;
+  }
+  .feed-grid__item {
+    display: flex;
+  }
+  .feed-grid__item > * {
+    width: 100%;
+  }
+
+  /* Editorial: lead + stack */
+  @media (min-width: 900px) {
+    .feed-grid__list--editorial {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+    .feed-grid__list--editorial .feed-grid__item {
+      grid-column: 8 / span 5;
+    }
+    .feed-grid__list--editorial .feed-grid__item:first-child {
+      grid-column: 1 / span 7;
+      grid-row: 1 / span 3;
+    }
+    .feed-grid__list--editorial .feed-grid__item:first-child .card--media-image-bg {
+      min-height: 0;
+    }
+  }
+
+  /* Empty state */
+  .feed-grid__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--wp--custom--stack--sm);
+    padding-block: var(--wp--preset--spacing--32);
+    text-align: center;
+  }
+
+  /* Load more */
+  .feed-grid__more {
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (max-width: 899px) {
+    .feed-grid__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .feed-grid__facet {
+      flex-wrap: nowrap;
+      align-items: flex-start;
+    }
+    .feed-grid__list--editorial .feed-grid__item:first-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .feed-grid__list {
+      grid-template-columns: 1fr;
+    }
+    .feed-grid__facet {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--wp--preset--spacing--8);
+    }
+    .feed-grid__results {
+      flex-wrap: wrap;
+    }
+  }
+</style>
+
+<script>
+  // Feed grid filters + Load more (docs/05 §2.3). Progressive enhancement: server markup shows
+  // every item; this reads/writes URL params, filters, pages by `count`, and swaps in the empty
+  // state. Scoped per [data-feed-grid] instance so two feed grids on one page don't clash.
+  function initFeedGrid(root: HTMLElement) {
+    const count = Number(root.dataset.count) || 6;
+    const label = root.dataset.label || 'items';
+    const list = root.querySelector<HTMLUListElement>('.feed-grid__list');
+    const items = list ? Array.from(list.querySelectorAll<HTMLLIElement>(':scope > .feed-grid__item')) : [];
+    const facetGroups = Array.from(root.querySelectorAll<HTMLElement>('[data-facet]'));
+    const loadMoreBtn = root.querySelector<HTMLElement>('[data-load-more]');
+    const countEl = root.querySelector<HTMLElement>('.feed-grid__count');
+    const emptyEl = root.querySelector<HTMLElement>('.feed-grid__empty');
+    const initial: Record<string, string> = JSON.parse(root.dataset.initialFilters || '{}');
+
+    const params = new URLSearchParams(location.search);
+    const selected = new Map<string, string>();
+    facetGroups.forEach((group) => {
+      const key = group.dataset.facet as string;
+      const value = params.get(key) ?? initial[key] ?? '';
+      selected.set(key, value);
+      syncChips(group, value);
+    });
+
+    let visible = count;
+
+    function syncChips(group: HTMLElement, value: string) {
+      group.querySelectorAll<HTMLElement>('.filter-chip').forEach((chip) => {
+        const chipValue = chip.dataset.value || '';
+        chip.setAttribute('aria-pressed', String(chipValue === value));
+      });
+    }
+
+    function matches(item: HTMLLIElement) {
+      const facetValues = JSON.parse(item.dataset.facets || '{}');
+      for (const [key, value] of selected) {
+        if (value && facetValues[key] !== value) return false;
+      }
+      return true;
+    }
+
+    function updateUrl() {
+      const url = new URL(location.href);
+      selected.forEach((value, key) => {
+        if (value) url.searchParams.set(key, value);
+        else url.searchParams.delete(key);
+      });
+      history.replaceState(null, '', url);
+    }
+
+    function render(focus?: { fromIndex: number }) {
+      const filtered = items.filter(matches);
+      items.forEach((item) => {
+        item.hidden = true;
+      });
+      filtered.forEach((item, i) => {
+        item.hidden = i >= visible;
+      });
+
+      if (countEl) countEl.textContent = `${filtered.length} ${label}`;
+      if (loadMoreBtn) loadMoreBtn.hidden = filtered.length <= visible;
+      if (list) list.hidden = filtered.length === 0;
+      if (emptyEl) emptyEl.hidden = filtered.length !== 0;
+
+      if (focus) {
+        const target = filtered[focus.fromIndex];
+        const focusable = target?.querySelector<HTMLElement>('a, button');
+        focusable?.focus();
+      }
+    }
+
+    root.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+
+      const chip = target.closest<HTMLElement>('.filter-chip');
+      if (chip && root.contains(chip)) {
+        const group = chip.closest<HTMLElement>('[data-facet]');
+        if (!group) return;
+        const key = group.dataset.facet as string;
+        const value = chip.dataset.value || '';
+        selected.set(key, value);
+        syncChips(group, value);
+        visible = count;
+        updateUrl();
+        render();
+        return;
+      }
+
+      if (target.closest('[data-clear-filters]')) {
+        event.preventDefault();
+        selected.forEach((_, key) => selected.set(key, ''));
+        facetGroups.forEach((group) => syncChips(group, ''));
+        visible = count;
+        updateUrl();
+        render();
+        return;
+      }
+
+      if (target.closest('[data-load-more]')) {
+        const fromIndex = visible;
+        visible += count;
+        render({ fromIndex });
+      }
+    });
+
+    render();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-feed-grid]').forEach(initFeedGrid);
+</script>

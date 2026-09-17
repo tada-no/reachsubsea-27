@@ -1,0 +1,83 @@
+---
+// Header states, one query string at a time. Static build: there is no server per request, so
+// `?state=` and `?current=` are read client-side (see the inline script below) — the header itself
+// always renders closed at build time, then the script opens the right panel and sets the current
+// indicator, reusing Header.astro's own click handling (it just clicks the real triggers).
+// Followed by a tall dummy <main> (PageHero + CardGrid) so sticky/hide-on-scroll can be tried, and a
+// simple placeholder <footer> (no Footer block exists yet — docs/04 §17 build order item 10).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import CardGrid from '../../blocks/CardGrid.astro';
+import { cardPresets } from '../../data/card-presets';
+
+const services = [
+  cardPresets.service({ title: 'Subsea', description: 'IMR, installation and intervention across the full subsea lifecycle.' }),
+  cardPresets.service({ pictogram: 'survey', title: 'Survey', description: 'High-resolution seabed and structure surveys from ROV and AUV platforms.' }),
+  cardPresets.service({ pictogram: 'global-monitoring', title: 'Monitoring', description: 'Continuous asset and environmental monitoring, on the seabed or the surface.' }),
+];
+---
+
+<BaseLayout title="Header frame · Reach Subsea 2027">
+  <Header initialState="closed" />
+  <main id="main">
+    <PageHero
+      style="text"
+      eyebrow="Investors"
+      title="Investor relations"
+      lead="Financial reports, presentations, share information and governance for Reach Subsea ASA."
+      actions={[{ label: 'Financial calendar', url: '#' }]}
+    />
+    <CardGrid
+      sectionHeader={{ title: 'Our services', intro: 'Subsea expertise across survey, monitoring and technology, delivered by one team.' }}
+      cards={services}
+      layout="3-columns"
+    />
+  </main>
+  <footer class="header-frame__footer">
+    <div class="container">
+      <p class="text-caption">© 2027 Reach Subsea ASA. All rights reserved.</p>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style is:global>
+  /* The header is fixed (out of flow): push the page's own content below it. */
+  #main {
+    padding-top: var(--header-offset, 96px);
+  }
+  .header-frame__footer {
+    padding-block: var(--wp--preset--spacing--32);
+    background-color: var(--wp--custom--color--bg--tint);
+    color: var(--wp--custom--color--text--secondary);
+  }
+</style>
+
+<script>
+  // A regular (module, deferred) script — not is:inline — so it executes in document order after
+  // Header.astro's own script has attached its click handlers (both are deferred modules; deferred
+  // scripts run in source order). An is:inline script here would run too early and let the trigger
+  // anchors navigate instead of opening their panel.
+  (function () {
+    const params = new URLSearchParams(location.search);
+    const state = params.get('state');
+    const current = params.get('current');
+
+    if (current) {
+      document.querySelector(`[data-nav-item="${current}"] [data-nav-target]`)?.setAttribute('aria-current', 'page');
+      document.querySelector(`[data-section-heading="${current}"]`)?.setAttribute('aria-current', 'page');
+    }
+
+    if (state === 'scrolled') {
+      window.scrollTo(0, 120);
+    } else if (state === 'search' || state === 'site-menu' || state === 'mobile-menu') {
+      const trigger = document.querySelector(state === 'search' ? '[data-trigger="search"]' : '[data-trigger="menu"]');
+      trigger?.click();
+      if (state === 'mobile-menu' && current) {
+        document.querySelector(`[data-menu-accordion="${current}"] .menu-accordion__trigger`)?.click();
+      }
+    } else if (state) {
+      document.querySelector(`[data-panel="${state}"]`)?.click();
+    }
+  })();
+</script>

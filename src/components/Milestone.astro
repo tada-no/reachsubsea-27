@@ -1,0 +1,109 @@
+---
+// Milestone (docs/05 §1): one entry in the Timeline block. A 16px marker on a 2px border/default
+// rail. Done = filled icon/accent; Current = 2px icon/accent ring + Badge Accent "Now";
+// Upcoming = 2px border/strong ring. Status is never colour alone: shape, badge and hidden text
+// all carry it. The rail is hidden below the last item (`showLine` false).
+import Badge from './Badge.astro';
+
+interface Props {
+  date: string;
+  title: string;
+  text?: string;
+  status?: 'done' | 'current' | 'upcoming';
+  /** Hide the connecting line below this item — the last milestone in the list. */
+  showLine?: boolean;
+  class?: string;
+}
+
+const { date, title, text, status = 'upcoming', showLine = true, class: className } = Astro.props;
+
+const STATE_LABEL: Record<string, string> = {
+  done: 'Completed',
+  current: 'In progress',
+  upcoming: 'Upcoming',
+};
+---
+
+<li
+  class:list={['milestone', `milestone--${status}`, !showLine && 'milestone--no-line', className]}
+  aria-current={status === 'current' ? 'step' : undefined}
+>
+  <span class="milestone__rail" aria-hidden="true">
+    <span class="milestone__marker"></span>
+    <span class="milestone__line"></span>
+  </span>
+  <div class="milestone__content">
+    <div class="milestone__meta">
+      <p class="milestone__date text-eyebrow">
+        {date}<span class="visually-hidden"> · {STATE_LABEL[status]}</span>
+      </p>
+      {status === 'current' && <Badge label="Now" tone="accent" class="milestone__badge" />}
+    </div>
+    <h3 class="milestone__title text-h5">{title}</h3>
+    {text && <p class="milestone__text text-small">{text}</p>}
+  </div>
+</li>
+
+<style is:global>
+  .milestone {
+    position: relative;
+    display: flex;
+    gap: var(--wp--preset--spacing--24);
+    padding-bottom: var(--wp--preset--spacing--40);
+  }
+  .milestone--no-line {
+    padding-bottom: 0;
+  }
+
+  .milestone__rail {
+    position: relative;
+    flex: none;
+    width: 16px;
+  }
+  .milestone__marker {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--bg--default);
+    box-shadow: inset 0 0 0 2px var(--wp--custom--color--border--strong);
+  }
+  .milestone--done .milestone__marker {
+    background-color: var(--wp--custom--color--icon--accent);
+    box-shadow: none;
+  }
+  .milestone--current .milestone__marker {
+    box-shadow: inset 0 0 0 2px var(--wp--custom--color--icon--accent);
+  }
+  .milestone__line {
+    position: absolute;
+    top: 18px;
+    bottom: calc(-1 * var(--wp--preset--spacing--40));
+    left: 7px;
+    width: 2px;
+    background-color: var(--wp--custom--color--border--default);
+  }
+  .milestone--no-line .milestone__line {
+    display: none;
+  }
+
+  .milestone__content {
+    display: flex;
+    flex-direction: column;
+    /* Figma measures 8 between date, title and text (docs/05 §1 says stack/sm) */
+    gap: var(--wp--custom--stack--xs);
+    min-width: 0;
+    padding-top: 1px;
+  }
+  .milestone__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .milestone__date,
+  .milestone__text {
+    color: var(--wp--custom--color--text--secondary);
+  }
+</style>

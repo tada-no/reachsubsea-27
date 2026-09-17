@@ -1,0 +1,43 @@
+---
+// Header frame inside a true 375px iframe (browser windows, headless Chrome included, can't go
+// narrower than ~500px) — mirrors src/pages/blocks/mobile/[slug].astro. Query string is forwarded.
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Mobile 375 · Header</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #e3e4ef;
+      }
+      iframe {
+        display: block;
+        width: 375px;
+        height: 1600px;
+        border: 0;
+        background: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="frame" title="Header, Mobile 375" width="375"></iframe>
+    <script is:inline>
+      const frame = document.getElementById('frame');
+      frame.addEventListener('load', () => {
+        const body = frame.contentDocument.body;
+        const fit = () => {
+          frame.style.height = `${Math.ceil(body.getBoundingClientRect().height)}px`;
+        };
+        fit();
+        new ResizeObserver(fit).observe(body);
+      });
+      frame.src = `/header/frame/${location.search}`;
+    </script>
+  </body>
+</html>

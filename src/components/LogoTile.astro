@@ -1,0 +1,111 @@
+---
+// Logo tile (docs/05 §1, docs/04 shared parts): the item in a Logo & badge strip.
+// Type Logo | Certificate | SDG. Logo/Certificate: 120-tall tile, bg/default, 1px border/subtle,
+// radius/md, logo image max 120×56 centred (placeholder: a bg/disabled rect, no photo icon).
+// Certificate adds a UI/Label name + Link Small File. SDG: the official UN tiles are images in their
+// own colours, so the placeholder is a 120×120 bg/disabled square showing the goal number + Body/Small label.
+import Link from './Link.astro';
+import type { ImageField, LinkField } from '../lib/types';
+
+interface Props {
+  type: 'logo' | 'certificate' | 'sdg';
+  /** Organisation / certificate / goal name. */
+  label: string;
+  logo?: ImageField;
+  /** Certificate only: the PDF link ("ISO 9001 certificate (PDF)"). */
+  file?: LinkField;
+  /** SDG only: the goal number shown in the placeholder square. */
+  goal?: number;
+  class?: string;
+}
+
+const { type, label, logo, file, goal, class: className } = Astro.props;
+---
+
+<li class:list={['logo-tile', `logo-tile--${type}`, className]}>
+  {
+    type === 'sdg' ? (
+      <>
+        {/* Adjacent visible label carries the accessible name; the number square is decorative. */}
+        <div class="logo-tile__sdg" aria-hidden="true">
+          {goal && <span class="logo-tile__goal">{goal}</span>}
+        </div>
+        <p class="logo-tile__label text-small">{label}</p>
+      </>
+    ) : (
+      <>
+        <div class="logo-tile__box">
+          {logo?.src ? (
+            <img class="logo-tile__logo" src={logo.src} alt={label} />
+          ) : type === 'certificate' ? (
+            // Adjacent visible name below carries the accessible name; decorative here.
+            <div class="logo-tile__logo logo-tile__logo--placeholder" aria-hidden="true" />
+          ) : (
+            <div class="logo-tile__logo logo-tile__logo--placeholder" role="img" aria-label={label} />
+          )}
+        </div>
+        {
+          type === 'certificate' && (
+            <div class="logo-tile__meta">
+              <p class="logo-tile__label text-label">{label}</p>
+              {file?.url && <Link label={file.label} href={file.url} action="file" size="small" />}
+            </div>
+          )
+        }
+      </>
+    )
+  }
+</li>
+
+<style is:global>
+  .logo-tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+    min-width: 0;
+  }
+  .logo-tile__box {
+    display: grid;
+    place-items: center;
+    height: 120px;
+    padding: var(--wp--preset--spacing--16);
+    background-color: var(--wp--custom--color--bg--default);
+    border: 1px solid var(--wp--custom--color--border--subtle);
+    border-radius: var(--wp--custom--radius--md);
+  }
+  .logo-tile__logo {
+    max-width: 120px;
+    max-height: 56px;
+    object-fit: contain;
+  }
+  .logo-tile__logo--placeholder {
+    width: 120px;
+    height: 56px;
+    background-color: var(--wp--custom--color--bg--disabled);
+    border-radius: var(--wp--custom--radius--sm);
+  }
+  .logo-tile__meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .logo-tile__label {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .logo-tile--sdg .logo-tile__label {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .logo-tile__sdg {
+    display: grid;
+    place-items: center;
+    width: 120px;
+    height: 120px;
+    background-color: var(--wp--custom--color--bg--disabled);
+    border-radius: var(--wp--custom--radius--md);
+  }
+  .logo-tile__goal {
+    font-size: var(--wp--preset--font-size--h3);
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--secondary);
+  }
+</style>

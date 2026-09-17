@@ -1,0 +1,553 @@
+---
+// Page hero · reach/page-hero (docs/05 §2.1). Style Text · Photo.
+// Always the page's only <h1>. Stack: Breadcrumb → Eyebrow/Badge → Title → Lead → Meta row → Actions,
+// gap stack/md, content cols 1–8 (864 at 1440). Photo: image fills the block behind a flat navy scrim,
+// Navy mode forced, content bottom-left, min-height 640/520.
+// No overlap panels (16 Sep 2026, docs/06): stats and latest cards go in their own block below the hero.
+// Video (17 Sep 2026): Photo's cinematic sibling for Home. Muted looping background video over the
+// poster, side + bottom gradient fades to solid navy instead of the flat scrim, near-viewport height,
+// the title enters word by word, and the media drifts slower than the page on scroll (parallax).
+// `video.loopEnd` loops early with a soft fade (the current hero.mp4 ends on a UI panel at ~15 s).
+// A pause control is always present (WCAG 2.2.2); reduced motion never autoplays.
+import BlockSection from '../components/BlockSection.astro';
+import Breadcrumb, { type BreadcrumbItem } from '../components/Breadcrumb.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Badge from '../components/Badge.astro';
+import MetaItem from '../components/MetaItem.astro';
+import Button from '../components/Button.astro';
+import Link from '../components/Link.astro';
+import Icon from '../components/Icon.astro';
+import { makeId } from '../lib/ids';
+import type { ActionField, BadgeField, BlockFields, ImageField, MetaField } from '../lib/types';
+
+interface Props extends BlockFields {
+  style?: 'text' | 'photo' | 'video';
+  /** Video style: muted background loop. `poster` shows first and for reduced motion. */
+  /** loopStart/loopEnd (s) trim a fade-in/out at either end of the file out of the loop. */
+  video?: { src: string; poster?: string; loopStart?: number; loopEnd?: number };
+  /** Visual style of the (always <h1>) title: Display on Home/section landing pages, H1 elsewhere. */
+  titleStyle?: 'h1' | 'display';
+  /** Ends with the current page (no href). Shown from depth ≥ 3. */
+  breadcrumb?: BreadcrumbItem[];
+  eyebrow?: string;
+  badge?: BadgeField;
+  title: string;
+  lead?: string;
+  image?: ImageField;
+  /** Photo style only: Body/Caption bottom right. */
+  credit?: string;
+  meta?: MetaField[];
+  /** 0–2: the first renders as a Button, the second as a Link (e.g. action 'video'). */
+  actions?: ActionField[];
+}
+
+const {
+  style = 'text',
+  titleStyle = 'h1',
+  breadcrumb = [],
+  eyebrow,
+  badge,
+  title,
+  lead,
+  image,
+  video,
+  credit,
+  meta = [],
+  actions = [],
+  background,
+  spacing,
+  anchor,
+} = Astro.props;
+
+const isVideo = style === 'video';
+const isPhoto = style === 'photo' || isVideo;
+const resolvedBackground = isPhoto ? 'navy' : (background ?? 'white');
+const titleWords = title.split(/\s+/).filter(Boolean);
+const titleId = makeId('page-hero', title);
+const shownActions = actions.slice(0, 2);
+const objectPosition = image?.focalPoint
+  ? `object-position: ${image.focalPoint.x * 100}% ${image.focalPoint.y * 100}%`
+  : undefined;
+---
+
+<BlockSection
+  slug="page-hero"
+  root="page-hero"
+  class={isVideo ? 'page-hero--photo page-hero--video' : `page-hero--${style}`}
+  data-hero-video={isVideo ? '' : undefined}
+  background={resolvedBackground}
+  spacing={spacing}
+  anchor={anchor}
+  labelledBy={titleId}
+  bleed
+>
+  <div class="page-hero__frame">
+    {
+      isPhoto && (
+        <div class="page-hero__media" aria-hidden="true" data-hero-media>
+          {isVideo && video ? (
+            <Fragment>
+              {video.poster && <img class="page-hero__image" src={video.poster} alt="" fetchpriority="high" decoding="async" />}
+              <video
+                class="page-hero__video"
+                muted
+                playsinline
+                loop
+                preload="metadata"
+                poster={video.poster}
+                data-src={video.src}
+                data-loop-start={video.loopStart}
+                data-loop-end={video.loopEnd}
+              />
+            </Fragment>
+          ) : image?.src ? (
+            <img
+              class="page-hero__image"
+              src={image.src}
+              alt=""
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              style={objectPosition}
+            />
+          ) : (
+            <div class="page-hero__placeholder" />
+          )}
+          <div class="page-hero__scrim" />
+        </div>
+      )
+    }
+    <div class="container page-hero__container">
+      {
+        isPhoto && credit && (
+          <p class="page-hero__credit text-caption">{credit}</p>
+        )
+      }
+      <div class="page-hero__bottom">
+        <div class="page-hero__content">
+          {breadcrumb.length > 0 && <Breadcrumb items={breadcrumb} class="page-hero__breadcrumb" />}
+          {
+            (eyebrow || badge) && (
+              <div class="page-hero__top">
+                {eyebrow && <Eyebrow text={eyebrow} />}
+                {badge && <Badge label={badge.label} tone={badge.tone} icon={badge.icon} />}
+              </div>
+            )
+          }
+          {isVideo ? (
+            <h1 id={titleId} class:list={['page-hero__title', titleStyle === 'display' ? 'text-display' : 'text-h1']} aria-label={title}>
+              {titleWords.map((word, i) => (
+                <Fragment>
+                  <span class="page-hero__word" aria-hidden="true" style={`--word-i: ${i}`}>
+                    <span>{word}</span>
+                  </span>{' '}
+                </Fragment>
+              ))}
+            </h1>
+          ) : (
+            <h1 id={titleId} class:list={['page-hero__title', titleStyle === 'display' ? 'text-display' : 'text-h1']}>
+              {title}
+            </h1>
+          )}
+          {lead && <p class="page-hero__lead text-lead">{lead}</p>}
+          {
+            meta.length > 0 && (
+              <ul class="page-hero__meta">
+                {meta.map((item) => (
+                  <MetaItem icon={item.icon} text={item.text} as="li" />
+                ))}
+              </ul>
+            )
+          }
+          {
+            shownActions.length > 0 && (
+              <div class="page-hero__actions">
+                {shownActions.map((action, i) =>
+                  (action.type ?? (i === 0 ? 'button' : 'link')) === 'button' ? (
+                    <Button label={action.label} href={action.url} variant={action.buttonStyle ?? 'primary'} />
+                  ) : (
+                    <Link
+                      label={action.label}
+                      href={action.url}
+                      action={action.action ?? 'page'}
+                      context={action.context}
+                    />
+                  ),
+                )}
+              </div>
+            )
+          }
+        </div>
+        {isVideo && (
+          <button type="button" class="page-hero__toggle" data-hero-toggle aria-pressed="false" hidden>
+            <Icon name="player-pause" size={20} class="page-hero__toggle-icon page-hero__toggle-icon--pause" />
+            <Icon name="player-play" size={20} class="page-hero__toggle-icon page-hero__toggle-icon--play" />
+            <span class="visually-hidden" data-hero-toggle-label>Pause background video</span>
+          </button>
+        )}
+      </div>
+    </div>
+  </div>
+</BlockSection>
+
+<style is:global>
+  .page-hero {
+    position: relative;
+  }
+  /* BlockSection's `.block` padding/background move onto `.page-hero__frame` below. */
+  .page-hero.block {
+    padding-block: 0;
+    background-color: transparent;
+  }
+
+  .page-hero__frame {
+    position: relative;
+    padding-block: var(--wp--custom--section--md);
+    background-color: var(--wp--custom--color--bg--default);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .page-hero.has-spacing-sm .page-hero__frame {
+    padding-block: var(--wp--custom--section--sm);
+  }
+  .page-hero.has-spacing-lg .page-hero__frame {
+    padding-block: var(--wp--custom--section--lg);
+  }
+
+  /* ── Content stack ─────────────────────────────────────────── */
+  .page-hero__bottom {
+    position: relative;
+    z-index: 1;
+  }
+  .page-hero__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    max-width: 864px;
+    min-width: 0;
+  }
+  .page-hero__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--12);
+  }
+  .page-hero__title {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .page-hero__lead {
+    max-width: 880px;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .page-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--24);
+  }
+  .page-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+    /* Actions sit a step further from the lead than the rest of the stack (17 Sep 2026). */
+    padding-top: var(--wp--preset--spacing--16);
+  }
+
+  /* ── Photo style ───────────────────────────────────────────── */
+  .page-hero--photo .page-hero__frame {
+    display: flex;
+    min-height: 640px;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .page-hero__container {
+    position: relative;
+  }
+  .page-hero--photo .page-hero__container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .page-hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background-color: var(--wp--custom--color--bg--disabled);
+  }
+  .page-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .page-hero__placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .page-hero__scrim {
+    position: absolute;
+    inset: 0;
+    background-color: var(--wp--custom--color--bg--overlay);
+  }
+  /* Bottom right, on the same row as the actions. Absolute (not part of the content flow) so it never
+     competes for width with the content column. */
+  .page-hero__credit {
+    position: absolute;
+    z-index: 1;
+    right: var(--wp--style--root--padding-right);
+    bottom: 0;
+    color: var(--wp--custom--color--text--on-overlay);
+  }
+
+  @media (max-width: 599px) {
+    .page-hero--photo .page-hero__frame {
+      min-height: 520px;
+    }
+  }
+
+  /* ── Video style ───────────────────────────────────────────── */
+  .page-hero--video .page-hero__frame {
+    /* Near full viewport; the header overlays it (Header `overlay`). svh: no jump when mobile bars move. */
+    min-height: clamp(640px, 100svh, 1080px);
+    padding-top: calc(var(--header-offset, 96px) + var(--wp--preset--spacing--48));
+    padding-bottom: var(--wp--custom--section--md);
+    overflow: hidden;
+    background-color: var(--wp--preset--color--navy-900);
+  }
+  /* Taller than the frame so the parallax drift never exposes an edge; the extra height also crops
+     the top strip of the source footage. Capped width: on very wide screens the sides are solid navy. */
+  .page-hero--video .page-hero__media {
+    inset: -14% 0 -6%;
+    max-width: 2400px;
+    margin-inline: auto;
+    background-color: var(--wp--preset--color--navy-900);
+    will-change: transform;
+  }
+  .page-hero--video .page-hero__image,
+  .page-hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* The footage is ~2.35:1, so a desktop frame crops its sides: keep the left-of-centre part, which
+     puts the subject to the right of the copy. Narrow screens centre it. */
+  @media (min-width: 900px) {
+    .page-hero--video .page-hero__image,
+    .page-hero__video {
+      object-position: 22% 50%;
+    }
+  }
+  .page-hero__video {
+    opacity: 0;
+    transition: opacity 1.2s var(--wp--custom--motion--ease-out);
+  }
+  .page-hero__video.is-playing {
+    opacity: 1;
+  }
+  /* Loop seam: dip to the poster, seek, come back. */
+  .page-hero__video.is-looping {
+    opacity: 0;
+    transition-duration: 0.6s;
+  }
+  /* Gradient scrim instead of the flat one: solid navy at both sides (wider on the text side),
+     a bottom ramp under the copy, a short top ramp under the header. */
+  .page-hero--video .page-hero__scrim {
+    background:
+      linear-gradient(to right, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0.82) 22%, rgb(27 29 59 / 0.35) 48%, rgb(27 29 59 / 0) 66%, rgb(27 29 59 / 0) 80%, var(--wp--preset--color--navy-900) 100%),
+      linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0.7) 22%, rgb(27 29 59 / 0) 56%),
+      linear-gradient(to bottom, rgb(27 29 59 / 0.78) 0%, rgb(27 29 59 / 0) 26%);
+  }
+  /* Below 900 the copy spans the full width, so the side fades give way to an even wash plus a
+     deeper bottom ramp; the footage reads through the top half. */
+  @media (max-width: 899px) {
+    .page-hero--video .page-hero__scrim {
+      background:
+        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0.86) 45%, rgb(27 29 59 / 0.3) 78%, rgb(27 29 59 / 0.6) 100%),
+        linear-gradient(to right, rgb(27 29 59 / 0.5) 0%, rgb(27 29 59 / 0) 12%, rgb(27 29 59 / 0) 88%, rgb(27 29 59 / 0.5) 100%);
+    }
+  }
+  .page-hero--video .page-hero__content {
+    /* Wide enough for the Display title to set in two lines at 1440 */
+    max-width: 1040px;
+    will-change: transform, opacity;
+  }
+  .page-hero--video .page-hero__lead {
+    max-width: 600px;
+    color: var(--wp--preset--color--navy-100);
+  }
+
+  /* Entrance. Title words rise out of a mask one after another; the rest follows as a group.
+     CSS animations: predetermined, run once, stay smooth while the video is still loading. */
+  .page-hero__word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    /* Room for descenders inside the mask without changing the line box */
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+  }
+  .page-hero__word > span {
+    display: inline-block;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .page-hero__word > span {
+      transform: translate3d(0, 105%, 0);
+      animation: page-hero-word 1s var(--wp--custom--motion--ease-out) forwards;
+      animation-delay: calc(0.25s + var(--word-i, 0) * 0.06s);
+    }
+    .page-hero--video .page-hero__top,
+    .page-hero--video .page-hero__lead,
+    .page-hero--video .page-hero__actions {
+      opacity: 0;
+      animation: page-hero-rise 0.9s var(--wp--custom--motion--ease-out) forwards;
+    }
+    .page-hero--video .page-hero__top {
+      animation-delay: 0.1s;
+    }
+    .page-hero--video .page-hero__lead {
+      animation-delay: 0.75s;
+    }
+    .page-hero--video .page-hero__actions {
+      animation-delay: 0.9s;
+    }
+  }
+  @keyframes page-hero-word {
+    to {
+      transform: none;
+    }
+  }
+  @keyframes page-hero-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 20px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Pause / play: quiet, bottom right, where the photo credit used to sit. */
+  .page-hero__toggle {
+    position: absolute;
+    z-index: 1;
+    right: var(--wp--style--root--padding-right);
+    bottom: 0;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--wp--custom--radius--full);
+    color: var(--wp--custom--color--text--on-overlay);
+    background-color: rgb(27 29 59 / 0.4);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.24);
+    transition:
+      background-color var(--wp--custom--motion--duration) ease,
+      transform var(--wp--custom--motion--duration-fast) var(--wp--custom--motion--ease-out);
+  }
+  .page-hero__toggle:active {
+    transform: scale(0.96);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .page-hero__toggle:hover {
+      background-color: rgb(27 29 59 / 0.7);
+    }
+  }
+  .page-hero__toggle-icon--play,
+  .page-hero__toggle[aria-pressed='true'] .page-hero__toggle-icon--pause {
+    display: none;
+  }
+  .page-hero__toggle[aria-pressed='true'] .page-hero__toggle-icon--play {
+    display: block;
+  }
+</style>
+
+<script>
+  // Video hero: lazy source, early loop with a soft seam, pause control, scroll parallax.
+  const root = document.querySelector<HTMLElement>('[data-hero-video]');
+  if (root) {
+    const media = root.querySelector<HTMLElement>('[data-hero-media]');
+    const content = root.querySelector<HTMLElement>('.page-hero__content');
+    const video = root.querySelector<HTMLVideoElement>('.page-hero__video');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-hero-toggle]');
+    const toggleLabel = root.querySelector<HTMLElement>('[data-hero-toggle-label]');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+
+    if (video && video.dataset.src && !saveData) {
+      const loopStart = Number(video.dataset.loopStart) || 0;
+      const loopEnd = Number(video.dataset.loopEnd) || 0;
+      if (loopStart > 0) video.addEventListener('loadedmetadata', () => (video.currentTime = loopStart), { once: true });
+      let userPaused = reduceMotion;
+
+      const setPaused = (paused: boolean) => {
+        toggle?.setAttribute('aria-pressed', String(paused));
+        if (toggleLabel) toggleLabel.textContent = paused ? 'Play background video' : 'Pause background video';
+      };
+
+      video.src = video.dataset.src;
+      toggle?.removeAttribute('hidden');
+      setPaused(userPaused);
+      video.addEventListener('playing', () => video.classList.add('is-playing'));
+      if (!userPaused) video.play().catch(() => setPaused(true));
+
+      if (loopEnd > 0) {
+        video.addEventListener('timeupdate', () => {
+          if (video.currentTime < loopEnd - 0.6 || video.classList.contains('is-looping')) return;
+          video.classList.add('is-looping');
+          window.setTimeout(() => {
+            video.currentTime = loopStart;
+            video.classList.remove('is-looping');
+          }, 620);
+        });
+      }
+
+      toggle?.addEventListener('click', () => {
+        userPaused = !video.paused;
+        if (userPaused) video.pause();
+        else video.play().catch(() => undefined);
+        setPaused(userPaused);
+      });
+
+      // Don't decode frames nobody can see.
+      new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting && !userPaused) video.play().catch(() => undefined);
+        else if (!entry.isIntersecting) video.pause();
+      }).observe(root);
+    }
+
+    // Parallax: the media drifts at ~25% of scroll speed and the copy lifts away slightly faster
+    // while fading, so the hero feels deep rather than flat. Runs only while the hero is on screen,
+    // one rAF per scroll frame, transforms set directly on the two elements.
+    if (media && content && !reduceMotion) {
+      let active = true;
+      let ticking = false;
+      const update = () => {
+        ticking = false;
+        const height = root.offsetHeight || 1;
+        const progress = Math.min(Math.max(window.scrollY / height, 0), 1);
+        media.style.transform = `translate3d(0, ${(progress * height * 0.25).toFixed(1)}px, 0)`;
+        content.style.transform = `translate3d(0, ${(progress * -64).toFixed(1)}px, 0)`;
+        content.style.opacity = String(Math.max(1 - progress * 1.6, 0));
+      };
+      new IntersectionObserver(([entry]) => {
+        active = entry.isIntersecting;
+      }).observe(root);
+      window.addEventListener(
+        'scroll',
+        () => {
+          if (!active || ticking) return;
+          ticking = true;
+          requestAnimationFrame(update);
+        },
+        { passive: true },
+      );
+      update();
+    }
+  }
+</script>

@@ -1,0 +1,108 @@
+---
+import CardGrid from '../blocks/CardGrid.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+import type { CardField } from '../lib/types';
+
+const sectionHeader = {
+  title: 'Our services',
+  intro: 'Subsea expertise across survey, monitoring and technology, delivered by one team.',
+};
+
+const services: CardField[] = [
+  {
+    pictogram: 'subsea-infrastructure',
+    eyebrow: 'Service',
+    title: 'Subsea',
+    description: 'IMR, installation and intervention across the full subsea lifecycle.',
+    action: { label: 'Explore subsea', url: '#' },
+  },
+  {
+    pictogram: 'survey',
+    eyebrow: 'Service',
+    title: 'Survey',
+    description: 'High-resolution seabed and structure surveys from ROV and AUV platforms.',
+    action: { label: 'Explore survey', url: '#' },
+  },
+  {
+    pictogram: 'global-monitoring',
+    eyebrow: 'Service',
+    title: 'Monitoring',
+    description: 'Continuous asset and environmental monitoring, on the seabed or the surface.',
+    action: { label: 'Explore monitoring', url: '#' },
+  },
+  {
+    pictogram: 'technology',
+    eyebrow: 'Service',
+    title: 'Technology & Innovation',
+    description: 'Remote operations and digital tools that extend what a vessel can do.',
+    action: { label: 'Explore technology & innovation', url: '#' },
+  },
+  {
+    pictogram: 'marine',
+    eyebrow: 'Service',
+    title: 'Assets',
+    description: 'Vessels, ROVs and subsea equipment supporting every operation.',
+    action: { label: 'Explore assets', url: '#' },
+  },
+];
+
+const values: CardField[] = [
+  {
+    title: 'Safety first',
+    description: 'Every operation starts and ends with the wellbeing of our people.',
+  },
+  {
+    title: 'Remote by design',
+    description: 'Built for uncrewed and autonomous operations from day one.',
+  },
+  {
+    title: 'One team',
+    description: 'Crew, engineers and shore teams working as one, wherever the job is.',
+  },
+];
+
+const mailboxes: CardField[] = [
+  { title: 'Sales', meta: [{ icon: 'mail', text: 'sales@reachsubsea.com', href: 'mailto:sales@reachsubsea.com' }] },
+  { title: 'Investor relations', meta: [{ icon: 'mail', text: 'ir@reachsubsea.com', href: 'mailto:ir@reachsubsea.com' }] },
+  { title: 'Media', meta: [{ icon: 'mail', text: 'media@reachsubsea.com', href: 'mailto:media@reachsubsea.com' }] },
+  { title: 'Careers', meta: [{ icon: 'mail', text: 'careers@reachsubsea.com', href: 'mailto:careers@reachsubsea.com' }] },
+];
+---
+
+<VariantLabel name="Layout · 2 columns" props='layout="2-columns" media="icon"' />
+<CardGrid sectionHeader={sectionHeader} layout="2-columns" media="icon" surface="white" cards={services.slice(0, 2)} />
+
+<VariantLabel name="Layout · 3 columns" props='layout="3-columns" media="icon"' />
+<CardGrid sectionHeader={sectionHeader} layout="3-columns" media="icon" surface="white" cards={services.slice(0, 3)} />
+
+<VariantLabel name="Layout · 4 columns" props='layout="4-columns" media="icon"' />
+<CardGrid sectionHeader={sectionHeader} layout="4-columns" media="icon" surface="white" cards={services.slice(0, 4)} />
+
+<VariantLabel name="Media · Pictogram panel, 3 columns" props='layout="3-columns" media="pictogram-panel"' />
+<CardGrid sectionHeader={sectionHeader} layout="3-columns" media="pictogram-panel" surface="white" cards={services.slice(0, 3)} />
+
+<VariantLabel name="Media · Pictogram panel, 2 columns (wide cards)" props='layout="2-columns" media="pictogram-panel"' />
+<CardGrid sectionHeader={sectionHeader} layout="2-columns" media="pictogram-panel" surface="white" cards={services.slice(0, 4)} />
+
+<VariantLabel name="Layout · Featured first" props='layout="featured-first" media="icon"' />
+<CardGrid sectionHeader={sectionHeader} layout="featured-first" media="icon" surface="white" cards={services} />
+
+<VariantLabel name="Example · Numbered values, 3 columns, on Tint" props='layout="3-columns" numbered media="none" background="tint"' />
+<CardGrid
+  sectionHeader={{ title: 'Our values', intro: 'The principles behind how Reach works, on every project.' }}
+  layout="3-columns"
+  numbered
+  media="none"
+  surface="white"
+  background="tint"
+  cards={values}
+/>
+
+<VariantLabel name="Example · Topic mailboxes, 4 columns" props='layout="4-columns" media="none"' />
+<CardGrid
+  sectionHeader={{ title: 'Get in touch', intro: 'Reach the right team directly.' }}
+  layout="4-columns"
+  media="none"
+  surface="white"
+  cards={mailboxes}
+/>

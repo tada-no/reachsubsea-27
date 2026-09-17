@@ -1,0 +1,93 @@
+---
+import DataList from '../blocks/DataList.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+import {
+  reportYears,
+  reportsLatest,
+  annualReports,
+  sustainabilityReports,
+  otherReports,
+  meetings,
+  meetingsLatest,
+  financialCalendar,
+  publications,
+  publicationFacets,
+} from '../data/documents';
+
+const reportsTabs = [
+  { id: 'quarterly', label: 'Quarterly reports' },
+  { id: 'annual', label: 'Annual reports' },
+  { id: 'sustainability', label: 'Sustainability reports' },
+  { id: 'other', label: 'Other' },
+];
+const reportsTabPanels = { annual: annualReports, sustainability: sustainabilityReports, other: otherReports };
+
+const reportsHeader = {
+  eyebrow: 'Investors',
+  title: 'Reports and presentations',
+  intro: 'Quarterly and annual reports, presentations and webcasts from 2016 to today.',
+};
+
+const meetingsHeader = {
+  title: 'General meetings',
+  intro: 'Notices, minutes and supporting documents for annual and extraordinary general meetings.',
+};
+
+const calendarHeader = {
+  title: 'Financial calendar',
+  intro: 'Confirmed dates for results, reports and general meetings. Changes are announced on Oslo Børs Newsweb.',
+};
+
+const publicationsHeader = {
+  eyebrow: 'Research',
+  title: 'Research and publications',
+  intro: 'Papers and conference contributions by Reach Subsea engineers and partners.',
+};
+---
+
+<VariantLabel name="Type · Reports" props='type="reports" showLatest showTabs showArchiveToggle' />
+<DataList
+  type="reports"
+  sectionHeader={reportsHeader}
+  showLatest
+  latest={reportsLatest}
+  tabs={reportsTabs}
+  tabPanels={reportsTabPanels}
+  years={reportYears}
+  showArchiveToggle
+/>
+
+<VariantLabel name="Type · Documents" props='type="documents" showLatest showArchiveToggle' />
+<DataList type="documents" sectionHeader={meetingsHeader} showLatest latest={meetingsLatest} meetings={meetings} showArchiveToggle />
+
+<VariantLabel name="Type · Dates" props='type="dates"' />
+<DataList type="dates" sectionHeader={calendarHeader} dates={financialCalendar} />
+
+<VariantLabel name="Type · Publications" props='type="publications" showFilters showLoadMore' />
+<DataList
+  type="publications"
+  sectionHeader={publicationsHeader}
+  publications={publications}
+  facets={publicationFacets}
+  count={4}
+  showLoadMore
+/>
+
+<VariantLabel name="Example · Reports on Tint" props='type="reports" background="tint"' />
+<DataList
+  type="reports"
+  background="tint"
+  sectionHeader={reportsHeader}
+  showLatest
+  latest={reportsLatest}
+  tabs={reportsTabs}
+  tabPanels={reportsTabPanels}
+  years={reportYears}
+  showArchiveToggle
+/>
+
+<VariantLabel name="Example · General meetings, no Latest" props='type="documents" showLatest={false}' />
+<DataList type="documents" sectionHeader={meetingsHeader} showLatest={false} meetings={meetings} showArchiveToggle />
+
+<VariantLabel name="Example · Financial calendar on Navy" props='type="dates" background="navy"' />
+<DataList type="dates" background="navy" sectionHeader={calendarHeader} dates={financialCalendar} />

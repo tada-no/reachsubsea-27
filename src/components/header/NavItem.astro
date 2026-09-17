@@ -1,0 +1,104 @@
+---
+// Nav item (docs/04 §16): one item in the header's right-aligned primary nav.
+// Type Trigger (opens a Mega menu panel on click) | Link (Contact — a plain link, never a button).
+// No-JS fallback: a Trigger renders as a real `<a href="{section landing page}">` — the section page
+// works with no JS. header/Header.astro's script intercepts the click to open the panel instead and
+// keeps the anchor's aria-expanded/aria-controls in sync (docs/04 §16 accessibility note).
+import Icon from '../Icon.astro';
+
+interface Props {
+  id: string;
+  label: string;
+  href: string;
+  /** Section id this item's Mega menu panel controls. Omit for a plain Link item (Contact). */
+  panel?: string;
+  /** Is this the current section (docs/04 §16 current-section indicator)? */
+  current?: boolean;
+  class?: string;
+}
+
+const { id, label, href, panel, current = false, class: className } = Astro.props;
+---
+
+<li class:list={['nav-item', className]} data-nav-item={id}>
+  <a
+    class="nav-item__target"
+    href={href}
+    data-nav-target
+    data-panel={panel}
+    aria-haspopup={panel ? 'true' : undefined}
+    aria-expanded={panel ? 'false' : undefined}
+    aria-controls={panel ? `panel-${panel}` : undefined}
+    aria-current={current ? 'page' : undefined}
+  >
+    <span class="nav-item__label text-label">{label}</span>
+    {panel && <Icon name="chevron-down" size={16} class="nav-item__chevron nav-item__chevron--down" />}
+    {panel && <Icon name="chevron-up" size={16} class="nav-item__chevron nav-item__chevron--up" />}
+    <span class="nav-item__bar" aria-hidden="true"></span>
+  </a>
+</li>
+
+<style is:global>
+  .nav-item {
+    position: relative;
+    height: 100%;
+  }
+  .nav-item__target {
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: 1fr auto;
+    align-items: center;
+    column-gap: var(--wp--preset--spacing--4);
+    height: 100%;
+    min-width: 48px;
+    padding-inline: var(--wp--preset--spacing--12);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .nav-item__label {
+    grid-row: 1;
+    grid-column: 1;
+    white-space: nowrap;
+  }
+  .nav-item__chevron {
+    grid-row: 1;
+    grid-column: 2;
+    color: var(--wp--custom--color--icon--primary);
+  }
+  .nav-item__chevron--up {
+    display: none;
+  }
+  .nav-item__target[aria-expanded='true'] .nav-item__chevron--down {
+    display: none;
+  }
+  .nav-item__target[aria-expanded='true'] .nav-item__chevron--up {
+    display: block;
+  }
+  /* Bar: 2px, label width only (grid col 1), flush with the header's bottom edge (grid row 2) */
+  .nav-item__bar {
+    grid-row: 2;
+    grid-column: 1;
+    height: 2px;
+    margin-top: var(--wp--preset--spacing--8);
+    background-color: transparent;
+  }
+  @media (hover: hover) {
+    .nav-item__target:not([aria-expanded='true'], [aria-current='page']):hover .nav-item__bar {
+      background-color: var(--wp--custom--color--border--default);
+    }
+  }
+  .nav-item__target[aria-expanded='true'] .nav-item__bar,
+  .nav-item__target[aria-current='page'] .nav-item__bar {
+    background-color: var(--wp--custom--color--icon--accent);
+  }
+  .nav-item__target:focus-visible {
+    outline: none;
+  }
+  .nav-item__target:focus-visible::after {
+    content: '';
+    position: absolute;
+    inset: 24px 4px;
+    border: 2px solid var(--wp--custom--color--border--focus);
+    border-radius: var(--wp--custom--radius--sm);
+    pointer-events: none;
+  }
+</style>

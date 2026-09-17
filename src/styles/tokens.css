@@ -1,0 +1,232 @@
+/*
+ * Reach Subsea 2027 design tokens.
+ * Source of truth: Figma HAvCQCXzWNFOKQ1AZxqNTX local variables (6 collections, 130 variables),
+ * text styles and effect styles, read 15 Sep 2026. Names are the CSS custom properties WordPress
+ * theme.json outputs (each variable's Dev Mode code syntax): palette, font-size and spacing presets
+ * → --wp--preset--*, everything else → --wp--custom--* (docs/02-foundations-proposal.md §0).
+ *
+ * Responsive: Typography and Layout values have Desktop (1440) and Mobile (375) modes. Here they
+ * are fluid clamp()s between those two viewports: clamp(mobile, …vw, desktop). Tablet interpolates.
+ * Colour: the Color collection has Light and Navy modes. .has-surface-navy redefines the semantic
+ * tokens, so everything inside flips; .has-surface-light forces Light back (panels, success badges).
+ */
+
+:root {
+  /* ── Primitives · colour ramps ─────────────────────────────── */
+  --wp--preset--color--navy-50: #f7f9fd;
+  --wp--preset--color--navy-100: #e3e4ef;
+  --wp--preset--color--navy-200: #cacbd6;
+  --wp--preset--color--navy-300: #b4b2c9;
+  --wp--preset--color--navy-400: #9494ab;
+  --wp--preset--color--navy-500: #757693;
+  --wp--preset--color--navy-600: #575a7c;
+  --wp--preset--color--navy-700: #3d416a;
+  --wp--preset--color--navy-800: #282c59;
+  --wp--preset--color--navy-900: #1b1d3b;
+
+  --wp--preset--color--sage-50: #f1f7f3;
+  --wp--preset--color--sage-100: #dbeae2;
+  --wp--preset--color--sage-200: #b7d5c6;
+  --wp--preset--color--sage-300: #8bb9a2;
+  --wp--preset--color--sage-400: #6eaa8c;
+  --wp--preset--color--sage-500: #5c8e75;
+  --wp--preset--color--sage-600: #416e58;
+  --wp--preset--color--sage-700: #2a4e3d;
+  --wp--preset--color--sage-800: #1b392b;
+  --wp--preset--color--sage-900: #0f261b;
+
+  --wp--preset--color--white: #ffffff;
+
+  --wp--preset--color--red-50: #fff1ed;
+  --wp--preset--color--red-300: #f0a08e;
+  --wp--preset--color--red-600: #c02b0a;
+  --wp--preset--color--green-50: #ecfaeb;
+  --wp--preset--color--green-300: #96cf95;
+  --wp--preset--color--green-700: #2e7d31;
+
+  /* navy/900 #1B1D3B at 8 / 12 / 16 / 64 % */
+  --wp--custom--color--alpha--navy-8: rgb(27 29 59 / 0.08);
+  --wp--custom--color--alpha--navy-12: rgb(27 29 59 / 0.12);
+  --wp--custom--color--alpha--navy-16: rgb(27 29 59 / 0.16);
+  --wp--custom--color--alpha--navy-64: rgb(27 29 59 / 0.64);
+
+  /* ── Spacing presets (px scale, 8px grid) ─────────────────── */
+  --wp--preset--spacing--0: 0px;
+  --wp--preset--spacing--4: 4px;
+  --wp--preset--spacing--8: 8px;
+  --wp--preset--spacing--12: 12px;
+  --wp--preset--spacing--16: 16px;
+  --wp--preset--spacing--24: 24px;
+  --wp--preset--spacing--32: 32px;
+  --wp--preset--spacing--40: 40px;
+  --wp--preset--spacing--48: 48px;
+  --wp--preset--spacing--56: 56px;
+  --wp--preset--spacing--64: 64px;
+  --wp--preset--spacing--72: 72px;
+  --wp--preset--spacing--80: 80px;
+  --wp--preset--spacing--96: 96px;
+  --wp--preset--spacing--112: 112px;
+  --wp--preset--spacing--128: 128px;
+  --wp--preset--spacing--160: 160px;
+
+  /* ── Radius ───────────────────────────────────────────────── */
+  --wp--custom--radius--none: 0px;
+  --wp--custom--radius--sm: 8px;
+  --wp--custom--radius--md: 16px;
+  --wp--custom--radius--lg: 24px;
+  --wp--custom--radius--xl: 32px;
+  --wp--custom--radius--full: 9999px;
+
+  /* ── Shadows (effect styles) ──────────────────────────────── */
+  --wp--preset--shadow--sm: 0 2px 8px var(--wp--custom--color--alpha--navy-8);
+  --wp--preset--shadow--md: 0 8px 24px var(--wp--custom--color--alpha--navy-12);
+  --wp--preset--shadow--lg: 0 16px 48px var(--wp--custom--color--alpha--navy-16);
+
+  /* ── Layout · Desktop 1440 | Mobile 375 ───────────────────── */
+  --wp--custom--section--sm: clamp(3rem, 2.6479rem + 1.5023vw, 4rem); /* 48 → 64 */
+  --wp--custom--section--md: clamp(4rem, 3.2958rem + 3.0047vw, 6rem); /* 64 → 96 */
+  --wp--custom--section--lg: clamp(5rem, 3.9437rem + 4.507vw, 8rem); /* 80 → 128 */
+  --wp--custom--stack--xs: var(--wp--preset--spacing--8);
+  --wp--custom--stack--sm: var(--wp--preset--spacing--16);
+  --wp--custom--stack--md: clamp(1rem, 0.8239rem + 0.7512vw, 1.5rem); /* 16 → 24 */
+  --wp--custom--stack--lg: clamp(1.5rem, 1.1479rem + 1.5023vw, 2.5rem); /* 24 → 40 */
+  --wp--custom--stack--xl: clamp(2.5rem, 1.9718rem + 2.2535vw, 4rem); /* 40 → 64 */
+  --wp--style--root--padding-left: clamp(1.5rem, 0.6197rem + 3.7559vw, 4rem); /* grid/margin 24 → 64 */
+  --wp--style--root--padding-right: var(--wp--style--root--padding-left);
+  --wp--custom--grid--gutter: clamp(1rem, 0.6479rem + 1.5023vw, 2rem); /* 16 → 32 */
+  --wp--custom--grid--columns: 12; /* 4 below 600px, set in base.css */
+  --wp--style--global--wide-size: 1440px; /* container/wide (1600 → 1440, 17 Sep 2026: tighter measure, media still bleeds) */
+  --wp--style--global--content-size: 880px; /* container/content */
+
+  /* ── Typography ───────────────────────────────────────────── */
+  --wp--preset--font-family--inter: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --wp--custom--font-weight--regular: 400;
+  --wp--custom--font-weight--medium: 500;
+  --wp--custom--font-weight--bold: 700;
+
+  --wp--preset--font-size--display: clamp(2.75rem, 1.9577rem + 3.3803vw, 5rem); /* 44 → 80 */
+  --wp--custom--line-height--display: clamp(3rem, 2.1197rem + 3.7559vw, 5.5rem); /* 48 → 88 */
+  --wp--preset--font-size--h1: clamp(2.5rem, 1.9718rem + 2.2535vw, 4rem); /* 40 → 64 */
+  --wp--custom--line-height--h1: clamp(3rem, 2.4718rem + 2.2535vw, 4.5rem); /* 48 → 72 */
+  --wp--preset--font-size--h2: clamp(2rem, 1.6479rem + 1.5023vw, 3rem); /* 32 → 48 */
+  --wp--custom--line-height--h2: clamp(2.5rem, 2.1479rem + 1.5023vw, 3.5rem); /* 40 → 56 */
+  --wp--preset--font-size--h3: clamp(1.5rem, 1.3239rem + 0.7512vw, 2rem); /* 24 → 32 */
+  --wp--custom--line-height--h3: clamp(2rem, 1.8239rem + 0.7512vw, 2.5rem); /* 32 → 40 */
+  --wp--preset--font-size--h4: clamp(1.25rem, 1.162rem + 0.3756vw, 1.5rem); /* 20 → 24 */
+  --wp--custom--line-height--h4: clamp(1.75rem, 1.662rem + 0.3756vw, 2rem); /* 28 → 32 */
+  --wp--preset--font-size--h5: clamp(1.125rem, 1.081rem + 0.1878vw, 1.25rem); /* 18 → 20 */
+  --wp--custom--line-height--h5: clamp(1.5rem, 1.412rem + 0.3756vw, 1.75rem); /* 24 → 28 */
+  --wp--preset--font-size--lead: clamp(1.125rem, 1.081rem + 0.1878vw, 1.25rem); /* 18 → 20 */
+  --wp--custom--line-height--lead: clamp(1.75rem, 1.662rem + 0.3756vw, 2rem); /* 28 → 32 */
+  --wp--preset--font-size--body: clamp(1rem, 0.956rem + 0.1878vw, 1.125rem); /* 16 → 18 */
+  --wp--custom--line-height--body: clamp(1.5rem, 1.412rem + 0.3756vw, 1.75rem); /* 24 → 28 */
+  --wp--preset--font-size--body-sm: clamp(0.875rem, 0.831rem + 0.1878vw, 1rem); /* 14 → 16 */
+  --wp--custom--line-height--body-sm: clamp(1.25rem, 1.162rem + 0.3756vw, 1.5rem); /* 20 → 24 */
+  --wp--preset--font-size--caption: 0.875rem; /* 14 */
+  --wp--custom--line-height--caption: 1.25rem; /* 20 */
+  --wp--preset--font-size--eyebrow: clamp(0.75rem, 0.728rem + 0.0939vw, 0.8125rem); /* 12 → 13 */
+  --wp--custom--line-height--eyebrow: clamp(1rem, 0.912rem + 0.3756vw, 1.25rem); /* 16 → 20 */
+  --wp--preset--font-size--label: 0.875rem; /* 14 */
+  --wp--custom--line-height--label: 1.25rem; /* 20 */
+  --wp--preset--font-size--button: 1rem; /* 16 */
+  --wp--custom--line-height--button: 1.5rem; /* 24 */
+  --wp--preset--font-size--button-sm: 0.875rem; /* 14 */
+  --wp--custom--line-height--button-sm: 1.25rem; /* 20 */
+
+  /* Tracking lives on the Figma text styles (percent of size) */
+  --wp--custom--letter-spacing--display: -0.02em;
+  --wp--custom--letter-spacing--h1: -0.015em;
+  --wp--custom--letter-spacing--h2: -0.01em;
+  --wp--custom--letter-spacing--h3: -0.005em;
+  --wp--custom--letter-spacing--eyebrow: 0.06em;
+
+  /* ── Motion (Phase 2 §0) ──────────────────────────────────── */
+  --wp--custom--motion--duration: 0.25s;
+  --wp--custom--motion--easing: ease-in-out;
+  /* Motion layer (17 Sep 2026). Strong curves: the built-in CSS keywords are too weak to read as intent.
+     ease-out = anything entering or responding; ease-in-out = things moving while on screen. */
+  --wp--custom--motion--ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --wp--custom--motion--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --wp--custom--motion--duration-fast: 0.16s;
+  --wp--custom--motion--duration-reveal: 0.8s;
+  --wp--custom--motion--stagger: 70ms;
+}
+
+/* ── Semantic colour · Light mode (default) ─────────────────── */
+:root,
+.has-surface-light {
+  --wp--custom--color--bg--default: var(--wp--preset--color--white);
+  --wp--custom--color--bg--tint: var(--wp--preset--color--navy-50);
+  --wp--custom--color--bg--accent-subtle: var(--wp--preset--color--sage-50);
+  --wp--custom--color--bg--disabled: var(--wp--preset--color--navy-100);
+  --wp--custom--color--bg--overlay: var(--wp--custom--color--alpha--navy-64);
+  --wp--custom--color--bg--error-subtle: var(--wp--preset--color--red-50);
+  --wp--custom--color--bg--success-subtle: var(--wp--preset--color--green-50);
+
+  --wp--custom--color--text--primary: var(--wp--preset--color--navy-800);
+  --wp--custom--color--text--secondary: var(--wp--preset--color--navy-600);
+  --wp--custom--color--text--accent: var(--wp--preset--color--sage-600);
+  --wp--custom--color--text--disabled: var(--wp--preset--color--navy-400);
+  --wp--custom--color--text--on-overlay: var(--wp--preset--color--white);
+  --wp--custom--color--text--error: var(--wp--preset--color--red-600);
+  --wp--custom--color--text--success: var(--wp--preset--color--green-700);
+
+  --wp--custom--color--border--subtle: var(--wp--preset--color--navy-100);
+  --wp--custom--color--border--default: var(--wp--preset--color--navy-200);
+  --wp--custom--color--border--strong: var(--wp--preset--color--navy-500);
+  --wp--custom--color--border--accent: var(--wp--preset--color--sage-400);
+  --wp--custom--color--border--focus: var(--wp--preset--color--sage-600);
+  --wp--custom--color--border--error: var(--wp--preset--color--red-600);
+
+  --wp--custom--color--icon--primary: var(--wp--preset--color--navy-800);
+  --wp--custom--color--icon--accent: var(--wp--preset--color--sage-500);
+
+  --wp--custom--color--action--primary--bg: var(--wp--preset--color--navy-800);
+  --wp--custom--color--action--primary--bg-hover: var(--wp--preset--color--navy-900);
+  --wp--custom--color--action--primary--fg: var(--wp--preset--color--white);
+  --wp--custom--color--action--secondary--bg: var(--wp--preset--color--sage-400);
+  --wp--custom--color--action--secondary--bg-hover: var(--wp--preset--color--sage-300);
+  --wp--custom--color--action--secondary--fg: var(--wp--preset--color--navy-900);
+  --wp--custom--color--action--outline--border: var(--wp--preset--color--navy-800);
+  --wp--custom--color--action--outline--fg: var(--wp--preset--color--navy-800);
+  --wp--custom--color--action--outline--bg-hover: var(--wp--preset--color--navy-50);
+}
+
+/* ── Semantic colour · Navy mode ────────────────────────────── */
+.has-surface-navy {
+  --wp--custom--color--bg--default: var(--wp--preset--color--navy-800);
+  --wp--custom--color--bg--tint: var(--wp--preset--color--navy-900);
+  --wp--custom--color--bg--accent-subtle: var(--wp--preset--color--navy-700);
+  --wp--custom--color--bg--disabled: var(--wp--preset--color--navy-700);
+  --wp--custom--color--bg--overlay: var(--wp--custom--color--alpha--navy-64);
+  --wp--custom--color--bg--error-subtle: var(--wp--preset--color--red-50);
+  --wp--custom--color--bg--success-subtle: var(--wp--preset--color--green-50);
+
+  --wp--custom--color--text--primary: var(--wp--preset--color--white);
+  --wp--custom--color--text--secondary: var(--wp--preset--color--navy-100);
+  --wp--custom--color--text--accent: var(--wp--preset--color--sage-300);
+  --wp--custom--color--text--disabled: var(--wp--preset--color--navy-400);
+  --wp--custom--color--text--on-overlay: var(--wp--preset--color--white);
+  --wp--custom--color--text--error: var(--wp--preset--color--red-300);
+  --wp--custom--color--text--success: var(--wp--preset--color--green-300);
+
+  --wp--custom--color--border--subtle: var(--wp--preset--color--navy-700);
+  --wp--custom--color--border--default: var(--wp--preset--color--navy-600);
+  --wp--custom--color--border--strong: var(--wp--preset--color--navy-400);
+  --wp--custom--color--border--accent: var(--wp--preset--color--sage-400);
+  --wp--custom--color--border--focus: var(--wp--preset--color--sage-300);
+  --wp--custom--color--border--error: var(--wp--preset--color--red-300);
+
+  --wp--custom--color--icon--primary: var(--wp--preset--color--white);
+  --wp--custom--color--icon--accent: var(--wp--preset--color--sage-400);
+
+  --wp--custom--color--action--primary--bg: var(--wp--preset--color--sage-400);
+  --wp--custom--color--action--primary--bg-hover: var(--wp--preset--color--sage-300);
+  --wp--custom--color--action--primary--fg: var(--wp--preset--color--navy-900);
+  --wp--custom--color--action--secondary--bg: var(--wp--preset--color--white);
+  --wp--custom--color--action--secondary--bg-hover: var(--wp--preset--color--navy-50);
+  --wp--custom--color--action--secondary--fg: var(--wp--preset--color--navy-900);
+  --wp--custom--color--action--outline--border: var(--wp--preset--color--white);
+  --wp--custom--color--action--outline--fg: var(--wp--preset--color--white);
+  --wp--custom--color--action--outline--bg-hover: var(--wp--preset--color--navy-700);
+}

@@ -1,0 +1,1180 @@
+---
+// Live operations · reach/live-operations (PROTOTYPE, 17 Sep 2026, not in docs/05 yet).
+// Where Reach's assets are working now, by sea region: never vessel positions (docs/07-live-operations.md).
+// Distinct from the 3D World embed: those zones are illustrative scenes; these regions are real work.
+//
+// Layout: status + count headline, filters above the map, region list in its own column. The list IS the
+// content (an <ol> of disclosure buttons, readable with no JS, no CSS, no map); the map is a picture of
+// the list, and its markers are pointer shortcuts to the list buttons. No on-page "by region, not position"
+// note (17 Sep 2026): the freshness is in the status line and the region level is enforced by the data
+// and the zoom cap, not by a sentence.
+//
+// Map (17 Sep 2026, user decision): an interactive GL map like the dev site's Contact map — zoom
+// controls inside the map, drag to pan, clusters that split as you zoom. Prototype runs MapLibre GL
+// (open-source fork of Mapbox GL, same API, no access token) on a local Natural Earth style: land as
+// the brand dot matrix, coloured from the tokens (a solid 'like Contact' style was reviewed and dropped); production can swap to mapbox-gl + the dev site's style (docs/07 §3). Markers are
+// HTML, so the pulse and the dashed cluster ring are plain CSS. Zoom is capped at region level.
+// Performance: a static dot-matrix map renders first; MapLibre (JS + CSS + ~45 KB GeoJSON) only loads
+// when the block nears the viewport, then fades in over the poster.
+//
+// States: live · stale (feed older than STALE_AFTER_HOURS) · unavailable (no feed: static map only).
+// The script re-checks staleness in the browser, because a cached WordPress page can outlive its data.
+import BlockSection from '../components/BlockSection.astro';
+import FilterChip from '../components/FilterChip.astro';
+import Icon from '../components/Icon.astro';
+import Badge from '../components/Badge.astro';
+import Link from '../components/Link.astro';
+import { makeId } from '../lib/ids';
+import { WORLD_BOX, worldDotsPath } from '../lib/world-dots';
+import { assetTypes, STALE_AFTER_HOURS, type LiveOperationsFeed } from '../data/live-operations';
+import type { BlockFields, LinkField } from '../lib/types';
+
+export type LiveOpsState = 'live' | 'stale' | 'unavailable';
+
+interface Props extends BlockFields {
+  /** The feed. Omit (or pass no regions) for the Unavailable state. */
+  feed?: LiveOperationsFeed;
+  /** Force a state for review. Omit in production: it is derived from `feed.updatedAt`. */
+  state?: LiveOpsState;
+  intro?: string;
+  showFilters?: boolean;
+  /** Unavailable state fallback, from Key figures (`countries`). */
+  fallbackFigure?: { value: string; label: string };
+  action?: LinkField;
+  /** Show the "Sample data" badge (prototype only). */
+  sample?: boolean;
+}
+
+const {
+  feed,
+  state: forcedState,
+  // No default intro (17 Sep 2026): the filter chips already name the asset types, and the privacy
+  // point lives in the note under the list. Optional field for pages that need context.
+  intro,
+  showFilters = true,
+  fallbackFigure = { value: '9', label: 'countries' },
+  action = { label: 'See our assets', url: '/assets/' },
+  sample = false,
+  background = 'navy',
+  spacing = 'lg',
+  anchor = 'live-operations',
+} = Astro.props;
+
+const regions = feed?.regions.filter((r) => r.operations.length > 0) ?? [];
+const updatedAt = feed ? new Date(feed.updatedAt) : undefined;
+const ageHours = updatedAt ? (Date.now() - updatedAt.getTime()) / 36e5 : Infinity;
+const state: LiveOpsState =
+  forcedState ?? (regions.length === 0 ? 'unavailable' : ageHours > STALE_AFTER_HOURS ? 'stale' : 'live');
+
+const titleId = makeId('live-ops', 'title');
+const uid = anchor;
+const n = regions.length;
+const regionWord = (count: number) => (count === 1 ? 'region' : 'regions');
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const dateFmt = { format: (d: Date) => `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}` };
+const timeFmt = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+const statusText = updatedAt
+  ? state === 'stale'
+    ? `Last confirmed ${dateFmt.format(updatedAt)}`
+    : `Updated ${dateFmt.format(updatedAt)}, ${timeFmt.format(updatedAt)} UTC`
+  : '';
+
+const counts = Object.fromEntries(
+  assetTypes.map((t) => [t.key, regions.reduce((sum, r) => sum + r.operations.filter((o) => o.type === t.key).length, 0)]),
+);
+const totalAssets = regions.reduce((sum, r) => sum + r.operations.length, 0);
+
+// Region points for the map. Label points are whole degrees (docs/07 §2): never a vessel position.
+const mapData = regions.map((r) => ({ id: r.id, name: r.name, lon: r.lon, lat: r.lat }));
+
+const mapSummary =
+  state === 'unavailable'
+    ? 'World map.'
+    : `Map of ${n} active ${regionWord(n)}: ${regions.map((r) => r.name).join(', ')}. Details in the list.`;
+const typeOf = (type: string) => assetTypes.find((t) => t.key === type)!;
+const wb = WORLD_BOX;
+---
+
+<BlockSection
+  slug="live-operations"
+  root="live-ops"
+  background={background}
+  spacing={spacing}
+  anchor={anchor}
+  labelledBy={titleId}
+  data-live-ops
+  data-state={state}
+  data-state-forced={forcedState ? '' : undefined}
+  data-updated={feed?.updatedAt}
+  data-stale-hours={STALE_AFTER_HOURS}
+>
+  <div class="live-ops__layout">
+    <header class="live-ops__head">
+      <p class="live-ops__status text-label">
+        {state !== 'unavailable' && <span class="live-ops__beacon" aria-hidden="true" />}
+        {state === 'live' && <span class="live-ops__status-live">Live</span>}
+        {state !== 'unavailable' && <span data-live-ops-status>{statusText}</span>}
+        {sample && <Badge label="Sample data" tone="accent" />}
+      </p>
+
+      {
+        state === 'unavailable' ? (
+          <h2 id={titleId} class="live-ops__title text-h2">
+            Working across <span class="live-ops__count">{fallbackFigure.value}</span> {fallbackFigure.label}
+          </h2>
+        ) : (
+          <h2 id={titleId} class="live-ops__title text-h2">
+            <span data-live-ops-prefix>{state === 'stale' ? 'Recently active in' : 'Active in'}</span>{' '}
+            <span class="live-ops__count" data-live-ops-count>{n}</span>{' '}
+            <span data-live-ops-word>{regionWord(n)}</span>
+            <span data-live-ops-suffix>{state === 'live' ? ' today' : ''}</span>
+          </h2>
+        )
+      }
+
+      {
+        state === 'unavailable' ? (
+          <p class="live-ops__intro text-lead">
+            Subsea, survey and monitoring work for offshore energy and infrastructure clients worldwide.
+          </p>
+        ) : (
+          intro && <p class="live-ops__intro text-lead">{intro}</p>
+        )
+      }
+      <p class="visually-hidden" aria-live="polite" data-live-ops-announce></p>
+    </header>
+
+    {
+      state !== 'unavailable' && (
+        <div class="live-ops__toolbar">
+          {showFilters && (
+            <div class="live-ops__filters" role="group" aria-label="Show asset type">
+              <FilterChip label="All" count={totalAssets} selected data-live-ops-filter="all" />
+              {assetTypes.map((t) => (
+                <FilterChip label={t.filter} count={counts[t.key]} disabled={counts[t.key] === 0} data-live-ops-filter={t.key} />
+              ))}
+            </div>
+          )}
+          {/* Zoom, in the toolbar row (17 Sep 2026). Disabled until the map has loaded. No "world" button:
+              "All", closing a row and zoom out already get back to the full view. */}
+          <div class="live-ops__controls" role="group" aria-label="Map zoom" data-live-ops-controls>
+            <button type="button" class="live-ops__control" data-map-zoom-out aria-label="Zoom out" disabled>
+              <Icon name="minus" size={20} />
+            </button>
+            <button type="button" class="live-ops__control" data-map-zoom-in aria-label="Zoom in" disabled>
+              <Icon name="plus" size={20} />
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    <figure class="live-ops__map" data-live-ops-map>
+      {/* Poster: static dot map, shown until the GL map is ready (and the whole map without JS) */}
+      <svg class="live-ops__poster" viewBox={`${wb.x} ${wb.y} ${wb.w} ${wb.h}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <path class="live-ops__land" d={worldDotsPath()} />
+      </svg>
+      {
+        state !== 'unavailable' && (
+          <Fragment>
+            <div class="live-ops__canvas" data-live-ops-canvas role="region" aria-label={mapSummary} />
+            <script type="application/json" data-live-ops-points set:html={JSON.stringify(mapData)} />
+          </Fragment>
+        )
+      }
+    </figure>
+
+    <div class="live-ops__side">
+      {
+        state !== 'unavailable' ? (
+          <ol class="live-ops__regions" data-live-ops-regions>
+            {regions.map((r) => {
+              const panelId = `${uid}-${r.id}`;
+              return (
+                <li class="live-ops__region" data-live-ops-region={r.id}>
+                  <h3 class="live-ops__region-heading">
+                    <button type="button" class="live-ops__region-toggle" aria-expanded="false" aria-controls={panelId} data-live-ops-toggle={r.id}>
+                      <span class="live-ops__region-name text-h5">{r.name}</span>
+                      <span class="live-ops__region-meta">
+                        <span class="live-ops__region-area text-small">{r.area}</span>
+                        <span class="live-ops__region-types" aria-hidden="true">
+                          {assetTypes
+                            .filter((t) => r.operations.some((o) => o.type === t.key))
+                            .map((t) => (
+                              <span class="live-ops__type-dot" data-type={t.key} title={t.filter}>
+                                <Icon name={t.icon} size={14} />
+                              </span>
+                            ))}
+                        </span>
+                      </span>
+                      <span class="visually-hidden" data-live-ops-region-count>
+                        , {r.operations.length} {r.operations.length === 1 ? 'asset' : 'assets'}
+                      </span>
+                      <Icon name="chevron-down" size={20} class="live-ops__chevron" />
+                    </button>
+                  </h3>
+                  <div class="live-ops__panel" id={panelId} hidden>
+                    <ul class="live-ops__ops">
+                      {r.operations.map((o) => (
+                        <li class="live-ops__op" data-type={o.type}>
+                          <span class="live-ops__op-icon" aria-hidden="true">
+                            <Icon name={typeOf(o.type).icon} size={20} />
+                          </span>
+                          <span class="live-ops__op-text">
+                            <span class="live-ops__op-asset text-label">
+                              {o.assetUrl ? <a href={o.assetUrl}>{o.asset}</a> : o.asset}
+                              <span class="visually-hidden">, {typeOf(o.type).label}</span>
+                            </span>
+                            <span class="live-ops__op-scope text-small">{o.scope}</span>
+                            <span class="live-ops__op-meta text-caption">
+                              {o.sector}
+                              {o.since && ` · Since ${o.since}`}
+                            </span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <p class="live-ops__fallback text-body">Current operations aren't available right now. See the fleet and where we have worked.</p>
+        )
+      }
+
+      <div class="live-ops__foot">
+        {action && <Link label={action.label} href={action.url} action={action.action ?? 'page'} />}
+      </div>
+    </div>
+  </div>
+</BlockSection>
+
+<script>
+  import type { GeoJSONSource, Map as GLMap, Marker } from 'maplibre-gl';
+  // MapLibre loads its tile worker from a URL next to the library, which breaks once Vite pre-bundles it.
+  // Bundle the worker (with its shared chunk) ourselves and hand MapLibre the URL.
+  import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const COUNTRIES_URL = '/data/world-countries.json';
+  /** Region level: never close enough to read as a position. */
+  const MAX_ZOOM = 5;
+  /** Zoom when a region is opened from the list or a marker: its sea area with context around it. */
+  const REGION_ZOOM = 3.5;
+  /** Clusters split from this zoom up. */
+  const CLUSTER_MAX_ZOOM = 2;
+  /** The world view: every continent Reach could work off, without the polar stretch of Mercator. */
+  const HOME: [[number, number], [number, number]] = [
+    [-130, -50],
+    [160, 70],
+  ];
+
+  interface Point {
+    id: string;
+    name: string;
+    lon: number;
+    lat: number;
+  }
+
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+  function initLiveOps(root: HTMLElement) {
+    root.classList.add('is-enhanced');
+    const toggles = [...root.querySelectorAll<HTMLButtonElement>('[data-live-ops-toggle]')];
+    const toggleFor = (id: string) => toggles.find((t) => t.dataset.liveOpsToggle === id);
+    const rowFor = (id: string) => toggleFor(id)?.closest<HTMLElement>('li');
+    const announce = root.querySelector<HTMLElement>('[data-live-ops-announce]');
+    const say = (text: string) => announce && (announce.textContent = text);
+    const points: Point[] = JSON.parse(root.querySelector('[data-live-ops-points]')?.textContent ?? '[]');
+    const pointFor = (id: string) => points.find((p) => p.id === id);
+
+    /** Assets shown per region under the current filter. */
+    const shownBy: Record<string, number> = {};
+    toggles.forEach((t) => {
+      const id = t.dataset.liveOpsToggle!;
+      shownBy[id] = rowFor(id)!.querySelectorAll('.live-ops__op').length;
+    });
+    let activeId: string | null = null;
+    let hoverIds: string[] = [];
+
+    // ── Staleness re-check (a cached page can outlive its data) ────────────────
+    const updated = root.dataset.updated ? new Date(root.dataset.updated) : undefined;
+    const staleHours = Number(root.dataset.staleHours ?? 72);
+    if (updated && root.dataset.state === 'live' && !('stateForced' in root.dataset)) {
+      const hours = (Date.now() - updated.getTime()) / 36e5;
+      const status = root.querySelector<HTMLElement>('[data-live-ops-status]');
+      if (hours > staleHours) {
+        root.dataset.state = 'stale';
+        root.querySelector('[data-live-ops-prefix]')!.textContent = 'Recently active in';
+        root.querySelector('[data-live-ops-suffix]')!.textContent = '';
+        root.querySelector('.live-ops__status-live')?.remove();
+        const month = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')[updated.getUTCMonth()];
+        if (status) status.textContent = `Last confirmed ${updated.getUTCDate()} ${month} ${updated.getUTCFullYear()}`;
+      } else if (status && hours >= 0) {
+        const h = Math.floor(hours);
+        status.textContent = h < 1 ? 'Updated within the hour' : `Updated ${h} ${h === 1 ? 'hour' : 'hours'} ago`;
+      }
+    }
+
+    // ── Map (loaded lazily) ─────────────────────────────────────────────────────
+    let map: GLMap | undefined;
+    let refreshMarkers = () => {};
+
+    const figure = root.querySelector<HTMLElement>('[data-live-ops-map]')!;
+    const canvas = root.querySelector<HTMLElement>('[data-live-ops-canvas]');
+
+    const featureCollection = () => ({
+      type: 'FeatureCollection' as const,
+      features: points
+        .filter((p) => shownBy[p.id] > 0)
+        .map((p) => ({
+          type: 'Feature' as const,
+          properties: { id: p.id, name: p.name, assets: shownBy[p.id] },
+          geometry: { type: 'Point' as const, coordinates: [p.lon, p.lat] },
+        })),
+    });
+
+    async function loadMap() {
+      if (!canvas || map) return;
+      const [ml] = await Promise.all([import('maplibre-gl'), import('maplibre-gl/dist/maplibre-gl.css')]);
+      ml.setWorkerUrl(workerUrl);
+      const css = getComputedStyle(figure);
+      const token = (name: string) => css.getPropertyValue(name).trim();
+
+      map = new ml.Map({
+        container: canvas,
+        style: {
+          version: 8,
+          sources: {
+            // Natural Earth is public domain: no on-map credit required (Mapbox in production must show its own)
+            countries: { type: 'geojson', data: COUNTRIES_URL },
+            regions: {
+              type: 'geojson',
+              data: featureCollection(),
+              cluster: true,
+              clusterRadius: 48,
+              clusterMaxZoom: CLUSTER_MAX_ZOOM,
+              clusterProperties: { assets: ['+', ['get', 'assets']] },
+            },
+          },
+          layers: [
+            // Markers are HTML; this invisible layer only makes the clustered source load and be queryable
+            { id: 'regions-query', type: 'circle', source: 'regions', paint: { 'circle-radius': 1, 'circle-opacity': 0 } },
+          ],
+        },
+        bounds: HOME,
+        fitBoundsOptions: { padding: 24 },
+        maxZoom: MAX_ZOOM,
+        renderWorldCopies: false,
+        dragRotate: false,
+        pitchWithRotate: false,
+        touchPitch: false,
+        cooperativeGestures: true,
+        attributionControl: false,
+        fadeDuration: reduceMotion.matches ? 0 : 300,
+      });
+      map.touchZoomRotate.disableRotation();
+      map.keyboard.disableRotation();
+      const m = map;
+      // Debug handle for review tooling (harmless in production)
+      (root as HTMLElement & { liveOpsMap?: GLMap }).liveOpsMap = m;
+
+      // Dot-matrix land: a tiny tiled image, fixed in screen px, so the dots stay crisp at every zoom
+      function dotsImage() {
+        const dpr = Math.max(1, Math.round(window.devicePixelRatio || 1));
+        const size = 14 * dpr;
+        const c = document.createElement('canvas');
+        c.width = size;
+        c.height = size;
+        const ctx = c.getContext('2d')!;
+        ctx.fillStyle = token('--map-dot');
+        for (const [x, y] of [
+          [3.5, 3.5],
+          [10.5, 10.5],
+        ]) {
+          ctx.beginPath();
+          ctx.arc(x * dpr, y * dpr, 1.7 * dpr, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        return { img: ctx.getImageData(0, 0, size, size), dpr };
+      }
+
+      m.on('load', () => {
+        const { img, dpr } = dotsImage();
+        m.addImage('live-ops-dots', img, { pixelRatio: dpr });
+        m.addLayer({ id: 'land-dots', type: 'fill', source: 'countries', paint: { 'fill-pattern': 'live-ops-dots' } }, 'regions-query');
+        figure.classList.add('is-ready');
+      });
+
+      // ── Zoom buttons in the toolbar row ──────────────────────────────────────────
+      const controls = root.querySelector<HTMLElement>('[data-live-ops-controls]')!;
+      const zoomIn = controls.querySelector<HTMLButtonElement>('[data-map-zoom-in]')!;
+      const zoomOut = controls.querySelector<HTMLButtonElement>('[data-map-zoom-out]')!;
+      let minZoom = 0;
+      function syncZoomButtons() {
+        zoomIn.disabled = m.getZoom() >= MAX_ZOOM - 0.01;
+        zoomOut.disabled = m.getZoom() <= minZoom + 0.01;
+      }
+      m.once('load', () => {
+        // The home view is as far out as it goes, so "Zoom out" is disabled there on every screen size
+        minZoom = m.getZoom();
+        m.setMinZoom(minZoom);
+        syncZoomButtons();
+      });
+      m.on('moveend', syncZoomButtons);
+      zoomIn.addEventListener('click', () => m.zoomIn({ animate: !reduceMotion.matches }));
+      zoomOut.addEventListener('click', () => m.zoomOut({ animate: !reduceMotion.matches }));
+
+      // ── HTML markers from the clustered source ─────────────────────────────────
+      const markers = new Map<string, Marker>();
+      let onScreen = new Map<string, Marker>();
+
+      function markerEl(key: string, label: string, count: number, cluster: boolean) {
+        const el = document.createElement('div');
+        el.className = `live-ops__marker${cluster ? ' live-ops__marker--cluster' : ''}`;
+        el.dataset.key = key;
+        el.setAttribute('aria-hidden', 'true');
+        el.innerHTML = `
+          <span class="live-ops__marker-pulse"></span>
+          ${cluster ? '<span class="live-ops__marker-ring"></span>' : ''}
+          <span class="live-ops__marker-dot">${count}</span>
+          <span class="live-ops__marker-label">${esc(label)}</span>`;
+        return el;
+      }
+
+      refreshMarkers = () => {
+        markers.forEach((mk) => mk.remove());
+        markers.clear();
+        onScreen = new Map();
+        (m.getSource('regions') as GeoJSONSource | undefined)?.setData(featureCollection());
+      };
+
+      function updateMarkers() {
+        const source = m.getSource('regions') as GeoJSONSource | undefined;
+        if (!source || !m.isSourceLoaded('regions')) return;
+        const next = new Map<string, Marker>();
+        const width = canvas!.clientWidth;
+        const placed: { el: HTMLElement; x: number }[] = [];
+        for (const f of m.querySourceFeatures('regions')) {
+          const p = f.properties as Record<string, unknown>;
+          const cluster = Boolean(p.cluster);
+          const key = cluster ? `c${p.cluster_id}` : String(p.id);
+          if (next.has(key)) continue;
+          let mk = markers.get(key);
+          if (!mk) {
+            const count = Number(cluster ? p.assets : p.assets);
+            const el = markerEl(key, cluster ? `${p.point_count} regions` : String(p.name), count, cluster);
+            const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
+            mk = new ml.Marker({ element: el }).setLngLat(coords);
+            if (cluster) {
+              const clusterId = Number(p.cluster_id);
+              source.getClusterLeaves(clusterId, Infinity, 0).then((leaves) => {
+                el.dataset.ids = leaves.map((l) => String(l.properties?.id)).join(' ');
+                paint(el);
+              });
+              el.addEventListener('click', async () => {
+                const zoom = await source.getClusterExpansionZoom(clusterId);
+                m.easeTo({ center: coords, zoom: Math.min(MAX_ZOOM, zoom + 0.5), duration: reduceMotion.matches ? 0 : 700 });
+                say(`Map zoomed in to ${p.point_count} regions`);
+              });
+              el.addEventListener('pointerenter', () => ids(el).forEach((id) => rowFor(id)?.classList.add('is-hover')));
+              el.addEventListener('pointerleave', () => ids(el).forEach((id) => rowFor(id)?.classList.remove('is-hover')));
+            } else {
+              const id = String(p.id);
+              el.addEventListener('click', () => {
+                const t = toggleFor(id);
+                if (!t) return;
+                select(t.getAttribute('aria-expanded') === 'true' ? null : id);
+                t.focus({ preventScroll: true });
+                if (window.matchMedia('(min-width: 900px)').matches)
+                  t.closest('li')!.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+              });
+              el.addEventListener('pointerenter', () => rowFor(id)?.classList.add('is-hover'));
+              el.addEventListener('pointerleave', () => rowFor(id)?.classList.remove('is-hover'));
+            }
+            markers.set(key, mk);
+          }
+          next.set(key, mk);
+          if (!onScreen.has(key)) mk.addTo(m);
+          placed.push({ el: mk.getElement(), x: m.project(mk.getLngLat()).x });
+          paint(mk.getElement());
+        }
+        // Labels point away from the middle of the visible markers, so neighbours' labels don't cross
+        // each other's markers; near an edge they point inwards
+        const mid = placed.length > 1 ? placed.reduce((sum, p) => sum + p.x, 0) / placed.length : width / 2;
+        placed.forEach(({ el, x }) => {
+          const left = x < 170 ? false : x > width - 170 ? true : x < mid;
+          el.classList.toggle('is-label-left', left);
+        });
+        onScreen.forEach((mk, key) => !next.has(key) && mk.remove());
+        onScreen = next;
+        // Once clusters have split, every region carries its name
+        root.classList.toggle('is-detail', m.getZoom() > CLUSTER_MAX_ZOOM + 0.25);
+      }
+
+      const ids = (el: HTMLElement) => (el.dataset.ids ?? el.dataset.key ?? '').split(' ').filter(Boolean);
+      function paint(el: HTMLElement) {
+        const members = el.classList.contains('live-ops__marker--cluster') ? ids(el) : [el.dataset.key!];
+        el.classList.toggle('is-active', activeId !== null && members.includes(activeId));
+        el.classList.toggle('is-hover', members.some((id) => hoverIds.includes(id)));
+      }
+      paintAll = () => onScreen.forEach((mk) => paint(mk.getElement()));
+
+      m.on('render', updateMarkers);
+
+      // Filters: frame whatever the chip leaves on the map ("All" = the home view). Padding keeps markers
+      // and labels clear of the controls; maxZoom keeps a single region at region level, not a close-up.
+      fitToShown = (all: boolean) => {
+        const shown = points.filter((p) => shownBy[p.id] > 0);
+        const animate = !reduceMotion.matches;
+        if (all || shown.length === 0) {
+          m.fitBounds(HOME, { padding: 24, animate, duration: 900 });
+          return;
+        }
+        const lons = shown.map((p) => p.lon);
+        const lats = shown.map((p) => p.lat);
+        m.fitBounds(
+          [
+            [Math.min(...lons), Math.min(...lats)],
+            [Math.max(...lons), Math.max(...lats)],
+          ],
+          { padding: { top: 72, bottom: 56, left: 72, right: 96 }, maxZoom: 3.5, animate, duration: 900 },
+        );
+      };
+      flyToRegion = (id: string) => {
+        const pt = pointFor(id);
+        if (!pt) return;
+        // Opening a row always takes the map to that region, at region level (never closer)
+        const options = { center: [pt.lon, pt.lat] as [number, number], zoom: REGION_ZOOM };
+        if (reduceMotion.matches) m.jumpTo(options);
+        else m.flyTo({ ...options, duration: 900 });
+      };
+    }
+
+    let paintAll = () => {};
+    let flyToRegion = (_id: string) => {};
+    let fitToShown = (_all: boolean) => {};
+    let currentFilter = 'all';
+
+    if (canvas) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            io.disconnect();
+            loadMap().catch((err) => console.error('Live operations map failed to load', err));
+          }
+        },
+        { rootMargin: '400px' },
+      );
+      io.observe(figure);
+    }
+
+
+    // ── Region selection: one open at a time; list and map stay in sync ────────
+    function select(id: string | null, moveMap = true) {
+      toggles.forEach((t) => {
+        const open = t.dataset.liveOpsToggle === id;
+        t.setAttribute('aria-expanded', String(open));
+        document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !open;
+        t.closest('li')!.classList.toggle('is-open', open);
+      });
+      activeId = id;
+      root.classList.toggle('has-selection', id !== null);
+      paintAll();
+      if (id && moveMap) flyToRegion(id);
+      // Closing the open row returns to the current filter's view
+      else if (!id && moveMap) fitToShown(currentFilter === 'all');
+    }
+
+    toggles.forEach((t) => {
+      const id = t.dataset.liveOpsToggle!;
+      t.addEventListener('click', () => select(t.getAttribute('aria-expanded') === 'true' ? null : id));
+      const li = t.closest<HTMLElement>('li')!;
+      const hover = (on: boolean) => {
+        hoverIds = on ? [id] : [];
+        paintAll();
+      };
+      li.addEventListener('pointerenter', () => hover(true));
+      li.addEventListener('pointerleave', () => hover(false));
+      t.addEventListener('focus', () => hover(true));
+      t.addEventListener('blur', () => hover(false));
+    });
+
+    // ── Asset-type filter ───────────────────────────────────────────────────────
+    const filters = [...root.querySelectorAll<HTMLButtonElement>('[data-live-ops-filter]')];
+    filters.forEach((f) =>
+      f.addEventListener('click', () => {
+        const type = f.dataset.liveOpsFilter!;
+        currentFilter = type;
+        filters.forEach((b) => b.setAttribute('aria-pressed', String(b === f)));
+        let visible = 0;
+        root.querySelectorAll<HTMLElement>('[data-live-ops-region]').forEach((li) => {
+          const ops = [...li.querySelectorAll<HTMLElement>('.live-ops__op')];
+          let shown = 0;
+          ops.forEach((op) => {
+            const match = type === 'all' || op.dataset.type === type;
+            op.hidden = !match;
+            if (match) shown += 1;
+          });
+          const id = li.dataset.liveOpsRegion!;
+          shownBy[id] = shown;
+          li.hidden = shown === 0;
+          li.querySelectorAll<HTMLElement>('.live-ops__type-dot').forEach((d) =>
+            d.classList.toggle('is-dim', type !== 'all' && d.dataset.type !== type),
+          );
+          const count = li.querySelector('[data-live-ops-region-count]');
+          if (count) count.textContent = `, ${shown} ${shown === 1 ? 'asset' : 'assets'}`;
+          if (shown === 0 && li.classList.contains('is-open')) select(null, false);
+          if (shown > 0) visible += 1;
+        });
+        refreshMarkers();
+        fitToShown(type === 'all');
+        const word = visible === 1 ? 'region' : 'regions';
+        root.querySelector('[data-live-ops-count]')!.textContent = String(visible);
+        root.querySelector('[data-live-ops-word]')!.textContent = word;
+        const label = f.querySelector('.filter-chip__label')?.textContent ?? '';
+        say(type === 'all' ? `Showing all ${visible} ${word}` : `${label}: ${visible} ${word}`);
+      }),
+    );
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-live-ops]').forEach(initLiveOps);
+</script>
+
+<style is:global>
+  .live-ops {
+    overflow: clip;
+  }
+  /* Desktop: head across the top; filters + map in the main column, region list beside them */
+  .live-ops__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 384px;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      'head head'
+      'filters side'
+      'map side';
+    column-gap: var(--wp--preset--spacing--64);
+    align-items: start;
+  }
+
+  /* ── Head ─────────────────────────────────────────────── */
+  .live-ops__head {
+    grid-area: head;
+    display: grid;
+    gap: var(--wp--preset--spacing--16);
+    margin-bottom: var(--wp--preset--spacing--40);
+  }
+  .live-ops__status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--12);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .live-ops__status-live {
+    color: var(--wp--custom--color--text--accent);
+    font-weight: var(--wp--custom--font-weight--bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .live-ops__beacon {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--border--accent);
+  }
+  .live-ops[data-state='stale'] .live-ops__beacon {
+    background-color: var(--wp--custom--color--text--disabled);
+  }
+  .live-ops[data-state='live'] .live-ops__beacon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-color: inherit;
+    animation: live-ops-ping 2.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  }
+  .live-ops__title {
+    color: var(--wp--custom--color--text--primary);
+    text-wrap: balance;
+  }
+  .live-ops__count {
+    color: var(--wp--custom--color--text--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .live-ops__intro {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* Toolbar: filter chips on the left, zoom on the right, above the map */
+  .live-ops__toolbar {
+    grid-area: filters;
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16);
+    margin-bottom: var(--wp--preset--spacing--24);
+  }
+  .live-ops__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--8);
+    min-width: 0;
+  }
+
+  /* ── Map ──────────────────────────────────────────────── */
+  .live-ops__map {
+    /* Map colours from tokens (read by the script); Light surface values here, Navy below */
+    --map-dot: var(--wp--preset--color--navy-300);
+    grid-area: map;
+    position: relative;
+    margin: 0;
+    aspect-ratio: 2 / 1;
+    border-radius: var(--wp--custom--radius--md);
+    overflow: hidden;
+  }
+  .live-ops.has-surface-navy .live-ops__map {
+    --map-dot: var(--wp--preset--color--navy-600);
+  }
+  .live-ops__poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 400ms var(--wp--custom--motion--easing);
+  }
+  .live-ops__land {
+    fill: none;
+    stroke: var(--map-dot);
+    stroke-width: 3.4;
+    stroke-linecap: round;
+  }
+  /* Doubled class: MapLibre's CSS (loaded later) sets .maplibregl-map { position: relative } */
+  .live-ops__canvas.live-ops__canvas {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 400ms var(--wp--custom--motion--easing);
+  }
+  .live-ops__map.is-ready .live-ops__canvas {
+    opacity: 1;
+  }
+  .live-ops__map.is-ready .live-ops__poster {
+    opacity: 0;
+  }
+  /* MapLibre chrome, brought onto the tokens */
+  .live-ops .maplibregl-map {
+    font-family: var(--wp--preset--font-family--inter);
+  }
+  .live-ops .maplibregl-canvas:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: -2px;
+  }
+  .live-ops .maplibregl-ctrl-attrib,
+  .live-ops .maplibregl-ctrl-attrib.maplibregl-compact,
+  .live-ops .maplibregl-ctrl-attrib.maplibregl-compact-show {
+    background-color: transparent;
+    color: var(--wp--custom--color--text--secondary);
+    font-size: 11px;
+  }
+  .live-ops .maplibregl-ctrl-attrib a {
+    color: inherit;
+  }
+  .live-ops.has-surface-navy .maplibregl-ctrl-attrib-button {
+    filter: invert(1);
+  }
+  .live-ops .maplibregl-cooperative-gesture-screen {
+    background: var(--wp--custom--color--bg--overlay);
+    color: var(--wp--custom--color--text--on-overlay);
+    font-size: var(--wp--preset--font-size--body-sm);
+    border-radius: inherit;
+  }
+
+  /* Zoom: one horizontal pill, same height and outline as the filter chips */
+  .live-ops__controls {
+    display: flex;
+    flex: none;
+    margin-inline-start: auto;
+    border-radius: var(--wp--custom--radius--full);
+    box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--default);
+    overflow: hidden;
+  }
+  .live-ops__control {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    color: var(--wp--custom--color--text--primary);
+    transition: background-color 160ms var(--wp--custom--motion--easing);
+  }
+  .live-ops__control + .live-ops__control {
+    box-shadow: inset 1px 0 0 var(--wp--custom--color--border--default);
+  }
+  .live-ops__control:hover:not(:disabled) {
+    background-color: var(--wp--custom--color--alpha--navy-8);
+  }
+  .live-ops.has-surface-navy .live-ops__control:hover:not(:disabled) {
+    background-color: rgb(255 255 255 / 0.08);
+  }
+  .live-ops__control:disabled {
+    color: var(--wp--custom--color--text--disabled);
+    cursor: default;
+  }
+  .live-ops__control:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: -3px;
+    border-radius: var(--wp--custom--radius--full);
+  }
+
+  /* ── Markers (HTML, positioned by the map) ─────────────── */
+  .live-ops__marker {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    font-family: var(--wp--preset--font-family--inter);
+  }
+  .live-ops__marker--cluster {
+    width: 34px;
+    height: 34px;
+    cursor: zoom-in;
+  }
+  .live-ops__marker::before {
+    /* larger hit area */
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+  .live-ops__marker-dot {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--border--accent);
+    color: var(--wp--preset--color--navy-900);
+    font-size: 13px;
+    font-weight: var(--wp--custom--font-weight--bold);
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 0 0 0 var(--wp--preset--color--navy-900);
+    transition:
+      transform 240ms var(--wp--custom--motion--easing),
+      box-shadow 240ms var(--wp--custom--motion--easing);
+  }
+  .live-ops__marker--cluster .live-ops__marker-dot {
+    font-size: 15px;
+  }
+  .live-ops__marker-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--border--accent);
+    opacity: 0;
+    animation: live-ops-pulse 3.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  }
+  .live-ops__marker-ring {
+    position: absolute;
+    inset: -6px;
+    border: 1.5px dashed var(--wp--custom--color--border--accent);
+    border-radius: var(--wp--custom--radius--full);
+    opacity: 0.8;
+    animation: live-ops-spin 18s linear infinite;
+  }
+  .live-ops[data-state='stale'] .live-ops__marker-pulse,
+  .live-ops[data-state='stale'] .live-ops__marker-ring {
+    animation: none;
+  }
+  .live-ops__marker-label {
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    translate: 0 -50%;
+    white-space: nowrap;
+    color: var(--wp--custom--color--text--primary);
+    font-size: 15px;
+    font-weight: var(--wp--custom--font-weight--medium);
+    text-shadow:
+      0 0 4px var(--wp--custom--color--bg--default),
+      0 0 2px var(--wp--custom--color--bg--default);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms var(--wp--custom--motion--easing);
+  }
+  .live-ops__marker.is-label-left .live-ops__marker-label {
+    left: auto;
+    right: calc(100% + 10px);
+  }
+  .live-ops__marker--cluster .live-ops__marker-label {
+    left: calc(100% + 14px);
+  }
+  .live-ops__marker--cluster.is-label-left .live-ops__marker-label {
+    right: calc(100% + 14px);
+  }
+  .live-ops__marker:hover .live-ops__marker-dot,
+  .live-ops__marker.is-hover .live-ops__marker-dot {
+    transform: scale(1.15);
+  }
+  .live-ops__marker.is-active .live-ops__marker-dot {
+    transform: scale(1.25);
+    box-shadow: 0 0 0 3px var(--wp--preset--color--navy-900);
+  }
+  .live-ops__marker:hover .live-ops__marker-label,
+  .live-ops__marker.is-hover .live-ops__marker-label,
+  .live-ops__marker.is-active .live-ops__marker-label,
+  .live-ops.is-detail .live-ops__marker:not(.live-ops__marker--cluster) .live-ops__marker-label {
+    opacity: 1;
+  }
+  .live-ops.has-selection .live-ops__marker:not(.is-active):not(:hover):not(.is-hover) {
+    opacity: 0.6;
+  }
+
+  /* ── Region list ──────────────────────────────────────── */
+  .live-ops__side {
+    grid-area: side;
+    display: grid;
+    gap: var(--wp--preset--spacing--24);
+  }
+  .live-ops__regions {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .live-ops__region {
+    border-bottom: 1px solid var(--wp--custom--color--border--subtle);
+    transition: background-color 200ms var(--wp--custom--motion--easing);
+  }
+  .live-ops__region.is-hover,
+  .live-ops__region.is-open {
+    background-color: var(--wp--custom--color--alpha--navy-8);
+  }
+  .live-ops.has-surface-navy .live-ops__region.is-hover,
+  .live-ops.has-surface-navy .live-ops__region.is-open {
+    background-color: rgb(255 255 255 / 0.05);
+  }
+  .live-ops__region-heading {
+    margin: 0;
+  }
+  /* Two lines per row: name, then area + asset-type icons */
+  .live-ops__region-toggle {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'name chevron' 'meta chevron';
+    align-items: center;
+    column-gap: var(--wp--preset--spacing--12);
+    row-gap: 2px;
+    width: 100%;
+    padding: var(--wp--preset--spacing--12);
+    text-align: start;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .live-ops__region-toggle:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: -2px;
+  }
+  .live-ops__region-name {
+    grid-area: name;
+  }
+  .live-ops__region-meta {
+    grid-area: meta;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--12);
+    min-width: 0;
+  }
+  .live-ops__region-area {
+    color: var(--wp--custom--color--text--secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .live-ops__region-types {
+    display: flex;
+    flex: none;
+    gap: var(--wp--preset--spacing--4);
+  }
+  .live-ops__type-dot {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--wp--custom--radius--full);
+    box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--default);
+    color: var(--wp--custom--color--text--accent);
+    transition: opacity 200ms var(--wp--custom--motion--easing);
+  }
+  .live-ops__type-dot.is-dim {
+    opacity: 0.3;
+  }
+  .live-ops__chevron {
+    grid-area: chevron;
+    color: var(--wp--custom--color--text--secondary);
+    transition: transform 240ms var(--wp--custom--motion--easing);
+  }
+  .live-ops__region-toggle[aria-expanded='true'] .live-ops__chevron {
+    transform: rotate(180deg);
+  }
+  .live-ops__ops {
+    list-style: none;
+    margin: 0;
+    padding: var(--wp--preset--spacing--4) var(--wp--preset--spacing--12) var(--wp--preset--spacing--16);
+    display: grid;
+    gap: var(--wp--preset--spacing--16);
+  }
+  .is-enhanced .live-ops__panel:not([hidden]) .live-ops__op {
+    animation: live-ops-rise 320ms var(--wp--custom--motion--easing) both;
+  }
+  .is-enhanced .live-ops__panel:not([hidden]) .live-ops__op:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .is-enhanced .live-ops__panel:not([hidden]) .live-ops__op:nth-child(3) {
+    animation-delay: 120ms;
+  }
+  .live-ops__op {
+    display: flex;
+    gap: var(--wp--preset--spacing--12);
+  }
+  .live-ops__op[hidden] {
+    display: none;
+  }
+  .live-ops__op-icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--wp--custom--radius--sm);
+    background-color: var(--wp--custom--color--border--accent);
+    color: var(--wp--preset--color--navy-900);
+  }
+  .live-ops__op-text {
+    display: grid;
+    gap: 2px;
+  }
+  .live-ops__op-asset {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .live-ops__op-scope {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .live-ops__op-meta {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .live-ops__fallback {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .live-ops__foot {
+    display: grid;
+    gap: var(--wp--preset--spacing--16);
+    justify-items: start;
+  }
+
+  /* No JS: buttons do nothing, so show every panel */
+  .live-ops:not(.is-enhanced) .live-ops__panel[hidden] {
+    display: block;
+  }
+  .live-ops:not(.is-enhanced) .live-ops__chevron {
+    display: none;
+  }
+
+  @keyframes live-ops-pulse {
+    0% {
+      opacity: 0.55;
+      transform: scale(1);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(2.8);
+    }
+  }
+  @keyframes live-ops-ping {
+    0% {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    80%,
+    100% {
+      opacity: 0;
+      transform: scale(2.6);
+    }
+  }
+  @keyframes live-ops-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes live-ops-rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .live-ops__marker-pulse,
+    .live-ops__marker-ring,
+    .live-ops__beacon::after,
+    .is-enhanced .live-ops__panel:not([hidden]) .live-ops__op {
+      animation: none !important;
+    }
+    .live-ops__marker-pulse {
+      opacity: 0.25;
+      transform: scale(1.6);
+    }
+  }
+
+  @media (max-width: 1199px) {
+    .live-ops__layout {
+      grid-template-columns: minmax(0, 1fr) 320px;
+      column-gap: var(--wp--preset--spacing--32);
+    }
+    .live-ops__region-meta {
+      align-items: flex-start;
+    }
+    .live-ops__region-area {
+      white-space: normal;
+    }
+  }
+  @media (max-width: 899px) {
+    .live-ops__layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+      grid-template-areas: 'head' 'filters' 'map' 'side';
+    }
+    .live-ops__map {
+      margin-bottom: var(--wp--preset--spacing--32);
+    }
+  }
+  @media (max-width: 599px) {
+    /* Chips scroll sideways; zoom stays pinned at the end of the row */
+    .live-ops__toolbar {
+      gap: var(--wp--preset--spacing--8);
+    }
+    .live-ops__filters {
+      flex: 1;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      margin-inline-start: calc(-1 * var(--wp--preset--spacing--16));
+      padding-inline: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+      scrollbar-width: none;
+      /* Fade the chips into the zoom buttons, hinting that the row scrolls */
+      mask-image: linear-gradient(to right, black calc(100% - 32px), transparent);
+    }
+    .live-ops__map {
+      aspect-ratio: 5 / 4;
+      margin-inline: calc(-1 * var(--wp--preset--spacing--16));
+      border-radius: 0;
+    }
+    .live-ops__marker-label {
+      font-size: 13px;
+    }
+  }
+</style>

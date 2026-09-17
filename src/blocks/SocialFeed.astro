@@ -1,0 +1,231 @@
+---
+// Social feed · LinkedIn (17 Sep 2026). PROTOTYPE DUMMY: static sample posts standing in for the
+// live LinkedIn widget the dev site already runs. In WordPress this is the Embed block's job
+// (third-party feed behind the Consent placeholder, docs/05 §2.13), not a new block, so nothing
+// here is a field contract. Layout: a sideways rail that runs off the container's right edge
+// (scroll-snap, arrow buttons on fine pointers), so it does not repeat the card rows above it.
+import BlockSection from '../components/BlockSection.astro';
+import Button from '../components/Button.astro';
+import Icon from '../components/Icon.astro';
+import IconButton from '../components/IconButton.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, ImageField } from '../lib/types';
+
+interface Post {
+  age: string;
+  text: string;
+  image?: ImageField;
+  reactions: number;
+  url: string;
+}
+
+interface Props extends BlockFields {
+  title: string;
+  followUrl: string;
+  posts: Post[];
+}
+
+const { title, followUrl, posts, background, spacing, anchor } = Astro.props;
+const titleId = makeId('social-feed', title);
+---
+
+<BlockSection slug="social-feed" root="social-feed" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId} bleed>
+  <div class="container social-feed__header">
+    <h2 id={titleId} class="text-h2">{title}</h2>
+    <div class="social-feed__controls">
+      <div class="social-feed__arrows" data-social-arrows hidden>
+        <IconButton icon="arrow-left" label="Previous posts" variant="outline" size="small" data-social-prev />
+        <IconButton icon="arrow-right" label="More posts" variant="outline" size="small" data-social-next />
+      </div>
+      <Button label="Follow us" href={followUrl} variant="primary" leadingIcon="brand-linkedin" target="_blank" rel="noopener noreferrer" />
+    </div>
+  </div>
+  <ul class="social-feed__rail" data-social-rail tabindex="0" aria-label="Latest LinkedIn posts">
+    {
+      posts.map((post) => (
+        <li class="social-feed__item">
+          <a class="social-feed__post" href={post.url} target="_blank" rel="noopener noreferrer">
+            <div class="social-feed__byline">
+              <span class="social-feed__avatar" aria-hidden="true">
+                <Icon name="brand-linkedin" size={20} />
+              </span>
+              <span class="social-feed__who">
+                <span class="text-label">Reach Subsea</span>
+                <span class="social-feed__age text-caption">{post.age}</span>
+              </span>
+            </div>
+            <p class="social-feed__text text-small">{post.text}</p>
+            {post.image?.src && (
+              <span class="social-feed__media">
+                <img src={post.image.src} alt={post.image.alt} loading="lazy" decoding="async" />
+              </span>
+            )}
+            <span class="social-feed__foot text-caption">
+              <Icon name="thumb-up" size={16} />
+              {post.reactions}
+              <span class="visually-hidden"> reactions. Opens on LinkedIn in a new tab.</span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</BlockSection>
+
+<style is:global>
+  .social-feed {
+    overflow: hidden;
+  }
+  .social-feed__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--wp--custom--stack--sm) var(--wp--custom--grid--gutter);
+    margin-bottom: var(--wp--custom--stack--xl);
+  }
+  .social-feed__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--24);
+  }
+  .social-feed__arrows {
+    display: flex;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .social-feed [hidden] {
+    display: none;
+  }
+
+  /* The rail starts on the container's left edge and bleeds off the right edge of the viewport. */
+  .social-feed__rail {
+    --rail-inset: max(
+      var(--wp--style--root--padding-left),
+      calc((100vw - var(--wp--style--global--wide-size)) / 2)
+    );
+    display: flex;
+    gap: var(--wp--custom--grid--gutter);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--rail-inset);
+    padding-inline: var(--rail-inset);
+    padding-block: var(--wp--preset--spacing--8) var(--wp--preset--spacing--24);
+    scrollbar-width: none;
+  }
+  .social-feed__rail::-webkit-scrollbar {
+    display: none;
+  }
+  .social-feed__rail:focus-visible {
+    outline-offset: -2px;
+  }
+  .social-feed__item {
+    flex: none;
+    width: min(384px, 82vw);
+    scroll-snap-align: start;
+  }
+  .social-feed__post {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--16);
+    height: 100%;
+    padding: var(--wp--preset--spacing--24);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--default);
+    box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--subtle);
+    transition:
+      transform 0.4s var(--wp--custom--motion--ease-out),
+      box-shadow 0.4s var(--wp--custom--motion--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .social-feed__post:hover {
+      transform: translate3d(0, -3px, 0);
+      box-shadow:
+        inset 0 0 0 1px var(--wp--custom--color--border--subtle),
+        var(--wp--preset--shadow--md);
+    }
+  }
+  .social-feed__byline {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--12);
+  }
+  .social-feed__avatar {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--preset--color--navy-800);
+    color: var(--wp--preset--color--white);
+  }
+  .social-feed__who {
+    display: flex;
+    flex-direction: column;
+  }
+  .social-feed__age,
+  .social-feed__foot {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .social-feed__text {
+    color: var(--wp--custom--color--text--primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  /* Text-only posts set larger, so the rail has rhythm instead of an empty half card */
+  .social-feed__post:not(:has(.social-feed__media)) .social-feed__text {
+    font-size: var(--wp--preset--font-size--h4);
+    line-height: var(--wp--custom--line-height--h4);
+    font-weight: var(--wp--custom--font-weight--medium);
+    -webkit-line-clamp: 8;
+    line-clamp: 8;
+  }
+  .social-feed__media {
+    display: block;
+    margin-top: auto;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--custom--color--bg--disabled);
+  }
+  .social-feed__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .social-feed__foot {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .social-feed__post:not(:has(.social-feed__media)) .social-feed__foot {
+    margin-top: auto;
+  }
+</style>
+
+<script>
+  // Arrow buttons page the rail by one card. Only shown for fine pointers; touch just swipes.
+  document.querySelectorAll<HTMLElement>('.social-feed').forEach((root) => {
+    const rail = root.querySelector<HTMLElement>('[data-social-rail]');
+    const arrows = root.querySelector<HTMLElement>('[data-social-arrows]');
+    const prev = root.querySelector<HTMLButtonElement>('[data-social-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-social-next]');
+    if (!rail || !arrows || !prev || !next) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    arrows.hidden = false;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const step = () => (rail.querySelector<HTMLElement>('.social-feed__item')?.offsetWidth ?? 384) + 32;
+    const page = (dir: 1 | -1) => rail.scrollBy({ left: dir * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
+    const sync = () => {
+      prev.disabled = rail.scrollLeft <= 4;
+      next.disabled = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4;
+    };
+    prev.addEventListener('click', () => page(-1));
+    next.addEventListener('click', () => page(1));
+    rail.addEventListener('scroll', sync, { passive: true });
+    sync();
+  });
+</script>

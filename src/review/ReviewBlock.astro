@@ -1,0 +1,46 @@
+---
+import { figmaUrl, type BlockEntry } from './registry';
+
+interface Props {
+  block: BlockEntry;
+  index: number;
+  heading?: 'h1' | 'h2';
+}
+
+const { block, index, heading: Heading = 'h2' } = Astro.props;
+const frame = `/blocks/frame/${block.slug}/`;
+const number = String(index + 1).padStart(2, '0');
+---
+
+<section class="rv-block" id={block.slug} aria-labelledby={`rv-title-${block.slug}`}>
+  <header class="rv-block__header">
+    <div class="rv-block__heading">
+      <p class="rv-block__meta">
+        <span>{number} · {block.spec}</span>
+        <code>reach/{block.slug}</code>
+        <code>src/blocks/{block.component}.astro</code>
+      </p>
+      <Heading id={`rv-title-${block.slug}`} class="rv-block__title">{block.name}</Heading>
+      <p class="rv-block__variants">{block.variants}</p>
+    </div>
+    <p class="rv-block__links">
+      <a href={frame} target="_blank">Open frame</a>
+      <a href={figmaUrl(block.figma)} target="_blank" rel="noopener noreferrer">Figma {block.figma}</a>
+      {Heading === 'h2' && <a href={`/blocks/${block.slug}/`}>Review alone</a>}
+    </p>
+  </header>
+  <div class="rv-block__viewports">
+    <figure class="rv-vp rv-vp--desktop">
+      <figcaption>Desktop · 1440</figcaption>
+      <div class="rv-vp__screen" data-width="1440">
+        <iframe src={frame} title={`${block.name}, Desktop 1440`} width="1440" loading="lazy"></iframe>
+      </div>
+    </figure>
+    <figure class="rv-vp rv-vp--mobile">
+      <figcaption>Mobile · 375</figcaption>
+      <div class="rv-vp__screen" data-width="375">
+        <iframe src={frame} title={`${block.name}, Mobile 375`} width="375" loading="lazy"></iframe>
+      </div>
+    </figure>
+  </div>
+</section>

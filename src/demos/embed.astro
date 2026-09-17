@@ -1,0 +1,63 @@
+---
+import Embed from '../blocks/Embed.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+
+const worldUrl = 'https://tada-no.github.io/reach-world/';
+const worldEyebrow = 'Explore 3D World';
+const worldTitle = 'Dive into our subsea world';
+const worldText =
+  'Fly over a survey site, inspect subsea assets and see how remote operations work. The scene loads about 18 MB when you launch it.';
+
+const sharePriceHeader = { title: 'Share price', intro: 'Live share price and trading data for REACH on Euronext Oslo Børs.' };
+const sharePriceProvider = { name: 'Oslo Market Solutions', domain: 'ir.oms.no' };
+
+const officesHeader = { title: 'Our offices', intro: 'Find us in Haugesund, Bergen and Aberdeen.' };
+---
+
+<VariantLabel name="3D World · Poster" props='type="3d-world" state="poster"' />
+<Embed type="3d-world" state="poster" eyebrow={worldEyebrow} title={worldTitle} text={worldText} worldUrl={worldUrl} showZones />
+
+<VariantLabel name="3D World · Loaded (static stand-in — the review never fetches the 18 MB scene)" props='type="3d-world" state="loaded"' />
+<Embed type="3d-world" state="loaded" eyebrow={worldEyebrow} title={worldTitle} text={worldText} worldUrl={worldUrl} showZones />
+
+<VariantLabel name="Iframe · Consent" props='type="iframe" state="consent"' />
+<Embed type="iframe" state="consent" sectionHeader={sharePriceHeader} provider={sharePriceProvider} url="about:blank" iframeTitle="REACH share price" />
+
+<VariantLabel name="Iframe · Loaded (src=&quot;about:blank&quot; stand-in for the real ir.oms.no widget)" props='type="iframe" state="loaded"' />
+<Embed type="iframe" state="loaded" sectionHeader={sharePriceHeader} provider={sharePriceProvider} url="about:blank" iframeTitle="REACH share price" />
+
+<VariantLabel name="Map · Consent" props='type="map" state="consent"' />
+<Embed type="map" state="consent" sectionHeader={officesHeader} url="#" />
+
+<VariantLabel name="Map · Loaded" props='type="map" state="loaded"' />
+<Embed
+  type="map"
+  state="loaded"
+  sectionHeader={officesHeader}
+  mapImage={{ alt: 'Map of Reach Subsea office locations in Haugesund, Bergen and Aberdeen' }}
+/>
+
+<VariantLabel name="Example · Home 3D World, zones off" props='type="3d-world" state="poster" showZones={false}' />
+<Embed type="3d-world" state="poster" eyebrow={worldEyebrow} title={worldTitle} text={worldText} worldUrl={worldUrl} />
+
+<VariantLabel name="Example · Share information Newsweb, on Tint" props='type="iframe" state="consent" background="tint"' />
+<Embed
+  type="iframe"
+  state="consent"
+  background="tint"
+  sectionHeader={{ title: 'Stock exchange announcements', intro: 'Company announcements filed with Oslo Børs via Newsweb.' }}
+  provider={{ name: 'Newsweb', domain: 'newsweb.oslobors.no' }}
+  url="about:blank"
+  iframeTitle="REACH stock exchange announcements"
+/>
+
+<VariantLabel name="Example · Share price consent, on Navy" props='type="iframe" state="consent" background="navy"' />
+<Embed
+  type="iframe"
+  state="consent"
+  background="navy"
+  sectionHeader={sharePriceHeader}
+  provider={sharePriceProvider}
+  url="about:blank"
+  iframeTitle="REACH share price"
+/>

@@ -1,0 +1,50 @@
+---
+// A block's frame inside a true 375px iframe. Browser windows (and headless Chrome) can't be
+// narrower than ~500px, so mobile screenshots go through this page. Query string is forwarded (?only=N).
+import { blocks } from '../../../review/registry';
+
+export function getStaticPaths() {
+  return blocks.map((block) => ({ params: { slug: block.slug } }));
+}
+
+const { slug } = Astro.params;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Mobile 375 · {slug}</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #e3e4ef;
+      }
+      iframe {
+        display: block;
+        width: 375px;
+        height: 1600px;
+        border: 0;
+        background: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="frame" title={`${slug}, Mobile 375`} width="375"></iframe>
+    <script is:inline define:vars={{ slug }}>
+      const frame = document.getElementById('frame');
+      frame.addEventListener('load', () => {
+        const body = frame.contentDocument.body;
+        const fit = () => {
+          frame.style.height = `${Math.ceil(body.getBoundingClientRect().height)}px`;
+        };
+        fit();
+        new ResizeObserver(fit).observe(body);
+      });
+      frame.src = `/blocks/frame/${slug}/${location.search}`;
+    </script>
+  </body>
+</html>

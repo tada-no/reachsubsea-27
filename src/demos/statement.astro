@@ -1,0 +1,40 @@
+---
+import Statement from '../blocks/Statement.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+---
+
+<VariantLabel name="Statement" props='style="statement"' />
+<Statement
+  style="statement"
+  eyebrow="Our vision"
+  statement="Making subsea operations safer, cleaner and more efficient by moving work from sea to shore."
+  action={{ label: 'About Reach Subsea', url: '#' }}
+/>
+
+<VariantLabel name="Quote" props='style="quote"' />
+<Statement
+  style="quote"
+  quote="Running a vessel from shore still feels like being on the bridge, just with the whole team beside you."
+  name="Kari Nordmann"
+  role="Remote operations supervisor"
+  photo={{ alt: 'Portrait of Kari Nordmann' }}
+/>
+
+<VariantLabel name="Example · Vision statement on Tint" props='style="statement" background="tint"' />
+<Statement
+  style="statement"
+  background="tint"
+  eyebrow="Our vision"
+  statement="Making subsea operations safer, cleaner and more efficient by moving work from sea to shore."
+  action={{ label: 'About Reach Subsea', url: '#' }}
+/>
+
+<VariantLabel name="Example · Employee quote on Navy" props='style="quote" background="navy"' />
+<Statement
+  style="quote"
+  background="navy"
+  quote="Moving from a crewed bridge to a shore control room was the best career move I have made."
+  name="Ola Nordmann"
+  role="ROV pilot technician"
+  photo={{ alt: 'Portrait of Ola Nordmann' }}
+/>

@@ -1,0 +1,129 @@
+---
+// Link — standalone action link (docs/04 §6). Dev theme class .link-arrow.
+// <a> when there is a url, otherwise <button> (Expand, or a Video that opens the dialog).
+import Icon from './Icon.astro';
+import type { LinkAction } from '../lib/types';
+
+interface Props {
+  label: string;
+  href?: string;
+  action?: LinkAction;
+  size?: 'medium' | 'small';
+  showIcon?: boolean;
+  /** Visually hidden context appended to the label ("Q2 2025 report, PDF"). */
+  context?: string;
+  /** Expand without a url: initial state (plus → minus). */
+  open?: boolean;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const {
+  label,
+  href,
+  action = 'page',
+  size = 'medium',
+  showIcon = true,
+  context,
+  open = false,
+  class: className,
+  ...attrs
+} = Astro.props;
+
+const ICONS: Record<LinkAction, string> = {
+  page: 'arrow-right',
+  external: 'arrow-up-right',
+  file: 'download',
+  video: 'player-play',
+  expand: 'plus',
+  anchor: 'arrow-down',
+};
+
+const iconSize = size === 'small' ? 16 : 20;
+const Tag = href ? 'a' : 'button';
+const isExternal = action === 'external' && Boolean(href);
+---
+
+<Tag
+  class:list={['link-arrow', `link-arrow--${action}`, size === 'small' && 'link-arrow--small', className]}
+  href={href}
+  type={href ? undefined : 'button'}
+  target={isExternal ? '_blank' : undefined}
+  rel={isExternal ? 'noopener noreferrer' : undefined}
+  aria-expanded={action === 'expand' && !href ? String(open) : undefined}
+  {...attrs}
+>
+  <span class="link-arrow__label"
+    >{label}{context && <span class="visually-hidden"> {context}</span>}{
+      isExternal && <span class="visually-hidden"> (opens in a new tab)</span>
+    }</span
+  >
+  {
+    showIcon && action === 'expand' && (
+      <Fragment>
+        <Icon name="plus" size={iconSize} class="link-arrow__icon link-arrow__icon--closed" />
+        <Icon name="minus" size={iconSize} class="link-arrow__icon link-arrow__icon--open" />
+      </Fragment>
+    )
+  }
+  {showIcon && action !== 'expand' && <Icon name={ICONS[action]} size={iconSize} class="link-arrow__icon" />}
+</Tag>
+
+<style is:global>
+  .link-arrow {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    width: fit-content;
+    min-height: 48px;
+    padding-block: var(--wp--preset--spacing--12);
+    font-size: var(--wp--preset--font-size--button);
+    line-height: var(--wp--custom--line-height--button);
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--primary);
+    text-align: left;
+    text-decoration: none;
+  }
+  .link-arrow--small {
+    min-height: 44px;
+    font-size: var(--wp--preset--font-size--button-sm);
+    line-height: var(--wp--custom--line-height--button-sm);
+  }
+  .link-arrow__icon {
+    flex: none;
+    color: var(--wp--custom--color--icon--accent);
+    transition: transform 0.3s var(--wp--custom--motion--easing);
+  }
+  .link-arrow__icon--open,
+  .link-arrow[aria-expanded='true'] .link-arrow__icon--closed {
+    display: none;
+  }
+  .link-arrow[aria-expanded='true'] .link-arrow__icon--open {
+    display: block;
+  }
+
+  @media (hover: hover) {
+    .link-arrow:hover .link-arrow__label {
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.3em;
+    }
+    .link-arrow:hover .link-arrow__icon {
+      transform: translateX(4px);
+    }
+  }
+
+  /* Ring 8px outside at the sides (links have no side padding), 4px top and bottom */
+  .link-arrow:focus-visible {
+    outline: none;
+  }
+  .link-arrow:focus-visible::after {
+    content: '';
+    position: absolute;
+    inset: -4px -8px;
+    border: 2px solid var(--wp--custom--color--border--focus);
+    border-radius: var(--wp--custom--radius--sm);
+    pointer-events: none;
+  }
+</style>

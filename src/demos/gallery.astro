@@ -1,0 +1,56 @@
+---
+import MediaGallery from '../blocks/MediaGallery.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+
+const photoCaptions = [
+  'Deck operations during ROV launch',
+  'Survey vessel departing Haugesund',
+  'Cable route survey, North Sea',
+  'Onshore operations centre',
+  'ROV recovery, night watch',
+  'Multibeam data processing',
+  'Crew transfer, offshore wind site',
+  'Reach Remote 1 during sea trials',
+];
+
+const photos = Array.from({ length: 24 }, (_, i) => ({
+  image: { alt: photoCaptions[i % photoCaptions.length] },
+  caption: `${photoCaptions[i % photoCaptions.length]}, 2025`,
+}));
+
+const videos = [
+  {
+    title: '3D World: seabed survey walkthrough',
+    description: 'A guided flythrough of a completed survey, rendered from the point-cloud data.',
+    url: '#',
+  },
+  {
+    title: 'Reach Remote: remote operations explained',
+    description: 'How our onshore operations centre pilots uncrewed vessels offshore.',
+    url: '#',
+  },
+  {
+    title: 'Vessel launch sequence',
+    description: 'From deck stowage to deployment: how a remote vessel launches from its mothership.',
+    url: '#',
+  },
+];
+---
+
+<VariantLabel name="Photos" props='type="photos" visibleCount={6}' />
+<MediaGallery type="photos" sectionHeader={{ title: 'Gallery' }} photos={photos} visibleCount={6} />
+
+<VariantLabel name="Videos" props='type="videos"' />
+<MediaGallery type="videos" sectionHeader={{ title: 'Videos and animations' }} videos={videos} />
+
+<VariantLabel name="Example · Asset gallery on Tint" props='type="photos" background="tint"' />
+<MediaGallery
+  type="photos"
+  background="tint"
+  sectionHeader={{ title: 'Vessel photo gallery' }}
+  photos={photos}
+  visibleCount={6}
+/>
+
+<VariantLabel name="Example · Videos on Navy" props='type="videos" background="navy"' />
+<MediaGallery type="videos" background="navy" sectionHeader={{ title: 'Videos and animations' }} videos={videos} />

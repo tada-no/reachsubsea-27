@@ -1,0 +1,44 @@
+---
+// Meta item (docs/04 §12): icon 20 icon/accent + Body/Small text/secondary, gap 8.
+// With href (tel:, mailto:) the text becomes a link; in a stretched-link card it sits above the overlay.
+import Icon from './Icon.astro';
+
+interface Props {
+  icon: string;
+  text: string;
+  href?: string;
+  as?: 'li' | 'div' | 'span';
+  class?: string;
+}
+
+const { icon, text, href, as: Tag = 'div', class: className } = Astro.props;
+---
+
+<Tag class:list={['meta-item', 'text-small', className]}>
+  <Icon name={icon} size={20} />
+  {href ? <a class="meta-item__link" href={href}>{text}</a> : <span>{text}</span>}
+</Tag>
+
+<style is:global>
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .meta-item .icon {
+    flex: none;
+    color: var(--wp--custom--color--icon--accent);
+  }
+  .meta-item__link {
+    position: relative;
+    z-index: 4;
+    text-decoration: underline;
+    text-decoration-color: var(--wp--custom--color--border--default);
+    text-underline-offset: 0.2em;
+  }
+  .meta-item__link:hover {
+    color: var(--wp--custom--color--text--primary);
+    text-decoration-color: currentColor;
+  }
+</style>

@@ -1,0 +1,94 @@
+---
+// Mobile menu panel (docs/04 §16): what the hamburger opens below 900px. Modal, full height under
+// the header (the menu icon becomes `x`), scroll-locked. Menu accordion rows, one open at a time
+// (the current section starts open); Contact is the last row, a plain link (no chevron, no panel). Then, after
+// stack/lg: Open positions ↗ · FAQ · Contact us · LinkedIn · Facebook (text links, 17 Sep 2026) · legal.
+import Link from '../Link.astro';
+import MenuAccordion from './MenuAccordion.astro';
+import { navSections, mobileUtility, socialLinks, legalLinks } from '../../data/navigation';
+
+interface Props {
+  id: string;
+  open?: boolean;
+  current?: string;
+}
+
+const { id, open = false, current } = Astro.props;
+// The current section starts expanded (docs/04 §16), in its usual place: the order never changes
+// from page to page, so people can find a section where they last saw it.
+---
+
+<div class="mobile-menu" id={id} role="dialog" aria-modal="true" aria-label="Menu" hidden={!open}>
+  <div class="container mobile-menu__body">
+    <div class="mobile-menu__accordions">
+      {navSections.map((section) => <MenuAccordion section={section} open={open && section.id === current} />)}
+      <div class="menu-accordion">
+        <a class="mobile-menu__contact text-h5" href="/contact/">Contact</a>
+      </div>
+    </div>
+    <div class="mobile-menu__utility">
+      <Link label="Open positions" href="https://hr-manager.net/reachsubsea" action="external" size="small" />
+      <Link label="FAQ" href="/faq/" size="small" />
+      <Link label="Contact us" href="/contact/" size="small" />
+      <ul class="mobile-menu__social">
+        {
+          socialLinks.map((social) => (
+            <li>
+              <Link label={social.label} href={social.href} action="external" size="small" />
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="mobile-menu__legal">
+        {
+          legalLinks.map((link) => (
+            <li>
+              <a class="text-caption" href={link.url}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .mobile-menu {
+    position: fixed;
+    inset: var(--header-offset, 64px) 0 0 0;
+    z-index: 30;
+    overflow-y: auto;
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  .mobile-menu__body {
+    display: flex;
+    flex-direction: column;
+    padding-block: var(--wp--preset--spacing--8) var(--wp--preset--spacing--48);
+  }
+  .mobile-menu__contact {
+    display: flex;
+    align-items: center;
+    min-height: 56px;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .mobile-menu__utility {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--16);
+    margin-top: var(--wp--custom--stack--lg);
+  }
+  .mobile-menu__social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--24);
+  }
+  .mobile-menu__legal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .mobile-menu__legal a {
+    color: var(--wp--custom--color--text--secondary);
+  }
+</style>

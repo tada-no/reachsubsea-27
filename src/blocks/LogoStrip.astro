@@ -1,0 +1,86 @@
+---
+// Logo & badge strip · reach/logo-strip (docs/05 §2.11). Type Logos · Certifications · SDGs.
+// Optional Section header, then a wrapping <ul> grid of Logo tiles, gap grid/gutter.
+// Desktop: 6 per row (Logos, SDGs), 4 per row (Certifications) — the built Figma set SDGs to 6 per
+// row, not the 4 the spec prose names; followed Figma (see block report). Mobile: 2 per row.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import LogoTile from '../components/LogoTile.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, ImageField, LinkField, SectionHeaderField } from '../lib/types';
+
+interface LogoStripItem {
+  label: string;
+  logo?: ImageField;
+  url?: string;
+  /** Certifications only: the PDF link. */
+  file?: LinkField;
+  /** SDGs only: the goal number. */
+  goal?: number;
+}
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  type: 'logos' | 'certifications' | 'sdgs';
+  items: LogoStripItem[];
+}
+
+const { sectionHeader, type, items, background, spacing, anchor } = Astro.props;
+
+const hasItems = items.length > 0;
+const titleId = sectionHeader ? makeId('logo-strip', sectionHeader.title) : undefined;
+const tileType = type === 'logos' ? 'logo' : type === 'certifications' ? 'certificate' : 'sdg';
+const fallbackLabel = { logos: 'Logos', certifications: 'Certifications', sdgs: 'Sustainable Development Goals' }[type];
+---
+
+{
+  hasItems && (
+    <BlockSection
+      slug="logo-strip"
+      root="logo-strip"
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : fallbackLabel}
+    >
+      <div class="block__body">
+        {sectionHeader && (
+          <SectionHeader title={sectionHeader.title} intro={sectionHeader.intro} action={sectionHeader.action} align={sectionHeader.align} id={titleId} />
+        )}
+        <ul class:list={['logo-strip__grid', `logo-strip__grid--${type}`]}>
+          {items.map((item) => (
+            <LogoTile type={tileType} label={item.label} logo={item.logo} file={item.file} goal={item.goal} />
+          ))}
+        </ul>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .logo-strip__grid {
+    display: grid;
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .logo-strip__grid--logos {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .logo-strip__grid--certifications {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .logo-strip__grid--sdgs {
+    grid-template-columns: repeat(6, 120px);
+    justify-content: start;
+  }
+
+  @media (max-width: 899px) {
+    .logo-strip__grid--logos,
+    .logo-strip__grid--certifications {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .logo-strip__grid--sdgs {
+      grid-template-columns: repeat(2, 120px);
+    }
+  }
+</style>

@@ -1,0 +1,69 @@
+---
+// Section header (docs/05 §1). Eyebrow → H2 → Lead, text max 880, gap stack/sm.
+// Start ≥900px: the action sits at the far end of the row, bottom-aligned. Center and narrow: below the intro.
+import Eyebrow from './Eyebrow.astro';
+import Link from './Link.astro';
+import type { SectionHeaderField } from '../lib/types';
+
+interface Props extends SectionHeaderField {
+  /** Heading id, for the block's aria-labelledby. */
+  id?: string;
+  as?: 'h2' | 'h3';
+  class?: string;
+}
+
+const { eyebrow, title, intro, action, align = 'start', id, as: Heading = 'h2', class: className } = Astro.props;
+---
+
+<header
+  class:list={['section-header', `section-header--${align}`, action && 'section-header--has-action', className]}
+>
+  <div class="section-header__text">
+    {eyebrow && <Eyebrow text={eyebrow} />}
+    <Heading id={id} class="section-header__title text-h2">{title}</Heading>
+    {intro && <p class="section-header__intro text-lead">{intro}</p>}
+  </div>
+  {
+    action && (
+      <div class="section-header__action">
+        <Link label={action.label} href={action.url} action={action.action ?? 'page'} context={action.context} />
+      </div>
+    )
+  }
+</header>
+
+<style is:global>
+  .section-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .section-header__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+    max-width: var(--wp--style--global--content-size);
+  }
+  .section-header__intro {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .section-header--center {
+    align-items: center;
+    text-align: center;
+  }
+  .section-header--center .section-header__text {
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .section-header--start.section-header--has-action {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--wp--custom--grid--gutter);
+    }
+    .section-header--start .section-header__action {
+      flex: none;
+    }
+  }
+</style>

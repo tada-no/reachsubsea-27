@@ -1,0 +1,33 @@
+---
+// Spec row (docs/05 §1 "Spec row", docs/04 §0). One row of a spec table: label and value share the
+// row equally (1fr 1fr) at every width, so values like "140 t AHC" never crush down. Place several
+// inside a <dl> (Split media's Spec table media).
+interface Props {
+  label: string;
+  value: string;
+  class?: string;
+}
+
+const { label, value, class: className } = Astro.props;
+---
+
+<div class:list={['spec-row', className]}>
+  <dt class="spec-row__label text-small">{label}</dt>
+  <dd class="spec-row__value text-small">{value}</dd>
+</div>
+
+<style is:global>
+  .spec-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--wp--preset--spacing--16);
+    padding-block: var(--wp--preset--spacing--12);
+    border-bottom: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .spec-row__label {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .spec-row__value {
+    color: var(--wp--custom--color--text--primary);
+  }
+</style>

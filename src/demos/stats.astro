@@ -1,0 +1,59 @@
+---
+import StatsBand from '../blocks/StatsBand.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+import { pickFigures } from '../data/key-figures';
+
+const threeStats = pickFigures(['fleet', 'people', 'countries']);
+const fourStats = pickFigures(['established', 'fleet', 'people', 'countries']);
+
+const threeStatsWithNote = threeStats.map((stat, i) =>
+  i === threeStats.length - 1 ? { ...stat, note: 'Figures as of 30 June 2026' } : stat,
+);
+---
+
+<VariantLabel name="Count 3 · Plain" props='style="plain" stats={3 figures}' />
+<StatsBand style="plain" stats={threeStats} />
+
+<VariantLabel name="Count 3 · Panel" props='style="panel" stats={3 figures}' />
+<StatsBand style="panel" background="tint" stats={threeStats} />
+
+<VariantLabel name="Count 4 · Plain" props='style="plain" stats={4 figures}' />
+<StatsBand style="plain" stats={fourStats} />
+
+<VariantLabel name="Count 4 · Panel" props='style="panel" stats={4 figures}' />
+<StatsBand style="panel" background="tint" stats={fourStats} />
+
+<VariantLabel
+  name="Example · Plain, 4 stats, on Navy, with section header"
+  props='style="plain" background="navy" sectionHeader={…}'
+/>
+<StatsBand
+  style="plain"
+  background="navy"
+  sectionHeader={{
+    eyebrow: 'By the numbers',
+    title: 'Reach in numbers',
+    intro: 'A snapshot of the fleet, the people and how we operate.',
+  }}
+  stats={fourStats}
+/>
+
+<VariantLabel
+  name="Example · Panel, 3 stats, on Tint, with a source note"
+  props='style="panel" background="tint" stats={3 figures, last with note}'
+/>
+<StatsBand style="panel" background="tint" stats={threeStatsWithNote} />
+
+<VariantLabel
+  name="Example · Centred header"
+  props='style="plain" sectionHeader={{ align: "center" }}'
+/>
+<StatsBand
+  style="plain"
+  sectionHeader={{
+    title: 'What sets us apart',
+    intro: 'The numbers behind how we work, onshore and offshore.',
+    align: 'center',
+  }}
+  stats={threeStats}
+/>

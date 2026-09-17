@@ -1,0 +1,124 @@
+---
+// Menu accordion (docs/04 §16): one row of the Mobile menu panel. 56px Heading/H5 trigger + chevron,
+// border/subtle divider; children are 48px Body/Body rows starting with the section's landing page.
+// One section open at a time — header/Header.astro's script closes the others (progressive
+// enhancement: every row's <a> works with no JS, the panel is simply expanded by default via CSS
+// only when it has no JS to collapse it — see the `hidden` default below).
+import Icon from '../Icon.astro';
+import type { NavSection } from '../../data/navigation';
+
+interface Props {
+  section: NavSection;
+  open?: boolean;
+}
+
+const { section, open = false } = Astro.props;
+const triggerId = `mobile-trigger-${section.id}`;
+const panelId = `mobile-panel-${section.id}`;
+---
+
+<div class="menu-accordion" data-menu-accordion={section.id}>
+  <h3 class="menu-accordion__row">
+    <button
+      class="menu-accordion__trigger text-h5"
+      id={triggerId}
+      type="button"
+      aria-expanded={String(open)}
+      aria-controls={panelId}
+    >
+      {section.label}
+      <Icon name="chevron-down" size={20} class="menu-accordion__chevron menu-accordion__chevron--down" />
+      <Icon name="chevron-up" size={20} class="menu-accordion__chevron menu-accordion__chevron--up" />
+    </button>
+  </h3>
+  <div class="menu-accordion__panel" id={panelId} role="region" aria-labelledby={triggerId} hidden={!open}>
+    <ul>
+      <li><a class="menu-accordion__link text-body" href={section.href}>{section.overview.label}</a></li>
+      {
+        section.links.map((item) => (
+          <>
+            <li>
+              <a
+                class="menu-accordion__link text-body"
+                href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+              >
+                {item.label}
+                {item.external && <Icon name="arrow-up-right" size={16} class="menu-accordion__icon" />}
+              </a>
+            </li>
+            {item.children?.map((child) => (
+              <li>
+                <a
+                  class="menu-accordion__link text-body"
+                  href={child.href}
+                  target={child.external ? '_blank' : undefined}
+                  rel={child.external ? 'noopener noreferrer' : undefined}
+                >
+                  {child.label}
+                  {child.external && <Icon name="arrow-up-right" size={16} class="menu-accordion__icon" />}
+                </a>
+              </li>
+            ))}
+          </>
+        ))
+      }
+    </ul>
+  </div>
+</div>
+
+<style is:global>
+  .menu-accordion {
+    border-bottom: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .menu-accordion__row {
+    margin: 0;
+  }
+  .menu-accordion__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--12);
+    width: 100%;
+    min-height: 56px;
+    color: var(--wp--custom--color--text--primary);
+    text-align: left;
+  }
+  .menu-accordion__chevron {
+    flex: none;
+    color: var(--wp--custom--color--icon--primary);
+  }
+  .menu-accordion__chevron--up {
+    display: none;
+  }
+  .menu-accordion__trigger[aria-expanded='true'] .menu-accordion__chevron--down {
+    display: none;
+  }
+  .menu-accordion__trigger[aria-expanded='true'] .menu-accordion__chevron--up {
+    display: block;
+  }
+  .menu-accordion__trigger:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--wp--custom--color--border--focus);
+    border-radius: var(--wp--custom--radius--sm);
+  }
+
+  .menu-accordion__panel ul {
+    padding-bottom: var(--wp--preset--spacing--8);
+  }
+  .menu-accordion__link {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--4);
+    min-height: 48px;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .menu-accordion__link:hover {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .menu-accordion__icon {
+    flex: none;
+    color: var(--wp--custom--color--icon--accent);
+  }
+</style>

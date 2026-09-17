@@ -1,0 +1,15 @@
+---
+import ReviewLayout from '../../review/ReviewLayout.astro';
+import ReviewBlock from '../../review/ReviewBlock.astro';
+import { blocks, type BlockEntry } from '../../review/registry';
+
+export function getStaticPaths() {
+  return blocks.map((block, index) => ({ params: { slug: block.slug }, props: { block, index } }));
+}
+
+const { block, index } = Astro.props as { block: BlockEntry; index: number };
+---
+
+<ReviewLayout title={`${block.name} · Blocks review`} current={block.slug}>
+  <ReviewBlock block={block} index={index} heading="h1" />
+</ReviewLayout>

@@ -1,0 +1,38 @@
+---
+// Review chrome only, never part of a block: names a variant and the props that produce it.
+// Sits between blocks in a demo, so it also stops the same-background padding collapse.
+interface Props {
+  name: string;
+  props?: string;
+}
+
+const { name, props } = Astro.props;
+---
+
+<div class="review-variant">
+  <span class="review-variant__name">{name}</span>
+  {props && <code class="review-variant__props">{props}</code>}
+</div>
+
+<style is:global>
+  .review-variant {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 16px;
+    padding: 10px var(--wp--style--root--padding-left);
+    border-block: 1px dashed var(--wp--preset--color--navy-200);
+    background-color: var(--wp--preset--color--white);
+    color: var(--wp--preset--color--navy-600);
+    font-size: 12px;
+    line-height: 16px;
+  }
+  .review-variant__name {
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--preset--color--navy-800);
+  }
+  .review-variant__props {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+  }
+</style>

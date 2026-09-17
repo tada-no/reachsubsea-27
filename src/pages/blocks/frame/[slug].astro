@@ -1,0 +1,34 @@
+---
+// One block, every variant, at the frame's own viewport width. /blocks loads this in a
+// Desktop (1440) and a Mobile (375) iframe; open it directly to resize freely.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Dialog from '../../../components/Dialog.astro';
+import VariantLabel from '../../../review/VariantLabel.astro';
+import { blocks, type BlockEntry } from '../../../review/registry';
+
+export function getStaticPaths() {
+  return blocks.map((block) => ({ params: { slug: block.slug }, props: { block } }));
+}
+
+const { block } = Astro.props as { block: BlockEntry };
+const demos = import.meta.glob<{ default: any }>('../../../demos/*.astro', { eager: true });
+const Demo = demos[`../../../demos/${block.slug}.astro`]?.default;
+---
+
+<BaseLayout title={`${block.name} · Reach Subsea 2027 blocks`}>
+  {Demo ? <Demo /> : <VariantLabel name={`${block.name} is not built yet`} props={`src/demos/${block.slug}.astro`} />}
+  <Dialog type="lightbox" />
+  <Dialog type="video" />
+  <script is:inline>
+    // ?only=N shows just the Nth variant (1-based, counted by review labels), for screenshots.
+    const only = new URLSearchParams(location.search).get('only');
+    if (only) {
+      let index = 0;
+      for (const node of [...document.body.children]) {
+        if (['SCRIPT', 'STYLE', 'DIALOG', 'TEMPLATE'].includes(node.tagName)) continue;
+        if (node.classList.contains('review-variant')) index += 1;
+        if (String(index) !== only) node.style.display = 'none';
+      }
+    }
+  </script>
+</BaseLayout>

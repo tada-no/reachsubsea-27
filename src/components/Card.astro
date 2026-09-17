@@ -1,0 +1,346 @@
+---
+// Card (docs/04 §13): Media none | icon | pictogram-panel | image-top | image-bg | stat (17 Sep 2026) × Surface white | tint | navy × Size default | featured.
+// Image bg is always Navy. Page and External actions make the whole card the link (stretched link,
+// one tab stop); File, Video and Expand keep the action as the only target. Cards fill their grid
+// cell height and pin the action to the bottom (docs/05 §2.2).
+import Eyebrow from './Eyebrow.astro';
+import Badge from './Badge.astro';
+import MetaItem from './MetaItem.astro';
+import Link from './Link.astro';
+import Pictogram from './Pictogram.astro';
+import Icon from './Icon.astro';
+import type { CardField } from '../lib/types';
+
+interface Props extends CardField {
+  headingLevel?: 'h2' | 'h3' | 'h4';
+  class?: string;
+}
+
+const {
+  media = 'none',
+  surface = 'white',
+  size = 'default',
+  pictogram,
+  image,
+  statValue,
+  eyebrow,
+  badge,
+  title,
+  description,
+  meta = [],
+  action,
+  headingLevel: Heading = 'h3',
+  class: className,
+} = Astro.props;
+
+const featured = size === 'featured';
+const navy = surface === 'navy' || media === 'image-bg';
+const actionType = action?.action ?? 'page';
+const showAction = Boolean(action && (action.url || actionType === 'expand'));
+const linked = showAction && Boolean(action?.url) && (actionType === 'page' || actionType === 'external');
+const hasImage = media === 'image-top' || media === 'image-bg';
+const fp = image?.focalPoint;
+const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : undefined;
+---
+
+<article
+  class:list={[
+    'card',
+    `card--${navy ? 'navy' : surface}`,
+    `card--media-${media}`,
+    featured && 'card--featured',
+    // The surface sets the card's own colour mode: a White or Tint card stays light inside a Navy section
+    navy ? 'has-surface-navy' : 'has-surface-light',
+    linked && 'card--linked',
+    className,
+  ]}
+>
+  {
+    hasImage && (
+      <div class={media === 'image-top' ? 'card__media' : 'card__bg'}>
+        {image?.src ? (
+          <img class="card__image" src={image.src} alt={image.alt} loading="lazy" decoding="async" style={objectPosition} />
+        ) : (
+          <div class="card__placeholder">
+            <Icon name="photo" size={24} />
+          </div>
+        )}
+        {media === 'image-bg' && <div class="card__overlay" />}
+      </div>
+    )
+  }
+  <div class="card__content">
+    {media === 'icon' && pictogram && <Pictogram name={pictogram} size={featured ? 128 : 96} class="card__pictogram" />}
+    {
+      media === 'pictogram-panel' && pictogram && (
+        <div class="card__pictogram-panel">
+          <Pictogram name={pictogram} size={96} />
+        </div>
+      )
+    }
+    {media === 'stat' && statValue && (
+      <p class="card__stat text-display" data-count-up>{statValue}</p>
+    )}
+    <div class="card__body">
+    <div class="card__text">
+      {
+        (eyebrow || badge) && (
+          <div class="card__top">
+            {eyebrow && <Eyebrow text={eyebrow} as="span" />}
+            {badge && <Badge label={badge.label} tone={badge.tone} icon={badge.icon} />}
+          </div>
+        )
+      }
+      <div class="card__heading">
+        <Heading class:list={['card__title', featured ? 'text-h3' : 'text-h4']}>{title}</Heading>
+        {description && <p class:list={['card__description', featured ? 'text-body' : 'text-small']}>{description}</p>}
+      </div>
+    </div>
+    {
+      meta.length > 0 && (
+        <ul class="card__meta">
+          {meta.map((item) => (
+            <MetaItem icon={item.icon} text={item.text} href={item.href} as="li" />
+          ))}
+        </ul>
+      )
+    }
+    {
+      showAction && action && (
+        <div class="card__action">
+          <Link
+            label={action.label}
+            href={action.url}
+            action={actionType}
+            size="small"
+            context={action.context}
+            {...(actionType === 'video' && action.url ? { 'data-video-src': action.url, 'data-video-title': title } : {})}
+          />
+        </div>
+      )
+    }
+    </div>
+  </div>
+</article>
+
+<style is:global>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+    overflow: hidden;
+    isolation: isolate;
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--default);
+    color: var(--wp--custom--color--text--primary);
+    transition:
+      transform 0.4s var(--wp--custom--motion--ease-out),
+      box-shadow 0.4s var(--wp--custom--motion--ease-out);
+  }
+  /* White: 1px inside stroke border/subtle, drawn above the image like Figma */
+  .card--white::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border: 1px solid var(--wp--custom--color--border--subtle);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .card--tint {
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+
+  .card__media {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background-color: var(--wp--custom--color--bg--disabled);
+  }
+  .card__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--wp--custom--color--bg--disabled);
+  }
+  .card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--wp--custom--motion--ease-out);
+  }
+  .card__placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* Image bg scrim: a bottom-up navy ramp (17 Sep 2026) so the photo stays a photo and the text
+     still clears AA; was a flat 64 % wash. Deepened through the text zone, with a light base wash. */
+  .card__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(27 29 59 / 0.96) 0%, rgb(27 29 59 / 0.86) 38%, rgb(27 29 59 / 0.5) 62%, rgb(27 29 59 / 0.22) 100%);
+  }
+
+  .card__content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--wp--custom--stack--md);
+    padding: var(--wp--preset--spacing--32);
+  }
+  .card--featured .card__content {
+    padding: var(--wp--preset--spacing--48);
+  }
+  .card--media-image-bg {
+    min-height: 520px;
+  }
+  .card--media-image-bg .card__content {
+    flex: 0 0 auto;
+    margin-top: auto;
+  }
+
+  .card__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+  }
+  /* Title + description read as one unit: a tighter gap than the text group around them */
+  .card__heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+  }
+  .card--featured .card__heading {
+    gap: var(--wp--preset--spacing--4);
+  }
+  /* Pictogram panel: the pictogram as the card's media, full width with no fill (Figma 217:8162) */
+  /* Text, meta and action: part of the content stack, except beside a Featured pictogram panel */
+  .card__body {
+    display: contents;
+  }
+  /* Featured pictogram panel (Figma 217:8241): a 260 square panel beside the body. Keyed to the card's
+     own width, not the viewport, so two wide cards in a 2-column row switch together; below 600 the
+     text column would be too narrow and the card stacks like Default. */
+  .card--featured.card--media-pictogram-panel {
+    container-type: inline-size;
+  }
+  @container (min-width: 600px) {
+    .card--featured.card--media-pictogram-panel .card__content {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    .card--featured .card__pictogram-panel {
+      flex: none;
+      width: 200px;
+    }
+    .card--featured.card--media-pictogram-panel .card__body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      gap: var(--wp--custom--stack--md);
+    }
+  }
+  /* Full 260 panel once the card is wide enough (864 in Figma); a 640 card in 2 columns keeps 200 so
+     the text column stays readable (~320) */
+  @container (min-width: 800px) {
+    .card--featured .card__pictogram-panel {
+      width: 260px;
+    }
+  }
+  .card__pictogram-panel .pictogram {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* Stat: the figure is the media. It sits at the top, the text settles at the bottom of the card. */
+  .card__stat {
+    color: var(--wp--custom--color--text--accent);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .card--media-stat .card__text {
+    margin-top: auto;
+  }
+  .card--media-stat .card__action {
+    margin-top: 0;
+  }
+  .card__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--12);
+  }
+  /* Capped measure so a wide card wraps title + description into one block, not a long strip */
+  .card__description {
+    max-width: 36rem;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* Meta belongs to the title (date, place): 12px under it rather than the full content gap */
+  .card__text + .card__meta {
+    margin-top: calc(var(--wp--preset--spacing--12) - var(--wp--custom--stack--md));
+  }
+  .card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .card__action {
+    margin-top: auto;
+  }
+
+  /* Stretched link: the whole card is the target, the ring moves to the card */
+  .card--linked .link-arrow {
+    position: static;
+  }
+  .card--linked .link-arrow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+  }
+  .card--linked .link-arrow:focus-visible::after {
+    display: none;
+  }
+  .card--linked:has(.link-arrow:focus-visible) {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .card--linked:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--wp--preset--shadow--md);
+    }
+    .card--linked:hover .card__image {
+      transform: scale(1.04);
+    }
+  }
+
+  /* Featured falls back to Default metrics on phones (docs/05 §2.2) */
+  @media (max-width: 599px) {
+    .card--featured .card__content {
+      padding: var(--wp--preset--spacing--32);
+    }
+    .card--featured .card__title {
+      font-size: var(--wp--preset--font-size--h4);
+      line-height: var(--wp--custom--line-height--h4);
+      letter-spacing: normal;
+    }
+    .card--featured .card__description {
+      font-size: var(--wp--preset--font-size--body-sm);
+      line-height: var(--wp--custom--line-height--body-sm);
+    }
+    .card--featured .card__heading {
+      gap: var(--wp--preset--spacing--4);
+    }
+    .card--featured .card__pictogram {
+      width: 96px;
+      height: 96px;
+    }
+  }
+</style>

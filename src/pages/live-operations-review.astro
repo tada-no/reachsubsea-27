@@ -1,0 +1,72 @@
+---
+// Review page for the Live operations block (17 Sep 2026): the automatic Stale and Unavailable states
+// alongside Live. The Live version is on the homepage. Standalone block, not a hero overlay (user decision, 17 Sep 2026).
+// Sample data only: src/data/live-operations.ts. Rationale: docs/07-live-operations.md.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/header/Header.astro';
+import Footer from '../components/Footer.astro';
+import LiveOperations from '../blocks/LiveOperations.astro';
+import { liveOperations } from '../data/live-operations';
+import { pickFigures } from '../data/key-figures';
+
+const countries = pickFigures(['countries'])[0];
+const fallbackFigure = { value: countries?.value ?? '9', label: 'countries' };
+// Stale demo: same regions, feed last confirmed four days earlier
+const staleFeed = { ...liveOperations, updatedAt: '2026-09-13T06:00:00Z' };
+---
+
+<BaseLayout title="Live operations · Review · Reach Subsea">
+  <Header />
+  <main id="main" class="live-review">
+    <div class="live-review__intro container">
+      <h1 class="text-h3">Live operations: prototype</h1>
+      <p class="text-body">
+        Sample data at region level. Click a region in the list or a marker on the map, zoom with the controls inside the map, and try the asset filters. The
+        block is shown in each state below. The Live version is on the homepage, after the Stats band.
+      </p>
+      <ul class="live-review__jump text-small">
+        <li><a href="#live-operations">Live, Navy</a></li>
+        <li><a href="#state-stale">Stale</a></li>
+        <li><a href="#state-unavailable">Unavailable</a></li>
+      </ul>
+    </div>
+
+    <LiveOperations feed={liveOperations} state="live" fallbackFigure={fallbackFigure} />
+
+    <p class="live-review__label container text-eyebrow" id="state-stale">State · Stale (feed older than 72 hours)</p>
+    <LiveOperations feed={staleFeed} state="stale" anchor="live-ops-stale" showFilters={false} />
+
+    <p class="live-review__label container text-eyebrow" id="state-unavailable">State · Unavailable (no feed)</p>
+    <LiveOperations state="unavailable" anchor="live-ops-unavailable" fallbackFigure={fallbackFigure} />
+
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style is:global>
+  .live-review {
+    padding-top: var(--header-offset, 80px);
+  }
+  .live-review__intro {
+    display: grid;
+    gap: var(--wp--preset--spacing--12);
+    padding-block: var(--wp--preset--spacing--48);
+    max-width: 880px;
+    margin-inline: auto;
+  }
+  .live-review__jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--16);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .live-review__jump a {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .live-review__label {
+    padding-block: var(--wp--preset--spacing--32) var(--wp--preset--spacing--16);
+    color: var(--wp--custom--color--text--secondary);
+  }
+</style>

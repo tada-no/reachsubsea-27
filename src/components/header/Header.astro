@@ -1,0 +1,483 @@
+---
+// Header family (docs/04 §16, docs/extract/header-recommendation.md). Fixed; 96 → 72 at ≥1200
+// scrolled, 72 Compact 600–1199 (nav collapses), 64 Mobile <600. Contains: skip link, the bar (logo,
+// primary nav, Search + Menu icon buttons), the 7 (non-modal) Mega menu panels, and the (modal)
+// Site menu / Mobile menu / Search panels + scrim — all inside <header> so `inert` only ever needs
+// to touch <main> and <footer>, never the header that holds the open panel.
+//
+// No-JS fallback: every Nav item Trigger is a real `<a href>` to the section's landing page (works
+// with no JS); header.ts's script intercepts the click and opens the panel instead, updating
+// aria-expanded/aria-controls. The Search and Menu buttons are real `<button>`s whose only no-JS
+// affordance is the always-visible `<a>` fallbacks other pages provide (search results page, site
+// index) — documented so a future iteration can add a `<noscript>` link to /search/ and /sitemap/ if
+// the client needs one; not required by docs/04 §16 (the two icons are for the panel affordance
+// itself, which does nothing meaningful without JS).
+import fs from 'node:fs';
+import path from 'node:path';
+import Icon from '../Icon.astro';
+import NavItem from './NavItem.astro';
+import MegaMenuPanel from './MegaMenuPanel.astro';
+import SiteMenuPanel from './SiteMenuPanel.astro';
+import MobileMenuPanel from './MobileMenuPanel.astro';
+import SearchPanel from './SearchPanel.astro';
+import { primaryNav, navSections } from '../../data/navigation';
+
+interface Props {
+  /** Section id for the current-section indicator (docs/04 §16), e.g. "investors". */
+  current?: string;
+  /** Review only: which panel (if any) renders open on first paint. Runtime state is JS-driven. */
+  initialState?: 'closed' | 'site-menu' | 'search' | 'mobile-menu' | (typeof navSections)[number]['id'];
+  /** Sits transparently over a photo/video hero (white logo + links) until the page scrolls or a
+   * panel opens, then becomes the usual solid bar. The page must not pad `main` for the header. */
+  overlay?: boolean;
+}
+
+const { current, initialState = 'closed', overlay = false } = Astro.props;
+
+const logoSvg = fs.readFileSync(path.join(process.cwd(), 'src/assets/logo.svg'), 'utf8');
+const logoInner = logoSvg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+
+const openPanelId = navSections.some((s) => s.id === initialState) ? initialState : undefined;
+const siteMenuOpen = initialState === 'site-menu';
+const mobileMenuOpen = initialState === 'mobile-menu';
+const searchOpen = initialState === 'search';
+const menuOpen = siteMenuOpen || mobileMenuOpen;
+---
+
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class:list={['site-header', overlay && 'site-header--overlay']} data-site-header>
+  <div class="site-header__bar container">
+    <a class="site-header__logo" href={import.meta.env.BASE_URL} aria-label="Reach Subsea, homepage">
+      <svg viewBox="0 0 147 32" aria-hidden="true" focusable="false" set:html={logoInner} />
+    </a>
+
+    <nav class="site-header__nav" aria-label="Primary">
+      <ul>
+        {
+          primaryNav.map((item) => (
+            <NavItem id={item.id} label={item.label} href={item.href} panel={item.panel} current={current === item.id} />
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      <button
+        type="button"
+        class="icon-btn icon-btn--ghost site-header__trigger"
+        data-trigger="search"
+        aria-haspopup="dialog"
+        aria-expanded={String(searchOpen)}
+        aria-controls="search-panel"
+      >
+        <Icon name="search" size={24} class="site-header__trigger-icon site-header__trigger-icon--open" />
+        <Icon name="x" size={24} class="site-header__trigger-icon site-header__trigger-icon--close" />
+        <span class="visually-hidden" data-trigger-label>{searchOpen ? 'Close search' : 'Search'}</span>
+      </button>
+      <button
+        type="button"
+        class="icon-btn icon-btn--ghost site-header__trigger site-header__trigger--menu"
+        data-trigger="menu"
+        aria-haspopup="dialog"
+        aria-expanded={String(menuOpen)}
+        aria-controls="site-menu-panel mobile-menu-panel"
+      >
+        <Icon name="menu-2" size={24} class="site-header__trigger-icon site-header__trigger-icon--open" />
+        <Icon name="x" size={24} class="site-header__trigger-icon site-header__trigger-icon--close" />
+        <span class="visually-hidden" data-trigger-label>{menuOpen ? 'Close menu' : 'Menu'}</span>
+      </button>
+    </div>
+  </div>
+
+  {navSections.map((section) => <MegaMenuPanel section={section} open={section.id === openPanelId} />)}
+  <SearchPanel id="search-panel" open={searchOpen} />
+  <SiteMenuPanel id="site-menu-panel" open={siteMenuOpen} current={current} />
+  <MobileMenuPanel id="mobile-menu-panel" open={mobileMenuOpen} current={current} />
+  <div class="site-header__scrim" data-scrim hidden={!menuOpen}></div>
+</header>
+
+<style is:global>
+  .skip-link {
+    position: absolute;
+    top: -80px;
+    left: var(--wp--preset--spacing--16);
+    z-index: 100;
+    padding: var(--wp--preset--spacing--12) var(--wp--preset--spacing--16);
+    border-radius: var(--wp--custom--radius--sm);
+    background-color: var(--wp--custom--color--action--primary--bg);
+    color: var(--wp--custom--color--action--primary--fg);
+    font-weight: var(--wp--custom--font-weight--bold);
+    transition: top var(--wp--custom--motion--duration) var(--wp--custom--motion--easing);
+  }
+  .site-menu:focus,
+  .mobile-menu:focus {
+    outline: none;
+  }
+  .skip-link:focus {
+    top: var(--wp--preset--spacing--16);
+  }
+
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    background-color: var(--wp--custom--color--bg--default);
+    border-bottom: 1px solid var(--wp--custom--color--border--subtle);
+    transition:
+      transform 0.4s var(--wp--custom--motion--ease-out),
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      box-shadow var(--wp--custom--motion--duration) var(--wp--custom--motion--easing);
+  }
+  /* Overlay: transparent over the hero until scrolled or a panel is open. Only the bar flips to
+     light-on-dark (three tokens), so the panels under it keep their own Light mode. */
+  .site-header--overlay:not(.is-scrolled, .has-open-panel) {
+    background-color: transparent;
+    border-bottom-color: transparent;
+  }
+  .site-header--overlay:not(.is-scrolled, .has-open-panel) .site-header__bar {
+    --wp--custom--color--text--primary: var(--wp--preset--color--white);
+    --wp--custom--color--icon--primary: var(--wp--preset--color--white);
+    --wp--custom--color--icon--accent: var(--wp--preset--color--sage-300);
+    --wp--custom--color--border--default: rgb(255 255 255 / 0.4);
+    --wp--custom--color--action--outline--bg-hover: rgb(255 255 255 / 0.14);
+  }
+  .site-header__logo,
+  .nav-item__target,
+  .site-header__trigger {
+    transition: color 0.3s ease;
+  }
+  .site-header.is-hidden {
+    transform: translateY(-100%);
+  }
+  .site-header.is-scrolled {
+    border-bottom-color: transparent;
+    box-shadow: var(--wp--preset--shadow--sm);
+  }
+
+  .site-header__bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 72px;
+    /* One-off 96 → 72 shrink; height is the only property that can do it and it runs once per direction */
+    transition: height 0.3s var(--wp--custom--motion--ease-out);
+  }
+  .site-header__logo {
+    flex: none;
+    display: block;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .site-header__logo svg {
+    display: block;
+    width: 110px;
+    height: 24px;
+  }
+  .site-header__nav {
+    display: none;
+  }
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+  .site-header__trigger {
+    position: relative;
+  }
+  .site-header__trigger-icon--close {
+    display: none;
+  }
+  .site-header__trigger[aria-expanded='true'] .site-header__trigger-icon--open {
+    display: none;
+  }
+  .site-header__trigger[aria-expanded='true'] .site-header__trigger-icon--close {
+    display: block;
+  }
+
+  .site-header__scrim {
+    position: fixed;
+    inset: var(--header-offset, 72px) 0 0 0;
+    z-index: 25;
+    background-color: var(--wp--custom--color--bg--overlay);
+  }
+
+  html.has-locked-scroll {
+    overflow: hidden;
+  }
+
+  @media (min-width: 600px) {
+    .site-header__bar {
+      height: 72px;
+    }
+    .site-header__logo svg {
+      width: 147px;
+      height: 32px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .site-header__bar {
+      height: 96px;
+    }
+    .site-header.is-scrolled .site-header__bar {
+      height: 72px;
+    }
+    .site-header__nav {
+      display: block;
+      margin-left: auto;
+    }
+    .site-header__nav ul {
+      display: flex;
+      align-items: stretch;
+      height: 100%;
+      gap: var(--wp--preset--spacing--16);
+    }
+    .site-header__actions {
+      margin-left: var(--wp--preset--spacing--16);
+    }
+    /* The last icon button is pulled in so its glyph aligns with the container edge (docs/04 §16) */
+    .site-header__actions .site-header__trigger:last-child {
+      margin-right: -12px;
+    }
+  }
+
+  /* Below 1200: hamburger opens the Mobile menu, not the Site menu */
+  .site-menu {
+    display: none;
+  }
+  .mobile-menu {
+    display: block;
+  }
+  /* 17 Sep 2026: the featured Site menu needs the full bar beside it, so 900–1199 now gets the
+     Mobile menu (which lists every section) and the Site menu starts at 1200. */
+  @media (min-width: 1200px) {
+    .site-menu {
+      display: block;
+    }
+    .mobile-menu {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+  if (header) {
+    const searchTrigger = header.querySelector<HTMLButtonElement>('[data-trigger="search"]')!;
+    const menuTrigger = header.querySelector<HTMLButtonElement>('[data-trigger="menu"]')!;
+    const scrim = header.querySelector<HTMLElement>('[data-scrim]')!;
+    const searchPanel = header.querySelector<HTMLElement>('#search-panel')!;
+    const siteMenuPanel = header.querySelector<HTMLElement>('#site-menu-panel')!;
+    const mobileMenuPanel = header.querySelector<HTMLElement>('#mobile-menu-panel')!;
+    const navTargets = [...header.querySelectorAll<HTMLAnchorElement>('[data-nav-target][data-panel]')];
+    const main = document.querySelector<HTMLElement>('main');
+    const footer = document.querySelector<HTMLElement>('footer');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const isDesktopMenu = () => window.matchMedia('(min-width: 1200px)').matches;
+    const syncOpenState = () => header!.classList.toggle('has-open-panel', Boolean(openMega || openModal));
+    const menuPanelFor = () => (isDesktopMenu() ? siteMenuPanel : mobileMenuPanel);
+
+    let openMega = navTargets.find((t) => t.getAttribute('aria-expanded') === 'true')?.dataset.panel ?? null;
+    let openModal: 'search' | 'menu' | null = !searchPanel.hidden ? 'search' : !siteMenuPanel.hidden || !mobileMenuPanel.hidden ? 'menu' : null;
+
+    function setLabel(trigger: HTMLButtonElement, openLabel: string, closedLabel: string, isOpen: boolean) {
+      const label = trigger.querySelector<HTMLElement>('[data-trigger-label]');
+      if (label) label.textContent = isOpen ? openLabel : closedLabel;
+    }
+
+    function closeMega(focusTrigger = false) {
+      if (!openMega) return;
+      const id = openMega;
+      const target = header!.querySelector<HTMLAnchorElement>(`[data-panel="${id}"]`);
+      const panel = header!.querySelector<HTMLElement>(`#panel-${id}`);
+      target?.setAttribute('aria-expanded', 'false');
+      panel?.setAttribute('hidden', '');
+      openMega = null;
+      syncOpenState();
+      if (focusTrigger) target?.focus();
+    }
+
+    function openMegaPanel(id: string) {
+      if (openMega === id) return;
+      closeMega();
+      closeModal();
+      const target = header!.querySelector<HTMLAnchorElement>(`[data-panel="${id}"]`);
+      const panel = header!.querySelector<HTMLElement>(`#panel-${id}`);
+      target?.setAttribute('aria-expanded', 'true');
+      panel?.removeAttribute('hidden');
+      openMega = id;
+      syncOpenState();
+    }
+
+    navTargets.forEach((target) => {
+      target.addEventListener('click', (event) => {
+        event.preventDefault();
+        const id = target.dataset.panel!;
+        if (openMega === id) closeMega();
+        else openMegaPanel(id);
+      });
+    });
+
+    function activateModal(kind: 'search' | 'menu') {
+      scrim.hidden = false;
+      document.documentElement.classList.add('has-locked-scroll');
+      main?.setAttribute('inert', '');
+      footer?.setAttribute('inert', '');
+      const trigger = kind === 'search' ? searchTrigger : menuTrigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      setLabel(trigger, kind === 'search' ? 'Close search' : 'Close menu', kind === 'search' ? 'Search' : 'Menu', true);
+      openModal = kind;
+      syncOpenState();
+    }
+
+    function closeModal(focusTrigger = false) {
+      if (!openModal) return;
+      const kind = openModal;
+      const panel = kind === 'search' ? searchPanel : menuPanelFor();
+      panel.setAttribute('hidden', '');
+      scrim.hidden = true;
+      document.documentElement.classList.remove('has-locked-scroll');
+      main?.removeAttribute('inert');
+      footer?.removeAttribute('inert');
+      const trigger = kind === 'search' ? searchTrigger : menuTrigger;
+      trigger.setAttribute('aria-expanded', 'false');
+      setLabel(trigger, kind === 'search' ? 'Close search' : 'Close menu', kind === 'search' ? 'Search' : 'Menu', false);
+      openModal = null;
+      syncOpenState();
+      if (focusTrigger) trigger.focus();
+    }
+
+    // Mouse opens move focus to the dialog itself (no ring on the first link, 17 Sep 2026); keyboard
+    // opens (click detail 0) go to the first control, as before. Search always takes its input.
+    function openModalPanel(kind: 'search' | 'menu', viaKeyboard = true) {
+      closeMega();
+      if (openModal && openModal !== kind) closeModal();
+      const panel = kind === 'search' ? searchPanel : menuPanelFor();
+      panel.removeAttribute('hidden');
+      activateModal(kind);
+      requestAnimationFrame(() => {
+        if (kind === 'menu' && !viaKeyboard) {
+          panel.setAttribute('tabindex', '-1');
+          panel.focus({ preventScroll: true });
+          return;
+        }
+        const focusTarget = panel.querySelector<HTMLElement>('input, a, button');
+        focusTarget?.focus();
+      });
+    }
+
+    // Sync side effects (scrim, inert, scroll lock, labels) for whatever the server already opened
+    // (review pages set `initialState`), without re-toggling the panel's own `hidden` attribute.
+    if (openModal) activateModal(openModal);
+
+    searchTrigger.addEventListener('click', () => (openModal === 'search' ? closeModal() : openModalPanel('search')));
+    menuTrigger.addEventListener('click', (event) =>
+      openModal === 'menu' ? closeModal() : openModalPanel('menu', event.detail === 0),
+    );
+    scrim.addEventListener('click', () => closeModal());
+
+    window.addEventListener('resize', () => {
+      if (openModal !== 'menu') return;
+      const wantDesktop = isDesktopMenu();
+      siteMenuPanel.toggleAttribute('hidden', !wantDesktop);
+      mobileMenuPanel.toggleAttribute('hidden', wantDesktop);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      if (openModal) closeModal(true);
+      else if (openMega) closeMega(true);
+    });
+
+    header!.addEventListener('focusout', () => {
+      requestAnimationFrame(() => {
+        if (openMega && header && !header.contains(document.activeElement)) closeMega();
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!openMega) return;
+      const target = event.target as Node;
+      const panel = header!.querySelector<HTMLElement>(`#panel-${openMega}`);
+      const trigger = header!.querySelector<HTMLElement>(`[data-panel="${openMega}"]`);
+      if (panel?.contains(target) || trigger?.contains(target)) return;
+      closeMega();
+    });
+
+    // Mobile accordion: one section open at a time (docs/04 §16 Mobile menu panel)
+    const accordions = [...header.querySelectorAll<HTMLElement>('[data-menu-accordion]')];
+    accordions.forEach((accordion) => {
+      const trigger = accordion.querySelector<HTMLButtonElement>('.menu-accordion__trigger')!;
+      const panel = accordion.querySelector<HTMLElement>('.menu-accordion__panel')!;
+      trigger.addEventListener('click', () => {
+        const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+        accordions.forEach((other) => {
+          other.querySelector('.menu-accordion__trigger')!.setAttribute('aria-expanded', 'false');
+          other.querySelector('.menu-accordion__panel')!.setAttribute('hidden', '');
+        });
+        if (!isOpen) {
+          trigger.setAttribute('aria-expanded', 'true');
+          panel.removeAttribute('hidden');
+        }
+      });
+    });
+
+    // Search field clear button
+    const clearButton = header.querySelector<HTMLButtonElement>('[data-search-clear]');
+    const searchField = header.querySelector<HTMLInputElement>('[data-search-field]');
+    clearButton?.addEventListener('click', () => {
+      if (!searchField) return;
+      searchField.value = '';
+      searchField.focus();
+    });
+
+    // Sticky: 96 → 72 after scrolling; hide on scroll down past 400px, reveal on 8px scroll up;
+    // never while a panel is open or focus is inside. Expose --header-offset for docked content.
+    const HIDE_AFTER = 400;
+    const SCROLLED_AFTER = 8;
+    let lastY = window.scrollY;
+    let upAccum = 0;
+    let ticking = false;
+
+    function setHeaderOffset() {
+      document.documentElement.style.setProperty('--header-offset', `${Math.round(header!.getBoundingClientRect().height)}px`);
+    }
+
+    function updateScroll() {
+      const y = window.scrollY;
+      header!.classList.toggle('is-scrolled', y > SCROLLED_AFTER);
+
+      const panelOpen = Boolean(openMega || openModal);
+      const focusInside = header!.contains(document.activeElement) && document.activeElement !== document.body;
+      if (!panelOpen && !focusInside) {
+        if (y > lastY) {
+          upAccum = 0;
+          if (y > HIDE_AFTER) header!.classList.add('is-hidden');
+        } else if (y < lastY) {
+          upAccum += lastY - y;
+          if (upAccum >= 8 || y <= HIDE_AFTER) header!.classList.remove('is-hidden');
+        }
+      } else {
+        header!.classList.remove('is-hidden');
+      }
+      lastY = y;
+      setHeaderOffset();
+      ticking = false;
+    }
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          requestAnimationFrame(updateScroll);
+          ticking = true;
+        }
+      },
+      { passive: true },
+    );
+    new ResizeObserver(() => setHeaderOffset()).observe(header);
+    setHeaderOffset();
+    void reduceMotion; // transitions are globally shortened in base.css under reduced motion
+  }
+</script>

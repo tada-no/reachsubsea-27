@@ -1,0 +1,168 @@
+---
+// Statement / quote · reach/statement (docs/05 §2.10). Style Statement · Quote. No Section header.
+// Statement: Eyebrow + H2, centred, max 880, optional Link. Quote: 40px quote icon, H3 quote text,
+// then attribution (56px round photo + name + role), left-aligned in an 880 column centred in the
+// container. The block has no visible title, so BlockSection gets `label` instead of `labelledBy`.
+import BlockSection from '../components/BlockSection.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Link from '../components/Link.astro';
+import Icon from '../components/Icon.astro';
+import type { BlockFields, ImageField, LinkField } from '../lib/types';
+
+interface Props extends BlockFields {
+  style?: 'statement' | 'quote';
+  eyebrow?: string;
+  /** Statement only. */
+  statement?: string;
+  action?: LinkField;
+  /** Quote only. */
+  quote?: string;
+  name?: string;
+  role?: string;
+  photo?: ImageField;
+}
+
+const {
+  style = 'statement',
+  eyebrow,
+  statement,
+  action,
+  quote,
+  name,
+  role,
+  photo,
+  background,
+  spacing,
+  anchor,
+} = Astro.props;
+
+const isQuote = style === 'quote';
+const label = isQuote ? (quote || 'Quote') : statement || eyebrow || 'Statement';
+const fp = photo?.focalPoint;
+const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : undefined;
+---
+
+<BlockSection
+  slug="statement"
+  root="statement"
+  class:list={[`statement--${style}`]}
+  background={background}
+  spacing={spacing}
+  anchor={anchor}
+  label={label}
+>
+  <div class="statement__inner">
+    {
+      isQuote ? (
+        <figure class="statement__quote">
+          <Icon name="quote" size={40} class="statement__quote-icon" />
+          {quote && <blockquote class="statement__quote-text text-h3">{quote}</blockquote>}
+          {
+            (name || role || photo) && (
+              <figcaption class="statement__attribution">
+                {photo && (
+                  <span class="statement__photo">
+                    {photo.src ? (
+                      <img src={photo.src} alt="" loading="lazy" decoding="async" style={objectPosition} />
+                    ) : (
+                      <span class="statement__photo-placeholder" aria-hidden="true" />
+                    )}
+                  </span>
+                )}
+                <span class="statement__person">
+                  {name && <span class="statement__name text-label">{name}</span>}
+                  {role && <span class="statement__role text-small">{role}</span>}
+                </span>
+              </figcaption>
+            )
+          }
+        </figure>
+      ) : (
+        <div class="statement__text">
+          {eyebrow && <Eyebrow text={eyebrow} class="statement__eyebrow" />}
+          {statement && <h2 class="statement__statement text-h2">{statement}</h2>}
+          {action && (
+            <Link
+              label={action.label}
+              href={action.url}
+              action={action.action ?? 'page'}
+              context={action.context}
+              class="statement__action"
+            />
+          )}
+        </div>
+      )
+    }
+  </div>
+</BlockSection>
+
+<style is:global>
+  .statement__inner {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Statement: centred column */
+  .statement__text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--wp--custom--stack--md);
+    max-width: 880px;
+    text-align: center;
+  }
+  .statement__statement {
+    color: var(--wp--custom--color--text--primary);
+  }
+
+  /* Quote: left-aligned within its own 880 column */
+  .statement__quote {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--custom--stack--md);
+    max-width: 880px;
+    margin: 0;
+    text-align: left;
+  }
+  .statement__quote-icon {
+    color: var(--wp--custom--color--icon--accent);
+  }
+  .statement__quote-text {
+    margin: 0;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .statement__attribution {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16);
+  }
+  .statement__photo {
+    flex: none;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--wp--custom--radius--full);
+    overflow: hidden;
+  }
+  .statement__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .statement__photo-placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: var(--wp--custom--color--bg--disabled);
+  }
+  .statement__person {
+    display: flex;
+    flex-direction: column;
+  }
+  .statement__name {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .statement__role {
+    color: var(--wp--custom--color--text--secondary);
+  }
+</style>

@@ -1,0 +1,643 @@
+{
+  "file": "HAvCQCXzWNFOKQ1AZxqNTX",
+  "page": {
+    "Blocks": "12:25"
+  },
+  "spec": "docs/05-blocks-spec.md",
+  "docFrames": {
+    "Section header": "130:22",
+    "Media frame": "131:64",
+    "Spec row": "131:123",
+    "Numbered item": "132:101",
+    "Milestone": "132:162",
+    "Dialog": "133:211",
+    "Logo tile": "136:232",
+    "Consent placeholder": "136:321",
+    "Page hero": "138:312",
+    "Card grid": "145:874",
+    "Feed grid": "152:1428",
+    "Split media": "162:2081",
+    "Stats band": "167:2491",
+    "Accordion": "174:2583",
+    "CTA band": "178:2730",
+    "Statement": "180:2814",
+    "Timeline": "188:2945",
+    "Logo strip": "190:3229",
+    "Media gallery": "192:3619",
+    "Data list": "195:3648",
+    "Embed": "201:4459",
+    "Section subnav": "207:4710"
+  },
+  "blocks": {
+    "Page hero": {
+      "id": "141:827",
+      "type": "COMPONENT_SET",
+      "variants": 12,
+      "axes": "Style (Text, Photo) × Breakpoint (Desktop, Mobile). Overlap axis (Stats, Cards) removed 16 Sep 2026",
+      "variantIds": {
+        "Text None Desktop": "138:317",
+        "Text None Mobile": "138:375",
+        "Photo None Desktop": "138:418",
+        "Photo None Mobile": "138:471",
+        "Text Stats Desktop": "139:418",
+        "Text Stats Mobile": "139:454",
+        "Photo Stats Desktop": "139:487",
+        "Photo Stats Mobile": "139:525",
+        "Text Cards Desktop": "139:560",
+        "Text Cards Mobile": "139:688",
+        "Photo Cards Desktop": "139:798",
+        "Photo Cards Mobile": "139:910"
+      },
+      "keys": {
+        "Title": "Title#141:0",
+        "Lead": "Lead#141:13",
+        "Show breadcrumb": "Show breadcrumb#141:26",
+        "Show eyebrow": "Show eyebrow#141:39",
+        "Show badge": "Show badge#141:52",
+        "Show lead": "Show lead#141:65",
+        "Show meta": "Show meta#141:78",
+        "Show actions": "Show actions#141:91",
+        "Show secondary action": "Show secondary action#141:104",
+        "Show credit": "Show credit#141:117"
+      },
+      "nestedKeys": {
+        "Eyebrow": "Text#89:0",
+        "Badge": "Label#87:0",
+        "Button": "Label#56:0",
+        "Link": "Label#68:0",
+        "Meta text": "Text#91:1",
+        "Meta icon": "Icon#91:0",
+        "Stat": "Value / Label / Show note on 90:284",
+        "Card": "Title#104:168, Description#104:189, Show meta#104:273, Show badge#104:231"
+      },
+      "layers": "[Photo: Image, Overlay (absolute STRETCH)] · Content (864 Desktop / FILL Mobile) > Breadcrumb, Top row > Eyebrow + Badge, Title, Lead, Meta > 3 × Meta item, Actions > Primary action (Button Primary Medium) + Secondary action (Link Video Medium) · [Overlap: Stats panel (4 × Stat Medium + Dividers) | Cards row (3 × Card None White)] · [Photo: Credit (absolute)]",
+      "notes": "Overlap variants removed 16 Sep 2026 (docs/06 §2). Title uses Heading/H1; examples override to Heading/Display for Home. Stat texts inside the Stats panels were set to textAutoResize HEIGHT + FILL on the instances (the Stat component's Label/Note are FIXED 192 wide and overflowed at 127 on Mobile).",
+      "examples": {
+        "group": "142:694",
+        "Home (Photo + Stats, Display title)": "142:697",
+        "Asset single (Photo, badge + meta)": "142:785",
+        "News single (Text on Tint)": "142:852",
+        "Investors overview (Text + Cards, Navy)": "142:915"
+      },
+      "todo": "done: renamed to Block/Page hero"
+    },
+    "Card grid": {
+      "id": "148:1288",
+      "type": "COMPONENT_SET",
+      "variants": 8,
+      "axes": "Layout (2 columns, 3 columns, 4 columns, Featured first) × Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "2 columns Desktop": "145:879",
+        "3 columns Desktop": "145:974",
+        "4 columns Desktop": "146:959",
+        "Featured first Desktop": "146:1113",
+        "2 columns Mobile": "147:1100",
+        "3 columns Mobile": "147:1191",
+        "4 columns Mobile": "147:1302",
+        "Featured first Mobile": "147:1446"
+      },
+      "keys": {
+        "Show section header": "Show section header#148:0"
+      },
+      "nestedKeys": {
+        "Section header": "Title#130:0, Intro#130:5, Show eyebrow#130:10, Show intro#130:15, Show action#130:20",
+        "Card": "Title#104:168, Description#104:189, Show eyebrow#104:210, Show badge#104:231, Show description#104:252, Show meta#104:273, Show action#104:294, Pictogram#104:315 (swap)",
+        "Card Eyebrow": "Text#89:0",
+        "Card Action": "Label#68:0"
+      },
+      "layers": "Section header (isExposedInstance, FILL, visible bound to Show section header) · Grid (VERTICAL, FILL, gap grid/gutter) > Row (HORIZONTAL, FILL, gap grid/gutter, align top) > Card instances (Media=Icon, Surface=White; Size=Default or Featured, isExposedInstance, FILL except the fixed-864 Featured card in the Featured-first row)",
+      "notes": "Cards use Card set 103:1110 variant 'Media=Icon, Surface=White, Size=Default' (Featured row uses 'Media=Icon, Surface=White, Size=Featured' fixed at 864, sibling Default card FILLs the remainder). Content is services-style placeholder copy (Subsea/Survey/Monitoring/Technology & Innovation, pictograms seabed-repair 37:102, survey 40:96, global-monitoring 39:102, technology 44:110) with a 5th 'Assets' card (pictogram marine 39:89) used only in the Featured-first Desktop row 2. Per the brief's literal Mobile instruction, Featured first Mobile stacks 3 Default cards (not 5) — a deliberate deviation from 'same number of cards' elsewhere in the same sentence; flagged for client/PM confirmation. isExposedInstance can only be set AFTER a fresh instance is appended into a component/component-set tree — setting it immediately after createInstance() throws 'Instance must be contained within a component or component set to be exposed.' (new gotcha, hit twice while building these blocks; scripts roll back cleanly on that error, safe to retry without a canvas read).",
+      "examples": {
+        "group": "150:1288",
+        "Numbered values, 3 columns, on Tint": "150:1291",
+        "Topic mailboxes, 4 columns": "150:1462"
+      }
+    },
+    "Feed grid": {
+      "id": "156:2012",
+      "type": "COMPONENT_SET",
+      "variants": 4,
+      "axes": "Filters (On, Off) × Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "On Desktop": "152:1433",
+        "Off Desktop": "154:1636",
+        "On Mobile": "155:1803",
+        "Off Mobile": "155:1995"
+      },
+      "keys": {
+        "Show section header": "Show section header#156:0",
+        "Show load more": "Show load more#156:5"
+      },
+      "nestedKeys": {
+        "Section header action": "Label#68:0 ('All projects')",
+        "Facet chip": "Label#92:0, Show count#92:6 on Filter chip set 92:337",
+        "Results link": "Label#68:0, Show icon#68:37 on Link 68:326",
+        "Card preset/Project": "wraps a Card instance (Media=Image top, Surface=Tint, Size=Default) — Title#104:168, Show eyebrow#104:210, Show description#104:252, Show meta#104:273, Show action#104:294; nested Eyebrow Text#89:0; Meta item Icon#91:0/Text#91:1; Action Label#68:0"
+      },
+      "layers": "Section header (isExposedInstance, FILL, action 'All projects', visible bound to Show section header) · [Filters=On] Filters (VERTICAL, FILL, gap space/16) > Facet 'Service' + Facet 'Region' (HORIZONTAL gap space/8 on Desktop: label + Filter chips, first chip State=Selected 'All'; VERTICAL FIXED 327 clipsContent on Mobile: label above an inner HORIZONTAL Chips row that overflows and is clipped) + Results row (HORIZONTAL, FILL, SPACE_BETWEEN, CENTER: '24 projects' Body/Small + Link Small 'Clear filters' icon off) · Grid (VERTICAL, FILL, gap grid/gutter) > 2 Rows × 3 Card preset/Project instances (Desktop) or 3 stacked instances (Mobile) · More (HORIZONTAL, FILL, CENTER) > Button Outline Medium 'Load more', visible bound to Show load more",
+      "notes": "Card preset/Project (114:724) instances DO stretch correctly with layoutSizingHorizontal='FILL' once appended into a FILL row/grid — confirmed by a throwaway test instance before building (both the preset wrapper and its nested Card instance accepted FILL and resized together), so the Card-preset route was used rather than falling back to a raw Card set variant. Each preset's nested Card instance needed its own layoutSizingHorizontal='FILL' set in addition to the wrapper's. Project preset defaults: eyebrow 'Offshore wind · 2025', title 'Cable route survey, southern North Sea', Show description true with placeholder body text, 2 of 3 Meta items visible (map-pin, ship), action 'Read project' — all overridden per card with setProperties for the 6 example projects. Section header's nested 'Action' Link instance is NOT gated by a Show… boolean the way Card's nested parts are, so it stayed populated and did not need the 'flip Show boolean first' workaround.",
+      "examples": {
+        "group": "157:2253",
+        "Latest info (Source = Latest), on Tint": "157:2256",
+        "Empty state": "157:2456"
+      }
+    },
+    "Split media": {
+      "id": "166:2339",
+      "type": "COMPONENT_SET",
+      "variants": 16,
+      "axes": "Media (Image, Video, Spec table, Numbered list) × Position (End, Start) × Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "Image End Desktop": "162:2086",
+        "Image Start Desktop": "162:2106",
+        "Video End Desktop": "162:2126",
+        "Video Start Desktop": "162:2154",
+        "Spec table End Desktop": "162:2180",
+        "Spec table Start Desktop": "162:2217",
+        "Numbered list End Desktop": "162:2254",
+        "Numbered list Start Desktop": "162:2288",
+        "Image End Mobile": "164:2211",
+        "Image Start Mobile": "164:2230",
+        "Video End Mobile": "164:2249",
+        "Video Start Mobile": "164:2274",
+        "Spec table End Mobile": "164:2299",
+        "Spec table Start Mobile": "164:2335",
+        "Numbered list End Mobile": "164:2371",
+        "Numbered list Start Mobile": "164:2404"
+      },
+      "keys": {
+        "Title": "Title#166:0",
+        "Body": "Body#166:17",
+        "Show eyebrow": "Show eyebrow#166:34",
+        "Show actions": "Show actions#166:51",
+        "Show spec link": "Show spec link#166:68"
+      },
+      "nestedKeys": {
+        "Eyebrow (Text column)": "Text#89:0 on Eyebrow set 89:268, variant Tone=Accent (no Breakpoint axis)",
+        "Action link (Text column)": "Label#68:0 on Link set 68:326, variant Action=Page, Size=Medium, State=Default",
+        "Video link": "Label#68:0, variant Action=Video, Size=Medium, State=Default, default 'Watch: remote operations explained (2:40)'",
+        "Spec download link": "Label#68:0, variant Action=File, Size=Small, State=Default, default 'Download spec sheet (PDF)', visibility bound to Show spec link",
+        "Media frame (Image/Video)": "Show play#131:0, Show caption#131:4, Caption#131:8 on Media frame set 131:100 — Image uses variant 4:3 (131:80), Video uses 16:9 (131:90)",
+        "Spec row": "Label#131:12, Value#131:13 on Spec row 131:128 (component, not a set)",
+        "Numbered item": "Number#132:0, Title#132:3, Text#132:6 — Desktop variant 132:106, Mobile variant 132:111"
+      },
+      "layers": "Desktop: Columns (HORIZONTAL, FILL, SPACE_BETWEEN, CENTER) > Text (VERTICAL, FIXED 528, gap stack/md: Eyebrow, Title, Body, Actions > Link) + Media (VERTICAL, FIXED 640, gap space/16: [Image: Media frame 4:3] | [Video: Media frame 16:9 (Show play true) + Link] | [Spec table: Heading H5 'Vessel specifications' + List > 6 × Spec row + Link File] | [Numbered list: List > 4 × Numbered item]). Position=Start swaps Text/Media order in Columns. Mobile: Text and Media are direct children of the block (no Columns wrapper), both FILL 327; Image/Video put Media first, Spec table/Numbered list put Text first.",
+      "notes": "componentPropertyReferences only accepts the literal keys 'characters' | 'visible' | 'mainComponent' — attempting to link a block-level BOOLEAN to a nested instance's OWN component property via its property key (e.g. { 'Show caption#131:4': blockKey }) throws 'Unrecognized key(s) in object'. So the brief's 'Show caption' block property was NOT added as a separate addComponentProperty; instead the Media frame instance is exposed (isExposedInstance = true, on both Image and Video variants) so designers toggle its own Show caption/Show play/Caption directly — this is the 'simplest' route the spec explicitly allowed. Title and Body are linked TEXT properties (identical default characters set on all 16 variants before combineAsVariants, per the TEXT-property gotcha). Show eyebrow/Show actions/Show spec link are BOOLEAN properties linked via componentPropertyReferences.visible on, respectively, the Eyebrow instance, the Actions row frame, and the Spec table's download Link instance (only wired on the 4 Spec table variants — the property exists set-wide but only those 4 variants' Link visibility responds to it). All Link instances (Text-column action, Video link, Spec download link) and all Eyebrow and Media frame instances are exposed. Mobile Spec row: each instance's Label TEXT child resized to width 131 (found via inst.findOne, HEIGHT auto-resize kept) so the Value keeps room at 327 total width, matching the Mobile Numbered item/Spec row gotcha in the brief. Set laid out as two columns (Desktop left, Mobile right) with matching row order across both, gap 48, via the same colOf/rowOf grid pattern as Card grid/Feed grid.",
+      "examples": {
+        "group": "166:2340",
+        "Reach Remote: numbered list, media end, on Tint": "166:2343",
+        "Asset single: spec table, media start": "166:2379",
+        "Video on Navy": "166:2418"
+      }
+    },
+    "Stats band": {
+      "id": "169:2557",
+      "type": "COMPONENT_SET",
+      "variants": 8,
+      "axes": "Count (3, 4) × Style (Plain, Panel) × Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "3 Plain Desktop": "167:2496",
+        "3 Panel Desktop": "167:2522",
+        "4 Plain Desktop": "167:2549",
+        "4 Panel Desktop": "167:2580",
+        "3 Plain Mobile": "168:2495",
+        "3 Panel Mobile": "168:2521",
+        "4 Plain Mobile": "168:2548",
+        "4 Panel Mobile": "168:2576"
+      },
+      "keys": {
+        "Show section header": "Show section header#169:0"
+      },
+      "nestedKeys": {
+        "Section header": "Title#130:0, Intro#130:5, Show eyebrow#130:10, Show intro#130:15, Show action#130:20 on set 130:68, Desktop variant Align=Start,Breakpoint=Desktop (130:27) / Mobile variant Align=Start,Breakpoint=Mobile (130:38); default Title 'Reach in numbers', Intro 'A snapshot of the fleet, the people and how we operate.', Show eyebrow/Show action false",
+        "Stat": "Value#90:0, Label#90:5, Show note#90:10, Note#90:15 on set 90:284, variant Size=Large, Align=Start used throughout (Mobile picks up the Mobile type scale via the block's own Typography mode, not a separate Stat variant)"
+      },
+      "layers": "Section header instance (FILL, exposed, visible bound to Show section header, default false/hidden) then either: Plain = Stats row/column directly in the block, or Panel = a Panel wrapper (VERTICAL, FILL, bg/default, Light mode forced, radius/lg, effect style Shadow/sm, padding space/40 Desktop / space/24 Mobile) containing the Stats row/column. Desktop Stats: HORIZONTAL, FILL, gap space/40, N Stat instances (FILL width) with 1px vertical Divider rectangles (bound fill border/subtle, layoutSizingVertical FILL) between neighbours, no dividers at the ends. Mobile Count=4: HORIZONTAL, layoutWrap WRAP, gap space/24, counterAxisSpacing bound space/24, 4 Stat instances FIXED width floor((available-24)/2) — available 327 Plain / 279 Panel — no dividers. Mobile Count=3: VERTICAL, gap space/24, 3 Stat instances FILL width with horizontal Divider rectangles (1px high, FILL width) between them.",
+      "notes": "Every Stat instance placed (build-time and later in examples) needs its Label/Note TEXT children set to textAutoResize='HEIGHT' then layoutSizingHorizontal='FILL' — the Stat component's Label/Note are FIXED 192 wide and would otherwise overflow inside a narrower FILL slot (same fix as Page hero's Stats panel). Divider rectangles were initially created without a bound fill (an oversight caught only by the post-build audit, not by screenshot review) — fixed afterwards by finding every RECTANGLE named 'Divider' under the doc frame (findAll, which also reaches per-example instance overrides) and binding fill to border/subtle; recorded here so a future block audit checks freshly-created Rectangle nodes for bound fills as carefully as it checks frames and text. Show section header defaults to false and is bound via componentPropertyReferences.visible on the Section header instance in all 8 variants; the instance's own `visible` was also explicitly set to false after linking, since linking alone does not retroactively hide an already-visible node. Set laid out as two columns (Desktop left, Mobile right), matching row order (Count=3 Plain/Panel then Count=4 Plain/Panel), gap 48, same colOf/rowOf grid pattern as the other blocks.",
+      "examples": {
+        "group": "169:2558",
+        "Plain, 4 stats, on Navy, with section header": "169:2561",
+        "Panel, 3 stats, on Tint, with a source note": "169:2595",
+        "Mobile, 4 stats": "169:2615"
+      }
+    },
+    "Accordion": {
+      "id": "175:2673",
+      "type": "COMPONENT_SET",
+      "variants": 4,
+      "axes": "Layout (Stacked, Split) × Breakpoint (Desktop, Mobile; Split Mobile duplicates Stacked Mobile per the brief)",
+      "variantIds": {
+        "Stacked Desktop": "174:2588",
+        "Split Desktop": "174:2623",
+        "Stacked Mobile": "174:5286",
+        "Split Mobile": "174:5319"
+      },
+      "keys": {
+        "Show section header": "Show section header#175:0"
+      },
+      "nestedKeys": {
+        "Section header": "Title#130:0, Intro#130:5, Show action#130:20 on set 130:68 — Stacked Desktop and both Mobile variants use the real Align=Start variant for their breakpoint (130:27 / 130:38), FILL width; Split Desktop uses the Mobile variant 130:38 with COLL.layout/COLL.type reset to Desktop mode on the instance, then FIXED 416, per the brief's documented gotcha",
+        "Accordion item": "Question#98:0, Answer#98:7 on set 98:412 — its own component properties, not linked to any block property; per-item copy is set directly via setProperties on each of the 4 instances"
+      },
+      "layers": "Section header instance (isExposedInstance, FILL, visible bound to Show section header, default true) then either: Stacked = List (VERTICAL, gap space/16, FIXED 880 Desktop / FILL 327 Mobile) of 4 Accordion item instances (2nd State=Open, rest Closed, all Interaction=Default, isExposedInstance), or Split = Columns (HORIZONTAL, FILL, SPACE_BETWEEN, align top) > Section header (FIXED 416) + List (FIXED 752 Desktop / FILL 327 Mobile, same 4 items)",
+      "notes": "Tested with a disposable instance before building: instance.layoutSizingHorizontal='FILL' can be set directly on an Accordion item instance despite its main component's width being bound to container/content (880) — instance.setBoundVariable('width', null) was NOT needed, FILL simply overrides the bound width. Section header's own default is Show eyebrow=true with placeholder text 'Services' — explicitly set to false via setProperties on all 4 Accordion variants since 05-blocks-spec.md §2.6 doesn't call for an eyebrow on this block. No raw rectangles/ellipses in this block. Binding audit (see top-level notes) came back clean.",
+      "examples": {
+        "FAQ page topic block, Stacked, on Tint": "175:5335",
+        "Split on Navy": "175:5375"
+      }
+    },
+    "CTA band": {
+      "id": "179:5432",
+      "type": "COMPONENT_SET",
+      "variants": 4,
+      "axes": "Style (Band, Inline) × Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "Band Desktop": "178:2735",
+        "Band Mobile": "178:2767",
+        "Inline Desktop": "179:2742",
+        "Inline Mobile": "179:2774"
+      },
+      "keys": {
+        "Title": "Title#179:0",
+        "Text": "Text#179:5",
+        "Show secondary action": "Show secondary action#179:10",
+        "Show contact": "Show contact#179:15"
+      },
+      "nestedKeys": {
+        "Primary action (Button)": "Label#56:0 on set 56:177, variant Style=Primary, Size=Medium, State=Default — not a block property; label set per instance",
+        "Secondary action (Link)": "Label#68:0 on set 68:326, default variant Action=Page, Size=Medium, State=Default — visible bound to Show secondary action; label and Action variant set per instance (example (b) swaps Action=External)",
+        "Contact / Person": "plain Name (Heading/H5) + Role (Body/Small) text nodes, not component properties",
+        "Contact / Meta item": "Icon#91:0 (INSTANCE_SWAP), Text#91:1 on component 91:286 (phone 25:123, mail 25:131) — recolorIcon to icon/accent after each swap"
+      },
+      "layers": "Band: Columns (HORIZONTAL, FILL, SPACE_BETWEEN, counterAxisAlignItems MAX on Desktop; VERTICAL stack, Actions layoutWrap WRAP on Mobile) > Text (FIXED 752 Desktop / FILL Mobile, gap stack/sm: Title, Text, Contact) + Actions (HORIZONTAL, gap space/24, CENTER: Button Primary Medium + Link Medium Page). Navy mode forced explicitly on both Band variant components (not just instances). Inline: same Text+Actions pattern inside a Callout frame (bg/tint, radius/lg, padding space/48 Desktop / 48 top-bottom + 40 sides Mobile (updated 16 Sep, Q41; the Mobile block frames are 48 top-bottom, and Band insets its content to 40); HORIZONTAL SPACE_BETWEEN Desktop / VERTICAL gap stack/md Mobile), no forced mode (ambient Light). Contact group (HORIZONTAL WRAP, gap space/24, counterAxisSpacing space/12, top padding space/16, all 4 variants): Person stack (gap space/0: Name + Role) + 2 Meta items (phone, mail); visible bound to Show contact, and each instance's own visible was explicitly set false after linking (Show contact defaults to false).",
+      "notes": "Title and Text are TEXT properties linked across ALL 4 variants (Band uses Heading/H2 + Body/Lead, Inline uses Heading/H4 + Body/Body — text STYLE differs per variant, only the shared characters had to match before linking, per the linked-TEXT-property gotcha). Both were set to identical default copy ('Would you like to know more?' / 'Talk to our team about your next campaign, from survey planning to remote operations.') on all 4 variant components before combineAsVariants. The primary button's label and the secondary link's label/Action are NOT block-level properties — example (b) overrides them by finding the nested instances directly and calling setProperties with their own keys (Label#56:0, Label#68:0) plus setProperties({Action:'External'}) on the Link, which is a full VARIANT swap (the External icon is already baked into that variant, so no recolorIcon step was needed, unlike an INSTANCE_SWAP).",
+      "examples": {
+        "Band, Desktop (default Navy)": "179:5433",
+        "Inline IR contact with Show contact on, on White": "179:5451",
+        "Band on Tint": "179:5485"
+      }
+    },
+    "Statement": {
+      "id": "182:2824",
+      "type": "COMPONENT_SET",
+      "variants": 4,
+      "axes": "Style (Statement, Quote) × Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "Statement Desktop": "180:2819",
+        "Statement Mobile": "180:2828",
+        "Quote Desktop": "180:5465",
+        "Quote Mobile": "180:5475"
+      },
+      "keys": {
+        "Statement": "Statement#182:0",
+        "Quote": "Quote#182:5",
+        "Name": "Name#182:10",
+        "Role": "Role#182:15",
+        "Show eyebrow": "Show eyebrow#182:20",
+        "Show action": "Show action#182:25",
+        "Show photo": "Show photo#182:30"
+      },
+      "nestedKeys": {
+        "Eyebrow (Statement only)": "Text#89:0 on set 89:268, variant Tone=Accent, default 'Our vision' — its own Text is a per-instance override, not linked to a block TEXT property; only its visible is bound to Show eyebrow",
+        "Link (Statement only)": "Label#68:0 on set 68:326, variant Action=Page, Size=Medium, State=Default, default 'About Reach Subsea' — visible bound to Show action, default hidden"
+      },
+      "layers": "Block counterAxisAlignItems CENTER (centres the Content column in the block). Statement: Content (VERTICAL, counterAxisAlignItems CENTER, FIXED 880 Desktop / FILL Mobile, gap stack/md) > Eyebrow instance (isExposedInstance, visible bound to Show eyebrow) · Statement text (Heading/H2, text/primary, textAlignHorizontal CENTER, FILL width / HEIGHT, characters bound to Statement) · Link instance (isExposedInstance, visible bound to Show action). Quote: Content (VERTICAL, counterAxisAlignItems MIN i.e. left-aligned within itself, FIXED 880 Desktop / FILL Mobile, gap stack/md) > Quote icon (iconInstance('quote', 40, icon/accent), ICON.quote = 137:2717) · Quote text (Heading/H3, text/primary, FILL width / HEIGHT, characters bound to Quote) · Attribution (HORIZONTAL, gap space/16, CENTER) > Photo ellipse 56×56 (bound fill bg/disabled at creation, visible bound to Show photo) + Person stack (Name UI/Label text/primary bound to Name, Role Body/Small text/secondary bound to Role).",
+      "notes": "Statement/Show eyebrow/Show action are linked only on the 2 Statement variants; Quote/Name/Role/Show photo only on the 2 Quote variants — addComponentProperty still runs once on the SET as usual (7 properties total), only the per-variant componentPropertyReferences linking step is scoped to the variants that actually have that layer, per the brief's 'link each property only to the layers of the variants that have them'. Show action defaults to false, and as with Stats band's Show section header, the Link instance's own visible was explicitly set to false after linking (linking alone doesn't retroactively hide an already-visible node). The 56×56 Photo ellipse got setFill(bg/disabled) at the moment it was created. Binding audit (see top-level notes) came back clean.",
+      "examples": {
+        "Vision statement on Tint": "182:5453",
+        "Employee quote on Navy": "182:5462",
+        "Quote, Mobile": "182:5475"
+      }
+    },
+    "Timeline": {
+      "id": "187:3005",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "axes": "Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "Desktop": "187:2842",
+        "Mobile": "187:2928"
+      },
+      "keys": {
+        "Show section header": "Show section header#187:0"
+      },
+      "nestedKeys": {
+        "Section header": "Title#130:0, Intro#130:5, Show eyebrow#130:10, Show intro#130:15, Show action#130:20 on set 130:68 — Desktop uses the Mobile variant (130:38) with COLL.layout/COLL.type reset to Desktop mode on the instance, then FIXED 416 (the narrow-column rule); Mobile uses the real Start Mobile variant (130:38), FILL",
+        "Milestone": "Date#132:9, Title#132:13, Text#132:17, Show line#132:21 on set 132:207 (Done 132:167, Current 132:181, Upcoming 132:194) — Status is a plain VARIANT property (key literally 'Status', no #id suffix), set via instance.setProperties({ Status: 'Done' })"
+      },
+      "layers": "Block (VERTICAL) > Columns (HORIZONTAL, FILL, SPACE_BETWEEN, align top) > Section header instance (isExposedInstance, FIXED 416 Desktop / FILL Mobile, visible bound to Show section header) + List (VERTICAL, FIXED 752 Desktop / FILL Mobile, itemSpacing bound to space/0 so each Milestone's own trailing Line rect reads as one continuous rail) > 5 Milestone instances (Done, Done, Current, Upcoming, Upcoming), each FILL width, last one Show line off. Mobile: Section header and List are direct children of the block (no Columns wrapper).",
+      "notes": "Every Milestone instance's layoutSizingHorizontal was set to 'FILL' immediately after appendChild and its resulting .width read back in the same script (752 Desktop, 327 Mobile, all 5 items) per the Accordion-overflow lesson — no drift found. List itemSpacing is explicitly bound to space/0 (not left unbound at 0), since Milestone's own Rail line is what creates the connecting vertical line between markers, not a list gap. Same colOf/rowOf(48/32) two-column grid layout as the other blocks (Desktop left, Mobile right).",
+      "examples": {
+        "group": "188:2952",
+        "Reach Remote 3 & 4 on Tint": "188:2954",
+        "Company history on Navy": "188:3016"
+      }
+    },
+    "Logo strip": {
+      "id": "190:3228",
+      "type": "COMPONENT_SET",
+      "variants": 6,
+      "axes": "Type (Logos, Certifications, SDGs) × Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "Logos Desktop": "189:3063",
+        "Certifications Desktop": "189:3094",
+        "SDGs Desktop": "189:3139",
+        "Logos Mobile": "190:3130",
+        "Certifications Mobile": "190:3156",
+        "SDGs Mobile": "190:3202"
+      },
+      "keys": {
+        "Show section header": "Show section header#190:0"
+      },
+      "nestedKeys": {
+        "Section header": "Title#130:0, Show eyebrow#130:10, Show intro#130:15, Show action#130:20 on set 130:68 — Start Desktop (130:27) / Start Mobile (130:38), FILL, no intro copy",
+        "Logo tile": "Label#136:0, Show link#136:4 on set 136:252 — Logo variant has no visible Label/Show link layer (harmless no-op if set); Certificate and SDG both bind Label to their own text node"
+      },
+      "layers": "Section header instance (isExposedInstance, FILL, visible bound to Show section header) then Grid (VERTICAL, FILL, gap grid/gutter) > Row(s) (HORIZONTAL, FILL, gap grid/gutter, align top). Desktop: 1 Row × 6 Logo tiles (FILL) | 1 Row × 4 Certificate tiles (FILL) | 1 Row × 6 SDG tiles (FIXED 120). Mobile: 2 Rows × 2 items each (4 of 6 Logos, all 4 Certifications, 4 of 6 SDGs) — Logos/Certifications FILL, SDGs FIXED 120.",
+      "notes": "Built the Logo tile resizability change (see the top-level 'Logo tile' component entry) before this block, then used the same main components (136:237/240/249) directly by id for every instance rather than looking up variant names. Every FILL'd tile's width was read back after the full row/grid finished (not mid-loop, since intermediate per-iteration reads reflect Figma's incremental layout pass and understate width until every sibling is appended) — final Desktop rows: 6 Logo tiles at 202.67 each, 4 Certificate tiles at 316 each, 6 SDG tiles at 120 fixed; final Mobile 2×2 rows: Logo/Certificate tiles at 155.5 each, SDG tiles at 120 fixed. No overflow found by the audit. Same colOf(Breakpoint)/rowOf(Type: Logos 0, Certifications 1, SDGs 2) two-column grid layout, gap 48.",
+      "examples": {
+        "group": "190:3236",
+        "HSEQ certifications on Tint": "190:3238",
+        "SDGs, Mobile": "190:3280",
+        "Partner logos on Navy": "190:3303"
+      }
+    },
+    "Media gallery": {
+      "id": "192:3618",
+      "type": "COMPONENT_SET",
+      "variants": 4,
+      "axes": "Type (Photos, Videos) × Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "Photos Desktop": "191:3276",
+        "Photos Mobile": "191:3338",
+        "Videos Desktop": "192:3365",
+        "Videos Mobile": "192:3501"
+      },
+      "keys": {
+        "Show section header": "Show section header#192:0",
+        "Show more": "Show more#192:5"
+      },
+      "nestedKeys": {
+        "Section header": "Title#130:0, Show eyebrow#130:10, Show intro#130:15, Show action#130:20 on set 130:68 — Start Desktop (130:27) / Start Mobile (130:38), FILL. 'Gallery' / 'Videos and animations', Show action off",
+        "Media frame": "Show play#131:0, Show caption#131:4, Caption#131:8 on set 131:100, variant 3:2 (131:69) — isExposedInstance, defaults kept (Show play/caption off)",
+        "More link": "Label#68:0 on Link set 68:326, variant Action=Expand, Size=Medium, State=Default — isExposedInstance, default label 'Show all 24 photos'",
+        "Video Card": "Title#104:168, Description#104:189, Show eyebrow#104:210, Show badge#104:231, Show meta#104:273, Show action#104:294 on Card set 103:1110, variant Media=Image top, Surface=White, Size=Default — nested Eyebrow's own Text#89:0 and nested Action's own Action variant + Label#68:0 are set directly on the found nested instances (not linked to any Card-level property), per the componentPropertyReferences-only-accepts-characters/visible/mainComponent gotcha"
+      },
+      "layers": "Section header instance (isExposedInstance, FILL, visible bound to Show section header) then: Photos = Grid (VERTICAL, FILL, gap grid/gutter) > 2 Rows (Desktop) or 3 Rows (Mobile) of Media frame 3:2 instances (FILL, isExposedInstance) + More (HORIZONTAL, FILL, CENTER, visible bound to Show more) > Link Expand instance. Videos = Row (HORIZONTAL FILL Desktop / VERTICAL FILL Mobile, gap grid/gutter) of 3 Card instances (FILL), nested Action switched to Action=Video, label 'Watch video'; no More frame on either Video variant. 16 Sep (Q42): Show eyebrow set false on all 6 Video cards, dropping the 'Animation · 1:45' type/duration line, which has no field in the block.",
+      "notes": "Show more is only linked (componentPropertyReferences.visible) on the 2 Photos variants — the brief allowed either leaving the More frame out of the Video variants or binding it there and defaulting false; this build left it out of Video entirely, since Video has its own per-card 'Watch video' actions and no 'show more' affordance in the spec. Show section header is linked on all 4 variants. Media frame instances' FILL widths were read back after each grid finished (Desktop 3-across rows: 1312/640/416 alternating as Figma's incremental layout settled, final state even at ~416 each — confirmed by screenshot; Mobile 2-across: even at 155.5 each). Card instances used the same Card-grid/Feed-grid recipe: setProperties for the Card's own keys, then findOne('Eyebrow')/findOne('Action') for the nested instances' own properties. Same colOf(Breakpoint)/rowOf(Type: Photos 0, Videos 1) two-column grid layout, gap 48.",
+      "examples": {
+        "group": "192:3626",
+        "Asset gallery on Tint": "192:3628",
+        "Videos on Navy": "192:3686",
+        "Photos, Mobile": "192:3746"
+      }
+    },
+    "Data list": {
+      "id": "200:4079",
+      "type": "COMPONENT_SET",
+      "variants": 8,
+      "axes": "Type (Reports, Documents, Dates, Publications) × Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "Reports Desktop": "195:3653",
+        "Reports Mobile": "197:3789",
+        "Documents Desktop": "197:3888",
+        "Documents Mobile": "198:3901",
+        "Dates Desktop": "198:3983",
+        "Dates Mobile": "198:4034",
+        "Publications Desktop": "199:3984",
+        "Publications Mobile": "199:4096"
+      },
+      "keys": {
+        "Show section header": "Show section header#200:0",
+        "Show latest": "Show latest#200:9",
+        "Show tabs": "Show tabs#200:18",
+        "Show archive toggle": "Show archive toggle#200:27",
+        "Show filters": "Show filters#200:36",
+        "Show load more": "Show load more#200:45"
+      },
+      "propertyCoverage": "Reports: section header, latest, tabs, archive · Documents: section header, latest, archive · Dates: section header · Publications: section header, filters, load more",
+      "layers": "Section header (exposed) · Body > [Tabs (Subnav items; Mobile FIXED 327 clipped)] · [Desktop: Columns SPACE_BETWEEN > Latest (Navy panel 416) + Archive (864) > Table (bg/default, border/subtle, radius/lg, clips) > Header row + Rows (padding space/24 × space/16, bottom rule) + archive toggle Link Expand] · [Mobile Reports: Latest + Years > open year frame styled as Accordion item Open + closed Accordion item instances + toggle] · [Documents Mobile / Dates Mobile / Publications Mobile: rows with top rules] · [Publications: Filters (Facets of Filter chips + result count), List 880, More > Button Outline]",
+      "notes": "Built by Opus 15 Sep. Latest is a Navy panel (not a Card instance) because it holds up to 3 links. Visible cell labels are short (Report / Presentation / Webcast); code adds hidden context. Accordion item instances in Reports Mobile needed FILL re-applied after setProperties (they reverted to the bound 880 width). With Show latest off on Desktop, the Archive column keeps its 864 width and right alignment; code lets the table span the container.",
+      "examples": {
+        "group": "200:4080",
+        "Reports on Tint": "200:4083",
+        "General meetings, no Latest": "200:4327",
+        "Financial calendar on Navy": "200:4436"
+      }
+    },
+    "Embed": {
+      "id": "203:4644",
+      "type": "COMPONENT_SET",
+      "variants": 12,
+      "axes": "Type (3D World, Iframe, Map) × State (Poster|Loaded for 3D World, Consent|Loaded for Iframe and Map) × Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "3D World Poster Desktop": "201:4464",
+        "3D World Loaded Desktop": "201:4504",
+        "3D World Poster Mobile": "201:4536",
+        "3D World Loaded Mobile": "201:4573",
+        "Iframe Consent Desktop": "202:4548",
+        "Iframe Loaded Desktop": "202:4579",
+        "Iframe Consent Mobile": "202:4637",
+        "Iframe Loaded Mobile": "202:4666",
+        "Map Consent Desktop": "202:4592",
+        "Map Loaded Desktop": "202:4619",
+        "Map Consent Mobile": "202:4679",
+        "Map Loaded Mobile": "202:4706"
+      },
+      "keys": {
+        "Show section header": "Show section header#203:0",
+        "Show zones": "Show zones#203:13"
+      },
+      "propertyCoverage": "Show zones: 3D World variants · Show section header: Iframe and Map variants",
+      "layers": "3D World Desktop: Stage (Navy mode, FILL, 16:9 lockAspectRatio, radius/xl, clips) > [Poster: Poster rect (bg/disabled, absolute STRETCH) + Overlay rect (bg/overlay, absolute STRETCH) + Content 640 (Eyebrow, Title H2, Body, Actions: Button Primary Launch + Link External Open full screen)] | [Loaded: Pictogram 96 + Viewer label + Toolbar (absolute top-right 24 inset, bg/overlay, radius/md: Link External Open full screen + Icon button Ghost x)] · Zones (Jump to a zone: + 4 Link External Small). 3D World Mobile: Poster (Media frame 16:9 FILL) · Content (Eyebrow, Title, Body, Actions: Link External Open 3D World, Note Caption) · Zones (wrap). Iframe/Map: Section header (Start, exposed, eyebrow/action off) · Consent placeholder (exposed, FILL) | Iframe frame (FILL, fixed height 480 Desktop / 560 Mobile, bg/default, border/subtle, radius/lg, Provider label) | Map (Media frame 16:9, exposed).",
+      "notes": "Built by Opus 15 Sep. 3D World variants use gap stack/md (no Section header); Iframe/Map use stack/xl like other blocks. Mobile Loaded 3D World is a clone of Mobile Poster (phones never load the scene in place). Poster uses the full flat scrim like the photo hero (Q40), not a lower-half gradient. The Toolbar pill is invisible over the flat navy placeholder but gives contrast over the live scene.",
+      "examples": {
+        "group": "204:4644",
+        "Home 3D World, zones off": "204:4648",
+        "Share information Newsweb on Tint": "204:4686",
+        "Contact map consent, Mobile": "204:4705",
+        "Share price consent on Navy": "204:4728"
+      }
+    },
+    "Section subnav": {
+      "id": null,
+      "type": "DOC_FRAME_ONLY",
+      "uses": "Subnav set 102:460 (Breakpoint Desktop 102:434 / Mobile 102:447, 6 Subnav items; item set 101:448 keys Label#101:0, State Default|Hover|Active|Focus)",
+      "layers": "Header · Rules (880, 6 Spec rows: Source Section pages, Source In-page, Placement, Sticky, Mobile, Replaces) · Group/Examples",
+      "notes": "No new component (spec §2.14). Hide unused Subnav items on the instance (visible=false) rather than detaching.",
+      "examples": {
+        "group": "207:4734",
+        "Section pages Investors, Desktop": "207:4738",
+        "In-page FAQ anchors, Mobile": "207:4761"
+      }
+    }
+  },
+  "components": {
+    "Section header": {
+      "id": "130:68",
+      "type": "COMPONENT_SET",
+      "variants": 4,
+      "variantIds": {
+        "Start Desktop": "130:27",
+        "Start Mobile": "130:38",
+        "Center Desktop": "130:48",
+        "Center Mobile": "130:58"
+      },
+      "keys": {
+        "Title": "Title#130:0",
+        "Intro": "Intro#130:5",
+        "Show eyebrow": "Show eyebrow#130:10",
+        "Show intro": "Show intro#130:15",
+        "Show action": "Show action#130:20"
+      },
+      "exposedInstances": [
+        "Eyebrow (89:268, Text#89:0)",
+        "Action (Link 68:326, Label#68:0)"
+      ],
+      "previews": "131:39 (Start on Tint, Center on Navy)"
+    },
+    "Media frame": {
+      "id": "131:100",
+      "type": "COMPONENT_SET",
+      "variants": 3,
+      "variantIds": {
+        "3:2": "131:69",
+        "4:3": "131:80",
+        "16:9": "131:90"
+      },
+      "sizes": "3:2 624×416 radius/lg · 4:3 640×480 radius/xl · 16:9 1312×738 radius/xl",
+      "keys": {
+        "Show play": "Show play#131:0",
+        "Show caption": "Show caption#131:4",
+        "Caption": "Caption#131:8"
+      },
+      "layers": "Frame (clips, bg/disabled) > Image (rectangle, STRETCH), Placeholder icon (photo 24, text/secondary, CENTER), Play (Icon button Primary Medium, player-play, CENTER) · Caption",
+      "aspectLock": "Frame has lockAspectRatio() + FILL width, so resizing an instance's WIDTH drives the image height (verified: 3:2 at 480 → 320, 16:9 at 327 → 184). Never resize the nested Frame height in an instance: Figma ignores nested height overrides (Dialog test 15 Sep). Set the instance width (or FILL) only."
+    },
+    "Spec row": {
+      "id": "131:128",
+      "type": "COMPONENT",
+      "keys": {
+        "Label": "Label#131:12",
+        "Value": "Value#131:13"
+      },
+      "notes": "640 wide, bottom-only 1px border/subtle. 15 Sep QA fix: Label and Value are both FILL (equal halves) on the main component and on every instance. The earlier fixed 256px label crushed values to ~55px on Mobile Split media. Instances just FILL their column; no per-instance label widths."
+    },
+    "Numbered item": {
+      "id": "132:116",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "variantIds": {
+        "Desktop": "132:106",
+        "Mobile": "132:111"
+      },
+      "keys": {
+        "Number": "Number#132:0",
+        "Title": "Title#132:3",
+        "Text": "Text#132:6"
+      },
+      "notes": "Desktop 640 wide, number column 80; Mobile 327 stacked with Layout/Typography Mobile modes. Top-only 1px border/subtle."
+    },
+    "Milestone": {
+      "id": "132:207",
+      "type": "COMPONENT_SET",
+      "variants": 3,
+      "variantIds": {
+        "Done": "132:167",
+        "Current": "132:181",
+        "Upcoming": "132:194"
+      },
+      "keys": {
+        "Date": "Date#132:9",
+        "Title": "Title#132:13",
+        "Text": "Text#132:17",
+        "Show line": "Show line#132:21"
+      },
+      "notes": "640 wide. Rail (16 wide, paddingTop 2 raw to centre the marker on the 20px Date line) > Marker ellipse 16 + Line rect 2 wide FILL height. Badge Accent 'Now' visible only on Current (hardcoded, not a property)."
+    },
+    "Dialog": {
+      "id": "133:259",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "variantIds": {
+        "Lightbox": "133:216",
+        "Video": "133:242"
+      },
+      "notes": "1440×900, Navy mode on each variant, ground bg/tint (navy/900). Top bar (Counter or Title + Close) · Stage (Previous, Media, Next on Lightbox) · Caption bar. Ghost icon buttons re-bound to icon/primary (white in Navy). Media = Media frame instance: Lightbox 3:2 at 1008 wide, Video 16:9 at 1120 wide."
+    },
+    "Logo tile": {
+      "id": "136:252",
+      "type": "COMPONENT_SET",
+      "variants": 3,
+      "variantIds": {
+        "Logo": "136:237",
+        "Certificate": "136:240",
+        "SDG": "136:249"
+      },
+      "keys": {
+        "Label": "Label#136:0",
+        "Show link": "Show link#136:4"
+      },
+      "notes": "Logo = Tile 200×120 > Logo rect 120×56 (placeholder bg/disabled). Certificate = Tile + Label (UI/Label) + Action (Link File Small, exposed). SDG = 120×120 rect + Label (Body/Small). The shared Label default reads 'ISO 9001:2015' on every variant (TEXT property gotcha); instances override it. 15 Sep, Logo strip batch: made all 3 variants resizable so an instance can FILL a Row. Logo and Certificate roots changed from HUG/HUG to a FIXED-width (200) / hug-height root (counterAxisSizingMode = 'FIXED' on the root, no resize() call needed since the width was already 200); their Tile frame's layoutSizingHorizontal set to 'FILL' (Tile keeps a FIXED 120 height and centres its 120×56 Logo rect via primaryAxisAlignItems/counterAxisAlignItems = CENTER, unaffected by the width change); Certificate's Label text also set to layoutSizingHorizontal 'FILL' (textAutoResize stays 'HEIGHT'). SDG root changed the same way (FIXED-width 120 root) with its Label set to FILL; the 120×120 SDG tile rectangle stays FIXED. Verified with a disposable test instance: Logo resized to 304 wide → its Tile followed to 304×120. The existing Logo tile doc-frame examples (136:232) were screenshotted afterward and still render correctly at their original 200/120 widths, confirming the change is backward-compatible."
+    },
+    "Consent placeholder": {
+      "id": "136:361",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "variantIds": {
+        "Desktop": "136:326",
+        "Mobile": "136:345"
+      },
+      "keys": {
+        "Title": "Title#136:8",
+        "Text": "Text#136:11"
+      },
+      "notes": "Desktop 1312 / Mobile 327, bg/tint, radius/lg. Pictogram shield-tick (43:108) 64 · Title H5 · Text Body/Small (560 max) · Actions: Load (Button Outline Small, exposed) + Open (Link External Small, exposed)."
+    }
+  },
+  "notes": [
+    "Blocks page uses the same doc-frame pattern as Components: 'Blocks / <Name>' frames stacked at x = 0, 160px apart, eyebrow 'Blocks · <group>'.",
+    "Section header widths: Desktop 1312 (1440 − 2 × grid/margin), Mobile 327. Instances inside blocks should FILL the container.",
+    "Icon/quote (137:2717) added 15 Sep to the Components page Icons grid as Tile/quote (137:2716), cloned from Tile/lock: Tabler Outline 3.46 SVG, two paths flattened into one Glyph, 1.5px round stroke bound to icon/primary. QA todo: the tile's caption TEXT layer is still named 'lock' (characters read 'quote').",
+    "Opus QA 15 Sep, Accordion Split Desktop (174:2623): the List was FIXED 752 but its 4 Accordion item instances were FIXED 880 (the main component's width is bound to container/content), so they overflowed the block and hid the plus icons. Fixed by setting each item to layoutSizingHorizontal FILL (the Navy example inherits it). Lesson: after placing instances in a column, read back widths numerically, and include an overflow check (child width > parent inner width) in every audit.",
+    "Card grid + Feed grid (15 Sep): isExposedInstance must be set AFTER the fresh instance is appended somewhere inside a component/component-set tree, never right after createInstance() — doing it too early throws 'Instance must be contained within a component or component set to be exposed.' Both times this was hit, the whole script rolled back with no partial nodes left on canvas, so it was safe to fix and retry without an extra canvas read.",
+    "Block-set variant grids reuse the same colOf/rowOf + gap(48)/pad(32) layout as gridVariants, keyed off variantProps() parsed from each variant's own 'Axis=Value, Axis=Value' name, rather than the docs-page gridVariants() helper itself (that helper's styling call was reused via a local styleSet()).",
+    "Block BOOLEAN properties (Show section header, Show load more) are added once on the COMPONENT_SET via addComponentProperty after combineAsVariants, then linked per-variant by setting componentPropertyReferences.visible on that variant's own child node (Section header instance = child index 0; the Feed grid Load-more control lives in a trailing 'More' wrapper frame, not the Button instance itself, so the boolean hides the whole centred row cleanly).",
+    "get_screenshot (the standalone MCP tool, not node.screenshot() called inline from use_figma) returned a stale/cropped image for the Feed grid examples group twice in a row (reported 1991×24 against an actual 2359×1116 frame per get_metadata) even after the writing script had returned successfully. node.screenshot({scale}) called inline inside a use_figma script gave the correct image immediately — prefer the inline screenshot when a fresh get_screenshot call looks visually wrong or truncated, before assuming the canvas itself is broken.",
+    "Confirmed by a disposable test instance (built and deleted before the real build): Card preset/Project (114:724) instances stretch correctly with layoutSizingHorizontal='FILL' inside a FILL row — both the preset wrapper and its nested Card instance accept FILL and resize together, so Feed grid's Grid uses Card preset/Project directly rather than the Card-set fallback the brief allowed for.",
+    "Split media + Stats band (15 Sep): componentPropertyReferences only ever accepts the three literal keys 'characters' | 'visible' | 'mainComponent' — there is no way to point a block-level BOOLEAN/TEXT property at a nested instance's OWN component property key (e.g. binding a block 'Show caption' to a Media frame instance's 'Show caption#131:4' throws 'Unrecognized key(s) in object'). Where the brief anticipated this ('Simplest: expose the Media frame instance...'), the fix is isExposedInstance = true on the nested instance, not a manual property link. Where a design needs a specific nested instance's own property surfaced as a real block-level control, there is no shortcut — either wire 'visible' to hide/show the whole instance, or accept the exposed-instance route and document it.",
+    "Divider rectangles (Stats band) are the first raw (non-component) shape nodes created in a block script here — the two build scripts that created them (Desktop and Mobile Stats rows) resized and positioned them correctly but never called setFill, leaving 19 SOLID-black, unbound-fill rectangles that only surfaced on the post-build audit script, not on screenshot review (a 1px-wide default-black divider is easy to miss at doc-frame screenshot scale). Fixed with one findAll(n => n.type==='RECTANGLE' && n.name==='Divider') + setFill(..., V.border.subtle) pass over the whole doc frame, which also reaches per-example instance overrides. Lesson for future blocks: run the binding audit (or at minimum grep newly-created RECTANGLE/ELLIPSE nodes for fills) even when screenshots look fine, and prefer binding fills at creation time for every raw shape, not just frames and text.",
+    "The audit script walks the doc frame's own tree (frames, text, rectangles it created) but does not descend into INSTANCE nodes' internals — nested component content is governed by its own source component, which is audited separately where it was built. Skip itemSpacing checks on frames with primaryAxisAlignItems SPACE_BETWEEN (the gap is visually irrelevant there since children are distributed, and it is legitimately left unbound in this file's Columns/Panel rows).",
+    "Accordion / CTA band / Statement (batch 5, 15 Sep): confirmed with a disposable test instance before building that instance.layoutSizingHorizontal='FILL' works directly on an instance even when its main component's own width is bound to a container/content variable — instance.setBoundVariable('width', null) is not needed first; FILL simply overrides the bound width outright. Used to let Accordion item instances fill 327/752/880-wide columns without unbinding anything.",
+    "componentPropertyReferences only ever accepts the three literal keys 'characters' | 'visible' | 'mainComponent' (reconfirmed) — there is still no way to point a block-level property at a nested instance's OWN component property key. CTA band's Title/Text TEXT properties needed identical default characters set on all 4 variant components (Band's Heading/H2+Body/Lead and Inline's Heading/H4+Body/Body can use different text STYLES; only the shared characters string has to match) before combineAsVariants, then were linked per-variant on that variant's own Title/Text text node. Where a block needs a nested instance's own property surfaced directly (e.g. CTA band's primary Button label, or the secondary Link's Action variant), there is still no property-link shortcut — the brief's example (b) instead finds the nested instance and calls setProperties with the instance's own key, or with the bare VARIANT property name for a variant swap (Action: 'External').",
+    "Statement block: a component set's block-level TEXT/BOOLEAN properties can be linked on only a SUBSET of its variants — Statement/Show eyebrow/Show action were linked only on the 2 Statement variants, Quote/Name/Role/Show photo only on the 2 Quote variants. addComponentProperty still runs once on the whole SET as usual; only the per-variant componentPropertyReferences assignment needs to be scoped, since a variant without that layer simply has nothing to link.",
+    "Following the Stats band divider-rectangle lesson, every RECTANGLE/ELLIPSE created across these three blocks (Statement's 56×56 Photo ellipse; no raw shapes in Accordion or CTA band) had its fill bound at the moment of creation. A post-build binding audit (SOLID fills/strokes without a bound colour, TEXT without a textStyleId, auto-layout frames with non-zero unbound padding/itemSpacing except on SPACE_BETWEEN frames, instance internals skipped) walked all three new doc frames and came back with 0 issues.",
+    "These three doc frames (Accordion, CTA band, Statement) place each example 'Group/<label>' frame as a direct sibling of the component set inside the doc frame, with no further wrapping 'Examples' container — unlike earlier blocks (Card grid, Feed grid, Stats band) whose ledger entries record a separate outer 'group' id. This is a harmless structural difference: 05-blocks-spec.md's doc-frame instructions ('Header, the set, then Group/… examples') don't require the extra wrapper, so these three entries omit the 'group' key.",
+    "Timeline / Logo strip / Media gallery (batch 7, 15 Sep): adopted the lesson from the prior Accordion overflow bug (an item list set to 752 whose instances stayed at their component's own bound width, 880, and overflowed) as standard practice — every instance placed in a column or row now has layoutSizingHorizontal set to 'FILL' (or FIXED + resize) immediately after appendChild, with its resulting .width read back in the same script. One new wrinkle found while doing this: reading .width inside the same loop that is still appending siblings returns an intermediate value (Figma re-flows the row after each append), so a 6-item Desktop Logos row read back as [1312, 640, 416, 304, 236.8, 192] — a false positive if read literally, but the post-loop screenshot and a fresh audit read (after the script returns) both confirmed all 6 tiles at the true, even final width. Lesson for future batches: read back widths either after the whole row/grid is built, or in a follow-up script, not mid-loop.",
+    "Added a fourth audit check across all four doc frames re-verified in this batch (Timeline, Logo strip, Media gallery, Logo tile): for every auto-layout frame found while walking the doc frame's own tree (instance internals still skipped), flag any non-absolute child whose width exceeds the parent's inner width (width minus horizontal padding), and, for HORIZONTAL frames, flag the frame if children's widths plus gaps exceed the inner width. Combined with the existing checks (unbound SOLID fill/stroke, TEXT without a textStyleId, unbound non-zero padding/itemSpacing except on SPACE_BETWEEN frames, default layer names), this ran clean — 0 issues of any kind — across all four doc frames, including the Logo tile frame after its main-component resizability change.",
+    "Card set 103:1110's Card-preset recipe (Card grid/Feed grid batches) reused as-is for Media gallery's Video cards: setProperties for the Card's own component-property keys (Title#104:168 etc.), then inst.findOne(n => n.type==='INSTANCE' && n.name==='Eyebrow'/'Action') to reach the nested Eyebrow's own Text#89:0 and the nested Action Link's own Action variant + Label#68:0 — Action's variant swap called before its Label, as a separate setProperties call, per the established 'variant swap, then label, separately' gotcha.",
+    "Milestone's variant axis property key is the bare literal 'Status' (no '#id' suffix) rather than 'Status#132:something' — confirmed by reading componentPropertyDefinitions off the Milestone SET (132:207) before use rather than guessing; instance.setProperties({ Status: 'Done' }) is enough to swap a Milestone instance's variant, e.g. for the Timeline 'Company history on Navy' example where all 5 items become Done.",
+    "Logo strip example 'SDGs, Mobile' (190:3280) squeezed to 247 because its parent Surface/Light frame had grid/margin side padding; bound that surface's paddingLeft/Right to space/0 and set the example instance FIXED 375. When a block example sits in a surface wrapper, the wrapper must have zero side padding.",
+    "Accordion item instances revert to their bound 880 width after setProperties on a parent; re-apply layoutSizingHorizontal FILL after every setProperties pass (Data list Reports Mobile, 15 Sep).",
+    "Never call findAll(...).resize on nested instance children to fix an example width: fix the example instance or its wrapper instead (a nested Section header was wrongly forced to 327 once).",
+    "Screenshots of a lone white icon on a transparent ground look blank or dark at small scale; check glyph.resolvedVariableModes and strokes[0].color before 'fixing' icon colour (Embed Exit icon resolved white correctly, 15 Sep).",
+    "Changing a nested instance's variant (setProperties({ State })) replaces that node: any JS reference to it or to nodes found inside it before the swap throws 'node does not exist'. Re-query from the parent (inst.children[k]) after each variant change, and set TEXT props before the variant prop (Section subnav retry, 15 Sep).",
+    "Link labels are HUG with no wrap: keep Mobile link labels under ~30 characters (Link Medium at 327) and card action labels under ~22 characters in 4-column cards (238 content width). Action rows that mix a Button and a Link in a Mobile callout need layoutWrap WRAP."
+  ],
+  "finalQA": {
+    "date": "2026-09-15",
+    "scope": "All 22 doc frames on Blocks page 12:25 (8 shared parts + 14 blocks), 5752 nodes, instance internals skipped for bindings but included for overflow",
+    "result": "Unbound paints 0 · text without style 0 · unbound spacing 3 (Milestone Rail paddingTop 2px, an intentional optical offset aligning the dot with the Date cap height; no space/2 token, left as is) · default-name flags 45 were intentional layer names (Text, Frame, Line used as property/structure names), none numbered · overflow 7 → 4 fixed, 3 intentional",
+    "fixed": [
+      "Card grid 4 columns Desktop: card action 'Explore technology & innovation' clipped at 238 → 'Explore technology'",
+      "Feed grid Group/Examples label (WIDTH_AND_HEIGHT, 2359 wide) → wraps at 1440",
+      "Split media Video Mobile (Start and End): caption link clipped at 327 → 'Watch: remote operations (2:40)'",
+      "CTA band Inline Mobile: Actions (Button + Link) 315 in a 231 callout → WRAP, FILL, row gap space/16"
+    ],
+    "intentional": [
+      "Feed grid Filters On Mobile: Chips rows 369 and 563 wide inside a clipping Facet = sideways-scrolling chip row (code: overflow-x auto, scroll-snap)"
+    ],
+    "canvasOrder": "Doc frames re-stacked: shared parts, then blocks 1–14 by eyebrow number, 160 gaps",
+    "componentsPage": "Tile/quote caption layer is named 'quote' like its siblings (the earlier 'lock' note was stale); no change needed"
+  }
+}

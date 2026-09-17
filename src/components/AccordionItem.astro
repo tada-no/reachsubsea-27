@@ -1,0 +1,154 @@
+---
+// Accordion item (docs/04 §14). Dev theme .faq-item: boxed, sage plus → minus, grid-rows height transition.
+// Several items may be open at once. A #<id> hash opens the item and scrolls to it (pass id="faq-{slug}").
+import Icon from './Icon.astro';
+import { makeId } from '../lib/ids';
+
+interface Props {
+  question: string;
+  /** Plain-text answer. Rich answers go in the default slot. */
+  answer?: string;
+  open?: boolean;
+  id?: string;
+  headingLevel?: 'h3' | 'h4';
+  class?: string;
+}
+
+const {
+  question,
+  answer,
+  open = false,
+  id = makeId('faq', question),
+  headingLevel: Heading = 'h3',
+  class: className,
+} = Astro.props;
+
+const buttonId = `${id}-question`;
+const panelId = `${id}-answer`;
+---
+
+<div id={id} class:list={['faq-item', open && 'is-open', className]} data-accordion-item>
+  <Heading class="faq-item__heading">
+    <button
+      id={buttonId}
+      type="button"
+      class="faq-item__question"
+      aria-expanded={String(open)}
+      aria-controls={panelId}
+      data-accordion-trigger
+    >
+      <span class="faq-item__title text-h5">{question}</span>
+      <span class="faq-item__icon">
+        <Icon name="plus" size={24} class="faq-item__plus" />
+        <Icon name="minus" size={24} class="faq-item__minus" />
+      </span>
+    </button>
+  </Heading>
+  <div id={panelId} class="faq-item__answer" role="region" aria-labelledby={buttonId}>
+    <div class="faq-item__answer-inner">
+      <div class="faq-item__answer-content text-body">
+        {answer && <p>{answer}</p>}
+        <slot />
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setOpen(item: Element, open: boolean) {
+    item.classList.toggle('is-open', open);
+    item.querySelector('[data-accordion-trigger]')?.setAttribute('aria-expanded', String(open));
+  }
+
+  document.addEventListener('click', (event) => {
+    const trigger = (event.target as Element).closest('[data-accordion-trigger]');
+    const item = trigger?.closest('[data-accordion-item]');
+    if (item) setOpen(item, !item.classList.contains('is-open'));
+  });
+
+  function openFromHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const item = id ? document.getElementById(id) : null;
+    if (item?.matches('[data-accordion-item]')) {
+      setOpen(item, true);
+      item.scrollIntoView({ block: 'start' });
+    }
+  }
+
+  openFromHash();
+  window.addEventListener('hashchange', openFromHash);
+</script>
+
+<style is:global>
+  .faq-item {
+    padding-bottom: var(--wp--preset--spacing--8);
+    background-color: var(--wp--custom--color--bg--default);
+    border: 1px solid var(--wp--custom--color--border--default);
+    border-radius: var(--wp--custom--radius--md);
+    transition: border-color var(--wp--custom--motion--duration) var(--wp--custom--motion--easing);
+  }
+  @media (hover: hover) {
+    .faq-item:hover {
+      border-color: var(--wp--custom--color--border--strong);
+    }
+  }
+
+  /* 24 padding all round, 16 (stack/sm) between question and answer */
+  /* Question: Medium weight at 18px rather than Bold H5 (17 Sep 2026), so the list reads lighter */
+  .faq-item__title {
+    font-size: 1.125rem;
+    font-weight: var(--wp--custom--font-weight--medium);
+    letter-spacing: -0.005em;
+  }
+  .faq-item__question {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--16);
+    width: 100%;
+    padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--24) var(--wp--preset--spacing--16);
+    border-radius: var(--wp--custom--radius--md);
+    color: var(--wp--custom--color--text--primary);
+    text-align: left;
+  }
+  .faq-item__icon {
+    flex: none;
+    margin-top: 2px;
+    color: var(--wp--custom--color--icon--accent);
+  }
+  .faq-item__minus,
+  .faq-item.is-open .faq-item__plus {
+    display: none;
+  }
+  .faq-item.is-open .faq-item__minus {
+    display: block;
+  }
+
+  .faq-item__answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s ease;
+  }
+  .faq-item.is-open .faq-item__answer {
+    grid-template-rows: 1fr;
+  }
+  .faq-item__answer-inner {
+    overflow: hidden;
+    visibility: hidden;
+    transition: visibility 0s linear 0.35s;
+  }
+  .faq-item.is-open .faq-item__answer-inner {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  /* 16px answers under the 18px question (17 Sep 2026) */
+  .faq-item__answer-content {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    padding: 0 var(--wp--preset--spacing--24) var(--wp--preset--spacing--16);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .faq-item__answer-content > * + * {
+    margin-top: var(--wp--custom--stack--sm);
+  }
+</style>

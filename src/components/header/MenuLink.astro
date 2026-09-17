@@ -1,0 +1,110 @@
+---
+// Menu link (docs/04 §16): one row in a Mega menu / Site menu / Mobile menu link list.
+// Level L1 = Heading/H5, no indent. L2 = Body/Small, indented space/16. Hover underlines the label;
+// Current shows a 2px × 24 icon/accent bar in the gutter, 12px before the start edge.
+import Icon from '../Icon.astro';
+
+interface Props {
+  label: string;
+  href: string;
+  level?: 'l1' | 'l2';
+  /** Visual indent (space/16). Defaults to true for L2 — Site/Mobile menu flatten the hierarchy and pass false. */
+  indent?: boolean;
+  current?: boolean;
+  external?: boolean;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const {
+  label,
+  href,
+  level = 'l1',
+  indent = level === 'l2',
+  current = false,
+  external = false,
+  class: className,
+  ...attrs
+} = Astro.props;
+---
+
+<a
+  class:list={['menu-link', `menu-link--${level}`, indent && 'menu-link--indent', className]}
+  href={href}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+  aria-current={current ? 'page' : undefined}
+  {...attrs}
+>
+  <span class="menu-link__bar" aria-hidden="true"></span>
+  <span class="menu-link__label">
+    {label}
+    {external && <Icon name="arrow-up-right" size={16} class="menu-link__icon" />}
+    {external && <span class="visually-hidden"> (opens in a new tab)</span>}
+  </span>
+</a>
+
+<style is:global>
+  .menu-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    width: 100%;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .menu-link--l1 {
+    font-size: var(--wp--preset--font-size--h5);
+    line-height: var(--wp--custom--line-height--h5);
+    font-weight: var(--wp--custom--font-weight--bold);
+  }
+  .menu-link--l2 {
+    font-size: var(--wp--preset--font-size--body-sm);
+    line-height: var(--wp--custom--line-height--body-sm);
+    font-weight: var(--wp--custom--font-weight--regular);
+  }
+  .menu-link--indent {
+    padding-left: var(--wp--preset--spacing--16);
+  }
+  .menu-link__label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--4);
+  }
+  .menu-link__icon {
+    flex: none;
+    color: var(--wp--custom--color--icon--accent);
+  }
+  .menu-link__bar {
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    width: 2px;
+    height: 24px;
+    transform: translateY(-50%);
+    background-color: transparent;
+  }
+  .menu-link[aria-current='page'] .menu-link__bar {
+    background-color: var(--wp--custom--color--icon--accent);
+  }
+
+  @media (hover: hover) {
+    .menu-link:hover .menu-link__label {
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.25em;
+    }
+  }
+
+  .menu-link:focus-visible {
+    outline: none;
+  }
+  .menu-link:focus-visible::after {
+    content: '';
+    position: absolute;
+    inset: 2px -8px;
+    border: 2px solid var(--wp--custom--color--border--focus);
+    border-radius: var(--wp--custom--radius--sm);
+    pointer-events: none;
+  }
+</style>

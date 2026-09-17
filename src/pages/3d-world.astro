@@ -1,0 +1,47 @@
+---
+// 3D World page (17 Sep 2026): the scene fills the viewport under the site header. Menus and links
+// across the site point here instead of opening the external build in a new tab.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/header/Header.astro';
+import { worldSceneUrl } from '../data/world';
+---
+
+<BaseLayout title="3D World · Reach Subsea">
+  <Header />
+  <main id="main" class="world-page">
+    <h1 class="visually-hidden">Reach Subsea 3D World</h1>
+    <iframe
+      class="world-page__scene"
+      src={worldSceneUrl}
+      data-world-scene={worldSceneUrl}
+      title="Reach Subsea 3D World"
+      allow="fullscreen; xr-spatial-tracking"
+      allowfullscreen
+    ></iframe>
+  </main>
+</BaseLayout>
+
+<script>
+  // Pass ?zone=N from the page URL through to the scene
+  const frame = document.querySelector<HTMLIFrameElement>('[data-world-scene]');
+  const zone = new URLSearchParams(location.search).get('zone');
+  if (frame && zone) {
+    const url = new URL(frame.dataset.worldScene!);
+    url.searchParams.set('zone', zone);
+    frame.src = url.toString();
+  }
+</script>
+
+<style is:global>
+  /* The header is fixed: start the scene below it, and fill exactly what is left of the viewport */
+  .world-page {
+    padding-top: var(--header-offset, 80px);
+    background-color: var(--wp--preset--color--navy-900);
+  }
+  .world-page__scene {
+    display: block;
+    width: 100%;
+    height: calc(100dvh - var(--header-offset, 80px));
+    border: 0;
+  }
+</style>
