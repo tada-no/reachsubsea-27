@@ -28,12 +28,12 @@ const { section, open = false } = Astro.props;
 >
   <div class="container">
     <div class="mega-menu__grid layout-grid">
-      <div class="mega-menu__intro">
+      <div class="mega-menu__intro mega-menu__col" style="--col-i: 0">
         <h2 class="mega-menu__title text-h4">{section.label}</h2>
         <p class="mega-menu__description text-small">{section.description}</p>
         <Link label={section.overview.label} href={section.overview.url} size="small" />
       </div>
-      <ul class="mega-menu__links">
+      <ul class="mega-menu__links mega-menu__col" style="--col-i: 1">
         {
           section.links.map((item) => (
             <li>
@@ -53,7 +53,7 @@ const { section, open = false } = Astro.props;
       </ul>
       {
         section.feature && (
-          <div class="mega-menu__feature">
+          <div class="mega-menu__feature mega-menu__col" style="--col-i: 2">
             <Card {...section.feature} headingLevel="h3" />
           </div>
         )
@@ -141,5 +141,39 @@ const { section, open = false } = Astro.props;
     gap: var(--wp--preset--spacing--12) var(--wp--preset--spacing--32);
     min-height: 80px;
     padding-block: var(--wp--preset--spacing--16);
+  }
+
+  /* Choreography (17 Sep 2026): matches the Site menu's entrance so every header panel opens the
+     same way, instead of the mega menus snapping open with no motion at all. Closing mirrors the
+     Site menu's quick 150ms fade+lift (Header.astro's script holds `hidden` off for the duration). */
+  @media (prefers-reduced-motion: no-preference) {
+    .mega-menu:not([hidden]) {
+      animation: mega-menu-in 0.32s var(--wp--custom--motion--ease-out) both;
+    }
+    .mega-menu:not([hidden]) .mega-menu__col {
+      animation: mega-menu-col-in 0.5s var(--wp--custom--motion--ease-out) both;
+      animation-delay: calc(0.06s + var(--col-i, 0) * 0.06s);
+    }
+    .mega-menu.is-closing {
+      animation: mega-menu-out 0.15s var(--wp--custom--motion--ease-in-out) both;
+    }
+  }
+  @keyframes mega-menu-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -12px, 0);
+    }
+  }
+  @keyframes mega-menu-col-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 16px, 0);
+    }
+  }
+  @keyframes mega-menu-out {
+    to {
+      opacity: 0;
+      transform: translate3d(0, -8px, 0);
+    }
   }
 </style>

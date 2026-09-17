@@ -119,11 +119,15 @@ const currentHref = current ? `/${current}/` : undefined;
     align-items: stretch;
     padding-block: var(--wp--preset--spacing--48) var(--wp--preset--spacing--56);
   }
+  /* Links narrower than a 4-column track would sit (17 Sep 2026): the labels are single words, so a
+     4-span column left ~250px of dead space before the real gutter — reading as a second, much wider
+     gap next to the project card's actual 32px one. 3 columns hugs the content; the freed column goes
+     to the project card. */
   .site-menu__links {
-    grid-column: 1 / span 4;
+    grid-column: 1 / span 3;
   }
   .site-menu__project {
-    grid-column: 5 / span 5;
+    grid-column: 4 / span 6;
     display: flex;
   }
   .site-menu__feeds {
@@ -246,6 +250,11 @@ const currentHref = current ? `/${current}/` : undefined;
       animation: site-menu-col-in 0.5s var(--wp--custom--motion--ease-out) both;
       animation-delay: calc(0.06s + var(--col-i, 0) * 0.06s);
     }
+    /* Closing (17 Sep 2026): a quick fade+lift instead of the instant snap, short enough (150ms) that
+       it never reads as "waiting" — Header.astro's script holds `hidden` off for the duration. */
+    .site-menu.is-closing {
+      animation: site-menu-out 0.15s var(--wp--custom--motion--ease-in-out) both;
+    }
   }
   @keyframes site-menu-in {
     from {
@@ -257,6 +266,12 @@ const currentHref = current ? `/${current}/` : undefined;
     from {
       opacity: 0;
       transform: translate3d(0, 16px, 0);
+    }
+  }
+  @keyframes site-menu-out {
+    to {
+      opacity: 0;
+      transform: translate3d(0, -8px, 0);
     }
   }
 </style>

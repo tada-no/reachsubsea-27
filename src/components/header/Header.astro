@@ -286,13 +286,33 @@ const menuOpen = siteMenuOpen || mobileMenuOpen;
       if (label) label.textContent = isOpen ? openLabel : closedLabel;
     }
 
-    function closeMega(focusTrigger = false) {
+    // Closing (17 Sep 2026): a quick 150ms fade+lift (site-menu-out / mega-menu-out) instead of the
+    // instant `hidden` snap, for a panel closing to nothing. Switching straight to another panel skips
+    // this (animate=false) — two absolutely-positioned panels crossfading past each other reads as a
+    // glitch, not a transition, so that swap stays instant as before.
+    function hidePanel(panel: HTMLElement, animate: boolean) {
+      panel.classList.remove('is-closing');
+      if (!animate || reduceMotion) {
+        panel.setAttribute('hidden', '');
+        return;
+      }
+      panel.classList.add('is-closing');
+      const finish = () => {
+        panel.removeEventListener('animationend', finish);
+        panel.classList.remove('is-closing');
+        panel.setAttribute('hidden', '');
+      };
+      panel.addEventListener('animationend', finish);
+      setTimeout(finish, 220);
+    }
+
+    function closeMega(focusTrigger = false, animate = true) {
       if (!openMega) return;
       const id = openMega;
       const target = header!.querySelector<HTMLAnchorElement>(`[data-panel="${id}"]`);
       const panel = header!.querySelector<HTMLElement>(`#panel-${id}`);
       target?.setAttribute('aria-expanded', 'false');
-      panel?.setAttribute('hidden', '');
+      if (panel) hidePanel(panel, animate);
       openMega = null;
       syncOpenState();
       if (focusTrigger) target?.focus();
@@ -300,8 +320,8 @@ const menuOpen = siteMenuOpen || mobileMenuOpen;
 
     function openMegaPanel(id: string) {
       if (openMega === id) return;
-      closeMega();
-      closeModal();
+      closeMega(false, false);
+      closeModal(false, false);
       const target = header!.querySelector<HTMLAnchorElement>(`[data-panel="${id}"]`);
       const panel = header!.querySelector<HTMLElement>(`#panel-${id}`);
       target?.setAttribute('aria-expanded', 'true');
@@ -331,11 +351,13 @@ const menuOpen = siteMenuOpen || mobileMenuOpen;
       syncOpenState();
     }
 
-    function closeModal(focusTrigger = false) {
+    function closeModal(focusTrigger = false, animate = true) {
       if (!openModal) return;
       const kind = openModal;
       const panel = kind === 'search' ? searchPanel : menuPanelFor();
-      panel.setAttribute('hidden', '');
+      // Only the desktop Site menu has an exit animation defined; Search and the Mobile menu accordion
+      // stay instant, same as before.
+      hidePanel(panel, animate && panel === siteMenuPanel);
       scrim.hidden = true;
       document.documentElement.classList.remove('has-locked-scroll');
       main?.removeAttribute('inert');
@@ -351,8 +373,8 @@ const menuOpen = siteMenuOpen || mobileMenuOpen;
     // Mouse opens move focus to the dialog itself (no ring on the first link, 17 Sep 2026); keyboard
     // opens (click detail 0) go to the first control, as before. Search always takes its input.
     function openModalPanel(kind: 'search' | 'menu', viaKeyboard = true) {
-      closeMega();
-      if (openModal && openModal !== kind) closeModal();
+      closeMega(false, false);
+      if (openModal && openModal !== kind) closeModal(false, false);
       const panel = kind === 'search' ? searchPanel : menuPanelFor();
       panel.removeAttribute('hidden');
       activateModal(kind);
