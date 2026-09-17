@@ -219,7 +219,7 @@ const wb = WORLD_BOX;
                       {r.operations.map((o) => (
                         <li class="live-ops__op" data-type={o.type}>
                           <span class="live-ops__op-icon" aria-hidden="true">
-                            <Icon name={typeOf(o.type).icon} size={20} />
+                            <Icon name={typeOf(o.type).icon} size={16} />
                           </span>
                           <span class="live-ops__op-text">
                             <span class="live-ops__op-asset text-label">
@@ -1061,20 +1061,25 @@ const wb = WORLD_BOX;
   }
   .live-ops__op {
     display: flex;
+    align-items: flex-start;
     gap: var(--wp--preset--spacing--12);
   }
   .live-ops__op[hidden] {
     display: none;
   }
+  /* Same treatment as the type dots in the row header above: a small outlined circle, not a
+     solid fill — a filled green square here read as another marker and competed with the
+     actual hotspot markers on the map. */
   .live-ops__op-icon {
     display: grid;
     place-items: center;
     flex: none;
-    width: 36px;
-    height: 36px;
-    border-radius: var(--wp--custom--radius--sm);
-    background-color: var(--wp--custom--color--border--accent);
-    color: var(--wp--preset--color--navy-900);
+    width: 28px;
+    height: 28px;
+    margin-top: 2px;
+    border-radius: var(--wp--custom--radius--full);
+    box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--default);
+    color: var(--wp--custom--color--text--accent);
   }
   .live-ops__op-text {
     display: grid;
