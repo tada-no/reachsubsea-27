@@ -363,11 +363,14 @@ const objectPosition = image?.focalPoint
       linear-gradient(to bottom, rgb(27 29 59 / 0.78) 0%, rgb(27 29 59 / 0) 26%);
   }
   /* Below 900 the copy spans the full width, so the side fades give way to an even wash plus a
-     deeper bottom ramp; the footage reads through the top half. */
+     deeper bottom ramp; the footage reads through the top half.
+     Monotonic, not a dip-then-recover (17 Sep 2026 fix): the old middle stop (0.3) was lighter than
+     the one above it, so on a tall 4-line mobile title the eyebrow could land in that lighter band
+     against bright footage (sky, fog) and nearly disappear. Never gets lighter as it goes up. */
   @media (max-width: 899px) {
     .page-hero--video .page-hero__scrim {
       background:
-        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0.86) 45%, rgb(27 29 59 / 0.3) 78%, rgb(27 29 59 / 0.6) 100%),
+        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0.85) 40%, rgb(27 29 59 / 0.65) 70%, rgb(27 29 59 / 0.55) 100%),
         linear-gradient(to right, rgb(27 29 59 / 0.5) 0%, rgb(27 29 59 / 0) 12%, rgb(27 29 59 / 0) 88%, rgb(27 29 59 / 0.5) 100%);
     }
   }
@@ -381,6 +384,17 @@ const objectPosition = image?.focalPoint
        not three. Still well inside the 1040px content column above. */
     max-width: 760px;
     color: var(--wp--preset--color--navy-100);
+  }
+  /* Display's mobile floor (44/48) was set for a static page hero, not a 5-word headline over a
+     ~330px column: it wrapped to 4 lines, pushing the eyebrow up into the scrim's lightest band
+     (17 Sep 2026 fix, paired with the scrim fix above). Smaller and tighter, so the title clears in
+     2-3 lines and the eyebrow stays low, over the darker wash. */
+  @media (max-width: 599px) {
+    .page-hero--video .page-hero__title.text-display {
+      font-size: 2.25rem;
+      line-height: 2.75rem;
+      letter-spacing: var(--wp--custom--letter-spacing--h1);
+    }
   }
 
   /* Entrance. Title words rise out of a mask one after another; the rest follows as a group.

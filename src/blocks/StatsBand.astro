@@ -221,6 +221,11 @@ const STAT_STAGGER = 160;
     .stats-band__rows {
       flex-basis: 100%;
       grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      /* The desktop row's align-items: end keeps every figure on one shared baseline; in this 2×2
+         grid each cell can wrap to a different number of label lines, so bottom-aligning pushes a
+         1-line label's figure down below a 2-line neighbour's. Top-align instead, so all four
+         figures start on the same line regardless of how their label wraps (17 Sep 2026 fix). */
+      align-items: start;
       gap: var(--wp--preset--spacing--24);
       padding: var(--wp--preset--spacing--24);
     }
