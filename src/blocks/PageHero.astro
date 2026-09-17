@@ -377,7 +377,9 @@ const objectPosition = image?.focalPoint
     will-change: transform, opacity;
   }
   .page-hero--video .page-hero__lead {
-    max-width: 600px;
+    /* 760: the home page's lead sentence sets in two balanced lines at 1728 (MacBook Pro 16),
+       not three. Still well inside the 1040px content column above. */
+    max-width: 760px;
     color: var(--wp--preset--color--navy-100);
   }
 
