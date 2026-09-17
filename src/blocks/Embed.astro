@@ -382,6 +382,27 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobi
       transform: scale(1.03);
     }
   }
+  /* Stage reveal (17 Sep 2026): the frame powers up rather than rising like a list item — a slight
+     zoom-out plus a lift from dim to full brightness, so the scene feels like it switches on as you
+     scroll to it. Distinct from the generic [data-reveal] rise every other section uses. */
+  html.js .embed__frame[data-reveal] {
+    transform: scale(1.045);
+    filter: brightness(0.7) saturate(0.85);
+    transition:
+      opacity var(--wp--custom--motion--duration-reveal) var(--wp--custom--motion--ease-out),
+      transform 1.1s var(--wp--custom--motion--ease-out),
+      filter 1.1s var(--wp--custom--motion--ease-out);
+  }
+  html.js .embed__frame[data-reveal].is-revealed {
+    transform: none;
+    filter: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .embed__frame[data-reveal] {
+      transform: none;
+      filter: none;
+    }
+  }
   .embed__mock {
     inset: 0;
     display: flex;

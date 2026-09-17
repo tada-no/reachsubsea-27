@@ -117,6 +117,25 @@ if (bento) {
     width: 100%;
   }
 
+  /* Bento reveal (17 Sep 2026): tiles settle into their grid cell instead of rising, since a dense
+     multi-row grid has no shared "below" direction for a translate to read from. Wide cards move less
+     — they already fill most of the row, so a big scale jump reads as a glitch rather than a tile
+     dropping into place. */
+  html.js .card-grid__list--bento .card-grid__item[data-reveal] {
+    transform: scale(0.95);
+  }
+  html.js .card-grid__list--bento .card-grid__item--wide[data-reveal] {
+    transform: scale(0.97);
+  }
+  html.js .card-grid__list--bento .card-grid__item[data-reveal].is-revealed {
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .card-grid__list--bento .card-grid__item[data-reveal] {
+      transform: none;
+    }
+  }
+
   .card-grid__list--2-columns .card-grid__item {
     grid-column: span 6;
   }

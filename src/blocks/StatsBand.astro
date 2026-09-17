@@ -190,14 +190,23 @@ const STAT_STAGGER = 160;
     color: var(--wp--custom--color--text--secondary);
     white-space: nowrap;
   }
-  html.js .stats-band--animate .stats-band__row,
-  html.js .stats-band--animate .stats-band__lead > * {
+  /* Rows rise in sequence beside the lead; the lead itself pops rather than rises — it's the hero
+     figure in its own navy tile, not one more item in the row, so it reads as switching on first
+     instead of queuing with the rest (17 Sep 2026). */
+  html.js .stats-band--animate .stats-band__row {
     opacity: 0;
     transform: translate3d(0, 16px, 0);
     transition:
       opacity 0.7s var(--wp--custom--motion--ease-out),
       transform 0.7s var(--wp--custom--motion--ease-out);
     transition-delay: calc(0.15s + var(--stat-i, 0) * 0.16s);
+  }
+  html.js .stats-band--animate .stats-band__lead > * {
+    opacity: 0;
+    transform: scale(0.92);
+    transition:
+      opacity 0.6s var(--wp--custom--motion--ease-out),
+      transform 0.6s var(--wp--custom--motion--ease-out);
   }
   html.js .stats-band--animate .is-revealed .stats-band__row,
   html.js .stats-band--animate .is-revealed .stats-band__lead > * {
@@ -254,7 +263,9 @@ const STAT_STAGGER = 160;
     transform: none;
   }
   @media (prefers-reduced-motion: reduce) {
-    html.js .stats-band--animate .stats-band__list > li {
+    html.js .stats-band--animate .stats-band__list > li,
+    html.js .stats-band--animate .stats-band__row,
+    html.js .stats-band--animate .stats-band__lead > * {
       transform: none;
     }
   }
