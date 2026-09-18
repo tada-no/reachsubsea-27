@@ -4,3 +4,5 @@ dist/
 .DS_Store
 backups/
 .claude/
+.agents/
+skills-lock.json
