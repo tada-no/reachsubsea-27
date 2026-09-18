@@ -11,24 +11,31 @@ interface Props {
 
 const { name, size = 64, class: className } = Astro.props;
 
+// Pictograms with tagged parts (class="pg-…" in the SVG source) get a looping micro animation:
+// motion.ts plays one cycle when the card scrolls in, and again on hover. Keyframes below.
+
+// Cache keyed on the file's mtime so an edited SVG shows up in the dev server without a restart.
 const cache: Map<string, string | null> = ((globalThis as any).__reachPictograms ??= new Map());
-let inner = cache.get(name);
+const file = path.join(process.cwd(), 'src/assets/pictograms', `${name}.svg`);
+const exists = fs.existsSync(file);
+const key = exists ? `${name}@${fs.statSync(file).mtimeMs}` : name;
+let inner = cache.get(key);
 if (inner === undefined) {
-  const file = path.join(process.cwd(), 'src/assets/pictograms', `${name}.svg`);
-  inner = fs.existsSync(file)
+  inner = exists
     ? fs
         .readFileSync(file, 'utf8')
         .replace(/^[\s\S]*?<svg[^>]*>/, '')
         .replace(/<\/svg>\s*$/, '')
     : null;
-  cache.set(name, inner);
+  cache.set(key, inner);
 }
+const live = Boolean(inner && inner.includes('class="pg-'));
 ---
 
 {
   inner ? (
     <svg
-      class:list={['pictogram', `pictogram--${name}`, className]}
+      class:list={['pictogram', `pictogram--${name}`, live && 'pictogram--live', className]}
       width={size}
       height={size}
       viewBox="0 0 96 96"
@@ -56,5 +63,287 @@ if (inner === undefined) {
     display: block;
     border-radius: var(--wp--custom--radius--sm);
     background-color: var(--wp--custom--color--bg--disabled);
+  }
+
+  /* ── Micro loops (18 Sep 2026) ─────────────────────────────────
+     Purpose: explanation. Each service pictogram acts out its subject once as the card reveals, and
+     again on hover. Style: After Effects trim paths — quick eased moves with holds between them, bright
+     segments riding a dimmed track. The moving parts are real strokes in the SVG source (pathLength
+     100) so stroke-dasharray can trim them; everything else stays the original filled artwork.
+     Transform, opacity, stroke-dashoffset and offset-distance only. Every part of one pictogram shares
+     its --pg-cycle and rests at 0% and 100%, so the loop can stop cleanly at a cycle boundary:
+     motion.ts removes .is-playing on the lead part's animationiteration. Phases live in the keyframes,
+     never in animation-delay, for the same reason. Reduced motion: base.css clamps every animation to
+     one 0.01ms iteration and motion.ts never adds .is-playing. */
+  .pictogram--live [class*='pg-'] {
+    animation-duration: var(--pg-cycle);
+    animation-timing-function: var(--wp--custom--motion--ease-in-out);
+    animation-iteration-count: infinite;
+  }
+  /* Trimmed strokes: dash 100 + a gap longer than the path, so an offset of ±110 hides the stroke
+     completely (round caps included). */
+  .pictogram--live :is(.pg-leg, .pg-arc, .pg-scan) {
+    stroke-dasharray: 100 120;
+  }
+  .pictogram--live :is(.pg-bolt, .pg-hinge, .pg-nucleus) {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  /* Technology: electrons ride their orbits one after another, each dragging a bright trail over the
+     dimmed orbit artwork. The electrons sit on their orbit with offset-path (rest = 0%); browsers
+     without it keep the static transform from the SVG and still get the trails. */
+  .pictogram--technology {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--technology .pg-trail {
+    stroke-dasharray: 14 86;
+    stroke-dashoffset: 14;
+    opacity: 0;
+  }
+  @supports (offset-path: path('M0 0')) {
+    .pictogram--technology .pg-electron {
+      transform: none;
+      offset-rotate: 0deg;
+      offset-distance: 0%;
+    }
+    .pictogram--technology .pg-electron--a {
+      offset-path: path('M42.42 21.07A10.6 32.56 0 1 0 54.48 74.93A10.6 32.56 0 1 0 42.42 21.07Z');
+    }
+    .pictogram--technology .pg-electron--b {
+      offset-path: path('M21.3 57.23A32.56 10.6 -30 1 0 75.6 38.77A32.56 10.6 -30 1 0 21.3 57.23Z');
+    }
+    .pictogram--technology .pg-electron--c {
+      offset-path: path('M74.7 56.51A32.56 10.6 30 1 0 22.2 39.49A32.56 10.6 30 1 0 74.7 56.51Z');
+    }
+  }
+  .pictogram--technology.is-playing .pg-orbits {
+    animation-name: pg-track-dim;
+  }
+  .pictogram--technology.is-playing .pg-nucleus {
+    animation-name: pg-kick;
+  }
+  .pictogram--technology.is-playing .pg-electron--a {
+    animation-name: pg-ride-a;
+  }
+  .pictogram--technology.is-playing .pg-electron--b {
+    animation-name: pg-ride-b;
+  }
+  .pictogram--technology.is-playing .pg-electron--c {
+    animation-name: pg-ride-c;
+  }
+  .pictogram--technology.is-playing .pg-trail--a {
+    animation-name: pg-trail-a, pg-trail-fade-a;
+  }
+  .pictogram--technology.is-playing .pg-trail--b {
+    animation-name: pg-trail-b, pg-trail-fade-b;
+  }
+  .pictogram--technology.is-playing .pg-trail--c {
+    animation-name: pg-trail-c, pg-trail-fade-c;
+  }
+  @keyframes pg-track-dim {
+    0%, 84%, 100% { opacity: 1; }
+    8%, 74% { opacity: 0.28; }
+  }
+  @keyframes pg-kick {
+    0%, 14%, 100% { transform: scale(1); }
+    6% { transform: scale(1.7); }
+  }
+  @keyframes pg-ride-a {
+    0%, 6% { offset-distance: 0%; }
+    44%, 100% { offset-distance: 100%; }
+  }
+  @keyframes pg-ride-b {
+    0%, 20% { offset-distance: 0%; }
+    58%, 100% { offset-distance: 100%; }
+  }
+  @keyframes pg-ride-c {
+    0%, 34% { offset-distance: 0%; }
+    72%, 100% { offset-distance: 100%; }
+  }
+  @keyframes pg-trail-a {
+    0%, 6% { stroke-dashoffset: 14; }
+    44%, 100% { stroke-dashoffset: -86; }
+  }
+  @keyframes pg-trail-b {
+    0%, 20% { stroke-dashoffset: 14; }
+    58%, 100% { stroke-dashoffset: -86; }
+  }
+  @keyframes pg-trail-c {
+    0%, 34% { stroke-dashoffset: 14; }
+    72%, 100% { stroke-dashoffset: -86; }
+  }
+  @keyframes pg-trail-fade-a {
+    0%, 6%, 44%, 100% { opacity: 0; }
+    12%, 38% { opacity: 1; }
+  }
+  @keyframes pg-trail-fade-b {
+    0%, 20%, 58%, 100% { opacity: 0; }
+    26%, 52% { opacity: 1; }
+  }
+  @keyframes pg-trail-fade-c {
+    0%, 34%, 72%, 100% { opacity: 0; }
+    40%, 66% { opacity: 1; }
+  }
+
+  /* Global monitoring: the two sonar arcs wipe and redraw top-down, then a sweep rides the dimmed
+     outer ring once around. */
+  .pictogram--global-monitoring {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--global-monitoring .pg-sweep {
+    stroke-dasharray: 22 78;
+    opacity: 0;
+  }
+  .pictogram--global-monitoring.is-playing .pg-scan--inner {
+    animation-name: pg-scan-inner;
+  }
+  .pictogram--global-monitoring.is-playing .pg-scan--mid {
+    animation-name: pg-scan-mid;
+  }
+  .pictogram--global-monitoring.is-playing .pg-ring {
+    animation-name: pg-ring-dim;
+  }
+  .pictogram--global-monitoring.is-playing .pg-sweep {
+    animation-name: pg-sweep, pg-sweep-fade;
+  }
+  @keyframes pg-scan-inner {
+    0% { stroke-dashoffset: 0; }
+    13% { stroke-dashoffset: -110; }
+    26%, 100% { stroke-dashoffset: -220; }
+  }
+  @keyframes pg-scan-mid {
+    0%, 8% { stroke-dashoffset: 0; }
+    21% { stroke-dashoffset: -110; }
+    34%, 100% { stroke-dashoffset: -220; }
+  }
+  @keyframes pg-ring-dim {
+    0%, 32%, 88%, 100% { opacity: 1; }
+    40%, 80% { opacity: 0.28; }
+  }
+  @keyframes pg-sweep {
+    0%, 38% { stroke-dashoffset: 22; }
+    80%, 100% { stroke-dashoffset: -78; }
+  }
+  @keyframes pg-sweep-fade {
+    0%, 34%, 84%, 100% { opacity: 0; }
+    40%, 78% { opacity: 1; }
+  }
+
+  /* Survey: the compass legs retract to the hinge and redraw, the hinge flares, then the compass
+     plots an arc between its tips that draws on and trims away in the same direction. */
+  .pictogram--survey {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--survey .pg-arc {
+    stroke-dashoffset: 110;
+  }
+  .pictogram--survey.is-playing .pg-leg--inner {
+    animation-name: pg-leg-inner;
+  }
+  .pictogram--survey.is-playing .pg-leg--outer {
+    animation-name: pg-leg-outer;
+  }
+  .pictogram--survey.is-playing .pg-hinge {
+    animation-name: pg-hinge;
+  }
+  .pictogram--survey.is-playing .pg-arc {
+    animation-name: pg-arc;
+  }
+  @keyframes pg-leg-inner {
+    0%, 28%, 100% { stroke-dashoffset: 0; }
+    8%, 14% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-leg-outer {
+    0%, 38%, 100% { stroke-dashoffset: 0; }
+    8%, 24% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-hinge {
+    0%, 8%, 24%, 100% { transform: scale(1); }
+    15% { transform: scale(1.9); }
+  }
+  @keyframes pg-arc {
+    0%, 38% { stroke-dashoffset: 110; }
+    60%, 70% { stroke-dashoffset: 0; }
+    90%, 100% { stroke-dashoffset: -110; }
+  }
+
+  /* Subsea infrastructure: the swell flows (two extra wave periods sit outside a fixed clip, so the
+     loop is seamless), the spanner takes two ratchet turns, the flange bolts tighten bottom to top,
+     the seabed sediment glints. */
+  .pictogram--subsea-infrastructure {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--subsea-infrastructure .pg-sea {
+    clip-path: inset(0 12.7px 0 13px) view-box;
+  }
+  .pictogram--subsea-infrastructure .pg-wave {
+    animation-timing-function: linear;
+  }
+  .pictogram--subsea-infrastructure .pg-spanner {
+    transform-box: view-box;
+    transform-origin: 69.72px 37.11px;
+  }
+  .pictogram--subsea-infrastructure.is-playing .pg-wave {
+    animation-name: pg-flow;
+  }
+  .pictogram--subsea-infrastructure.is-playing .pg-spanner {
+    animation-name: pg-ratchet;
+  }
+  .pictogram--subsea-infrastructure.is-playing .pg-bolt--1 {
+    animation-name: pg-bolt-1;
+  }
+  .pictogram--subsea-infrastructure.is-playing .pg-bolt--2 {
+    animation-name: pg-bolt-2;
+  }
+  .pictogram--subsea-infrastructure.is-playing .pg-bolt--3 {
+    animation-name: pg-bolt-3;
+  }
+  .pictogram--subsea-infrastructure.is-playing .pg-bolt--4 {
+    animation-name: pg-bolt-4;
+  }
+  .pictogram--subsea-infrastructure.is-playing .pg-dot--a {
+    animation-name: pg-glint-a;
+  }
+  .pictogram--subsea-infrastructure.is-playing .pg-dot--b {
+    animation-name: pg-glint-b;
+  }
+  .pictogram--subsea-infrastructure.is-playing .pg-dot--c {
+    animation-name: pg-glint-c;
+  }
+  @keyframes pg-flow {
+    to { transform: translate3d(27.2px, 0, 0); }
+  }
+  @keyframes pg-ratchet {
+    0%, 6%, 30%, 36%, 60%, 100% { transform: rotate(0deg); }
+    18%, 48% { transform: rotate(11deg); }
+  }
+  @keyframes pg-bolt-1 {
+    0%, 10%, 26%, 100% { transform: scale(1); }
+    18% { transform: scale(1.7); }
+  }
+  @keyframes pg-bolt-2 {
+    0%, 18%, 34%, 100% { transform: scale(1); }
+    26% { transform: scale(1.7); }
+  }
+  @keyframes pg-bolt-3 {
+    0%, 40%, 56%, 100% { transform: scale(1); }
+    48% { transform: scale(1.7); }
+  }
+  @keyframes pg-bolt-4 {
+    0%, 48%, 64%, 100% { transform: scale(1); }
+    56% { transform: scale(1.7); }
+  }
+  @keyframes pg-glint-a {
+    0%, 30%, 100% { opacity: 1; }
+    15% { opacity: 0.15; }
+  }
+  @keyframes pg-glint-b {
+    0%, 30%, 60%, 100% { opacity: 1; }
+    45% { opacity: 0.15; }
+  }
+  @keyframes pg-glint-c {
+    0%, 60%, 90%, 100% { opacity: 1; }
+    75% { opacity: 0.15; }
   }
 </style>

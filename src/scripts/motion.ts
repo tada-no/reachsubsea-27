@@ -1,7 +1,9 @@
-// Motion layer (17 Sep 2026): scroll reveal + count-up. One small vanilla file so it ports to the
-// WordPress theme as-is. Blocks stay untouched: targets are picked by selector here.
+// Motion layer (17 Sep 2026): scroll reveal + count-up + pictogram loops. One small vanilla file so
+// it ports to the WordPress theme as-is. Blocks stay untouched: targets are picked by selector here.
 // Purpose of each: reveal = bridges content in as you reach it (staggered so groups read in order);
-// count-up = draws the eye to the key figures once. Both are skipped or softened for reduced motion.
+// count-up = draws the eye to the key figures once; pictogram loops (18 Sep 2026) = each service
+// pictogram acts out its subject once as its card settles, and again on hover. All are skipped or
+// softened for reduced motion.
 
 const REVEAL_TARGETS = [
   '.section-header',
@@ -97,5 +99,56 @@ function initCountUp() {
   parsed.forEach((item) => observer.observe(item.el));
 }
 
+// Pictogram loops: .pictogram--live SVGs (Pictogram.astro) carry tagged parts with keyframes that
+// rest at 0% and 100%. Play = add .is-playing; the loop then runs whole cycles and stops at the
+// first cycle boundary where nothing is asking for it (the reveal only asks for one cycle, hover asks
+// for as long as the pointer stays). Hover is gated to fine pointers so a tap never fires it.
+function initPictogramLoops() {
+  const svgs = [...document.querySelectorAll<SVGSVGElement>('.pictogram--live')];
+  if (svgs.length === 0 || reduceMotion || !('IntersectionObserver' in window)) return;
+  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  const loops = svgs.map((svg) => {
+    const lead = svg.querySelector('.pg-lead');
+    const card = svg.closest<HTMLElement>('.card') ?? svg;
+    const revealed = card.closest<HTMLElement>('[data-reveal]');
+    let held = false; // hover / focus wants the loop to keep going
+
+    const play = () => svg.classList.add('is-playing');
+    svg.addEventListener('animationiteration', (e) => {
+      if (e.target === lead && !held) svg.classList.remove('is-playing');
+    });
+
+    if (canHover) {
+      card.addEventListener('mouseenter', () => ((held = true), play()));
+      card.addEventListener('mouseleave', () => (held = false));
+    }
+    // Keyboard parity: a focused card link plays the same loop.
+    card.addEventListener('focusin', () => ((held = true), play()));
+    card.addEventListener('focusout', () => (held = false));
+
+    // First play waits for the card's own reveal to settle, so the two motions never overlap.
+    const playOnceSettled = () => {
+      if (revealed && !revealed.classList.contains('is-settled')) {
+        revealed.addEventListener('transitionend', play, { once: true });
+      } else play();
+    };
+    return { card, playOnceSettled };
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        loops.find((l) => l.card === entry.target)?.playOnceSettled();
+      });
+    },
+    { threshold: 0.5 },
+  );
+  loops.forEach((l) => observer.observe(l.card));
+}
+
 initReveal();
 initCountUp();
+initPictogramLoops();
