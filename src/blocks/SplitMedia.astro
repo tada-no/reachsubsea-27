@@ -4,14 +4,24 @@
 // media side cols 7–12, vertically centred; Position=Start swaps the sides.
 // Mobile (≤899): Image/Video stack above the text; Spec table/Numbered list stack below it (DOM order
 // is always text-then-media; only Image/Video get `order: -1` at the mobile breakpoint).
+// 18 Sep 2026 (Why invest), three more media options:
+//   Figures: a sequence of 2–4 points, each with its own proof figure. Title spans the top; the
+//     figure column (cols 1–5) is sticky and swaps to the point crossing the middle of the viewport
+//     (a clip + rise wipe, never a fade); the points scroll past in cols 7–12. A point's figure can
+//     be a value or a split bar (e.g. revenue mix) that grows in. Mobile: no sticky, each point shows
+//     its figure inline.
+//   Card: a Card (usually Image bg, Featured) as the media, uncovered by a wipe as it enters.
+//   Embed: an iframe (ir.oms.no share graph) cropped to `crop` px, with a source line and link.
+// Any media except Numbered list can also carry `items` as a numbered list under the body copy.
 import BlockSection from '../components/BlockSection.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import Link from '../components/Link.astro';
 import MediaFrame from '../components/MediaFrame.astro';
 import SpecRow from '../components/SpecRow.astro';
 import NumberedItem from '../components/NumberedItem.astro';
+import Card from '../components/Card.astro';
 import { makeId } from '../lib/ids';
-import type { BlockFields, ImageField, LinkField } from '../lib/types';
+import type { BlockFields, CardField, ImageField, LinkField } from '../lib/types';
 
 interface VideoField {
   url: string;
@@ -30,8 +40,31 @@ interface NumberedListItem {
   text: string;
 }
 
+interface FigurePoint {
+  /** Short label above the point title, e.g. "Reach Remote". */
+  kicker?: string;
+  title: string;
+  text: string;
+  /** The proof figure, e.g. "+111%". Ignored when `split` is set. */
+  figure?: string;
+  /** One line under the figure: what it measures and when. */
+  caption: string;
+  /** Two-part split bar instead of a figure; values are percentages. */
+  split?: { label: string; value: number }[];
+}
+
+interface EmbedField {
+  src: string;
+  title: string;
+  /** Full iframe height (px); the frame shows only the top `crop` px. */
+  height: number;
+  crop?: number;
+  source?: string;
+  link?: LinkField;
+}
+
 interface Props extends BlockFields {
-  media?: 'image' | 'video' | 'spec-table' | 'numbered-list';
+  media?: 'image' | 'video' | 'spec-table' | 'numbered-list' | 'figures' | 'card' | 'embed';
   position?: 'end' | 'start';
   eyebrow?: string;
   title: string;
@@ -49,6 +82,9 @@ interface Props extends BlockFields {
   specFile?: LinkField;
   /** 3–6 numbered items (Reach Remote oversight levels, HOP). */
   items?: NumberedListItem[];
+  figures?: FigurePoint[];
+  card?: CardField;
+  embed?: EmbedField;
   class?: string;
 }
 
@@ -67,6 +103,9 @@ const {
   specs = [],
   specFile,
   items = [],
+  figures = [],
+  card,
+  embed,
   background,
   spacing,
   anchor,
@@ -76,6 +115,7 @@ const {
 const titleId = makeId('split-media', title);
 const shownActions = actions.slice(0, 2);
 const hasSpecFile = Boolean(specFile?.url);
+const listInText = media !== 'numbered-list' && items.length > 0;
 const rootClass = [`split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
 ---
 
@@ -88,6 +128,57 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
   anchor={anchor}
   labelledBy={titleId}
 >
+  {media === 'figures' ? (
+    <div class="split-media__figures" data-figures>
+      <div class="split-media__figures-head">
+        {eyebrow && <Eyebrow text={eyebrow} />}
+        <Heading id={titleId} class:list={['split-media__title', 'text-h2']}>{title}</Heading>
+      </div>
+      <div class="figures__stage" aria-hidden="true">
+        {figures.map((point, i) => (
+          <div class:list={['figures__slot', i === 0 && 'is-active']} data-figure-slot={i}>
+            {point.split ? (
+              <div class="figures__split" style={`--split-a: ${point.split[0]?.value ?? 50}%`}>
+                <div class="figures__bar">
+                  {point.split.map((part) => <span class="figures__part">{part.value}%</span>)}
+                </div>
+                <div class="figures__keys text-small">
+                  {point.split.map((part) => <span>{part.label}</span>)}
+                </div>
+              </div>
+            ) : (
+              <p class="figures__value">{point.figure}</p>
+            )}
+            <p class="figures__caption text-body">{point.caption}</p>
+          </div>
+        ))}
+      </div>
+      <ol class="figures__points">
+        {figures.map((point, i) => (
+          <li class="figures__point" data-figure-point={i}>
+            <div class="figures__inline">
+              {point.split ? (
+                <div class="figures__split" style={`--split-a: ${point.split[0]?.value ?? 50}%`}>
+                  <div class="figures__bar">
+                    {point.split.map((part) => <span class="figures__part">{part.value}%</span>)}
+                  </div>
+                  <div class="figures__keys text-small">
+                    {point.split.map((part) => <span>{part.label}</span>)}
+                  </div>
+                </div>
+              ) : (
+                <p class="figures__value">{point.figure}</p>
+              )}
+              <p class="figures__caption text-small">{point.caption}</p>
+            </div>
+            {point.kicker && <Eyebrow text={point.kicker} as="span" />}
+            <h3 class="figures__title text-h3">{point.title}</h3>
+            <p class="figures__text text-lead">{point.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  ) : (
   <div class="split-media__columns">
     <div class="split-media__text">
       {eyebrow && <Eyebrow text={eyebrow} />}
@@ -98,6 +189,15 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
         {body && <Fragment set:html={body} />}
         <slot />
       </div>
+      {
+        listInText && (
+          <ol class="split-media__list split-media__list--text">
+            {items.map((item) => (
+              <NumberedItem title={item.title} text={item.text} />
+            ))}
+          </ol>
+        )
+      }
       {
         shownActions.length > 0 && (
           <div class="split-media__actions">
@@ -158,8 +258,41 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
           </ol>
         )
       }
+
+      {
+        media === 'card' && card && (
+          <div class="split-media__card" data-wipe>
+            <Card {...card} />
+          </div>
+        )
+      }
+
+      {
+        media === 'embed' && embed && (
+          <figure class="split-media__embed">
+            <div class="split-media__embed-crop" style={`height: ${embed.crop ?? embed.height}px`}>
+              <iframe
+                src={embed.src}
+                title={embed.title}
+                width="100%"
+                height={embed.height}
+                loading="lazy"
+                scrolling="no"
+                referrerpolicy="strict-origin-when-cross-origin"
+              />
+            </div>
+            {(embed.source || embed.link) && (
+              <figcaption class="split-media__embed-caption text-caption">
+                {embed.source && <span>{embed.source}</span>}
+                {embed.link && <Link label={embed.link.label} href={embed.link.url} action={embed.link.action ?? 'page'} size="small" />}
+              </figcaption>
+            )}
+          </figure>
+        )
+      }
     </div>
   </div>
+  )}
 </BlockSection>
 
 <style is:global>
@@ -220,6 +353,216 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
     gap: 0;
   }
 
+
+  /* A pull line in rich text (e.g. the dividend policy) */
+  .split-media__body .split-media__quote {
+    font-size: var(--wp--preset--font-size--h4);
+    line-height: 1.35;
+    font-weight: var(--wp--custom--font-weight--medium);
+    color: var(--wp--custom--color--text--primary);
+    text-wrap: pretty;
+  }
+  .split-media__list--text {
+    margin-top: var(--wp--preset--spacing--8);
+  }
+  .split-media__list--text .numbered-item {
+    grid-template-columns: 56px 1fr;
+  }
+
+  /* ── Card ─────────────────────────────────────────────────── */
+  .split-media--card .split-media__columns {
+    align-items: stretch;
+  }
+  .split-media__card {
+    display: flex;
+    flex: 1;
+    min-height: 560px;
+  }
+  .split-media__card > .card {
+    flex: 1;
+  }
+
+  /* ── Embed ────────────────────────────────────────────────── */
+  .split-media--embed .split-media__columns {
+    align-items: start;
+  }
+  .split-media__embed {
+    overflow: hidden;
+    border: 1px solid var(--wp--custom--color--border--subtle);
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--preset--color--white);
+  }
+  .split-media__embed-crop {
+    overflow: hidden;
+  }
+  .split-media__embed iframe {
+    display: block;
+    width: 100%;
+    border: 0;
+  }
+  .split-media__embed-caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--16);
+    padding: var(--wp--preset--spacing--12) var(--wp--preset--spacing--24);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+    background-color: var(--wp--preset--color--navy-50);
+    color: var(--wp--preset--color--navy-600);
+  }
+
+  /* ── Figures ──────────────────────────────────────────────── */
+  .split-media__figures {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+  }
+  .split-media__figures-head {
+    grid-column: 1 / span 8;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    margin-bottom: var(--wp--custom--stack--xl);
+  }
+  .split-media__figures-head .split-media__title {
+    text-wrap: balance;
+  }
+  .figures__stage {
+    grid-column: 1 / span 5;
+    position: sticky;
+    top: calc(50svh - 180px);
+    align-self: start;
+    height: 360px;
+  }
+  .figures__slot {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--wp--preset--spacing--16);
+    /* Resting (inactive) state is masked out below its line; the active one wipes up into place. */
+    clip-path: inset(0 0 100% 0);
+    transform: translate3d(0, 40px, 0);
+    transition:
+      clip-path 0.7s var(--wp--custom--motion--ease-out),
+      transform 0.7s var(--wp--custom--motion--ease-out);
+  }
+  .figures__slot.is-active {
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+  .figures__value {
+    color: var(--wp--custom--color--text--accent);
+    font-size: clamp(4rem, 2.5915rem + 6.0094vw, 8rem); /* 64 → 128 */
+    line-height: 0.9;
+    font-weight: var(--wp--custom--font-weight--bold);
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+  }
+  .has-surface-navy .figures__value {
+    color: var(--wp--preset--color--sage-400);
+  }
+  .figures__caption {
+    max-width: 400px;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .figures__split {
+    width: 100%;
+    max-width: 520px;
+  }
+  .figures__bar {
+    display: grid;
+    grid-template-columns: var(--split-a) 1fr;
+    gap: 4px;
+    height: 64px;
+    transition: grid-template-columns 1.1s var(--wp--custom--motion--ease-out) 0.15s;
+  }
+  .figures__part {
+    display: flex;
+    align-items: center;
+    padding-inline: var(--wp--preset--spacing--16);
+    border-radius: var(--wp--custom--radius--sm);
+    font-size: var(--wp--preset--font-size--h4);
+    font-weight: var(--wp--custom--font-weight--bold);
+    font-variant-numeric: tabular-nums;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .figures__part:first-child {
+    background-color: var(--wp--preset--color--navy-600);
+    color: var(--wp--preset--color--white);
+  }
+  .figures__part:last-child {
+    background-color: var(--wp--preset--color--sage-400);
+    color: var(--wp--preset--color--navy-900);
+  }
+  /* Grows from an all-oil-&-gas bar to the real split each time the point becomes active */
+  html.js .figures__slot:not(.is-active) .figures__bar {
+    grid-template-columns: calc(100% - 8px) 1fr;
+    transition-duration: 0s;
+  }
+  .figures__keys {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--16);
+    margin-top: var(--wp--preset--spacing--12);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .figures__points {
+    grid-column: 7 / span 6;
+  }
+  .figures__point {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--wp--preset--spacing--16);
+    min-height: 400px;
+    padding-block: var(--wp--preset--spacing--48);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .figures__point:last-child {
+    border-bottom: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .figures__text {
+    color: var(--wp--custom--color--text--secondary);
+    max-width: 560px;
+  }
+  .figures__inline {
+    display: none;
+  }
+  @media (max-width: 899px) {
+    .split-media__figures {
+      display: block;
+    }
+    .figures__stage {
+      display: none;
+    }
+    .figures__point {
+      min-height: 0;
+      padding-block: var(--wp--preset--spacing--32);
+    }
+    .figures__inline {
+      display: flex;
+      flex-direction: column;
+      gap: var(--wp--preset--spacing--8);
+      margin-bottom: var(--wp--preset--spacing--8);
+    }
+    .figures__inline .figures__value {
+      font-size: var(--wp--preset--font-size--display);
+    }
+    .split-media__card {
+      min-height: 440px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .figures__slot {
+      transform: none;
+    }
+  }
+
   @media (max-width: 899px) {
     .split-media__columns {
       display: flex;
@@ -232,3 +575,23 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
     }
   }
 </style>
+
+<script>
+  // Figures: the point nearest the middle of the viewport owns the sticky figure.
+  document.querySelectorAll<HTMLElement>('[data-figures]').forEach((root) => {
+    const slots = [...root.querySelectorAll<HTMLElement>('[data-figure-slot]')];
+    const points = [...root.querySelectorAll<HTMLElement>('[data-figure-point]')];
+    if (slots.length === 0 || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const i = (entry.target as HTMLElement).dataset.figurePoint;
+          slots.forEach((slot) => slot.classList.toggle('is-active', slot.dataset.figureSlot === i));
+        });
+      },
+      { rootMargin: '-45% 0px -45% 0px' },
+    );
+    points.forEach((point) => observer.observe(point));
+  });
+</script>

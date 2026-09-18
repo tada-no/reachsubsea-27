@@ -11,8 +11,8 @@
 //
 // Sticky: `position: sticky; top: var(--reach-subnav-top, 0px)`. On the real site the header sets
 // `--reach-subnav-top` as it shows/hides (96 → 72 → 0, docs/04 §16) so the subnav docks to the
-// header's current bottom edge and then to `top: 0` once the header is hidden; that header script
-// is out of this block's scope, so it's left as a custom property with a 0px fallback here.
+// header's current bottom edge and then to `top: 0` once the header is hidden. The header script
+// sets it (18 Sep 2026); the 0px fallback covers pages without the site header.
 import SubnavItem from '../components/SubnavItem.astro';
 
 export interface SubnavLink {
@@ -56,6 +56,8 @@ const { source, label, items, current } = Astro.props;
     z-index: 20;
     background-color: var(--wp--custom--color--bg--default);
     border-bottom: 1px solid var(--wp--custom--color--border--subtle);
+    /* Same curve and duration as the header's show/hide, so the two move as one */
+    transition: top 0.4s var(--wp--custom--motion--ease-out);
   }
   .subnav__row {
     display: flex;

@@ -463,7 +463,10 @@ const menuOpen = siteMenuOpen || mobileMenuOpen;
     let ticking = false;
 
     function setHeaderOffset() {
-      document.documentElement.style.setProperty('--header-offset', `${Math.round(header!.getBoundingClientRect().height)}px`);
+      const height = Math.round(header!.getBoundingClientRect().height);
+      document.documentElement.style.setProperty('--header-offset', `${height}px`);
+      // Section subnav docks to the header's bottom edge, and to the top while the header is hidden.
+      document.documentElement.style.setProperty('--reach-subnav-top', header!.classList.contains('is-hidden') ? '0px' : `${height}px`);
     }
 
     function updateScroll() {

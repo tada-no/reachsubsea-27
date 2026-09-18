@@ -10,6 +10,39 @@ _No open questions right now._
 
 ## Answered log
 
+### Q60. Share price on Why invest (18 Sep 2026, Why invest)
+Context: the PDF's chart is sample data. The dev Share info page embeds `https://ir.oms.no/component/standardPage?token=reach_std&lang=en` (a full ~2,200px OMS page: quote, chart, profit calculator, etc.).
+- [ ] Placeholder slot
+- [ ] Link out only
+- [ ] Styled sample chart
+- [x] Use the real OMS iframe
+
+**Answer:** Use the ir.oms.no iframe, as on the dev Share info page. Prototype: the same standard page, cropped to the quote + chart (top ~520px), plus a link to Share info for the rest. Developer note: ask OMS for a compact share-graph module token so we don't need to crop.
+
+### Q59. Why invest additions (18 Sep 2026, Why invest)
+All built from the client PDF's own data.
+- [x] Proof figure per reason (cuts the separate "Proof points" section, which repeated them)
+- [x] Revenue mix bar (54% oil & gas / 46% renewables & other, Q2 2026) inside reason 3
+- [x] Next report date strip (Q3 2026 · 17 Nov 2026 + add to calendar)
+- [x] IR contact in the CTA (Arne Joa, CFO, from the live site)
+
+**Answer:** All four.
+
+### Q58. Investors section subnav placement (18 Sep 2026, Why invest)
+- [x] Directly under the hero, sticky; docks under the header on scroll (keeps the transparent header over the photo)
+- [ ] Under the header, above the hero
+- [ ] Inside the hero, bottom edge
+
+**Answer:** Under the hero, sticky. The breadcrumb moves to the top of the hero (just under the header), apart from the title stack. Drop the eyebrow where the breadcrumb and title already say it.
+
+### Q57. Hero direction across the site (18 Sep 2026, Why invest)
+Context: the PDF uses a navy→sage gradient on Investors/Company pages and photos elsewhere.
+- [x] Photo/video hero (navy scrim) on story pages; plain navy Text hero on data pages (Reports, Calendar, Governance). No gradients anywhere
+- [ ] Photo everywhere
+- [ ] Gradient everywhere
+
+**Answer:** Photo + text hero. Consistency comes from shared structure (height, breadcrumb position, type, scrim), not an identical look. The gradient is dropped: it reads as generic, and the PDF only needed it because its photo heroes lacked a scrim (fixed by Q40).
+
 ### Q56. Live operations map: placement (17 Sep 2026, docs/07)
 Context: the client PDF puts a "live zones" panel over the Home hero. The user decided on a standalone block instead of a hero overlay.
 - [x] Home straight after the Stats band, plus the Assets overview

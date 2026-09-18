@@ -9,6 +9,9 @@
 // the title enters word by word, and the media drifts slower than the page on scroll (parallax).
 // `video.loopEnd` loops early with a soft fade (the current hero.mp4 ends on a UI panel at ~15 s).
 // A pause control is always present (WCAG 2.2.2); reduced motion never autoplays.
+// 18 Sep 2026 (Q58): the breadcrumb is pinned to the top of the hero, just under the header, apart
+// from the title stack (which stays bottom-left on Photo/Video). Photo can opt into the Video style's
+// motion with `animate` (title words rise in, media drifts on scroll, copy lifts away).
 import BlockSection from '../components/BlockSection.astro';
 import Breadcrumb, { type BreadcrumbItem } from '../components/Breadcrumb.astro';
 import Eyebrow from '../components/Eyebrow.astro';
@@ -39,6 +42,8 @@ interface Props extends BlockFields {
   meta?: MetaField[];
   /** 0–2: the first renders as a Button, the second as a Link (e.g. action 'video'). */
   actions?: ActionField[];
+  /** Photo style: the Video style's entrance and scroll parallax. */
+  animate?: boolean;
 }
 
 const {
@@ -54,6 +59,7 @@ const {
   credit,
   meta = [],
   actions = [],
+  animate = false,
   background,
   spacing,
   anchor,
@@ -61,6 +67,7 @@ const {
 
 const isVideo = style === 'video';
 const isPhoto = style === 'photo' || isVideo;
+const hasMotion = isVideo || (isPhoto && animate);
 const resolvedBackground = isPhoto ? 'navy' : (background ?? 'white');
 const titleWords = title.split(/\s+/).filter(Boolean);
 const titleId = makeId('page-hero', title);
@@ -73,8 +80,9 @@ const objectPosition = image?.focalPoint
 <BlockSection
   slug="page-hero"
   root="page-hero"
-  class={isVideo ? 'page-hero--photo page-hero--video' : `page-hero--${style}`}
+  class={isVideo ? 'page-hero--photo page-hero--video' : [`page-hero--${style}`, hasMotion && 'page-hero--motion'].filter(Boolean).join(' ')}
   data-hero-video={isVideo ? '' : undefined}
+  data-hero-motion={hasMotion ? '' : undefined}
   background={resolvedBackground}
   spacing={spacing}
   anchor={anchor}
@@ -123,9 +131,9 @@ const objectPosition = image?.focalPoint
           <p class="page-hero__credit text-caption">{credit}</p>
         )
       }
+      {breadcrumb.length > 0 && <Breadcrumb items={breadcrumb} class="page-hero__breadcrumb" />}
       <div class="page-hero__bottom">
         <div class="page-hero__content">
-          {breadcrumb.length > 0 && <Breadcrumb items={breadcrumb} class="page-hero__breadcrumb" />}
           {
             (eyebrow || badge) && (
               <div class="page-hero__top">
@@ -134,7 +142,7 @@ const objectPosition = image?.focalPoint
               </div>
             )
           }
-          {isVideo ? (
+          {hasMotion ? (
             <h1 id={titleId} class:list={['page-hero__title', titleStyle === 'display' ? 'text-display' : 'text-h1']} aria-label={title}>
               {titleWords.map((word, i) => (
                 <Fragment>
@@ -308,6 +316,33 @@ const objectPosition = image?.focalPoint
     }
   }
 
+
+  /* ── Breadcrumb, pinned to the top (18 Sep 2026, Q58) ──────── */
+  .page-hero__breadcrumb {
+    position: relative;
+    z-index: 1;
+    margin-bottom: var(--wp--custom--stack--lg);
+  }
+  .page-hero--photo .page-hero__breadcrumb {
+    /* Pushes the title stack to the bottom of the frame */
+    margin-bottom: auto;
+    padding-bottom: var(--wp--custom--stack--xl);
+  }
+  /* Under a transparent header the photo starts at the top of the viewport: clear the bar (72 / 96,
+     fixed values rather than --header-offset, which shrinks on scroll and would nudge the crumbs). */
+  .site-header--overlay ~ main > .page-hero--photo:first-child .page-hero__frame {
+    padding-top: calc(72px + var(--wp--preset--spacing--24));
+  }
+  @media (min-width: 1200px) {
+    .site-header--overlay ~ main > .page-hero--photo:first-child .page-hero__frame {
+      padding-top: calc(96px + var(--wp--preset--spacing--24));
+    }
+  }
+  .page-hero--motion:not(.page-hero--video) .page-hero__media {
+    inset: -12% 0 -4%;
+    will-change: transform;
+  }
+
   /* ── Video style ───────────────────────────────────────────── */
   .page-hero--video .page-hero__frame {
     /* Near full viewport; the header overlays it (Header `overlay`). svh: no jump when mobile bars move. */
@@ -418,19 +453,27 @@ const objectPosition = image?.focalPoint
       animation: page-hero-word 1s var(--wp--custom--motion--ease-out) forwards;
       animation-delay: calc(0.25s + var(--word-i, 0) * 0.06s);
     }
+    .page-hero--motion .page-hero__breadcrumb,
     .page-hero--video .page-hero__top,
     .page-hero--video .page-hero__lead,
-    .page-hero--video .page-hero__actions {
+    .page-hero--video .page-hero__actions,
+    .page-hero--motion .page-hero__top,
+    .page-hero--motion .page-hero__lead,
+    .page-hero--motion .page-hero__actions {
       opacity: 0;
       animation: page-hero-rise 0.9s var(--wp--custom--motion--ease-out) forwards;
     }
-    .page-hero--video .page-hero__top {
+    .page-hero--video .page-hero__top,
+    .page-hero--motion .page-hero__top,
+    .page-hero--motion .page-hero__breadcrumb {
       animation-delay: 0.1s;
     }
-    .page-hero--video .page-hero__lead {
+    .page-hero--video .page-hero__lead,
+    .page-hero--motion .page-hero__lead {
       animation-delay: 0.75s;
     }
-    .page-hero--video .page-hero__actions {
+    .page-hero--video .page-hero__actions,
+    .page-hero--motion .page-hero__actions {
       animation-delay: 0.9s;
     }
   }
@@ -487,7 +530,7 @@ const objectPosition = image?.focalPoint
 
 <script>
   // Video hero: lazy source, early loop with a soft seam, pause control, scroll parallax.
-  const root = document.querySelector<HTMLElement>('[data-hero-video]');
+  const root = document.querySelector<HTMLElement>('[data-hero-video], [data-hero-motion]');
   if (root) {
     const media = root.querySelector<HTMLElement>('[data-hero-media]');
     const content = root.querySelector<HTMLElement>('.page-hero__content');

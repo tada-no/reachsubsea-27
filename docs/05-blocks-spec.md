@@ -40,6 +40,7 @@ Tabs inside a block (Data list) reuse the **Subnav item** look with `role="tabli
 
 ### 2.1 Page hero · `reach/page-hero`
 `Style` Text · Photo × `Breakpoint` = **4**. Photo treatment = full photo + navy scrim (Q40). **16 Sep 2026: overlap variants removed** (Overlap Stats and Overlap Cards; reasoning in docs/06). Key figures go in a Stats band and latest items in a Card grid or Feed grid directly below the hero. Removed in code and Figma (the Home and Investors examples now use the plain hero).
+**18 Sep 2026 (Why invest, Q57–Q58):** no gradient heroes anywhere. Photo/Video on story pages, Text on data pages. The Breadcrumb is **pinned to the top of the hero** (Photo: just under the transparent header, 72/96 + 24; the title stack stays bottom-left), no longer the first item of the stack. Drop the eyebrow when the breadcrumb and title already say it. Photo gains an `Animate` option that reuses the Video motion (title words rise, media parallax, copy lifts away). *Figma to update.*
 
 | Part | Spec |
 |---|---|
@@ -85,6 +86,12 @@ Tabs inside a block (Data list) reuse the **Subnav item** look with `role="tabli
 - Mobile: Image and Video stack **above** the text; Spec table and Numbered list stack **below** it. Spec rows split label and value equally, so values like "140 t AHC" stay on one line at 375.
 - Replaces: Our story, Reach Remote sections, growth strategy, vessel spec card, HOP 5-up, charter slide v1 (Image + File link, Q26).
 
+**18 Sep 2026 (Why invest), new media options.** *Figma to add.*
+- **Figures:** 2–4 points, each with a proof figure (value, or a two-part split bar such as the revenue mix) and a caption. The H2 spans cols 1–8. The figure column (1–5) is sticky and wipes to the point crossing the middle of the viewport (clip + rise, no fade). The points (kicker, H3, lead) scroll in cols 7–12, min-height 400. Mobile: no sticky, each point shows its figure inline. Best on Navy.
+- **Card:** a Card (usually Image bg, Featured, min-height 560 / 440 mobile) as the media, uncovered from the right edge as it enters (`data-wipe`).
+- **Embed:** an iframe cropped to `crop` px, with a source line + link below. Used for the ir.oms.no share graph (standardPage cropped to quote + chart until OMS supplies a compact module).
+- Any media except Numbered list can carry `items` as a numbered list under the body copy.
+
 ### 2.5 Stats band · `reach/stats`
 `Count` 3 · 4 × `Style` Plain · Panel × `Breakpoint` = **8**.
 - Optional Section header. Stat Large, `Align` Start (Center when the Section header is centred). 1px `border/subtle` vertical rules between stats (horizontal on mobile).
@@ -92,6 +99,7 @@ Tabs inside a block (Data list) reuse the **Subnav item** look with `role="tabli
 - Mobile: 4 → 2 × 2 without rules; 3 → one column with horizontal 1px `border/subtle` rules between stats.
 - Values come from the **Key figures** options page (repeater: value, label, note, key); the block picks keys. No count-up animation.
 - Replaces: every stat strip, the 8-stat Why invest card (split into a Stats band + Split media spec table).
+- **Results style (18 Sep 2026, Why invest):** latest reported quarter from the *Latest results* options page (`src/data/investor-results.ts`). The title (H2) and an "As reported" badge + publication date sit on one row. Below them: 4 headline figures (unit · value · scale, change line with a trend arrow) under a 2px `text/primary` rule, with 1px dividers between them, then 4 secondary figures in a ruled row. The footer has the next report (calendar tile, generated .ics "Add to calendar") and the report file link. Layout: 4-up, 2×2 below 1100, unit on its own line below 600. Headline figures count up with decimals kept. *Figma to add.*
 
 ### 2.6 Accordion / FAQ · `reach/accordion`
 `Layout` Stacked · Split × `Breakpoint` (Split is Desktop only) = **3**.

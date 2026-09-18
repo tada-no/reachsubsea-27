@@ -313,6 +313,16 @@ html.js [data-reveal].is-revealed {
 html.js [data-reveal].is-settled {
   transition-delay: 0s;
 }
+/* Wipe (motion.ts initWipe): the photo uncovers from the right edge. */
+[data-wipe] {
+  transition: clip-path 1.2s var(--wp--custom--motion--ease-out);
+}
+[data-wipe].will-wipe {
+  clip-path: inset(0 0 0 100%);
+}
+[data-wipe].will-wipe.is-wiped {
+  clip-path: inset(0 0 0 0);
+}
 
 @media (prefers-reduced-motion: reduce) {
   html.js [data-reveal] {

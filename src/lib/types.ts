@@ -97,4 +97,10 @@ export interface StatField {
   value: string;
   label: string;
   note?: string;
+  /** Results style: small unit before the figure ("NOK") and the scale after it ("m", "bn"). */
+  unit?: string;
+  suffix?: string;
+  /** Results style: change line under the label, e.g. "+44% year on year". */
+  delta?: string;
+  trend?: 'up' | 'down';
 }
