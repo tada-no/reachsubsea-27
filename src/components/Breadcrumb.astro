@@ -51,16 +51,17 @@ const parent = items.length > 1 ? items[items.length - 2] : undefined;
 }
 
 <style is:global>
+  /* 18 Sep 2026: tightened from 8 + 8 around each chevron to 4 + 4 */
   .breadcrumb__list {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--wp--preset--spacing--8);
+    gap: var(--wp--preset--spacing--4);
   }
   .breadcrumb__item {
     display: flex;
     align-items: center;
-    gap: var(--wp--preset--spacing--8);
+    gap: var(--wp--preset--spacing--4);
     min-width: 0;
   }
   .breadcrumb__link {
@@ -84,7 +85,7 @@ const parent = items.length > 1 ? items[items.length - 2] : undefined;
   .breadcrumb__mobile-link {
     display: none;
     align-items: center;
-    gap: var(--wp--preset--spacing--8);
+    gap: var(--wp--preset--spacing--4);
     color: var(--wp--custom--color--text--secondary);
   }
   .breadcrumb__mobile-link:hover {

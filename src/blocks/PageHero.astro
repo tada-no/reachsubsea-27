@@ -338,9 +338,47 @@ const objectPosition = image?.focalPoint
       padding-top: calc(96px + var(--wp--preset--spacing--24));
     }
   }
+  /* Small overscan only: enough for the drift, not enough to zoom the photo (review round 4) */
   .page-hero--motion:not(.page-hero--video) .page-hero__media {
-    inset: -12% 0 -4%;
+    top: -6%;
+    bottom: -2%;
     will-change: transform;
+  }
+
+  /* Photo ground (18 Sep 2026, review rounds 1, 4 and 6): navy/900 behind the photo, which runs full
+     width under the tint below. Choose calm images (sky/water, subject right): see docs/05 §2.1. */
+  .page-hero--photo:not(.page-hero--video) .page-hero__frame {
+    overflow: hidden;
+    background-color: var(--wp--preset--color--navy-900);
+  }
+  .page-hero--photo:not(.page-hero--video) .page-hero__media {
+    background-color: var(--wp--preset--color--navy-900);
+  }
+  /* Review round 6: the photo is capped at its native width (1,240, never enlarged) and centred;
+     beyond it the frame is solid navy/900. An even navy tint tones the whole image down, so the side
+     fades stay short and near-equal (a little longer on the title side), running into the solid
+     edges, plus a bottom-left ellipse that carries the lead */
+  .page-hero--photo:not(.page-hero--video) .page-hero__media {
+    left: 0;
+    right: 0;
+    max-width: 1240px;
+    margin-inline: auto;
+  }
+  .page-hero--photo:not(.page-hero--video) .page-hero__scrim {
+    background:
+      linear-gradient(to right, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0) 30%),
+      linear-gradient(to left, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0) 22%),
+      /* Heavy under the copy only: an ellipse from the bottom-left corner carries the lead, so the
+         subject at the bottom right stays lit. A short full-width ramp joins the subnav */
+      radial-gradient(ellipse 85% 75% at 0% 100%, rgb(27 29 59 / 0.9) 0%, rgb(27 29 59 / 0.6) 45%, rgb(27 29 59 / 0) 100%),
+      linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0) 24%),
+      rgb(27 29 59 / 0.45);
+  }
+  @media (max-width: 899px) {
+    .page-hero--photo:not(.page-hero--video) .page-hero__scrim {
+      background:
+        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, var(--wp--preset--color--navy-900) 34%, rgb(27 29 59 / 0.6) 70%, rgb(27 29 59 / 0.45) 100%);
+    }
   }
 
   /* ── Video style ───────────────────────────────────────────── */
@@ -598,6 +636,9 @@ const objectPosition = image?.focalPoint
       };
       new IntersectionObserver(([entry]) => {
         active = entry.isIntersecting;
+        // A jump back to the top (Home key, back-to-top) can land before this fires: redraw on entry
+        // so the copy is never left at the faded, lifted state from further down the page.
+        if (active) requestAnimationFrame(update);
       }).observe(root);
       window.addEventListener(
         'scroll',

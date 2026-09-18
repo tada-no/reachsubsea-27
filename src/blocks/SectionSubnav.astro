@@ -55,15 +55,21 @@ const { source, label, items, current } = Astro.props;
     top: var(--reach-subnav-top, 0px);
     z-index: 20;
     background-color: var(--wp--custom--color--bg--default);
-    border-bottom: 1px solid var(--wp--custom--color--border--subtle);
     /* Same curve and duration as the header's show/hide, so the two move as one */
-    transition: top 0.4s var(--wp--custom--motion--ease-out);
+    transition:
+      top 0.4s var(--wp--custom--motion--ease-out),
+      box-shadow var(--wp--custom--motion--duration) var(--wp--custom--motion--easing);
+  }
+  /* No hairline in the page flow (18 Sep 2026). Once docked it becomes part of the header: it takes
+     over the header's shadow, so the two read as one bar (base.css drops the header's own shadow). */
+  .subnav.is-docked {
+    box-shadow: var(--wp--preset--shadow--sm);
   }
   .subnav__row {
     display: flex;
     align-items: center;
     gap: var(--wp--preset--spacing--8);
-    padding-block: var(--wp--preset--spacing--12);
+    padding-block: var(--wp--preset--spacing--16);
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -134,4 +140,23 @@ const { source, label, items, current } = Astro.props;
   }
 
   document.querySelectorAll<HTMLElement>('[data-subnav]').forEach(initSubnav);
+
+  // Docked state: a 1px sentinel just above the bar leaves the viewport's top band when the bar sticks.
+  document.querySelectorAll<HTMLElement>('[data-subnav]').forEach((nav) => {
+    const sentinel = document.createElement('div');
+    sentinel.setAttribute('aria-hidden', 'true');
+    sentinel.style.cssText = 'height:1px;margin-bottom:-1px';
+    nav.before(sentinel);
+    let docked = false;
+    const update = () => {
+      const top = parseFloat(getComputedStyle(nav).top) || 0;
+      const next = sentinel.getBoundingClientRect().bottom <= top + 1;
+      if (next === docked) return;
+      docked = next;
+      nav.classList.toggle('is-docked', docked);
+      document.documentElement.classList.toggle('has-docked-subnav', docked);
+    };
+    window.addEventListener('scroll', () => requestAnimationFrame(update), { passive: true });
+    update();
+  });
 </script>

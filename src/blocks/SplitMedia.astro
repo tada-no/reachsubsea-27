@@ -13,6 +13,8 @@
 //   Card: a Card (usually Image bg, Featured) as the media, uncovered by a wipe as it enters.
 //   Embed: an iframe (ir.oms.no share graph) cropped to `crop` px, with a source line and link.
 // Any media except Numbered list can also carry `items` as a numbered list under the body copy.
+// Layout Stacked (18 Sep 2026 review): heading on top, `items` as three numbered cards in columns,
+// and optionally a Card as a full-width banner below (left-to-right scrim, text bottom-left).
 import BlockSection from '../components/BlockSection.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import Link from '../components/Link.astro';
@@ -51,6 +53,8 @@ interface FigurePoint {
   caption: string;
   /** Two-part split bar instead of a figure; values are percentages. */
   split?: { label: string; value: number }[];
+  /** Split only: the period, shown first in the donut centre ("Q2 2026"). */
+  period?: string;
 }
 
 interface EmbedField {
@@ -65,6 +69,9 @@ interface EmbedField {
 
 interface Props extends BlockFields {
   media?: 'image' | 'video' | 'spec-table' | 'numbered-list' | 'figures' | 'card' | 'embed';
+  /** Card media only: `stacked` = heading, items in columns, the card as a full-width banner below.
+   * Figures media: `cards` = all points visible as cards (default `split` = sticky figure). */
+  layout?: 'split' | 'stacked' | 'cards';
   position?: 'end' | 'start';
   eyebrow?: string;
   title: string;
@@ -90,6 +97,7 @@ interface Props extends BlockFields {
 
 const {
   media = 'image',
+  layout = 'split',
   position = 'end',
   eyebrow,
   title,
@@ -116,7 +124,16 @@ const titleId = makeId('split-media', title);
 const shownActions = actions.slice(0, 2);
 const hasSpecFile = Boolean(specFile?.url);
 const listInText = media !== 'numbered-list' && items.length > 0;
-const rootClass = [`split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
+const stacked = layout === 'stacked' && media !== 'figures';
+const figureCards = media === 'figures' && layout === 'cards';
+// Cards: value points stack in the left column; a split point becomes the feature card on the right.
+const valuePoints = figures.filter((p) => !p.split);
+const splitPoint = figures.find((p) => p.split);
+// Donut geometry: r = 100/2π, so the circumference is exactly 100 and dash lengths are percentages.
+const DONUT_R = 15.9155;
+// No gap between arcs (review round 6): gaps made a 100% split read as an incomplete ring.
+const DONUT_GAP = 0;
+const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-media--figure-cards', `split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
 ---
 
 <BlockSection
@@ -128,7 +145,90 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
   anchor={anchor}
   labelledBy={titleId}
 >
-  {media === 'figures' ? (
+  {stacked ? (
+    <div class="split-media__stack">
+      <div class="split-media__stack-head">
+        {eyebrow && <Eyebrow text={eyebrow} />}
+        <Heading id={titleId} class:list={['split-media__title', Heading === 'h3' ? 'text-h3' : 'text-h2']}>{title}</Heading>
+        {body && <div class="prose split-media__body"><Fragment set:html={body} /></div>}
+      </div>
+      {items.length > 0 && (
+        <ol class="split-media__list split-media__cols">
+          {items.map((item) => (
+            <NumberedItem title={item.title} text={item.text} />
+          ))}
+        </ol>
+      )}
+      {card && (
+        <div class="split-media__banner" data-wipe>
+          <Card {...card} />
+        </div>
+      )}
+    </div>
+  ) : figureCards ? (
+    <div class="split-media__stack">
+      <div class="split-media__stack-head">
+        {eyebrow && <Eyebrow text={eyebrow} />}
+        <Heading id={titleId} class:list={['split-media__title', 'text-h2']}>{title}</Heading>
+      </div>
+      <div class:list={['figures__cards', !splitPoint && 'figures__cards--single']}>
+        <ul class="figures__list">
+          {valuePoints.map((point) => (
+            <li class="figures__card">
+              <div class="figures__card-text">
+                <h3 class="text-h4">{point.title}</h3>
+                <p class="figures__text text-small">{point.text}</p>
+              </div>
+              <div class="figures__proof">
+                <p class="figures__value"><span data-count-up>{point.figure}</span></p>
+                <p class="figures__caption text-caption">{point.caption}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        {splitPoint?.split && (
+          <div class="figures__card figures__card--feature has-surface-navy">
+            <h3 class="text-h4">{splitPoint.title}</h3>
+            <figure class="figures__donut">
+              <div class="figures__donut-chart">
+                <svg viewBox="0 0 42 42" aria-hidden="true" focusable="false">
+                  {splitPoint.split.map((part, n) => {
+                    const offset = splitPoint.split!.slice(0, n).reduce((sum, p) => sum + p.value, 0);
+                    return (
+                      <circle
+                        class={`figures__arc figures__arc--${n}`}
+                        cx="21"
+                        cy="21"
+                        r={DONUT_R}
+                        fill="none"
+                        style={`--arc: ${part.value - DONUT_GAP}; --arc-offset: ${-offset}; --arc-i: ${n}`}
+                      />
+                    );
+                  })}
+                </svg>
+                <figcaption class="figures__donut-centre">
+                  {splitPoint.period && <strong class="figures__donut-period">{splitPoint.period}</strong>}
+                  <span class="text-small">{splitPoint.caption}</span>
+                </figcaption>
+              </div>
+              {/* Arcs start at 12 o'clock and run clockwise, so the first share sits on the right and
+                  the second on the left: each label flanks its own arc */}
+              {splitPoint.split.slice(0, 2).map((part, n) => (
+                <p class={`figures__donut-label figures__donut-label--${n === 0 ? 'end' : 'start'}`}>
+                  <span class="figures__donut-value">{part.value}%</span>
+                  <span class="figures__donut-name text-small">
+                    <span class={`figures__swatch figures__swatch--${n}`} aria-hidden="true" />
+                    {part.label}
+                  </span>
+                </p>
+              ))}
+            </figure>
+            <p class="figures__text text-small">{splitPoint.text}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  ) : media === 'figures' ? (
     <div class="split-media__figures" data-figures>
       <div class="split-media__figures-head">
         {eyebrow && <Eyebrow text={eyebrow} />}
@@ -354,19 +454,16 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
   }
 
 
-  /* A pull line in rich text (e.g. the dividend policy) */
-  .split-media__body .split-media__quote {
-    font-size: var(--wp--preset--font-size--h4);
-    line-height: 1.35;
-    font-weight: var(--wp--custom--font-weight--medium);
-    color: var(--wp--custom--color--text--primary);
-    text-wrap: pretty;
-  }
   .split-media__list--text {
     margin-top: var(--wp--preset--spacing--8);
   }
   .split-media__list--text .numbered-item {
     grid-template-columns: 56px 1fr;
+  }
+  /* The list follows the heading directly; a rule above the first item only adds noise (18 Sep 2026) */
+  .split-media__list:not(.split-media__cols) .numbered-item:first-child {
+    border-top: 0;
+    padding-top: 0;
   }
 
   /* ── Card ─────────────────────────────────────────────────── */
@@ -382,10 +479,266 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
     flex: 1;
   }
 
-  /* ── Embed ────────────────────────────────────────────────── */
-  .split-media--embed .split-media__columns {
-    align-items: start;
+
+  /* ── Stacked (Card) ───────────────────────────────────────── */
+  .split-media__stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
   }
+  .split-media__stack-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    max-width: 880px;
+  }
+  .split-media__stack-head .split-media__title {
+    text-wrap: balance;
+  }
+  .split-media__cols {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: auto;
+    gap: var(--wp--custom--stack--lg) var(--wp--custom--grid--gutter);
+  }
+  /* In columns the number sits above the title instead of beside it */
+  .split-media__cols .numbered-item {
+    grid-template-columns: 1fr;
+    /* Cards (review round 4) */
+    padding: var(--wp--preset--spacing--32);
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--custom--color--bg--tint);
+    /* Number, title and text share rows across the three columns, so the text always starts on
+       one line even when a title wraps to two */
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: var(--wp--preset--spacing--12);
+    border-top: 0;
+  }
+  .split-media__cols .numbered-item__body {
+    display: contents;
+  }
+  .split-media__banner {
+    display: flex;
+    min-height: 480px;
+  }
+  .split-media__banner > .card {
+    flex: 1;
+  }
+  .split-media__banner .card__content {
+    max-width: 720px;
+  }
+  /* Wide banner: the scrim runs from the text side instead of from the bottom, so the right half
+     stays a photo */
+  .split-media__banner .card__overlay {
+    background:
+      linear-gradient(to right, rgb(27 29 59 / 0.94) 0%, rgb(27 29 59 / 0.82) 38%, rgb(27 29 59 / 0.3) 68%, rgb(27 29 59 / 0.08) 100%),
+      linear-gradient(to top, rgb(27 29 59 / 0.5) 0%, rgb(27 29 59 / 0) 45%);
+  }
+  @media (max-width: 899px) {
+    .split-media__cols {
+      grid-template-columns: 1fr;
+    }
+    .split-media__banner {
+      min-height: 440px;
+    }
+    .split-media__banner .card__overlay {
+      background: linear-gradient(to top, rgb(27 29 59 / 0.96) 0%, rgb(27 29 59 / 0.86) 45%, rgb(27 29 59 / 0.3) 75%, rgb(27 29 59 / 0.1) 100%);
+    }
+  }
+
+
+  /* ── Figures · Cards (review round 4) ─────────────────────── */
+  /* Reading order inside each card: title → body → proof figure. Value points stack on the left;
+     the split (revenue mix) is the feature card on the right, drawn as a donut. */
+  .figures__cards {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .figures__list {
+    grid-column: 1 / span 7;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .figures__cards--single .figures__list {
+    grid-column: 1 / -1;
+  }
+  .figures__card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--wp--preset--spacing--24) var(--wp--preset--spacing--48);
+    /* Card · Featured metrics (docs/04): these cards are 7 and 5 columns wide, past the 416 Default */
+    padding: var(--wp--preset--spacing--48);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  .figures__card-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .figures__card .figures__text {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .figures__proof {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--wp--preset--spacing--4);
+    text-align: right;
+    min-width: 176px;
+  }
+  .figures__card .figures__value {
+    font-size: clamp(2.25rem, 1.8979rem + 0.7512vw, 2.75rem); /* 36 → 44 */
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .figures__proof .figures__caption {
+    max-width: 200px;
+  }
+  /* The feature card is Navy (review round 5): the section's one chart, and a break in the run of
+     tint cards. Its tokens flip through `has-surface-navy`; the ground is set explicitly to navy/800 */
+  .figures__card--feature {
+    background-color: var(--wp--preset--color--navy-800);
+    grid-column: 8 / span 5;
+    grid-template-columns: 1fr;
+    align-content: start;
+    /* Heading → ring → body: the heading lines up with the value cards' titles */
+    gap: var(--wp--preset--spacing--24);
+  }
+  /* Donut (review rounds 5–6): heading → ring → labels → body. The labels sit in a row under the
+     ring, each on its own arc's side (the first share runs clockwise from 12 o'clock, so it owns the
+     right; the last closes the ring on the left), which frees the width for a larger ring. Arcs meet
+     with no gap, so a 100% split reads as a full ring. The centre names the period and measure */
+  .figures__donut {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: 'chart chart' 'start end';
+    row-gap: var(--wp--preset--spacing--16);
+  }
+  .figures__donut-chart {
+    grid-area: chart;
+    justify-self: center;
+    position: relative;
+    width: min(100%, 368px); /* the largest that keeps the card within the value cards' height */
+    aspect-ratio: 1;
+  }
+  .figures__donut-centre {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wp--preset--spacing--4);
+    padding: 0 24%;
+    text-align: center;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .figures__donut-period {
+    font-size: var(--wp--preset--font-size--lead);
+    font-weight: var(--wp--custom--font-weight--bold);
+    line-height: 1.2;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .figures__donut-label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+  }
+  .figures__donut-label--start {
+    grid-area: start;
+  }
+  .figures__donut-label--end {
+    grid-area: end;
+    align-items: flex-end;
+    text-align: right;
+  }
+  /* A dot beside the name keys the colour (a dash above the value read as a minus sign) */
+  .figures__donut-name {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    white-space: nowrap;
+  }
+  .figures__donut-name .figures__swatch {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .figures__donut-value {
+    font-size: var(--wp--preset--font-size--h4);
+    font-weight: var(--wp--custom--font-weight--bold);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .figures__donut-name {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .figures__donut-chart svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+  /* Solid arcs drawn as trim paths: each one grows from 0 to its share, the second after the first */
+  .figures__arc {
+    stroke-width: 7;
+    stroke-dasharray: var(--arc) calc(100 - var(--arc));
+    stroke-dashoffset: var(--arc-offset);
+    transition: stroke-dasharray 1s var(--wp--custom--motion--ease-out);
+    transition-delay: calc(0.3s + var(--arc-i) * 0.5s);
+  }
+  html.js .figures__card--feature[data-reveal]:not(.is-revealed) .figures__arc {
+    stroke-dasharray: 0 100;
+    transition-duration: 0s;
+    transition-delay: 0s;
+  }
+  /* Review round 6: the counterpart is navy/200, a light neutral that makes the sage (the share the
+     point is about, and the chart's only hue) pop. navy/400 read as disabled (the text/disabled token) */
+  .figures__arc--0,
+  .figures__swatch--0 {
+    stroke: var(--wp--preset--color--navy-200);
+    background-color: var(--wp--preset--color--navy-200);
+  }
+  .figures__arc--1,
+  .figures__swatch--1 {
+    stroke: var(--wp--preset--color--sage-400);
+    background-color: var(--wp--preset--color--sage-400);
+  }
+  .figures__swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+  @media (max-width: 1099px) {
+    .figures__list,
+    .figures__card--feature {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 599px) {
+    .figures__card {
+      grid-template-columns: 1fr;
+      padding: var(--wp--preset--spacing--32); /* Featured falls back to Default on phones */
+    }
+    .figures__donut-chart {
+      width: min(100%, 280px);
+    }
+    .figures__proof {
+      align-items: flex-start;
+      text-align: left;
+      min-width: 0;
+    }
+  }
+
+  /* ── Embed ────────────────────────────────────────────────── */
   .split-media__embed {
     overflow: hidden;
     border: 1px solid var(--wp--custom--color--border--subtle);
@@ -435,6 +788,9 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
     align-self: start;
     height: 360px;
   }
+  /* Directional swap (18 Sep 2026): the outgoing figure exits up through a ceiling quickly; the
+     incoming one rises from a floor just behind it with a crisper ease-out, so each change lands as
+     one decisive beat instead of two figures cross-wiping at once. No fades. */
   .figures__slot {
     position: absolute;
     inset: 0;
@@ -442,16 +798,22 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
     flex-direction: column;
     justify-content: center;
     gap: var(--wp--preset--spacing--16);
-    /* Resting (inactive) state is masked out below its line; the active one wipes up into place. */
-    clip-path: inset(0 0 100% 0);
-    transform: translate3d(0, 40px, 0);
+    clip-path: inset(100% 0 0 0);
+    transform: translate3d(0, 48px, 0);
     transition:
-      clip-path 0.7s var(--wp--custom--motion--ease-out),
-      transform 0.7s var(--wp--custom--motion--ease-out);
+      clip-path 0.32s var(--wp--custom--motion--ease-in-out),
+      transform 0.32s var(--wp--custom--motion--ease-in-out);
+  }
+  .figures__slot.is-past {
+    clip-path: inset(0 0 100% 0);
+    transform: translate3d(0, -48px, 0);
   }
   .figures__slot.is-active {
     clip-path: inset(0 0 0 0);
     transform: none;
+    transition-duration: 0.55s;
+    transition-timing-function: var(--wp--custom--motion--ease-out);
+    transition-delay: 0.14s;
   }
   .figures__value {
     color: var(--wp--custom--color--text--accent);
@@ -466,7 +828,6 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
     color: var(--wp--preset--color--sage-400);
   }
   .figures__caption {
-    max-width: 400px;
     color: var(--wp--custom--color--text--secondary);
   }
   .figures__split {
@@ -521,10 +882,6 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
     gap: var(--wp--preset--spacing--16);
     min-height: 400px;
     padding-block: var(--wp--preset--spacing--48);
-    border-top: 1px solid var(--wp--custom--color--border--subtle);
-  }
-  .figures__point:last-child {
-    border-bottom: 1px solid var(--wp--custom--color--border--subtle);
   }
   .figures__text {
     color: var(--wp--custom--color--text--secondary);
@@ -586,8 +943,12 @@ const rootClass = [`split-media--${media}`, `split-media--${position}`, classNam
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
-          const i = (entry.target as HTMLElement).dataset.figurePoint;
-          slots.forEach((slot) => slot.classList.toggle('is-active', slot.dataset.figureSlot === i));
+          const i = Number((entry.target as HTMLElement).dataset.figurePoint);
+          slots.forEach((slot) => {
+            const n = Number(slot.dataset.figureSlot);
+            slot.classList.toggle('is-active', n === i);
+            slot.classList.toggle('is-past', n < i);
+          });
         });
       },
       { rootMargin: '-45% 0px -45% 0px' },

@@ -6,6 +6,8 @@ import type { StatField } from '../lib/types';
 
 export interface ResultsRecord {
   period: string;
+  /** All values are in this currency, stated once beside the publication date. */
+  currency: string;
   /** ISO date the report was published. */
   published: string;
   headline: StatField[];
@@ -13,28 +15,32 @@ export interface ResultsRecord {
   /** Revenue by segment, percent of the period's revenue. */
   revenueMix: { label: string; value: number }[];
   report: { label: string; url: string; context?: string };
+  /** Latest annual report. PLACEHOLDER until the client confirms the title, date and file. */
+  annualReport: { label: string; meta: string; url: string; context?: string };
   next: { label: string; date: string };
 }
 
 export const latestResults: ResultsRecord = {
   period: 'Q2 2026',
+  currency: 'NOK',
   published: '2026-08-18',
   headline: [
-    { key: 'revenue', value: '988.1', unit: 'NOK', suffix: 'm', label: 'Revenue', delta: '+44% year on year', trend: 'up' },
-    { key: 'ebit', value: '192.4', unit: 'NOK', suffix: 'm', label: 'EBIT', delta: '+111% year on year', trend: 'up' },
-    { key: 'backlog', value: '1,850', unit: 'NOK', suffix: 'm', label: 'Order backlog', delta: '+61% year on year', trend: 'up' },
-    { key: 'pipeline', value: '9', unit: 'NOK', suffix: 'bn', label: 'Tender pipeline', delta: 'Active opportunities' },
+    { key: 'revenue', value: '988.1', suffix: 'm', label: 'Revenue', delta: '+44% year on year', trend: 'up' },
+    { key: 'ebit', value: '192.4', suffix: 'm', label: 'EBIT', delta: '+111% year on year', trend: 'up' },
+    { key: 'backlog', value: '1,850', suffix: 'm', label: 'Order backlog', delta: '+61% year on year', trend: 'up' },
+    { key: 'pipeline', value: '9', suffix: 'bn', label: 'Tender pipeline', delta: 'Active opportunities' },
   ],
   secondary: [
-    { key: 'ebitda', value: 'NOK 428.3m', label: 'EBITDA' },
-    { key: 'net-profit', value: 'NOK 133.6m', label: 'Net profit' },
+    { key: 'ebitda', value: '428.3m', label: 'EBITDA' },
+    { key: 'net-profit', value: '133.6m', label: 'Net profit' },
     { key: 'utilisation', value: '83%', label: 'Fleet utilisation' },
-    { key: 'cash', value: 'NOK 410.4m', label: 'Cash and equivalents' },
+    { key: 'cash', value: '410.4m', label: 'Cash and equivalents' },
   ],
   revenueMix: [
     { label: 'Oil & gas', value: 54 },
     { label: 'Renewables & other', value: 46 },
   ],
   report: { label: 'Q2 2026 report', url: '#', context: 'PDF' },
+  annualReport: { label: 'Annual report 2025', meta: 'Annual and sustainability report', url: '#', context: 'PDF' },
   next: { label: 'Q3 2026 results', date: '2026-11-17' },
 };

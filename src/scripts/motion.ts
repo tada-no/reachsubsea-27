@@ -18,6 +18,7 @@ const REVEAL_TARGETS = [
   '.accordion__header',
   '.accordion__list > *',
   '.cta-band__inner',
+  '.figures__card',
 ].join(',');
 
 const MAX_STAGGER = 6;

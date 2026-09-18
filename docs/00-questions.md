@@ -10,6 +10,14 @@ _No open questions right now._
 
 ## Answered log
 
+### Q61. Why invest: four reasons layout (18 Sep 2026, review round 3)
+Context: with the Results band now directly above, the pinned-figure scroll took ~1,700px for ~200 words, showed one figure at a time, and repeated two figures from the band (EBIT +111%, cash 410.4m).
+- [x] 2×2 figure grid: all four visible, each led by a figure the band doesn't show (+84% net profit, 750+ days, 54/46 revenue mix bar, NOK 1,172.5m equity)
+- [ ] Keep the pinned scroll, shortened
+- [ ] Keep as is
+
+**Answer:** 2×2 grid, on the light (tint) background. **Review round 4:** reworked to cards on white. The three value reasons are stacked as cards (title → body → figure), and revenue mix is a feature card with a donut chart. The Results footer moved to a Navy panel with three evenly spaced items. Section grounds (round 4): Results white with a tint footer strip · Reasons white · Share tint · Strategy white (tint cards; the market opportunity banner removed) · FAQ tint · CTA tint.
+
 ### Q60. Share price on Why invest (18 Sep 2026, Why invest)
 Context: the PDF's chart is sample data. The dev Share info page embeds `https://ir.oms.no/component/standardPage?token=reach_std&lang=en` (a full ~2,200px OMS page: quote, chart, profit calculator, etc.).
 - [ ] Placeholder slot

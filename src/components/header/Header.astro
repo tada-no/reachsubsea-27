@@ -154,6 +154,10 @@ const menuOpen = siteMenuOpen || mobileMenuOpen;
     border-bottom-color: transparent;
     box-shadow: var(--wp--preset--shadow--sm);
   }
+  /* A docked Section subnav carries the shadow for both bars (SectionSubnav.astro) */
+  :root.has-docked-subnav .site-header.is-scrolled:not(.has-open-panel) {
+    box-shadow: none;
+  }
 
   .site-header__bar {
     position: relative;

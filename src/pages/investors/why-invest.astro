@@ -26,34 +26,32 @@ const subnavItems = [
 const pick = (key: string) => [...r.headline, ...r.secondary].find((s) => s.key === key)!;
 const renewables = r.revenueMix[1];
 
+// Each reason carries a figure the Results band above doesn't already show (review round 3).
 const reasons = [
   {
-    kicker: 'Results',
     title: 'Operational excellence, record results',
-    text: `Revenue and EBIT both grew sharply in ${r.period}, and net profit rose 84% to ${pick('net-profit').value}. Higher activity is turning into utilisation and earnings.`,
-    figure: '+111%',
-    caption: `EBIT growth, ${r.period} year on year.`,
+    text: `Revenue and EBIT both grew sharply in ${r.period}, and net profit reached NOK ${pick('net-profit').value}. Higher activity is turning into utilisation and earnings.`,
+    figure: '+84%',
+    caption: `Net profit growth, ${r.period} year on year.`,
   },
   {
-    kicker: 'Reach Remote',
     title: 'Reach Remote is scaling commercially',
     text: "Uncrewed operations delivered every quarter, DNV's world-first AROS class notation, and remote-sailing permits in place in Norway, Australia and the UK.",
     figure: '750+',
     caption: 'Uncrewed operational days delivered per quarter.',
   },
   {
-    kicker: 'Diversification',
     title: 'Revenue diversifying beyond oil & gas',
     text: `Renewables and other segments now make up ${renewables.value}% of revenue. Offshore wind and emerging ocean industries are growing their share of demand.`,
-    caption: `Revenue by segment, ${r.period}, as reported.`,
+    caption: 'Revenue by segment',
+    period: r.period,
     split: r.revenueMix,
   },
   {
-    kicker: 'Balance sheet',
     title: 'A fleet built for growth',
-    text: 'A stronger balance sheet, with equity of NOK 1,172.5m, supports continued fleet investment: the Viking Vigor newbuild due in H2 2026 and the Reach Remote 3 & 4 build.',
-    figure: pick('cash').value.replace('NOK ', ''),
-    caption: 'NOK in cash and equivalents at quarter end.',
+    text: `A stronger balance sheet, with NOK ${pick('cash').value} in cash, supports continued fleet investment: the Viking Vigor newbuild due in H2 2026 and the Reach Remote 3 & 4 build.`,
+    figure: '1,172.5m',
+    caption: 'NOK in equity at quarter end.',
   },
 ];
 
@@ -91,7 +89,7 @@ const faqItems = [
       ]}
       title="Why invest in Reach Subsea"
       lead="A technology-driven subsea partner with record results, a growing uncrewed operations platform and a fleet built for the next phase of offshore energy, across oil & gas and renewables."
-      image={{ src: `${base}images/vessel-olympic-zeus.jpg`, alt: '', focalPoint: { x: 0.45, y: 0.55 } }}
+      image={{ src: `${base}images/windfarm-turbine-install.jpg`, alt: '', focalPoint: { x: 0.6, y: 0.66 } }}
     />
 
     <SectionSubnav source="section-pages" label="Investors" items={subnavItems} current="/investors/why-invest/" />
@@ -101,15 +99,20 @@ const faqItems = [
       animate
       sectionHeader={{ title: `${r.period} results` }}
       published={r.published}
+      currency={r.currency}
       stats={r.headline}
       secondary={r.secondary}
-      report={{ label: `${r.report.label} (PDF)`, url: r.report.url, action: 'file' }}
+      documents={[
+        { ...r.report, action: 'file', meta: `Published ${new Date(`${r.published}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}` },
+        { ...r.annualReport, action: 'file' },
+      ]}
       next={r.next}
     />
 
     <SplitMedia
       media="figures"
-      background="navy"
+      layout="cards"
+      background="white"
       spacing="lg"
       title="Four reasons we believe in Reach Subsea's next chapter"
       figures={reasons}
@@ -120,23 +123,23 @@ const faqItems = [
       position="start"
       background="tint"
       eyebrow="Capital allocation"
-      title="Growth and returns, in balance"
-      body={`<p class="split-media__quote">We aim to distribute a dividend of around 50% of adjusted net profit.</p>
-<p>That is balanced against continued investment in fleet growth and the Reach Remote programme. Adjusted net profit is reported net profit, adjusted for items the Board regards as transitory.</p>
-<p>Reach Subsea ASA is listed on the Oslo Stock Exchange (Euronext) under the ticker REACH.</p>`}
+      title="A dividend of around 50% of adjusted net profit"
+      body="<p>Balanced against continued investment in fleet growth and the Reach Remote programme. Adjusted net profit is reported net profit, adjusted for items the Board regards as transitory.</p>"
       actions={[{ label: 'Dividend & IR policy', url: '/investors/governance-meetings/' }]}
       embed={{
         src: 'https://ir.oms.no/component/standardPage?token=reach_std&lang=en',
         title: 'Reach Subsea share price, live from Euronext',
         height: 2212,
         crop: 640,
-        source: 'Live share data: Euronext · OMS',
+        source: 'REACH · Oslo Stock Exchange (Euronext). Live data: OMS',
         link: { label: 'Full share information', url: '/investors/share-information/' },
       }}
     />
 
     <SplitMedia
-      media="card"
+      media="numbered-list"
+      layout="stacked"
+      background="white"
       title="Three priorities driving the next phase"
       items={[
         {
@@ -152,15 +155,6 @@ const faqItems = [
           text: 'Add capacity such as the Viking Vigor newbuild (H2 2026) while managing the balance sheet. The Viking Reach divestment unlocks over NOK 200m in liquidity.',
         },
       ]}
-      card={{
-        media: 'image-bg',
-        size: 'featured',
-        image: { src: `${base}images/windfarm-turbine-install.jpg`, alt: 'Offshore support vessel working in a wind farm', focalPoint: { x: 0.55, y: 0.5 } },
-        eyebrow: 'Market opportunity',
-        title: 'Demand for ocean data is broadening',
-        description:
-          'Survey, monitoring and inspection demand now spans offshore wind, oil & gas and emerging ocean industries. That puts our fleet and uncrewed technology across more than one energy cycle.',
-      }}
     />
 
     <Accordion
@@ -186,7 +180,7 @@ const faqItems = [
         { label: 'Share information', url: '/investors/share-information/', action: 'page' },
       ]}
       showContact
-      contact={{ name: 'Arne Joa', role: 'Chief Financial Officer · Investor relations', phone: '+47 474 51 344', email: 'arne.joa@reachsubsea.com' }}
+      contact={{ label: 'Investor relations', name: 'Arne Joa', role: 'Chief Financial Officer', phone: '+47 474 51 344', email: 'arne.joa@reachsubsea.com' }}
     />
   </main>
   <Footer />

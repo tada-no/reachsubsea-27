@@ -9,10 +9,13 @@ import BlockSection from '../components/BlockSection.astro';
 import Button from '../components/Button.astro';
 import Link from '../components/Link.astro';
 import MetaItem from '../components/MetaItem.astro';
+import Eyebrow from '../components/Eyebrow.astro';
 import { makeId } from '../lib/ids';
 import type { ActionField, BlockFields } from '../lib/types';
 
 interface Contact {
+  /** Panel only: small label above the name, e.g. "Investor relations". */
+  label?: string;
   name: string;
   role?: string;
   phone?: string;
@@ -45,6 +48,9 @@ const {
 } = Astro.props;
 
 const panel = style === 'panel';
+// Panel + contact (18 Sep 2026): message and actions on the left, the person as a quiet card on the
+// right, instead of squeezing name, role, phone and email into one wrapping row under the lead.
+const panelContact = panel && showContact && Boolean(contact);
 const band = style === 'band' || panel;
 const titleId = makeId('cta', title);
 const shownActions = actions.slice(0, 2);
@@ -60,6 +66,46 @@ const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
   anchor={anchor}
   labelledBy={titleId}
 >
+  {panelContact && contact ? (
+  <div class="cta-band__inner cta-band__inner--contact has-surface-navy">
+    <div class="cta-band__main">
+      <div class="cta-band__text">
+        <h2 id={titleId} class="cta-band__title text-h2">{title}</h2>
+        {text && <p class="cta-band__lead text-lead">{text}</p>}
+      </div>
+      {shownActions.length > 0 && (
+        <div class="cta-band__actions">
+          {shownActions.map((action, i) =>
+            (action.type ?? (i === 0 ? 'button' : 'link')) === 'button' ? (
+              <Button label={action.label} href={action.url} variant={action.buttonStyle ?? 'primary'} />
+            ) : (
+              <Link label={action.label} href={action.url} action={action.action ?? 'page'} context={action.context} />
+            ),
+          )}
+        </div>
+      )}
+    </div>
+    <address class="cta-band__card">
+      {contact.label && <Eyebrow text={contact.label} as="span" />}
+      <div class="cta-band__person">
+        <p class="text-h4">{contact.name}</p>
+        {contact.role && <p class="cta-band__role text-small">{contact.role}</p>}
+      </div>
+      <div class="cta-band__card-links">
+        {contact.email && (
+          <a class="cta-band__contact-link" href={`mailto:${contact.email}`}>
+            <MetaItem icon="mail" text={contact.email} as="span" />
+          </a>
+        )}
+        {contact.phone && (
+          <a class="cta-band__contact-link" href={telHref(contact.phone)}>
+            <MetaItem icon="phone" text={contact.phone} as="span" />
+          </a>
+        )}
+      </div>
+    </address>
+  </div>
+  ) : (
   <div class:list={['cta-band__inner', panel && 'has-surface-navy', !band && `cta-band__callout cta-band__callout--${calloutBackground}`]}>
     <div class="cta-band__text">
       <h2 id={titleId} class:list={['cta-band__title', band ? 'text-h2' : 'text-h4']}>{title}</h2>
@@ -99,6 +145,7 @@ const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
       )
     }
   </div>
+  )}
 </BlockSection>
 
 <style is:global>
@@ -187,13 +234,57 @@ const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
   .cta-band--panel .cta-band__title {
     text-wrap: balance;
   }
+  /* Lead size (review round 4, all panels): the H3-sized line competed with the title */
   .cta-band--panel .cta-band__lead {
-    font-size: var(--wp--preset--font-size--h3);
-    line-height: var(--wp--custom--line-height--h3);
     color: var(--wp--custom--color--text--primary);
   }
   .cta-band--panel .cta-band__text {
     gap: var(--wp--preset--spacing--4);
+  }
+
+  /* Panel + contact */
+  .cta-band--panel .cta-band__inner--contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
+    align-items: center;
+    gap: var(--wp--custom--stack--xl) var(--wp--preset--spacing--64);
+  }
+  .cta-band__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+    min-width: 0;
+  }
+  .cta-band--panel .cta-band__inner--contact .cta-band__actions {
+    justify-content: flex-start;
+  }
+  .cta-band__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--16);
+    padding-left: var(--wp--preset--spacing--48);
+    border-left: 1px solid var(--wp--custom--color--border--subtle);
+    font-style: normal;
+  }
+  .cta-band__card .cta-band__person {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+  }
+  .cta-band__card-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+  }
+  @media (max-width: 899px) {
+    .cta-band--panel .cta-band__inner--contact {
+      grid-template-columns: 1fr;
+    }
+    .cta-band__card {
+      padding: var(--wp--preset--spacing--32) 0 0;
+      border-left: 0;
+      border-top: 1px solid var(--wp--custom--color--border--subtle);
+    }
   }
 
   /* Inline: callout inside the container */

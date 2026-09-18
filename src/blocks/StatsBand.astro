@@ -7,7 +7,7 @@
 // columns with a rule between, all sharing one bottom line with the lead's label. Stacks below 900.
 // Results (18 Sep 2026, Why invest): the latest reported quarter. Title + "As reported" badge + date,
 // 4 headline figures (unit · value · scale, change line) over a 2px navy rule, 4 secondary figures in
-// a ruled row, then the next report date (add to calendar, .ics) and the report file. Reads the
+// a ruled row, then the next report date (add to calendar, .ics) and the report downloads. Reads the
 // Latest results options page (src/data/investor-results.ts). Replaces the PDF's overlapping card.
 // Max one Stats band per page (docs/05 §0).
 import BlockSection from '../components/BlockSection.astro';
@@ -30,10 +30,13 @@ interface Props extends BlockFields {
   align?: 'start' | 'center';
   /** Stats enter one by one and count up from 0 when the band scrolls into view (17 Sep 2026). */
   animate?: boolean;
-  /** Results style: ISO publication date, the secondary figures, the report file and the next report. */
+  /** Results style: ISO publication date, the secondary figures, the report downloads and the next report. */
   published?: string;
+  /** Results style: stated once in the stamp ("All figures in NOK"), never on each figure. */
+  currency?: string;
   secondary?: StatField[];
-  report?: LinkField;
+  /** Results style: 0–2 PDF downloads (latest quarterly report, annual report), one line of meta each. */
+  documents?: (LinkField & { meta?: string })[];
   next?: { label: string; date: string };
   class?: string;
 }
@@ -46,8 +49,9 @@ const {
   align,
   animate = false,
   published,
+  currency,
   secondary = [],
-  report,
+  documents = [],
   next,
   background,
   spacing,
@@ -100,7 +104,10 @@ const STAT_STAGGER = 160;
         {results ? (
           <div class="stats-band__group stats-band__results">
             <div class="results__top">
-              {sectionHeader && <h2 id={titleId} class="text-h2">{sectionHeader.title}</h2>}
+              <div class="results__title">
+                {sectionHeader && <h2 id={titleId} class="text-h2">{sectionHeader.title}</h2>}
+                {currency && <p class="results__currency text-small">All figures in {currency}</p>}
+              </div>
               {published && (
                 <p class="results__stamp text-small">
                   <Badge label="As reported" tone="accent" />
@@ -112,10 +119,14 @@ const STAT_STAGGER = 160;
               {stats.map((stat, i) => (
                 <li class="results__item" style={`--stat-i: ${i}`}>
                   <p class="results__label text-small">{stat.label}</p>
+                  {/* The scale ("m", "bn") is part of the counted text, so it always sits hard against the digits */}
                   <p class="results__value">
                     {stat.unit && <span class="results__unit">{stat.unit}</span>}
-                    {animate ? <span data-count-up data-count-up-delay={150 + i * STAT_STAGGER}>{stat.value}</span> : stat.value}
-                    {stat.suffix && <span class="results__suffix">{stat.suffix}</span>}
+                    {animate ? (
+                      <span data-count-up data-count-up-delay={150 + i * STAT_STAGGER}>{stat.value}{stat.suffix}</span>
+                    ) : (
+                      `${stat.value}${stat.suffix ?? ''}`
+                    )}
                   </p>
                   {stat.delta && (
                     <p class:list={['results__delta text-small', stat.trend && `results__delta--${stat.trend}`]}>
@@ -131,27 +142,39 @@ const STAT_STAGGER = 160;
                 {secondary.map((stat) => (
                   <div class="results__row">
                     <dt class="text-small">{stat.label}</dt>
-                    <dd class="text-h5">{stat.value}</dd>
+                    <dd class="text-h4">{stat.value}</dd>
                   </div>
                 ))}
               </dl>
             )}
-            {(next || report?.url) && (
+            {(next || documents.length > 0) && (
               <div class="results__footer">
                 {next && nextDate && (
-                  <div class="results__next">
-                    <span class="results__cal" aria-hidden="true">
-                      <span class="results__cal-month">{nextDate.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' })}</span>
-                      <span class="results__cal-day">{nextDate.getUTCDate()}</span>
+                  <div class="results__doc">
+                    <span class="results__tile" aria-hidden="true">
+                      <span class="results__tile-band">{nextDate.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' })}</span>
+                      <span class="results__tile-body">{nextDate.getUTCDate()}</span>
                     </span>
-                    <p class="results__next-text">
-                      <span class="text-h5">{next.label}</span>
-                      <span class="text-small">Next report · <time datetime={next.date}>{longDate(next.date)}</time></span>
-                    </p>
-                    <Link label="Add to calendar" href={icsHref} action="file" context={next.label} download={`reach-subsea-${next.date}.ics`} />
+                    <div class="results__doc-text">
+                      <h3 class="text-h4">{next.label}</h3>
+                      <p class="text-small">Next report · <time datetime={next.date}>{longDate(next.date)}</time></p>
+                      <Link label="Add to calendar" href={icsHref} action="file" size="small" context={next.label} download={`reach-subsea-${next.date}.ics`} />
+                    </div>
                   </div>
                 )}
-                {report?.url && <Link label={report.label} href={report.url} action="file" context={report.context} class="results__report" />}
+                {documents.slice(0, 2).map((doc) => (
+                  <div class="results__doc">
+                    <span class="results__tile" aria-hidden="true">
+                      <span class="results__tile-band">PDF</span>
+                      <span class="results__tile-body"><Icon name="file-text" size={24} /></span>
+                    </span>
+                    <div class="results__doc-text">
+                      <h3 class="text-h4">{doc.label}</h3>
+                      {doc.meta && <p class="text-small">{doc.meta}</p>}
+                      <Link label="Download report" href={doc.url} action="file" size="small" context={doc.context ?? doc.label} />
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -371,6 +394,15 @@ const STAT_STAGGER = 160;
     display: flex;
     flex-direction: column;
   }
+  .results__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--wp--preset--spacing--4) var(--wp--preset--spacing--16);
+  }
+  .results__currency {
+    color: var(--wp--custom--color--text--secondary);
+  }
   .results__stamp {
     display: flex;
     flex-wrap: wrap;
@@ -381,7 +413,6 @@ const STAT_STAGGER = 160;
   .results__headline {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    border-top: 2px solid var(--wp--custom--color--text--primary);
   }
   .results__item {
     display: flex;
@@ -403,7 +434,8 @@ const STAT_STAGGER = 160;
     display: flex;
     align-items: baseline;
     color: var(--wp--custom--color--text--primary);
-    font-size: clamp(2.25rem, 1.5458rem + 1.5023vw, 3.25rem); /* 36 → 52 */
+    /* One step below the H2 title (48) so the heading still leads (review round 4) */
+    font-size: clamp(2rem, 1.6479rem + 0.7512vw, 2.5rem); /* 32 → 40 */
     line-height: 1;
     font-weight: var(--wp--custom--font-weight--bold);
     letter-spacing: -0.03em;
@@ -417,9 +449,6 @@ const STAT_STAGGER = 160;
     letter-spacing: 0;
     color: var(--wp--custom--color--text--secondary);
   }
-  .results__suffix {
-    margin-left: 0.04em;
-  }
   .results__delta {
     display: inline-flex;
     align-items: center;
@@ -431,10 +460,11 @@ const STAT_STAGGER = 160;
   .results__delta--up {
     color: var(--wp--custom--color--text--accent);
   }
+  /* One rule, between the headline and secondary rows (review round 2) */
   .results__secondary {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    border-block: 1px solid var(--wp--custom--color--border--subtle);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
   }
   .results__row {
     display: flex;
@@ -455,32 +485,49 @@ const STAT_STAGGER = 160;
     font-variant-numeric: tabular-nums lining-nums;
     white-space: nowrap;
   }
+  /* Footer (review round 4): a full-width tint strip that closes the section, flush with its bottom
+     edge; three items evenly spaced on the container (no rules, round 5). The strip bleeds with
+     a box-shadow + clip-path pair, so it never causes a horizontal scrollbar. */
   .results__footer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--wp--preset--spacing--24);
-    padding-top: var(--wp--preset--spacing--32);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: var(--wp--custom--section--sm);
+    margin-bottom: calc(var(--wp--custom--section--md) * -1);
+    padding-block: var(--wp--preset--spacing--64) var(--wp--preset--spacing--48);
+    background-color: var(--wp--custom--color--bg--tint);
+    box-shadow: 0 0 0 100vmax var(--wp--custom--color--bg--tint);
+    clip-path: inset(0 -100vmax);
   }
-  .results__next {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--wp--preset--spacing--16) var(--wp--preset--spacing--32);
+  .results__footer > * {
+    padding-inline: var(--wp--preset--spacing--40);
   }
-  .results__next-text {
+  .results__footer > :first-child {
+    padding-left: 0;
+  }
+  .results__doc {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--16);
+  }
+  .results__doc-text {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: var(--wp--preset--spacing--4);
   }
-  .results__next-text .text-small {
+  .results__doc-text .text-small {
     color: var(--wp--custom--color--text--secondary);
   }
-  .results__next-text + .link-arrow {
-    margin-left: calc(var(--wp--preset--spacing--16) * -1 + var(--wp--preset--spacing--8));
+  /* The link's 44px tap target adds 12px above its label: pull it up so the visible gap to the
+     meta line is 12, without shrinking the target (review round 5) */
+  .results__doc-text .link-arrow {
+    margin-top: calc(var(--wp--preset--spacing--4) * -1);
   }
-  .results__cal {
+  .results__tile {
+    flex: none;
+    /* Optical: top of the tile level with the title's cap height, not its line box (H4 leading puts
+       the caps ~0.28em down); scales with the fluid H4 (review round 5) */
+    margin-top: calc(var(--wp--preset--font-size--h4) * 0.28);
     display: grid;
     grid-template-rows: 24px 40px;
     width: 56px;
@@ -488,9 +535,8 @@ const STAT_STAGGER = 160;
     border: 2px solid var(--wp--custom--color--text--primary);
     border-radius: var(--wp--custom--radius--sm);
     text-align: center;
-    margin-right: calc(var(--wp--preset--spacing--32) * -1 + var(--wp--preset--spacing--16));
   }
-  .results__cal-month {
+  .results__tile-band {
     background-color: var(--wp--custom--color--text--primary);
     color: var(--wp--custom--color--bg--default);
     font-size: 0.75rem;
@@ -499,11 +545,14 @@ const STAT_STAGGER = 160;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  .results__cal-day {
-    font-size: 1.5rem;
-    line-height: 40px;
+  .results__tile-body {
+    display: grid;
+    place-items: center;
+    /* Secondary figures, footer titles and the calendar day share H4 (24) (review round 5) */
+    font-size: var(--wp--preset--font-size--h4);
     font-weight: var(--wp--custom--font-weight--bold);
     font-variant-numeric: tabular-nums;
+    color: var(--wp--custom--color--text--primary);
   }
   html.js .stats-band--animate .results__item {
     opacity: 0;
@@ -526,13 +575,16 @@ const STAT_STAGGER = 160;
       padding-left: 0;
       border-left: 0;
     }
-    .results__item:nth-child(n + 3),
-    .results__row:nth-child(n + 3) {
-      border-top: 1px solid var(--wp--custom--color--border--subtle);
-    }
     .results__row:nth-child(3) {
       padding-left: 0;
       border-left: 0;
+    }
+    .results__footer {
+      grid-template-columns: 1fr;
+      padding-block: var(--wp--preset--spacing--8);
+    }
+    .results__footer > * {
+      padding: var(--wp--preset--spacing--24) 0;
     }
   }
   /* Phones: two columns of ~160px, so the unit moves onto its own line above the figure */
