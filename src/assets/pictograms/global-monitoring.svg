@@ -1,7 +1,6 @@
 <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M67.45 70.6C67.44 70.53 66.01 63.51 64.66 59.76C63.74 57.19 62.36 56.68 59.85 55.75C59.21 55.51 58.53 55.25 57.81 54.95C55.95 54.15 54.84 52.33 54.82 50.06C54.8 47.5 56.26 44.26 59.56 42.79C61.4 41.97 64.96 42.47 71.12 44.42C73.02 45.02 76.17 43.79 77.22 43.27L78.34 45.51C77.86 45.75 73.55 47.82 70.36 46.8C63.41 44.6 61.25 44.77 60.58 45.07C58.32 46.08 57.31 48.35 57.32 50.04C57.33 50.64 57.48 52.09 58.79 52.65C59.47 52.94 60.12 53.18 60.73 53.4C63.39 54.4 65.7 55.25 67.01 58.91C68.42 62.83 69.84 69.81 69.9 70.11L67.45 70.6Z" fill="currentColor"/>
-<path class="pg-ring pg-lead" d="M48 18A30 30 0 1 1 48 78A30 30 0 1 1 48 18Z" stroke="currentColor" stroke-width="2.5"/>
-<path class="pg-sweep" pathLength="100" d="M48 18A30 30 0 1 1 48 78A30 30 0 1 1 48 18Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+<path class="pg-ring pg-lead" pathLength="100" d="M48 18A30 30 0 1 1 48 78A30 30 0 1 1 48 18Z" stroke="currentColor" stroke-width="2.5"/>
 <path class="pg-scan pg-scan--mid" pathLength="100" d="M48 24A24 24 0 0 0 48 72" stroke="currentColor" stroke-width="2.5"/>
 <path class="pg-scan pg-scan--inner" pathLength="100" d="M48 30A18 18 0 0 0 48 66" stroke="currentColor" stroke-width="2.5"/>
 <path d="M49.25 18H46.75V77.94H49.25V18Z" fill="currentColor"/>

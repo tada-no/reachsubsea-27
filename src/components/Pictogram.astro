@@ -67,10 +67,12 @@ const live = Boolean(inner && inner.includes('class="pg-'));
 
   /* ── Micro loops (18 Sep 2026) ─────────────────────────────────
      Purpose: explanation. Each service pictogram acts out its subject once as the card reveals, and
-     again on hover. Style: After Effects trim paths — quick eased moves with holds between them, bright
-     segments riding a dimmed track. The moving parts are real strokes in the SVG source (pathLength
-     100) so stroke-dasharray can trim them; everything else stays the original filled artwork.
-     Transform, opacity, stroke-dashoffset and offset-distance only. Every part of one pictogram shares
+     again on hover. Style: After Effects trim paths — quick eased moves with holds between them.
+     Rule (18 Sep 2026): no transparency. The icons stay fully solid; highlights are travelling gaps,
+     either trimmed out of the stroke itself or cut by an eraser stroke in the card's solid surface
+     colour (--pg-bg, set by Card.astro). The moving parts are real strokes in the SVG source
+     (pathLength 100) so stroke-dasharray can trim them; everything else stays the original filled
+     artwork. Transform, stroke-dasharray, stroke-dashoffset and offset-distance only. Every part of one pictogram shares
      its --pg-cycle and rests at 0% and 100%, so the loop can stop cleanly at a cycle boundary:
      motion.ts removes .is-playing on the lead part's animationiteration. Phases live in the keyframes,
      never in animation-delay, for the same reason. Reduced motion: base.css clamps every animation to
@@ -90,16 +92,23 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     transform-origin: center;
   }
 
-  /* Technology: electrons ride their orbits one after another, each dragging a bright trail over the
-     dimmed orbit artwork. The electrons sit on their orbit with offset-path (rest = 0%); browsers
-     without it keep the static transform from the SVG and still get the trails. */
+  /* Technology: electrons ride their orbits one after another, each dragging a gap that cuts through
+     the orbit lines behind it — the same gap language the icon already uses where orbits weave. The
+     gap is an eraser stroke in the surface colour whose length grows from 0 and shrinks back (pattern
+     "0 G L 0": the dash L is anchored at its head, which tracks the electron). The electrons sit on
+     their orbit with offset-path (rest = 0%); browsers without it keep the static transform from the
+     SVG and still get the gaps. Without --pg-bg (outside a card) the gaps simply don't paint. */
   .pictogram--technology {
     --pg-cycle: 3.2s;
   }
   .pictogram--technology .pg-trail {
-    stroke-dasharray: 14 86;
-    stroke-dashoffset: 14;
-    opacity: 0;
+    stroke: var(--pg-bg, none);
+    stroke-width: 4.5;
+    stroke-dasharray: 0 100 0 0;
+    stroke-dashoffset: 100;
+  }
+  .pictogram--technology .pg-electron {
+    fill: var(--pg-bg, none);
   }
   @supports (offset-path: path('M0 0')) {
     .pictogram--technology .pg-electron {
@@ -117,9 +126,6 @@ const live = Boolean(inner && inner.includes('class="pg-'));
       offset-path: path('M74.7 56.51A32.56 10.6 30 1 0 22.2 39.49A32.56 10.6 30 1 0 74.7 56.51Z');
     }
   }
-  .pictogram--technology.is-playing .pg-orbits {
-    animation-name: pg-track-dim;
-  }
   .pictogram--technology.is-playing .pg-nucleus {
     animation-name: pg-kick;
   }
@@ -133,17 +139,13 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     animation-name: pg-ride-c;
   }
   .pictogram--technology.is-playing .pg-trail--a {
-    animation-name: pg-trail-a, pg-trail-fade-a;
+    animation-name: pg-trail-a, pg-trail-len-a;
   }
   .pictogram--technology.is-playing .pg-trail--b {
-    animation-name: pg-trail-b, pg-trail-fade-b;
+    animation-name: pg-trail-b, pg-trail-len-b;
   }
   .pictogram--technology.is-playing .pg-trail--c {
-    animation-name: pg-trail-c, pg-trail-fade-c;
-  }
-  @keyframes pg-track-dim {
-    0%, 84%, 100% { opacity: 1; }
-    8%, 74% { opacity: 0.28; }
+    animation-name: pg-trail-c, pg-trail-len-c;
   }
   @keyframes pg-kick {
     0%, 14%, 100% { transform: scale(1); }
@@ -162,38 +164,37 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     72%, 100% { offset-distance: 100%; }
   }
   @keyframes pg-trail-a {
-    0%, 6% { stroke-dashoffset: 14; }
-    44%, 100% { stroke-dashoffset: -86; }
+    0%, 6% { stroke-dashoffset: 100; }
+    44%, 100% { stroke-dashoffset: 0; }
   }
   @keyframes pg-trail-b {
-    0%, 20% { stroke-dashoffset: 14; }
-    58%, 100% { stroke-dashoffset: -86; }
+    0%, 20% { stroke-dashoffset: 100; }
+    58%, 100% { stroke-dashoffset: 0; }
   }
   @keyframes pg-trail-c {
-    0%, 34% { stroke-dashoffset: 14; }
-    72%, 100% { stroke-dashoffset: -86; }
+    0%, 34% { stroke-dashoffset: 100; }
+    72%, 100% { stroke-dashoffset: 0; }
   }
-  @keyframes pg-trail-fade-a {
-    0%, 6%, 44%, 100% { opacity: 0; }
-    12%, 38% { opacity: 1; }
+  @keyframes pg-trail-len-a {
+    0%, 6%, 44%, 100% { stroke-dasharray: 0 100 0 0; }
+    16%, 32% { stroke-dasharray: 0 84 16 0; }
   }
-  @keyframes pg-trail-fade-b {
-    0%, 20%, 58%, 100% { opacity: 0; }
-    26%, 52% { opacity: 1; }
+  @keyframes pg-trail-len-b {
+    0%, 20%, 58%, 100% { stroke-dasharray: 0 100 0 0; }
+    30%, 46% { stroke-dasharray: 0 84 16 0; }
   }
-  @keyframes pg-trail-fade-c {
-    0%, 34%, 72%, 100% { opacity: 0; }
-    40%, 66% { opacity: 1; }
+  @keyframes pg-trail-len-c {
+    0%, 34%, 72%, 100% { stroke-dasharray: 0 100 0 0; }
+    44%, 60% { stroke-dasharray: 0 84 16 0; }
   }
 
-  /* Global monitoring: the two sonar arcs wipe and redraw top-down, then a sweep rides the dimmed
-     outer ring once around. */
+  /* Global monitoring: the two sonar arcs wipe and redraw top-down, then a gap opens in the outer
+     ring, sweeps once around clockwise and closes (pattern "D G": the gap's head tracks the offset). */
   .pictogram--global-monitoring {
     --pg-cycle: 3.2s;
   }
-  .pictogram--global-monitoring .pg-sweep {
-    stroke-dasharray: 22 78;
-    opacity: 0;
+  .pictogram--global-monitoring .pg-ring {
+    stroke-dasharray: 100 0;
   }
   .pictogram--global-monitoring.is-playing .pg-scan--inner {
     animation-name: pg-scan-inner;
@@ -202,10 +203,7 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     animation-name: pg-scan-mid;
   }
   .pictogram--global-monitoring.is-playing .pg-ring {
-    animation-name: pg-ring-dim;
-  }
-  .pictogram--global-monitoring.is-playing .pg-sweep {
-    animation-name: pg-sweep, pg-sweep-fade;
+    animation-name: pg-sweep, pg-sweep-gap;
   }
   @keyframes pg-scan-inner {
     0% { stroke-dashoffset: 0; }
@@ -217,17 +215,13 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     21% { stroke-dashoffset: -110; }
     34%, 100% { stroke-dashoffset: -220; }
   }
-  @keyframes pg-ring-dim {
-    0%, 32%, 88%, 100% { opacity: 1; }
-    40%, 80% { opacity: 0.28; }
-  }
   @keyframes pg-sweep {
-    0%, 38% { stroke-dashoffset: 22; }
-    80%, 100% { stroke-dashoffset: -78; }
+    0%, 38% { stroke-dashoffset: 0; }
+    82%, 100% { stroke-dashoffset: -100; }
   }
-  @keyframes pg-sweep-fade {
-    0%, 34%, 84%, 100% { opacity: 0; }
-    40%, 78% { opacity: 1; }
+  @keyframes pg-sweep-gap {
+    0%, 36%, 86%, 100% { stroke-dasharray: 100 0; }
+    46%, 74% { stroke-dasharray: 78 22; }
   }
 
   /* Survey: the compass legs retract to the hinge and redraw, the hinge flares, then the compass
@@ -270,7 +264,7 @@ const live = Boolean(inner && inner.includes('class="pg-'));
 
   /* Subsea infrastructure: the swell flows (two extra wave periods sit outside a fixed clip, so the
      loop is seamless), the spanner takes two ratchet turns, the flange bolts tighten bottom to top,
-     the seabed sediment glints. */
+     the seabed sediment is stirred in three phases. */
   .pictogram--subsea-infrastructure {
     --pg-cycle: 3.2s;
   }
@@ -303,13 +297,13 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     animation-name: pg-bolt-4;
   }
   .pictogram--subsea-infrastructure.is-playing .pg-dot--a {
-    animation-name: pg-glint-a;
+    animation-name: pg-stir-a;
   }
   .pictogram--subsea-infrastructure.is-playing .pg-dot--b {
-    animation-name: pg-glint-b;
+    animation-name: pg-stir-b;
   }
   .pictogram--subsea-infrastructure.is-playing .pg-dot--c {
-    animation-name: pg-glint-c;
+    animation-name: pg-stir-c;
   }
   @keyframes pg-flow {
     to { transform: translate3d(27.2px, 0, 0); }
@@ -334,16 +328,16 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     0%, 48%, 64%, 100% { transform: scale(1); }
     56% { transform: scale(1.7); }
   }
-  @keyframes pg-glint-a {
-    0%, 30%, 100% { opacity: 1; }
-    15% { opacity: 0.15; }
+  @keyframes pg-stir-a {
+    0%, 0%, 30%, 100% { transform: translate3d(0, 0, 0); }
+    15% { transform: translate3d(0, -2.5px, 0); }
   }
-  @keyframes pg-glint-b {
-    0%, 30%, 60%, 100% { opacity: 1; }
-    45% { opacity: 0.15; }
+  @keyframes pg-stir-b {
+    0%, 30%, 60%, 100% { transform: translate3d(0, 0, 0); }
+    45% { transform: translate3d(0, -2.5px, 0); }
   }
-  @keyframes pg-glint-c {
-    0%, 60%, 90%, 100% { opacity: 1; }
-    75% { opacity: 0.15; }
+  @keyframes pg-stir-c {
+    0%, 60%, 90%, 100% { transform: translate3d(0, 0, 0); }
+    75% { transform: translate3d(0, -2.5px, 0); }
   }
 </style>

@@ -133,7 +133,9 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     overflow: hidden;
     isolation: isolate;
     border-radius: var(--wp--custom--radius--lg);
-    background-color: var(--wp--custom--color--bg--default);
+    /* The card's solid surface colour, for pictogram loops that cut gaps without transparency (Pictogram.astro) */
+    --pg-bg: var(--wp--custom--color--bg--default);
+    background-color: var(--pg-bg);
     color: var(--wp--custom--color--text--primary);
     transition:
       transform 0.4s var(--wp--custom--motion--ease-out),
@@ -150,7 +152,7 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     pointer-events: none;
   }
   .card--tint {
-    background-color: var(--wp--custom--color--bg--tint);
+    --pg-bg: var(--wp--custom--color--bg--tint);
   }
 
   .card__media {
