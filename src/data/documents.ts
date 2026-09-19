@@ -224,7 +224,7 @@ export const meetingsLatest = {
 
 /** Financial calendar: confirmed dates only. */
 export const financialCalendar: CalendarDate[] = [
-  { date: '12 Nov 2026', event: 'Q3 2026 report and presentation', icsHref: '#' },
+  { date: '17 Nov 2026', event: 'Q3 2026 report and presentation', icsHref: '#' },
   { date: '11 Feb 2027', event: 'Q4 2026 report and presentation', icsHref: '#' },
   { date: '26 Mar 2027', event: 'Annual report 2026', icsHref: '#' },
   { date: '12 May 2027', event: 'Q1 2027 report and presentation', icsHref: '#' },

@@ -3,34 +3,96 @@
 // list cols 5–12 (752) on Desktop; stacked on Mobile, same markup throughout. Milestones render
 // the shared Milestone part (src/components/Milestone.astro); status may be given explicitly or
 // derived from `isoDate` against today.
+// Layout Track (19 Sep 2026, Investors overview): the same milestones on a horizontal time axis, a
+// rolling window from 7 months back to 8 months ahead of today. Primary milestones label above the
+// rail, secondary ones below; a Today marker splits the drawn (done) rail from the plain one. Under
+// the track, two panels: Latest (newest done milestone with links) and Next (first upcoming, with a
+// countdown and an .ics). On reveal the rail draws to today and each marker lands as it is reached.
+// Below 900 the track scrolls sideways (opened at today) and the panels stack.
 import BlockSection from '../components/BlockSection.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import Milestone from '../components/Milestone.astro';
+import DateTile from '../components/DateTile.astro';
+import Link from '../components/Link.astro';
 import { makeId } from '../lib/ids';
-import type { BlockFields, SectionHeaderField } from '../lib/types';
+import type { BlockFields, LinkField, SectionHeaderField } from '../lib/types';
 
 export interface MilestoneField {
-  date: string;
+  /** Display date. Optional when `isoDate` is set (formatted "24 Apr 2026"). */
+  date?: string;
   title: string;
   text?: string;
   status?: 'done' | 'current' | 'upcoming';
   /** Compared against today ("2026-09-15") to derive status when `status` is omitted. */
   isoDate?: string;
+  /** Track layout: primary labels above the rail, secondary below. */
+  kind?: 'primary' | 'secondary';
+  /** Track layout: the newest done milestone with links becomes the Latest panel. */
+  links?: LinkField[];
 }
 
 interface Props extends BlockFields {
   sectionHeader?: SectionHeaderField;
+  layout?: 'list' | 'track';
   milestones: MilestoneField[];
+  /** Track layout: ISO date that counts as today. Defaults to the build date; the script refreshes it. */
+  today?: string;
 }
 
-const { sectionHeader, milestones = [], background, spacing, anchor } = Astro.props;
+const { sectionHeader, layout = 'list', milestones = [], today: todayProp, background, spacing, anchor } = Astro.props;
+const track = layout === 'track';
 
 const titleId = sectionHeader ? makeId('timeline', sectionHeader.title) : undefined;
+const today = todayProp ?? new Date().toISOString().slice(0, 10);
+
+const DAY = 86_400_000;
+const utc = (iso: string) => Date.parse(`${iso}T00:00:00Z`);
+const fmt = (iso: string, opts: Intl.DateTimeFormatOptions) =>
+  new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { ...opts, timeZone: 'UTC' });
+const shortDate = (iso: string) => fmt(iso, { day: 'numeric', month: 'short' });
+const longDate = (iso: string) => fmt(iso, { day: 'numeric', month: 'long', year: 'numeric' });
+const displayDate = (m: MilestoneField) => m.date ?? (m.isoDate ? fmt(m.isoDate, { day: 'numeric', month: 'short', year: 'numeric' }) : '');
+
+// Track window: first of the month 7 months back → first of the month 8 months ahead (15 months,
+// about two quarters of history and two to come).
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const t = new Date(`${today}T00:00:00Z`);
+const windowStart = Date.UTC(t.getUTCFullYear(), t.getUTCMonth() - 7, 1);
+const windowEnd = Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 8, 1);
+const pos = (ms: number) => (ms - windowStart) / (windowEnd - windowStart);
+const months = Array.from({ length: 15 }, (_, i) => {
+  const d = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() - 7 + i, 1));
+  // January carries the year; so does the first month, so the axis always says where it starts
+  return { x: pos(d.getTime()), label: MONTHS[d.getUTCMonth()], year: d.getUTCMonth() === 0 || i === 0 ? d.getUTCFullYear() : undefined };
+});
+const todayX = pos(utc(today));
+
+const events = track
+  ? milestones
+      .filter((m) => m.isoDate && utc(m.isoDate) >= windowStart && utc(m.isoDate) < windowEnd)
+      .map((m) => ({ ...m, x: pos(utc(m.isoDate!)), status: deriveStatus(m) }))
+  : [];
+const latest = [...events].reverse().find((e) => e.status === 'done' && e.links?.length);
+const next = events.find((e) => e.status !== 'done');
+const daysToNext = next ? Math.round((utc(next.isoDate!) - utc(today)) / DAY) : 0;
+const icsHref = next
+  ? 'data:text/calendar;charset=utf-8,' +
+    encodeURIComponent(
+      [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Reach Subsea//Investors//EN', 'BEGIN:VEVENT',
+        `UID:${next.isoDate}-investors@reachsubsea.com`, `DTSTAMP:${next.isoDate!.replace(/-/g, '')}T000000Z`,
+        `DTSTART;VALUE=DATE:${next.isoDate!.replace(/-/g, '')}`, `SUMMARY:Reach Subsea ${next.title}`,
+        'END:VEVENT', 'END:VCALENDAR',
+      ].join('\r\n'),
+    )
+  : undefined;
+// Markers land as the drawing rail reaches them: delay ∝ distance along the drawn part.
+const DRAW = 1.4;
+const landDelay = (x: number) => (x <= todayX ? (x / todayX) * DRAW : DRAW + 0.2 + (x - todayX) * 1.2);
 
 function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
   if (m.status) return m.status;
   if (!m.isoDate) return 'upcoming';
-  const today = new Date().toISOString().slice(0, 10);
   if (m.isoDate < today) return 'done';
   if (m.isoDate === today) return 'current';
   return 'upcoming';
@@ -48,20 +110,100 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
       labelledBy={titleId}
       label={titleId ? undefined : 'Timeline'}
     >
-      <div class="timeline__inner">
-        {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} class="timeline__header" />}
-        <ol class="timeline__list">
-          {milestones.map((m, i) => (
-            <Milestone
-              date={m.date}
-              title={m.title}
-              text={m.text}
-              status={deriveStatus(m)}
-              showLine={i !== milestones.length - 1}
-            />
-          ))}
-        </ol>
-      </div>
+      {track ? (
+        <div class="timeline__inner timeline__inner--track">
+          {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} class="timeline__header" />}
+          <div class="track-scroll">
+            <div class="track" data-track style={`--today: ${todayX}; --draw: ${DRAW}s`}>
+              <ol class="track__months" aria-hidden="true">
+                {months.map((m) => (
+                  <li class:list={['track__month', m.year && 'track__month--year']} style={`--x: ${m.x}`}>
+                    {m.year && m.label !== 'Jan' ? <Fragment>{`${m.label} `}<strong>{m.year}</strong></Fragment> : m.year ?? m.label}
+                  </li>
+                ))}
+              </ol>
+              <span class="track__rail" aria-hidden="true"><span class="track__rail-done"></span></span>
+              <span class="track__today" aria-hidden="true"><span class="track__today-label text-label">Today</span></span>
+              <ol class="track__events">
+                {events.map((e) => (
+                  <li
+                    class:list={[
+                      'track__event',
+                      `track__event--${e.kind ?? 'primary'}`,
+                      `track__event--${e.status}`,
+                      e === latest && 'track__event--latest',
+                      e === next && 'track__event--next',
+                      e.x > 0.88 && 'track__event--end',
+                    ]}
+                    style={`--x: ${e.x}; --land: ${landDelay(e.x).toFixed(2)}s`}
+                    aria-current={e === next ? 'step' : undefined}
+                  >
+                    <span class="track__node" aria-hidden="true"></span>
+                    <span class="track__stem" aria-hidden="true"></span>
+                    <span class="track__label">
+                      <strong class="track__title">{e.title}</strong>
+                      <time class="track__date" datetime={e.isoDate}>
+                        {shortDate(e.isoDate!)}
+                        <span class="visually-hidden"> {fmt(e.isoDate!, { year: 'numeric' })} · {e.status === 'done' ? 'Published' : 'Upcoming'}</span>
+                      </time>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+          {(latest || next) && (
+            <div class="track__panels">
+              {latest && (
+                <div class="track__panel track__panel--latest has-surface-light">
+                  <DateTile band="PDF" />
+                  <div class="track__panel-text">
+                    <p class="text-eyebrow track__panel-kicker">Latest</p>
+                    <h3 class="text-h4">{latest.title}</h3>
+                    <p class="text-small track__panel-meta">Published <time datetime={latest.isoDate}>{longDate(latest.isoDate!)}</time></p>
+                    <ul class="track__links">
+                      {latest.links!.map((l) => (
+                        <li><Link label={l.label} href={l.url} action={l.action} size="small" context={l.context} /></li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+              {next && (
+                <div class="track__panel track__panel--next has-surface-navy">
+                  <DateTile date={next.isoDate} />
+                  <div class="track__panel-text">
+                    <p class="text-eyebrow track__panel-kicker">Next</p>
+                    <h3 class="text-h4">{next.title}</h3>
+                    <p class="text-small track__panel-meta">
+                      <time datetime={next.isoDate}>{longDate(next.isoDate!)}</time>
+                      {daysToNext > 0 && <Fragment> · in <span data-countdown={next.isoDate}>{daysToNext} days</span></Fragment>}
+                    </p>
+                    <ul class="track__links">
+                      <li><Link label="Add to calendar" href={icsHref} action="file" size="small" context={next.title} download={`reach-subsea-${next.isoDate}.ics`} /></li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div class="timeline__inner">
+          {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} class="timeline__header" />}
+          <ol class="timeline__list">
+            {milestones.map((m, i) => (
+              <Milestone
+                date={displayDate(m)}
+                title={m.title}
+                text={m.text}
+                status={deriveStatus(m)}
+                showLine={i !== milestones.length - 1}
+              />
+            ))}
+          </ol>
+        </div>
+      )}
     </BlockSection>
   )
 }
@@ -96,4 +238,341 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
       width: 100%;
     }
   }
+  /* ── Track layout (19 Sep 2026) ───────────────────────────── */
+  .timeline__inner--track {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--wp--custom--stack--xl);
+  }
+  .timeline__inner--track .timeline__header {
+    flex: none;
+    max-width: none;
+  }
+  .track-scroll {
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: calc(-1 * var(--wp--style--root--padding-left));
+    padding-inline: var(--wp--style--root--padding-left);
+  }
+  .track-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  /* Geometry: rail at 120; primary labels end 24 above it, secondary start 24 below; month axis at 232 */
+  .track {
+    --rail: 120px;
+    position: relative;
+    min-width: 1200px;
+    height: 264px;
+  }
+  .track__rail {
+    position: absolute;
+    top: calc(var(--rail) - 1px);
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--wp--custom--color--border--default);
+  }
+  .track__rail-done {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: calc(var(--today) * 100%);
+    background-color: var(--wp--custom--color--text--primary);
+    transform-origin: left center;
+  }
+  .track__months {
+    position: absolute;
+    inset: 224px 0 auto;
+    height: 40px;
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .track__month {
+    position: absolute;
+    top: 0;
+    left: calc(var(--x) * 100%);
+    padding: var(--wp--preset--spacing--12) 0 0 var(--wp--preset--spacing--8);
+    border-left: 1px solid var(--wp--custom--color--border--default);
+    font-size: 0.8125rem;
+    line-height: 1;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .track__month--year strong,
+  .track__month--year {
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--primary);
+    border-left-color: var(--wp--custom--color--text--primary);
+  }
+  .track__today {
+    position: absolute;
+    top: 24px;
+    bottom: 40px;
+    left: calc(var(--today) * 100%);
+    width: 2px;
+    margin-left: -1px;
+    background-color: var(--wp--custom--color--icon--accent);
+    transform-origin: center bottom;
+  }
+  .track__today-label {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-bottom: var(--wp--preset--spacing--4);
+    color: var(--wp--custom--color--text--accent);
+    white-space: nowrap;
+  }
+
+  .track__event {
+    position: absolute;
+    top: 0;
+    left: calc(var(--x) * 100%);
+    height: 100%;
+  }
+  .track__node {
+    position: absolute;
+    top: var(--rail);
+    left: 0;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--bg--default);
+    box-shadow: inset 0 0 0 2px var(--wp--custom--color--border--strong);
+  }
+  .track__event--done .track__node {
+    background-color: var(--wp--custom--color--text--primary);
+    box-shadow: none;
+  }
+  .track__event--latest .track__node,
+  .track__event--next .track__node {
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+  }
+  .track__event--latest .track__node {
+    background-color: var(--wp--custom--color--icon--accent);
+  }
+  .track__event--next .track__node {
+    box-shadow: inset 0 0 0 3px var(--wp--custom--color--icon--accent);
+  }
+  .track__stem {
+    position: absolute;
+    left: 0;
+    width: 1px;
+    height: 24px;
+    background-color: var(--wp--custom--color--border--strong);
+  }
+  .track__event--primary .track__stem {
+    top: calc(var(--rail) - 8px - 24px);
+    transform-origin: center bottom;
+  }
+  .track__event--secondary .track__stem {
+    top: calc(var(--rail) + 8px);
+    transform-origin: center top;
+  }
+  .track__label {
+    position: absolute;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: max-content;
+    max-width: 152px;
+    padding-left: var(--wp--preset--spacing--8);
+    border-left: 1px solid var(--wp--custom--color--border--strong);
+  }
+  .track__event--primary .track__label {
+    bottom: calc(100% - var(--rail) + 8px + 24px);
+  }
+  .track__event--secondary .track__label {
+    top: calc(var(--rail) + 8px + 24px);
+  }
+  /* Near the right edge, or just before Today, the label hangs to the left of its stem */
+  .track__event--end .track__label,
+  .track__event--latest .track__label {
+    left: auto;
+    right: -1px;
+    align-items: flex-end;
+    text-align: right;
+    padding: 0 var(--wp--preset--spacing--8) 0 0;
+    border-left: 0;
+    border-right: 1px solid var(--wp--custom--color--border--strong);
+  }
+  .track__title {
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .track__event--secondary .track__title {
+    font-weight: var(--wp--custom--font-weight--medium);
+  }
+  .track__date {
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .track__event--latest .track__date,
+  .track__event--next .track__date {
+    color: var(--wp--custom--color--text--accent);
+    font-weight: var(--wp--custom--font-weight--bold);
+  }
+
+  .track__panels {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .track__panel {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--24);
+    padding: var(--wp--preset--spacing--40);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  .track__panel--latest {
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  .track__panel .date-tile {
+    margin-top: 2px;
+  }
+  .track__panel-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--4);
+    min-width: 0;
+  }
+  .track__panel-kicker {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .track__panel-meta {
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .track__links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--wp--preset--spacing--24);
+    margin-top: var(--wp--preset--spacing--4);
+  }
+
+  /* Draw-in: the rail runs to Today, each marker lands as the rail reaches it, then its stem and label
+     rise out of a clip (no fades). The next date's ring keeps breathing, solid, as the one live point */
+  html.js .track {
+    --ease-draw: cubic-bezier(0.45, 0, 0.25, 1);
+  }
+  html.js .track .track__rail-done {
+    transition: transform var(--draw) var(--ease-draw);
+  }
+  html.js .track .track__node {
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) var(--land);
+  }
+  html.js .track .track__stem {
+    transition: transform 0.3s var(--wp--custom--motion--ease-out) calc(var(--land) + 0.12s);
+  }
+  html.js .track .track__label {
+    transition:
+      clip-path 0.5s var(--wp--custom--motion--ease-out) calc(var(--land) + 0.2s),
+      translate 0.5s var(--wp--custom--motion--ease-out) calc(var(--land) + 0.2s);
+  }
+  html.js .track .track__today {
+    transition: transform 0.5s var(--wp--custom--motion--ease-out) calc(var(--draw) - 0.1s);
+  }
+  html.js .track .track__today-label {
+    transition: clip-path 0.4s var(--wp--custom--motion--ease-out) calc(var(--draw) + 0.25s);
+  }
+  html.js .track:not(.is-drawn) .track__rail-done {
+    transform: scaleX(0);
+  }
+  html.js .track:not(.is-drawn) .track__node {
+    transform: scale(0);
+  }
+  html.js .track:not(.is-drawn) .track__stem,
+  html.js .track:not(.is-drawn) .track__today {
+    transform: scaleY(0);
+  }
+  html.js .track:not(.is-drawn) .track__event--primary .track__label {
+    clip-path: inset(100% 0 0 0);
+    translate: 0 8px;
+  }
+  html.js .track:not(.is-drawn) .track__event--secondary .track__label {
+    clip-path: inset(0 0 100% 0);
+    translate: 0 -8px;
+  }
+  html.js .track:not(.is-drawn) .track__today-label {
+    clip-path: inset(100% 0 0 0);
+  }
+  .track__label,
+  .track__today-label {
+    clip-path: inset(0);
+  }
+  .track.is-drawn .track__event--next .track__node::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 2px var(--wp--custom--color--icon--accent);
+    animation: track-breathe 2.8s var(--wp--custom--motion--ease-in-out) calc(var(--land) + 0.6s) infinite;
+  }
+  @keyframes track-breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.75); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .track * {
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+    }
+    .track.is-drawn .track__event--next .track__node::after {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .track__panels {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--wp--preset--spacing--16);
+    }
+  }
+  @media (max-width: 599px) {
+    .track__panel {
+      padding: var(--wp--preset--spacing--24);
+      gap: var(--wp--preset--spacing--16);
+    }
+  }
 </style>
+
+<script>
+  // Track: draw on first view; on narrow screens open the scroller at Today; refresh the countdown.
+  const tracks = [...document.querySelectorAll<HTMLElement>('[data-track]')];
+  const io =
+    'IntersectionObserver' in window
+      ? new IntersectionObserver(
+          (entries) =>
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add('is-drawn');
+              io!.unobserve(entry.target);
+            }),
+          { threshold: 0.2 },
+        )
+      : null;
+  tracks.forEach((track) => {
+    if (io) io.observe(track);
+    else track.classList.add('is-drawn');
+    const scroller = track.parentElement!;
+    if (scroller.scrollWidth > scroller.clientWidth) {
+      const today = parseFloat(track.style.getPropertyValue('--today'));
+      scroller.scrollLeft = today * track.offsetWidth - scroller.clientWidth * 0.35;
+    }
+  });
+  document.querySelectorAll<HTMLElement>('[data-countdown]').forEach((el) => {
+    const now = new Date();
+    const todayUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const days = Math.round((Date.parse(`${el.dataset.countdown}T00:00:00Z`) - todayUtc) / 86_400_000);
+    if (days > 0) el.textContent = days === 1 ? '1 day' : `${days} days`;
+  });
+</script>
+

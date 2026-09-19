@@ -192,6 +192,10 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
             <figure class="figures__donut">
               <div class="figures__donut-chart">
                 <svg viewBox="0 0 42 42" aria-hidden="true" focusable="false">
+                  <mask id={`${titleId}-sweep`} maskUnits="userSpaceOnUse" x="0" y="0" width="42" height="42">
+                    <circle class="figures__sweep" cx="21" cy="21" r={DONUT_R} fill="none" stroke="#fff" stroke-width="9" />
+                  </mask>
+                  <g mask={`url(#${titleId}-sweep)`}>
                   {splitPoint.split.map((part, n) => {
                     const offset = splitPoint.split!.slice(0, n).reduce((sum, p) => sum + p.value, 0);
                     return (
@@ -201,18 +205,21 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
                         cy="21"
                         r={DONUT_R}
                         fill="none"
-                        style={`--arc: ${part.value - DONUT_GAP}; --arc-offset: ${-offset}; --arc-i: ${n}`}
+                        style={`--arc: ${part.value - DONUT_GAP}; --arc-offset: ${-offset}`}
                       />
                     );
                   })}
+                  </g>
                 </svg>
-                <figcaption class="figures__donut-centre">
+                <p class="figures__donut-centre">
                   {splitPoint.period && <strong class="figures__donut-period">{splitPoint.period}</strong>}
                   <span class="text-small">{splitPoint.caption}</span>
-                </figcaption>
+                </p>
               </div>
-              {/* Arcs start at 12 o'clock and run clockwise, so the first share sits on the right and
-                  the second on the left: each label flanks its own arc */}
+            </figure>
+            {/* Arcs start at 12 o'clock and run clockwise, so the first share sits on the right and
+                the second on the left: under the ring each label sits beside its own arc */}
+            <div class="figures__donut-labels">
               {splitPoint.split.slice(0, 2).map((part, n) => (
                 <p class={`figures__donut-label figures__donut-label--${n === 0 ? 'end' : 'start'}`}>
                   <span class="figures__donut-value">{part.value}%</span>
@@ -222,7 +229,7 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
                   </span>
                 </p>
               ))}
-            </figure>
+            </div>
             <p class="figures__text text-small">{splitPoint.text}</p>
           </div>
         )}
@@ -604,27 +611,37 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
   .figures__card--feature {
     background-color: var(--wp--preset--color--navy-800);
     grid-column: 8 / span 5;
-    grid-template-columns: 1fr;
-    align-content: start;
+    display: flex;
+    flex-direction: column;
     /* Heading → ring → body: the heading lines up with the value cards' titles */
     gap: var(--wp--preset--spacing--24);
   }
-  /* Donut (review rounds 5–6): heading → ring → labels → body. The labels sit in a row under the
-     ring, each on its own arc's side (the first share runs clockwise from 12 o'clock, so it owns the
-     right; the last closes the ring on the left), which frees the width for a larger ring. Arcs meet
-     with no gap, so a 100% split reads as a full ring. The centre names the period and measure */
+  /* Donut (review rounds 5–7). Tall card (1280+): heading → ring → labels → body. The value cards
+     alone set the row height; the figure takes the height left over (flex 1 with size containment,
+     so it adds nothing to the row) and the ring is the largest square that fits. Arcs meet with no
+     gap, so a 100% split reads as a full ring; the centre names the period and measure */
   .figures__donut {
+    flex: 1 1 0;
+    align-self: stretch; /* size containment gives it no content width of its own */
+    min-height: 240px;
+    container-type: size;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas: 'chart chart' 'start end';
-    row-gap: var(--wp--preset--spacing--16);
+    place-items: center;
   }
   .figures__donut-chart {
-    grid-area: chart;
-    justify-self: center;
     position: relative;
-    width: min(100%, 368px); /* the largest that keeps the card within the value cards' height */
+    width: min(100cqw, 100cqh, 400px);
     aspect-ratio: 1;
+  }
+  /* Under the ring each label sits on its own arc's side: renewables (the last share, closing the
+     ring on the left) left, oil & gas right */
+  .figures__donut-labels {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--24);
+  }
+  .figures__donut-label--start {
+    order: -1;
   }
   .figures__donut-centre {
     position: absolute;
@@ -649,11 +666,7 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
     flex-direction: column;
     gap: var(--wp--preset--spacing--4);
   }
-  .figures__donut-label--start {
-    grid-area: start;
-  }
   .figures__donut-label--end {
-    grid-area: end;
     align-items: flex-end;
     text-align: right;
   }
@@ -687,15 +700,19 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
     height: 100%;
     transform: rotate(-90deg);
   }
-  /* Solid arcs drawn as trim paths: each one grows from 0 to its share, the second after the first */
+  /* The arcs sit at their final lengths; one trim-path sweep in a mask draws the whole ring clockwise
+     in a single continuous motion (review round 7). Per-arc draws eased out separately and hitched at
+     the seam where the first slowed as the second began */
   .figures__arc {
     stroke-width: 7;
     stroke-dasharray: var(--arc) calc(100 - var(--arc));
     stroke-dashoffset: var(--arc-offset);
-    transition: stroke-dasharray 1s var(--wp--custom--motion--ease-out);
-    transition-delay: calc(0.3s + var(--arc-i) * 0.5s);
   }
-  html.js .figures__card--feature[data-reveal]:not(.is-revealed) .figures__arc {
+  .figures__sweep {
+    stroke-dasharray: 100 0;
+    transition: stroke-dasharray 1.4s var(--wp--custom--motion--ease-in-out) 0.3s;
+  }
+  html.js .figures__card--feature[data-reveal]:not(.is-revealed) .figures__sweep {
     stroke-dasharray: 0 100;
     transition-duration: 0s;
     transition-delay: 0s;
@@ -717,19 +734,61 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
     height: 12px;
     border-radius: 3px;
   }
-  @media (max-width: 1099px) {
+  /* Below 1280 a 5-column navy card is too narrow (heavy wrapping, a small ring), so the feature
+     card spans the full width under the value cards */
+  @media (max-width: 1279px) {
     .figures__list,
     .figures__card--feature {
       grid-column: 1 / -1;
+    }
+  }
+  /* Full-width feature card (768–1279, review round 7): one reading column on the left (heading →
+     body → the two shares, side by side) and the donut on the right as the image, both vertically
+     centred */
+  @media (min-width: 768px) and (max-width: 1279px) {
+    .figures__card--feature {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-rows: 1fr auto auto auto 1fr;
+      grid-template-areas: '. fig' 'title fig' 'text fig' 'labels fig' '. fig';
+      column-gap: var(--wp--preset--spacing--64);
+      row-gap: 0;
+    }
+    .figures__card--feature > h3 {
+      grid-area: title;
+    }
+    .figures__card--feature > .figures__text {
+      grid-area: text;
+      margin-top: var(--wp--preset--spacing--12);
+      max-width: 520px;
+    }
+    .figures__card--feature > .figures__donut-labels {
+      grid-area: labels;
+      justify-content: flex-start;
+      gap: var(--wp--preset--spacing--48);
+      margin-top: var(--wp--preset--spacing--32);
+    }
+    .figures__card--feature .figures__donut-label--end {
+      align-items: flex-start;
+      text-align: left;
+    }
+    .figures__card--feature > .figures__donut {
+      grid-area: fig;
+      width: clamp(280px, 30vw, 360px);
+      height: clamp(280px, 30vw, 360px);
+    }
+  }
+  /* Stacked on small screens: heading → ring → labels → body, the ring at a fixed height */
+  @media (max-width: 767px) {
+    .figures__donut {
+      flex: none;
+      height: min(100vw - 112px, 400px);
     }
   }
   @media (max-width: 599px) {
     .figures__card {
       grid-template-columns: 1fr;
       padding: var(--wp--preset--spacing--32); /* Featured falls back to Default on phones */
-    }
-    .figures__donut-chart {
-      width: min(100%, 280px);
     }
     .figures__proof {
       align-items: flex-start;
@@ -917,6 +976,9 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
   @media (prefers-reduced-motion: reduce) {
     .figures__slot {
       transform: none;
+    }
+    .figures__sweep {
+      transition-delay: 0s;
     }
   }
 

@@ -261,9 +261,16 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     height: auto;
   }
   /* Stat: the figure is the media. It sits at the top, the text settles at the bottom of the card. */
+  /* The figure scales with the card so long values ("988.1m", "1,850m") fit a 3-column bento cell;
+     short ones ("750+") still reach Display (19 Sep 2026, Investors overview) */
+  .card--media-stat {
+    container-type: inline-size;
+  }
   .card__stat {
     color: var(--wp--custom--color--text--accent);
     font-variant-numeric: tabular-nums lining-nums;
+    font-size: min(var(--wp--preset--font-size--display), 22cqi);
+    white-space: nowrap;
   }
   .card--media-stat .card__text {
     margin-top: auto;

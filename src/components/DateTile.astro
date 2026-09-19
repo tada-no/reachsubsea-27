@@ -1,0 +1,55 @@
+---
+// Date tile (19 Sep 2026): the calendar/file tile first drawn in the Stats band Results footer, as a
+// shared part. A navy band (month, or a file type) over a body (day, or an icon). 56 × 64, 2px
+// text/primary border, so it flips with the surface (white-on-navy inside a Navy panel).
+// The Results footer still carries its own copy (.results__tile): fold it into this part when that
+// block is next touched.
+import Icon from './Icon.astro';
+
+interface Props {
+  /** ISO date: the band shows the month, the body the day. */
+  date?: string;
+  /** Instead of a date: band text (e.g. "PDF") and a body icon. */
+  band?: string;
+  icon?: string;
+  class?: string;
+}
+
+const { date, band, icon = 'file-text', class: className } = Astro.props;
+const d = date ? new Date(`${date}T12:00:00Z`) : undefined;
+---
+
+<span class:list={['date-tile', className]} aria-hidden="true">
+  <span class="date-tile__band">{d ? d.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }) : band}</span>
+  <span class="date-tile__body">{d ? d.getUTCDate() : <Icon name={icon} size={24} />}</span>
+</span>
+
+<style is:global>
+  .date-tile {
+    flex: none;
+    display: grid;
+    grid-template-rows: 24px 40px;
+    width: 56px;
+    overflow: hidden;
+    border: 2px solid var(--wp--custom--color--text--primary);
+    border-radius: var(--wp--custom--radius--sm);
+    text-align: center;
+  }
+  .date-tile__band {
+    background-color: var(--wp--custom--color--text--primary);
+    color: var(--wp--custom--color--bg--default);
+    font-size: 0.75rem;
+    line-height: 22px;
+    font-weight: var(--wp--custom--font-weight--bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .date-tile__body {
+    display: grid;
+    place-items: center;
+    font-size: var(--wp--preset--font-size--h4);
+    font-weight: var(--wp--custom--font-weight--bold);
+    font-variant-numeric: tabular-nums;
+    color: var(--wp--custom--color--text--primary);
+  }
+</style>

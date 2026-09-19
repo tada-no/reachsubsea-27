@@ -1,0 +1,220 @@
+---
+// Investors › Overview (19 Sep 2026). Content: client PDF p38–39 ("Investors — Overview") and the live
+// site's Investor relations hero. Follows the Why invest decisions (Q57–Q60): photo hero, breadcrumb
+// pinned to the top, Investors subnav under the hero, IR contact in the CTA.
+// The page is the hub, so it answers "what's new and what's next" and hands the case to Why invest:
+// Investor year track (the PDF's Latest report + Upcoming event, on one time axis) · Q2 at a glance
+// bento (headline figures + the charter one-pager) · Investor news · FAQ · CTA panel with IR contact
+// and Newsweb. Cut from the PDF: the sample share-price card (the live OMS graph lives on Why invest
+// and Share information), the Highlights tabs (Why invest's Results band) and the CEO letter + video
+// (quote and video not supplied: real quotes only).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import SectionSubnav from '../../blocks/SectionSubnav.astro';
+import Timeline from '../../blocks/Timeline.astro';
+import CardGrid from '../../blocks/CardGrid.astro';
+import FeedGrid from '../../blocks/FeedGrid.astro';
+import Accordion from '../../blocks/Accordion.astro';
+import CtaBand from '../../blocks/CtaBand.astro';
+import { navSections } from '../../data/navigation';
+import { cardPresets } from '../../data/card-presets';
+import { latestResults as r } from '../../data/investor-results';
+import { investorCalendar } from '../../data/investor-calendar';
+import type { CardField } from '../../lib/types';
+
+const base = import.meta.env.BASE_URL;
+const investors = navSections.find((s) => s.id === 'investors')!;
+const subnavItems = [
+  { label: 'Overview', href: investors.href },
+  ...investors.links.map((l) => ({ label: l.label, href: l.href })),
+];
+const fig = (key: string) => r.headline.find((s) => s.key === key)!;
+const longDate = (iso: string) =>
+  new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+// Bento on 12 columns: the case (6×2) beside three headline figures and the charter one-pager (3×1 each).
+const glanceCards: CardField[] = [
+  {
+    media: 'image-bg',
+    size: 'featured',
+    span: { cols: 6, rows: 2 },
+    image: { src: `${base}images/vessel-olympic-zeus.jpg`, alt: 'Olympic Zeus at anchor in calm water', focalPoint: { x: 0.5, y: 0.55 } },
+    title: 'Why invest in Reach Subsea',
+    description: 'Record results, an uncrewed operations platform that is scaling commercially, and a fleet built for the next phase of offshore energy.',
+    action: { label: 'Four reasons to invest', url: '/investors/why-invest/' },
+  },
+  {
+    media: 'stat',
+    surface: 'navy',
+    span: { cols: 3, rows: 1 },
+    statValue: `${fig('revenue').value}${fig('revenue').suffix}`,
+    title: `NOK revenue, ${fig('revenue').delta}`,
+  },
+  {
+    media: 'stat',
+    surface: 'white',
+    span: { cols: 3, rows: 1 },
+    statValue: `${fig('backlog').value}${fig('backlog').suffix}`,
+    title: `NOK order backlog, ${fig('backlog').delta}`,
+  },
+  {
+    media: 'stat',
+    surface: 'white',
+    span: { cols: 3, rows: 1 },
+    statValue: `${fig('pipeline').value}${fig('pipeline').suffix}`,
+    title: 'NOK tender pipeline in active opportunities',
+  },
+  cardPresets.document({
+    surface: 'tint',
+    span: { cols: 3, rows: 1 },
+    eyebrow: 'One-pager',
+    badge: { label: 'PDF', tone: 'neutral' },
+    title: 'Charter agreement overview',
+    description: 'Fixed charter periods and options across the fleet, year by year.',
+    meta: [],
+    action: { label: 'Download (PDF)', url: '#', action: 'file' },
+  }),
+];
+
+// Sample posts: in WordPress this is the News query filtered to the Investors topic, lead = sticky post.
+const newsItems: CardField[] = [
+  cardPresets.news({
+    media: 'image-bg',
+    size: 'featured',
+    image: { src: `${base}images/vessel-agalas.jpg`, alt: 'Reach Subsea vessel at sea in evening light', focalPoint: { x: 0.55, y: 0.5 } },
+    eyebrow: '04.08.2026',
+    badge: { label: 'Stock exchange release', tone: 'accent' },
+    title: 'MoA signed for sale of Viking Reach and onboard WROV',
+    description: 'The divestment unlocks more than NOK 200m in liquidity for continued fleet growth.',
+    action: { label: 'Read the release', url: '/newsroom/' },
+  }),
+  cardPresets.news({
+    media: 'none',
+    surface: 'white',
+    eyebrow: '18.08.2026',
+    badge: { label: 'Results', tone: 'accent' },
+    title: `${r.period}: revenue up 44% and EBIT more than doubled`,
+    description: undefined,
+    action: { label: 'Read more', url: '/newsroom/' },
+  }),
+  cardPresets.news({
+    media: 'none',
+    surface: 'white',
+    eyebrow: '13.10.2025',
+    badge: { label: 'News', tone: 'accent' },
+    title: 'Reach Remote 1 cleared for operations without supporting vessel',
+    description: undefined,
+    action: { label: 'Read more', url: '/newsroom/' },
+  }),
+  cardPresets.news({
+    media: 'none',
+    surface: 'white',
+    eyebrow: '24.09.2025',
+    badge: { label: 'News', tone: 'accent' },
+    title: 'Reach Subsea orders Reach Remote 3 and 4 from Kongsberg Maritime',
+    description: undefined,
+    action: { label: 'Read more', url: '/newsroom/' },
+  }),
+];
+
+const faqItems = [
+  {
+    slug: 'where-is-reach-subsea-listed',
+    question: 'Where is Reach Subsea listed?',
+    answer: 'Reach Subsea ASA is listed on the Oslo Stock Exchange (Euronext) under the ticker REACH.',
+    open: true,
+  },
+  {
+    slug: 'latest-quarterly-results',
+    question: 'What were the latest reported quarterly results?',
+    answer: `${r.period}: revenue NOK 988.1m (+44% year on year), EBIT NOK 192.4m (+111%), net profit NOK 133.6m (+84%) and an order backlog of NOK 1,850m (+61%).`,
+  },
+  {
+    slug: 'next-quarterly-report',
+    question: 'When is the next quarterly report due?',
+    answer: `${longDate(r.next.date)} (${r.next.label}). Every reporting date is in the financial calendar.`,
+  },
+];
+---
+
+<BaseLayout title="Investor relations · Reach Subsea" motion>
+  <Header current="investors" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Investors' }]}
+      title="Investor relations"
+      lead="Reach Subsea delivers survey, monitoring and subsea services worldwide through a versatile fleet, advanced ROV technology and a pioneering remote and uncrewed operations platform."
+      image={{ src: `${base}images/ocean-horizon-calm.jpg`, alt: '', focalPoint: { x: 0.5, y: 0.5 } }}
+      actions={[
+        { label: 'Why invest in Reach Subsea', url: '/investors/why-invest/', action: 'page' },
+        { label: 'Latest results', url: '#investor-year', action: 'anchor', type: 'link' },
+      ]}
+    />
+
+    <SectionSubnav source="section-pages" label="Investors" items={subnavItems} current="/investors/" />
+
+    <Timeline
+      layout="track"
+      anchor="investor-year"
+      background="white"
+      sectionHeader={{
+        title: 'The investor year',
+        action: { label: 'Financial calendar', url: '/investors/financial-calendar/' },
+      }}
+      milestones={investorCalendar}
+    />
+
+    <CardGrid
+      layout="bento"
+      background="tint"
+      sectionHeader={{
+        title: `${r.period} at a glance`,
+        action: { label: 'Reports & presentations', url: '/investors/reports-presentations/' },
+      }}
+      cards={glanceCards}
+    />
+
+    <FeedGrid
+      source="news"
+      layout="editorial"
+      background="white"
+      sectionHeader={{
+        title: 'Investor news',
+        action: { label: 'All announcements on Newsweb', url: 'https://newsweb.oslobors.no/', action: 'external' },
+      }}
+      items={newsItems}
+      showLoadMore={false}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'About our listing, results and reporting.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="investors"
+      background="tint"
+      items={faqItems}
+    />
+
+    <CtaBand
+      style="panel"
+      background="tint"
+      title="Would you like to know more?"
+      text="Our investor relations team answers questions on results, reporting and the share."
+      actions={[
+        { label: 'Share information', url: '/investors/share-information/', action: 'page' },
+        { label: 'Announcements on Newsweb', url: 'https://newsweb.oslobors.no/', action: 'external' },
+      ]}
+      showContact
+      contact={{ label: 'Investor relations', name: 'Arne Joa', role: 'Chief Financial Officer', phone: '+47 474 51 344', email: 'arne.joa@reachsubsea.com' }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

@@ -449,13 +449,19 @@ const STAT_STAGGER = 160;
     letter-spacing: 0;
     color: var(--wp--custom--color--text--secondary);
   }
+  /* The arrow sits on the first line: when the change wraps (2-up on phones) it must not drop to the
+     middle of the block. (1lh − 16) / 2 centres the 16px icon on one line box */
   .results__delta {
     display: inline-flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--wp--preset--spacing--4);
     margin-top: var(--wp--preset--spacing--4);
     color: var(--wp--custom--color--text--secondary);
     font-weight: var(--wp--custom--font-weight--medium);
+  }
+  .results__delta .icon {
+    flex: none;
+    margin-top: calc((1lh - 16px) / 2);
   }
   .results__delta--up {
     color: var(--wp--custom--color--text--accent);
@@ -579,12 +585,37 @@ const STAT_STAGGER = 160;
       padding-left: 0;
       border-left: 0;
     }
+    /* Tablet: keep three columns, each tile above its text (as cards stack), instead of one
+       left-hugging column with an empty right half (review round 7) */
     .results__footer {
-      grid-template-columns: 1fr;
-      padding-block: var(--wp--preset--spacing--8);
+      padding-block: var(--wp--preset--spacing--48) var(--wp--preset--spacing--40);
     }
     .results__footer > * {
-      padding: var(--wp--preset--spacing--24) 0;
+      padding-inline: var(--wp--preset--spacing--24);
+    }
+    .results__doc {
+      flex-direction: column;
+      gap: var(--wp--preset--spacing--16);
+    }
+    .results__tile {
+      margin-top: 0;
+    }
+  }
+  /* Phones: one compact column, tile beside the text again */
+  @media (max-width: 599px) {
+    .results__footer {
+      grid-template-columns: 1fr;
+      row-gap: var(--wp--preset--spacing--32);
+      padding-block: var(--wp--preset--spacing--40);
+    }
+    .results__footer > * {
+      padding-inline: 0;
+    }
+    .results__doc {
+      flex-direction: row;
+    }
+    .results__tile {
+      margin-top: calc(var(--wp--preset--font-size--h4) * 0.28);
     }
   }
   /* Phones: two columns of ~160px, so the unit moves onto its own line above the figure */
