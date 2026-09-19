@@ -166,6 +166,9 @@
   --wp--custom--color--text--primary: var(--wp--preset--color--navy-800);
   --wp--custom--color--text--secondary: var(--wp--preset--color--navy-600);
   --wp--custom--color--text--accent: var(--wp--preset--color--sage-600);
+  /* Display-size figures (≥ 24px bold): large text needs 3:1, so one step lighter than text/accent.
+     sage-500 on white 3.8:1, on tint 3.6:1 (19 Sep 2026) */
+  --wp--custom--color--text--accent-display: var(--wp--preset--color--sage-500);
   --wp--custom--color--text--disabled: var(--wp--preset--color--navy-400);
   --wp--custom--color--text--on-overlay: var(--wp--preset--color--white);
   --wp--custom--color--text--error: var(--wp--preset--color--red-600);
@@ -205,6 +208,7 @@
   --wp--custom--color--text--primary: var(--wp--preset--color--white);
   --wp--custom--color--text--secondary: var(--wp--preset--color--navy-100);
   --wp--custom--color--text--accent: var(--wp--preset--color--sage-300);
+  --wp--custom--color--text--accent-display: var(--wp--preset--color--sage-300);
   --wp--custom--color--text--disabled: var(--wp--preset--color--navy-400);
   --wp--custom--color--text--on-overlay: var(--wp--preset--color--white);
   --wp--custom--color--text--error: var(--wp--preset--color--red-300);

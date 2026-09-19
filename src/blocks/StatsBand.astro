@@ -7,7 +7,7 @@
 // columns with a rule between, all sharing one bottom line with the lead's label. Stacks below 900.
 // Results (18 Sep 2026, Why invest): the latest reported quarter. Title + "As reported" badge + date,
 // 4 headline figures (unit · value · scale, change line) over a 2px navy rule, 4 secondary figures in
-// a ruled row, then the next report date (add to calendar, .ics) and the report downloads. Reads the
+// a ruled row, then the shared Report cards (annual · latest · next, 19 Sep 2026). Reads the
 // Latest results options page (src/data/investor-results.ts). Replaces the PDF's overlapping card.
 // Max one Stats band per page (docs/05 §0).
 import BlockSection from '../components/BlockSection.astro';
@@ -15,9 +15,9 @@ import SectionHeader from '../components/SectionHeader.astro';
 import Stat from '../components/Stat.astro';
 import Badge from '../components/Badge.astro';
 import Icon from '../components/Icon.astro';
-import Link from '../components/Link.astro';
+import ReportCards from '../components/ReportCards.astro';
 import { makeId } from '../lib/ids';
-import type { BlockFields, LinkField, SectionHeaderField, StatField } from '../lib/types';
+import type { BlockFields, ReportCardField, SectionHeaderField, StatField } from '../lib/types';
 
 interface Props extends BlockFields {
   sectionHeader?: SectionHeaderField;
@@ -35,9 +35,8 @@ interface Props extends BlockFields {
   /** Results style: stated once in the stamp ("All figures in NOK"), never on each figure. */
   currency?: string;
   secondary?: StatField[];
-  /** Results style: 0–2 PDF downloads (latest quarterly report, annual report), one line of meta each. */
-  documents?: (LinkField & { meta?: string })[];
-  next?: { label: string; date: string };
+  /** Results style: the shared Report cards under the figures (annual · latest · next, 19 Sep 2026). */
+  cards?: ReportCardField[];
   class?: string;
 }
 
@@ -51,8 +50,7 @@ const {
   published,
   currency,
   secondary = [],
-  documents = [],
-  next,
+  cards = [],
   background,
   spacing,
   anchor,
@@ -64,19 +62,6 @@ const feature = style === 'feature';
 const results = style === 'results';
 const longDate = (iso: string) =>
   new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
-const nextDate = next ? new Date(`${next.date}T12:00:00Z`) : undefined;
-// One all-day event. Editors only set the label and date; the file is generated.
-const icsHref = next
-  ? 'data:text/calendar;charset=utf-8,' +
-    encodeURIComponent(
-      [
-        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Reach Subsea//Investors//EN', 'BEGIN:VEVENT',
-        `UID:${next.date}-results@reachsubsea.com`, `DTSTAMP:${next.date.replace(/-/g, '')}T000000Z`,
-        `DTSTART;VALUE=DATE:${next.date.replace(/-/g, '')}`, `SUMMARY:Reach Subsea ${next.label}`,
-        'END:VEVENT', 'END:VCALENDAR',
-      ].join('\r\n'),
-    )
-  : undefined;
 const leadIndex = Math.max(0, featureKey ? stats.findIndex((s) => s.key === featureKey) : 0);
 const lead = stats[leadIndex];
 const rest = stats.filter((_, i) => i !== leadIndex);
@@ -147,36 +132,7 @@ const STAT_STAGGER = 160;
                 ))}
               </dl>
             )}
-            {(next || documents.length > 0) && (
-              <div class="results__footer">
-                {next && nextDate && (
-                  <div class="results__doc">
-                    <span class="results__tile" aria-hidden="true">
-                      <span class="results__tile-band">{nextDate.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' })}</span>
-                      <span class="results__tile-body">{nextDate.getUTCDate()}</span>
-                    </span>
-                    <div class="results__doc-text">
-                      <h3 class="text-h4">{next.label}</h3>
-                      <p class="text-small">Next report · <time datetime={next.date}>{longDate(next.date)}</time></p>
-                      <Link label="Add to calendar" href={icsHref} action="file" size="small" context={next.label} download={`reach-subsea-${next.date}.ics`} />
-                    </div>
-                  </div>
-                )}
-                {documents.slice(0, 2).map((doc) => (
-                  <div class="results__doc">
-                    <span class="results__tile" aria-hidden="true">
-                      <span class="results__tile-band">PDF</span>
-                      <span class="results__tile-body"><Icon name="file-text" size={24} /></span>
-                    </span>
-                    <div class="results__doc-text">
-                      <h3 class="text-h4">{doc.label}</h3>
-                      {doc.meta && <p class="text-small">{doc.meta}</p>}
-                      <Link label="Download report" href={doc.url} action="file" size="small" context={doc.context ?? doc.label} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <ReportCards cards={cards} class="results__cards" />
           </div>
         ) : feature ? (
           <div class="stats-band__group stats-band__feature has-surface-light">
@@ -467,6 +423,10 @@ const STAT_STAGGER = 160;
     color: var(--wp--custom--color--text--accent);
   }
   /* One rule, between the headline and secondary rows (review round 2) */
+  /* Same distance above the cards as under the Investors overview track */
+  .results__cards {
+    margin-top: var(--wp--custom--stack--xl);
+  }
   .results__secondary {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -494,72 +454,6 @@ const STAT_STAGGER = 160;
   /* Footer (review round 4): a full-width tint strip that closes the section, flush with its bottom
      edge; three items evenly spaced on the container (no rules, round 5). The strip bleeds with
      a box-shadow + clip-path pair, so it never causes a horizontal scrollbar. */
-  .results__footer {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-top: var(--wp--custom--section--sm);
-    margin-bottom: calc(var(--wp--custom--section--md) * -1);
-    padding-block: var(--wp--preset--spacing--64) var(--wp--preset--spacing--48);
-    background-color: var(--wp--custom--color--bg--tint);
-    box-shadow: 0 0 0 100vmax var(--wp--custom--color--bg--tint);
-    clip-path: inset(0 -100vmax);
-  }
-  .results__footer > * {
-    padding-inline: var(--wp--preset--spacing--40);
-  }
-  .results__footer > :first-child {
-    padding-left: 0;
-  }
-  .results__doc {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--wp--preset--spacing--16);
-  }
-  .results__doc-text {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--wp--preset--spacing--4);
-  }
-  .results__doc-text .text-small {
-    color: var(--wp--custom--color--text--secondary);
-  }
-  /* The link's 44px tap target adds 12px above its label: pull it up so the visible gap to the
-     meta line is 12, without shrinking the target (review round 5) */
-  .results__doc-text .link-arrow {
-    margin-top: calc(var(--wp--preset--spacing--4) * -1);
-  }
-  .results__tile {
-    flex: none;
-    /* Optical: top of the tile level with the title's cap height, not its line box (H4 leading puts
-       the caps ~0.28em down); scales with the fluid H4 (review round 5) */
-    margin-top: calc(var(--wp--preset--font-size--h4) * 0.28);
-    display: grid;
-    grid-template-rows: 24px 40px;
-    width: 56px;
-    overflow: hidden;
-    border: 2px solid var(--wp--custom--color--text--primary);
-    border-radius: var(--wp--custom--radius--sm);
-    text-align: center;
-  }
-  .results__tile-band {
-    background-color: var(--wp--custom--color--text--primary);
-    color: var(--wp--custom--color--bg--default);
-    font-size: 0.75rem;
-    line-height: 22px;
-    font-weight: var(--wp--custom--font-weight--bold);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .results__tile-body {
-    display: grid;
-    place-items: center;
-    /* Secondary figures, footer titles and the calendar day share H4 (24) (review round 5) */
-    font-size: var(--wp--preset--font-size--h4);
-    font-weight: var(--wp--custom--font-weight--bold);
-    font-variant-numeric: tabular-nums;
-    color: var(--wp--custom--color--text--primary);
-  }
   html.js .stats-band--animate .results__item {
     opacity: 0;
     transform: translate3d(0, 16px, 0);
@@ -584,38 +478,6 @@ const STAT_STAGGER = 160;
     .results__row:nth-child(3) {
       padding-left: 0;
       border-left: 0;
-    }
-    /* Tablet: keep three columns, each tile above its text (as cards stack), instead of one
-       left-hugging column with an empty right half (review round 7) */
-    .results__footer {
-      padding-block: var(--wp--preset--spacing--48) var(--wp--preset--spacing--40);
-    }
-    .results__footer > * {
-      padding-inline: var(--wp--preset--spacing--24);
-    }
-    .results__doc {
-      flex-direction: column;
-      gap: var(--wp--preset--spacing--16);
-    }
-    .results__tile {
-      margin-top: 0;
-    }
-  }
-  /* Phones: one compact column, tile beside the text again */
-  @media (max-width: 599px) {
-    .results__footer {
-      grid-template-columns: 1fr;
-      row-gap: var(--wp--preset--spacing--32);
-      padding-block: var(--wp--preset--spacing--40);
-    }
-    .results__footer > * {
-      padding-inline: 0;
-    }
-    .results__doc {
-      flex-direction: row;
-    }
-    .results__tile {
-      margin-top: calc(var(--wp--preset--font-size--h4) * 0.28);
     }
   }
   /* Phones: two columns of ~160px, so the unit moves onto its own line above the figure */

@@ -104,3 +104,17 @@ export interface StatField {
   delta?: string;
   trend?: 'up' | 'down';
 }
+
+/** Report card (19 Sep 2026): one document or date in the investor report cards. */
+export interface ReportCardField {
+  /** A date tile (month · day) when set, else a PDF tile. */
+  date?: string;
+  kicker: string;
+  title: string;
+  meta?: string;
+  /** ISO date: appends "· in N days" to the meta, refreshed in the browser. */
+  countdownTo?: string;
+  /** 1–3 actions, in one ruled row at the foot of the card. */
+  links: (LinkField & { download?: string })[];
+  tone?: 'tint' | 'navy';
+}

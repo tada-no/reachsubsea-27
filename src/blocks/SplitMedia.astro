@@ -92,6 +92,9 @@ interface Props extends BlockFields {
   figures?: FigurePoint[];
   card?: CardField;
   embed?: EmbedField;
+  /** A quote in place of the visible heading (19 Sep 2026, Investors overview CEO letter). `title` stays the
+   * section's accessible name (a visually hidden H2); the quote reads as H3, then the attribution. */
+  quote?: { text: string; name: string; role?: string };
   class?: string;
 }
 
@@ -114,6 +117,7 @@ const {
   figures = [],
   card,
   embed,
+  quote,
   background,
   spacing,
   anchor,
@@ -289,9 +293,21 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
   <div class="split-media__columns">
     <div class="split-media__text">
       {eyebrow && <Eyebrow text={eyebrow} />}
-      <Heading id={titleId} class:list={['split-media__title', Heading === 'h3' ? 'text-h3' : 'text-h2']}>
-        {title}
-      </Heading>
+      {quote ? (
+        <Fragment>
+          <Heading id={titleId} class="visually-hidden">{title}</Heading>
+          <figure class="split-media__quote">
+            <blockquote class="text-h3"><p>{quote.text}</p></blockquote>
+            <figcaption class="text-small">
+              <strong>{quote.name}</strong>{quote.role && `, ${quote.role}`}
+            </figcaption>
+          </figure>
+        </Fragment>
+      ) : (
+        <Heading id={titleId} class:list={['split-media__title', Heading === 'h3' ? 'text-h3' : 'text-h2']}>
+          {title}
+        </Heading>
+      )}
       <div class="prose split-media__body">
         {body && <Fragment set:html={body} />}
         <slot />
@@ -432,6 +448,26 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
   }
   .split-media--start .split-media__media {
     grid-column: 1 / span 6;
+  }
+
+  /* Quote: the text reads as H3 with hanging marks, the attribution one line under it */
+  .split-media__quote {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+    margin: 0;
+  }
+  .split-media__quote blockquote {
+    margin: 0;
+    text-indent: -0.4em;
+    text-wrap: pretty;
+  }
+  .split-media__quote figcaption {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .split-media__quote figcaption strong {
+    color: var(--wp--custom--color--text--primary);
+    font-weight: var(--wp--custom--font-weight--bold);
   }
 
   .split-media__body:empty {
@@ -875,7 +911,7 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
     transition-delay: 0.14s;
   }
   .figures__value {
-    color: var(--wp--custom--color--text--accent);
+    color: var(--wp--custom--color--text--accent-display);
     font-size: clamp(4rem, 2.5915rem + 6.0094vw, 8rem); /* 64 → 128 */
     line-height: 0.9;
     font-weight: var(--wp--custom--font-weight--bold);

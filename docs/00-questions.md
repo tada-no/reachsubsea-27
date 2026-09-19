@@ -10,6 +10,14 @@ _No open questions right now._
 
 ## Answered log
 
+### Q62. Investors overview: what comes back from the PDF (19 Sep 2026, Investors overview)
+Context: the first build cut the PDF's share-price card, Highlights tabs and CEO letter + video.
+- [x] Share price: show the live OMS graph on the Overview too (Split media Embed, same crop as Why invest)
+- [x] Highlights: the "Q2 2026 at a glance" bento is the highlights; only the Q2 / Annual / Sustainability tabs stay cut (no figures behind them)
+- [x] CEO letter: the PDF's Q2 quote (Jostein Alendal, CEO) + a 53 s clip from the Q4 2025 webcast (qcnl.tv, 1:30–2:23) in the video dialog
+
+**Answer:** All three as above. Split media gained a `quote` option (quote as H3 in place of the heading, the title kept as a hidden H2). Client to supply: confirmation the quote is approved for the site, and the Q2 2026 webcast so the clip matches the quarter.
+
 ### Q61. Why invest: four reasons layout (18 Sep 2026, review round 3)
 Context: with the Results band now directly above, the pinned-figure scroll took ~1,700px for ~200 words, showed one figure at a time, and repeated two figures from the band (EBIT +111%, cash 410.4m).
 - [x] 2×2 figure grid: all four visible, each led by a figure the band doesn't show (+84% net profit, 750+ days, 54/46 revenue mix bar, NOK 1,172.5m equity)

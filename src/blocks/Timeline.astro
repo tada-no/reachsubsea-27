@@ -5,17 +5,16 @@
 // derived from `isoDate` against today.
 // Layout Track (19 Sep 2026, Investors overview): the same milestones on a horizontal time axis, a
 // rolling window from 7 months back to 8 months ahead of today. Primary milestones label above the
-// rail, secondary ones below; a Today marker splits the drawn (done) rail from the plain one. Under
-// the track, two panels: Latest (newest done milestone with links) and Next (first upcoming, with a
-// countdown and an .ics). On reveal the rail draws to today and each marker lands as it is reached.
-// Below 900 the track scrolls sideways (opened at today) and the panels stack.
+// rail, secondary ones below; a Today marker splits the drawn (done) rail from the plain one. The newest
+// done primary milestone is marked Latest, the first upcoming one Next. `panels` renders the shared
+// Report cards under the track (annual · latest · next). On reveal the rail draws to today and each
+// marker lands as it is reached. Below 900 the track scrolls sideways (opened at today).
 import BlockSection from '../components/BlockSection.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import Milestone from '../components/Milestone.astro';
-import DateTile from '../components/DateTile.astro';
-import Link from '../components/Link.astro';
+import ReportCards from '../components/ReportCards.astro';
 import { makeId } from '../lib/ids';
-import type { BlockFields, LinkField, SectionHeaderField } from '../lib/types';
+import type { BlockFields, ReportCardField, SectionHeaderField } from '../lib/types';
 
 export interface MilestoneField {
   /** Display date. Optional when `isoDate` is set (formatted "24 Apr 2026"). */
@@ -27,8 +26,8 @@ export interface MilestoneField {
   isoDate?: string;
   /** Track layout: primary labels above the rail, secondary below. */
   kind?: 'primary' | 'secondary';
-  /** Track layout: the newest done milestone with links becomes the Latest panel. */
-  links?: LinkField[];
+  /** Track layout: the visible label ("Q4 25", "AR 25", "AGM"); `title` stays the accessible name. */
+  short?: string;
 }
 
 interface Props extends BlockFields {
@@ -37,9 +36,11 @@ interface Props extends BlockFields {
   milestones: MilestoneField[];
   /** Track layout: ISO date that counts as today. Defaults to the build date; the script refreshes it. */
   today?: string;
+  /** Track layout: Report cards under the track. */
+  panels?: ReportCardField[];
 }
 
-const { sectionHeader, layout = 'list', milestones = [], today: todayProp, background, spacing, anchor } = Astro.props;
+const { sectionHeader, layout = 'list', milestones = [], today: todayProp, panels = [], background, spacing, anchor } = Astro.props;
 const track = layout === 'track';
 
 const titleId = sectionHeader ? makeId('timeline', sectionHeader.title) : undefined;
@@ -62,8 +63,11 @@ const windowEnd = Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 8, 1);
 const pos = (ms: number) => (ms - windowStart) / (windowEnd - windowStart);
 const months = Array.from({ length: 15 }, (_, i) => {
   const d = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() - 7 + i, 1));
-  // January carries the year; so does the first month, so the axis always says where it starts
-  return { x: pos(d.getTime()), label: MONTHS[d.getUTCMonth()], year: d.getUTCMonth() === 0 || i === 0 ? d.getUTCFullYear() : undefined };
+  // January and the first month carry a two-digit year in bold ("Feb 26", "Jan 27"), like the Q4 25 labels
+  const yearMark = d.getUTCMonth() === 0 || i === 0;
+  const next = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+  // w = the month's share of the axis: the label centres in its own span, between two ticks
+  return { x: pos(d.getTime()), w: pos(next) - pos(d.getTime()), label: MONTHS[d.getUTCMonth()] + (yearMark ? ` ${String(d.getUTCFullYear()).slice(2)}` : ''), year: yearMark };
 });
 const todayX = pos(utc(today));
 
@@ -72,20 +76,8 @@ const events = track
       .filter((m) => m.isoDate && utc(m.isoDate) >= windowStart && utc(m.isoDate) < windowEnd)
       .map((m) => ({ ...m, x: pos(utc(m.isoDate!)), status: deriveStatus(m) }))
   : [];
-const latest = [...events].reverse().find((e) => e.status === 'done' && e.links?.length);
+const latest = [...events].reverse().find((e) => e.status === 'done' && e.kind !== 'secondary');
 const next = events.find((e) => e.status !== 'done');
-const daysToNext = next ? Math.round((utc(next.isoDate!) - utc(today)) / DAY) : 0;
-const icsHref = next
-  ? 'data:text/calendar;charset=utf-8,' +
-    encodeURIComponent(
-      [
-        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Reach Subsea//Investors//EN', 'BEGIN:VEVENT',
-        `UID:${next.isoDate}-investors@reachsubsea.com`, `DTSTAMP:${next.isoDate!.replace(/-/g, '')}T000000Z`,
-        `DTSTART;VALUE=DATE:${next.isoDate!.replace(/-/g, '')}`, `SUMMARY:Reach Subsea ${next.title}`,
-        'END:VEVENT', 'END:VCALENDAR',
-      ].join('\r\n'),
-    )
-  : undefined;
 // Markers land as the drawing rail reaches them: delay ∝ distance along the drawn part.
 const DRAW = 1.4;
 const landDelay = (x: number) => (x <= todayX ? (x / todayX) * DRAW : DRAW + 0.2 + (x - todayX) * 1.2);
@@ -117,8 +109,8 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
             <div class="track" data-track style={`--today: ${todayX}; --draw: ${DRAW}s`}>
               <ol class="track__months" aria-hidden="true">
                 {months.map((m) => (
-                  <li class:list={['track__month', m.year && 'track__month--year']} style={`--x: ${m.x}`}>
-                    {m.year && m.label !== 'Jan' ? <Fragment>{`${m.label} `}<strong>{m.year}</strong></Fragment> : m.year ?? m.label}
+                  <li class:list={['track__month', m.year && 'track__month--year']} style={`--x: ${m.x}; --w: ${m.w}`}>
+                    {m.label}
                   </li>
                 ))}
               </ol>
@@ -133,7 +125,7 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
                       `track__event--${e.status}`,
                       e === latest && 'track__event--latest',
                       e === next && 'track__event--next',
-                      e.x > 0.88 && 'track__event--end',
+                      e.x > 0.95 && 'track__event--end',
                     ]}
                     style={`--x: ${e.x}; --land: ${landDelay(e.x).toFixed(2)}s`}
                     aria-current={e === next ? 'step' : undefined}
@@ -141,7 +133,9 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
                     <span class="track__node" aria-hidden="true"></span>
                     <span class="track__stem" aria-hidden="true"></span>
                     <span class="track__label">
-                      <strong class="track__title">{e.title}</strong>
+                      <strong class="track__title">
+                        {e.short ? <Fragment><span aria-hidden="true">{e.short}</span><span class="visually-hidden">{e.title}</span></Fragment> : e.title}
+                      </strong>
                       <time class="track__date" datetime={e.isoDate}>
                         {shortDate(e.isoDate!)}
                         <span class="visually-hidden"> {fmt(e.isoDate!, { year: 'numeric' })} · {e.status === 'done' ? 'Published' : 'Upcoming'}</span>
@@ -152,41 +146,7 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
               </ol>
             </div>
           </div>
-          {(latest || next) && (
-            <div class="track__panels">
-              {latest && (
-                <div class="track__panel track__panel--latest has-surface-light">
-                  <DateTile band="PDF" />
-                  <div class="track__panel-text">
-                    <p class="text-eyebrow track__panel-kicker">Latest</p>
-                    <h3 class="text-h4">{latest.title}</h3>
-                    <p class="text-small track__panel-meta">Published <time datetime={latest.isoDate}>{longDate(latest.isoDate!)}</time></p>
-                    <ul class="track__links">
-                      {latest.links!.map((l) => (
-                        <li><Link label={l.label} href={l.url} action={l.action} size="small" context={l.context} /></li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              )}
-              {next && (
-                <div class="track__panel track__panel--next has-surface-navy">
-                  <DateTile date={next.isoDate} />
-                  <div class="track__panel-text">
-                    <p class="text-eyebrow track__panel-kicker">Next</p>
-                    <h3 class="text-h4">{next.title}</h3>
-                    <p class="text-small track__panel-meta">
-                      <time datetime={next.isoDate}>{longDate(next.isoDate!)}</time>
-                      {daysToNext > 0 && <Fragment> · in <span data-countdown={next.isoDate}>{daysToNext} days</span></Fragment>}
-                    </p>
-                    <ul class="track__links">
-                      <li><Link label="Add to calendar" href={icsHref} action="file" size="small" context={next.title} download={`reach-subsea-${next.isoDate}.ics`} /></li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          <ReportCards cards={panels} class="timeline__cards" />
         </div>
       ) : (
         <div class="timeline__inner">
@@ -257,12 +217,12 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
   .track-scroll::-webkit-scrollbar {
     display: none;
   }
-  /* Geometry: rail at 120; primary labels end 24 above it, secondary start 24 below; month axis at 232 */
+  /* Geometry: rail at 96; primary labels end 24 above it, secondary start 24 below; month axis at 184 */
   .track {
-    --rail: 120px;
+    --rail: 96px;
     position: relative;
     min-width: 1200px;
-    height: 264px;
+    height: 224px;
   }
   .track__rail {
     position: absolute;
@@ -281,25 +241,37 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
   }
   .track__months {
     position: absolute;
-    inset: 224px 0 auto;
+    inset: 184px 0 auto;
     height: 40px;
     border-top: 1px solid var(--wp--custom--color--border--subtle);
   }
+  /* Month ticks: short 6px marks at the 1st of each month, all one light colour. Each label centres in
+     its month's span, so a marker sits inside its own month (18 Aug under "Aug"). Year months are told
+     apart by their bold label only */
   .track__month {
     position: absolute;
     top: 0;
     left: calc(var(--x) * 100%);
-    padding: var(--wp--preset--spacing--12) 0 0 var(--wp--preset--spacing--8);
-    border-left: 1px solid var(--wp--custom--color--border--default);
+    width: calc(var(--w) * 100%);
+    padding-top: var(--wp--preset--spacing--12);
+    text-align: center;
     font-size: 0.8125rem;
     line-height: 1;
+    white-space: nowrap;
     color: var(--wp--custom--color--text--secondary);
   }
-  .track__month--year strong,
+  .track__month::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 6px;
+    background-color: var(--wp--custom--color--border--default);
+  }
   .track__month--year {
     font-weight: var(--wp--custom--font-weight--bold);
     color: var(--wp--custom--color--text--primary);
-    border-left-color: var(--wp--custom--color--text--primary);
   }
   .track__today {
     position: absolute;
@@ -386,9 +358,8 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
   .track__event--secondary .track__label {
     top: calc(var(--rail) + 8px + 24px);
   }
-  /* Near the right edge, or just before Today, the label hangs to the left of its stem */
-  .track__event--end .track__label,
-  .track__event--latest .track__label {
+  /* Near the right edge the label hangs to the left of its stem */
+  .track__event--end .track__label {
     left: auto;
     right: -1px;
     align-items: flex-end;
@@ -411,51 +382,6 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
     line-height: 1.3;
     color: var(--wp--custom--color--text--secondary);
     font-variant-numeric: tabular-nums;
-  }
-  .track__event--latest .track__date,
-  .track__event--next .track__date {
-    color: var(--wp--custom--color--text--accent);
-    font-weight: var(--wp--custom--font-weight--bold);
-  }
-
-  .track__panels {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--wp--custom--grid--gutter);
-  }
-  .track__panel {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--wp--preset--spacing--24);
-    padding: var(--wp--preset--spacing--40);
-    border-radius: var(--wp--custom--radius--lg);
-    background-color: var(--wp--custom--color--bg--default);
-  }
-  .track__panel--latest {
-    background-color: var(--wp--custom--color--bg--tint);
-  }
-  .track__panel .date-tile {
-    margin-top: 2px;
-  }
-  .track__panel-text {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--wp--preset--spacing--4);
-    min-width: 0;
-  }
-  .track__panel-kicker {
-    color: var(--wp--custom--color--text--accent);
-  }
-  .track__panel-meta {
-    color: var(--wp--custom--color--text--secondary);
-    font-variant-numeric: tabular-nums;
-  }
-  .track__links {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: var(--wp--preset--spacing--24);
-    margin-top: var(--wp--preset--spacing--4);
   }
 
   /* Draw-in: the rail runs to Today, each marker lands as the rail reaches it, then its stem and label
@@ -530,22 +456,10 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
     }
   }
 
-  @media (max-width: 899px) {
-    .track__panels {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--wp--preset--spacing--16);
-    }
-  }
-  @media (max-width: 599px) {
-    .track__panel {
-      padding: var(--wp--preset--spacing--24);
-      gap: var(--wp--preset--spacing--16);
-    }
-  }
 </style>
 
 <script>
-  // Track: draw on first view; on narrow screens open the scroller at Today; refresh the countdown.
+  // Track: draw on first view; on narrow screens open the scroller at Today.
   const tracks = [...document.querySelectorAll<HTMLElement>('[data-track]')];
   const io =
     'IntersectionObserver' in window
@@ -567,12 +481,6 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
       const today = parseFloat(track.style.getPropertyValue('--today'));
       scroller.scrollLeft = today * track.offsetWidth - scroller.clientWidth * 0.35;
     }
-  });
-  document.querySelectorAll<HTMLElement>('[data-countdown]').forEach((el) => {
-    const now = new Date();
-    const todayUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-    const days = Math.round((Date.parse(`${el.dataset.countdown}T00:00:00Z`) - todayUtc) / 86_400_000);
-    if (days > 0) el.textContent = days === 1 ? '1 day' : `${days} days`;
   });
 </script>
 

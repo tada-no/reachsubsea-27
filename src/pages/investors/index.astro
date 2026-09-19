@@ -3,11 +3,13 @@
 // site's Investor relations hero. Follows the Why invest decisions (Q57–Q60): photo hero, breadcrumb
 // pinned to the top, Investors subnav under the hero, IR contact in the CTA.
 // The page is the hub, so it answers "what's new and what's next" and hands the case to Why invest:
-// Investor year track (the PDF's Latest report + Upcoming event, on one time axis) · Q2 at a glance
+// Investor year track (the PDF's Latest report + Upcoming event, on one time axis, over the same three
+// Report cards as Why invest: annual · latest · next) · Q2 at a glance
 // bento (headline figures + the charter one-pager) · Investor news · FAQ · CTA panel with IR contact
-// and Newsweb. Cut from the PDF: the sample share-price card (the live OMS graph lives on Why invest
-// and Share information), the Highlights tabs (Why invest's Results band) and the CEO letter + video
-// (quote and video not supplied: real quotes only).
+// and Newsweb. Added back 19 Sep 2026 (user review): the CEO letter (PDF quote + a 53 s clip from the
+// Q4 2025 webcast, qcnl.tv, 1:30–2:23) and the live share graph (same OMS embed as Why invest).
+// Still cut: the Highlights tabs (no Annual or Sustainability figures to put behind them; the bento is
+// the Q2 highlights).
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/header/Header.astro';
 import Footer from '../../components/Footer.astro';
@@ -15,12 +17,14 @@ import PageHero from '../../blocks/PageHero.astro';
 import SectionSubnav from '../../blocks/SectionSubnav.astro';
 import Timeline from '../../blocks/Timeline.astro';
 import CardGrid from '../../blocks/CardGrid.astro';
+import SplitMedia from '../../blocks/SplitMedia.astro';
+import Dialog from '../../components/Dialog.astro';
 import FeedGrid from '../../blocks/FeedGrid.astro';
 import Accordion from '../../blocks/Accordion.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
 import { navSections } from '../../data/navigation';
 import { cardPresets } from '../../data/card-presets';
-import { latestResults as r } from '../../data/investor-results';
+import { latestResults as r, reportCards } from '../../data/investor-results';
 import { investorCalendar } from '../../data/investor-calendar';
 import type { CardField } from '../../lib/types';
 
@@ -66,8 +70,9 @@ const glanceCards: CardField[] = [
     statValue: `${fig('pipeline').value}${fig('pipeline').suffix}`,
     title: 'NOK tender pipeline in active opportunities',
   },
+  // White, like the stat cards: a tint card on the tint section loses its edge
   cardPresets.document({
-    surface: 'tint',
+    surface: 'white',
     span: { cols: 3, rows: 1 },
     eyebrow: 'One-pager',
     badge: { label: 'PDF', tone: 'neutral' },
@@ -166,6 +171,7 @@ const faqItems = [
         action: { label: 'Financial calendar', url: '/investors/financial-calendar/' },
       }}
       milestones={investorCalendar}
+      panels={reportCards}
     />
 
     <CardGrid
@@ -176,6 +182,43 @@ const faqItems = [
         action: { label: 'Reports & presentations', url: '/investors/reports-presentations/' },
       }}
       cards={glanceCards}
+    />
+
+    <SplitMedia
+      media="video"
+      position="end"
+      background="white"
+      eyebrow={`Letter from the CEO · ${r.period}`}
+      title="Letter from the CEO"
+      quote={{
+        text: '“We are pleased to report a strong second quarter, both operationally and financially, driven by significantly higher project activity and solid project execution.”',
+        name: 'Jostein Alendal',
+        role: 'CEO',
+      }}
+      actions={[{ label: 'Read the letter', url: r.report.url, action: 'file', context: `in the ${r.period} report, PDF` }]}
+      image={{ src: `${base}images/ceo-webcast-poster.jpg`, alt: 'Jostein Alendal, CEO of Reach Subsea, presenting the quarterly results', focalPoint: { x: 0.6, y: 0.4 } }}
+      video={{
+        url: `${base}video/ceo-webcast-q4-2025.mp4`,
+        title: 'Jostein Alendal on the Q4 2025 highlights',
+        label: 'Watch: the CEO on the Q4 2025 highlights (0:53)',
+      }}
+    />
+
+    <SplitMedia
+      media="embed"
+      position="start"
+      background="tint"
+      eyebrow="The share"
+      title="REACH on Euronext Oslo"
+      body="<p>Reach Subsea ASA is listed on the Oslo Stock Exchange (Euronext) under the ticker REACH. Quote and chart are live from Oslo Børs.</p>"
+      actions={[{ label: 'Share information', url: '/investors/share-information/' }]}
+      embed={{
+        src: 'https://ir.oms.no/component/standardPage?token=reach_std&lang=en',
+        title: 'Reach Subsea share price, live from Euronext',
+        height: 2212,
+        crop: 640,
+        source: 'REACH · Oslo Stock Exchange (Euronext). Live data: OMS',
+      }}
     />
 
     <FeedGrid
@@ -217,4 +260,5 @@ const faqItems = [
     />
   </main>
   <Footer />
+  <Dialog type="video" />
 </BaseLayout>

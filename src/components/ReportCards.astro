@@ -1,0 +1,159 @@
+---
+// Report cards (19 Sep 2026): the investor documents and dates as three equal cards, shared by the
+// Stats band Results style (Why invest) and the Timeline Track layout (Investors overview). Each card is
+// one flow on one left edge: Date tile (PDF, or month · day), kicker, H4 title, a one-line date, then its
+// 1–3 actions. No rule inside the card. Tint cards, the Next date on Navy.
+// The row picks its shape from its own width (container query), so a card is never squeezed:
+//   ≥ 1120  three across; tile on top, actions at the foot (Report · Presentation · Webcast need ~305px)
+//   ≥ 760   one row per card: tile | text | actions on the right
+//   narrow  tile beside the text, actions under the text
+// Data: reportCards in src/data/investor-results.ts.
+import DateTile from './DateTile.astro';
+import Link from './Link.astro';
+import type { ReportCardField } from '../lib/types';
+
+interface Props {
+  cards: ReportCardField[];
+  class?: string;
+}
+
+const { cards, class: className } = Astro.props;
+const DAY = 86_400_000;
+const daysUntil = (iso: string) =>
+  Math.round((Date.parse(`${iso}T00:00:00Z`) - Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`)) / DAY);
+---
+
+{
+  cards.length > 0 && (
+    <div class:list={['report-cards', className]}>
+      <ul class="report-cards__list">
+        {cards.map((card) => {
+          const days = card.countdownTo ? daysUntil(card.countdownTo) : 0;
+          return (
+            <li class:list={['report-card', card.tone === 'navy' ? 'has-surface-navy report-card--navy' : 'has-surface-light']}>
+              <DateTile date={card.date} band={card.date ? undefined : 'PDF'} class="report-card__tile" />
+              <div class="report-card__text">
+                <p class="text-eyebrow report-card__kicker">{card.kicker}</p>
+                <h3 class="text-h4">{card.title}</h3>
+                {card.meta && (
+                  <p class="text-small report-card__meta">
+                    {card.meta}
+                    {days > 0 && (
+                      <Fragment>
+                        {' · in '}
+                        <span data-countdown={card.countdownTo}>{days === 1 ? '1 day' : `${days} days`}</span>
+                      </Fragment>
+                    )}
+                  </p>
+                )}
+              </div>
+              <ul class="report-card__actions">
+                {card.links.map((l) => (
+                  <li>
+                    <Link label={l.label} href={l.url} action={l.action} size="small" context={l.context} download={l.download} />
+                  </li>
+                ))}
+              </ul>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  )
+}
+
+<style is:global>
+  .report-cards {
+    container-type: inline-size;
+  }
+  .report-cards__list {
+    display: grid;
+    gap: var(--wp--preset--spacing--16);
+  }
+
+  /* Narrow (base): tile beside the text, actions under the text */
+  .report-card {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    column-gap: var(--wp--preset--spacing--16);
+    align-items: start;
+    /* Bottom: 24 less the 12 the links' 44px targets add below their labels */
+    padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--24) var(--wp--preset--spacing--12);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  .report-card--navy {
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  .report-card__tile {
+    grid-row: span 2;
+  }
+  .report-card__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    min-width: 0;
+  }
+  .report-card__kicker {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .report-card__meta {
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .report-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--wp--preset--spacing--24);
+    /* The 44px targets add 12 above the labels: with 4 more, the visible gap to the date is 16 */
+    margin-top: var(--wp--preset--spacing--4);
+  }
+
+  /* Medium: one row per card, actions on the right, vertically centred on the text */
+  @container (min-width: 760px) {
+    .report-card {
+      grid-template-columns: 56px minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: var(--wp--preset--spacing--24);
+      padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--32);
+    }
+    .report-card__tile {
+      grid-row: auto;
+    }
+    .report-card__actions {
+      flex-wrap: nowrap;
+      margin-top: 0;
+    }
+  }
+
+  /* Wide: three across, one left edge top to bottom; actions pinned to the foot so they line up */
+  @container (min-width: 1120px) {
+    .report-cards__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--wp--custom--grid--gutter);
+    }
+    .report-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: var(--wp--preset--spacing--32) var(--wp--preset--spacing--32) calc(var(--wp--preset--spacing--32) - var(--wp--preset--spacing--12));
+    }
+    .report-card__text {
+      margin-top: var(--wp--preset--spacing--24);
+    }
+    .report-card__actions {
+      margin-top: auto;
+      padding-top: var(--wp--preset--spacing--12);
+    }
+  }
+</style>
+
+<script>
+  // Countdown ("in 59 days") from the visitor's today, not the build date.
+  document.querySelectorAll<HTMLElement>('[data-countdown]').forEach((el) => {
+    const now = new Date();
+    const todayUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const days = Math.round((Date.parse(`${el.dataset.countdown}T00:00:00Z`) - todayUtc) / 86_400_000);
+    if (days > 0) el.textContent = days === 1 ? '1 day' : `${days} days`;
+  });
+</script>

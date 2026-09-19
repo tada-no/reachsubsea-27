@@ -15,7 +15,7 @@ import SplitMedia from '../../blocks/SplitMedia.astro';
 import Accordion from '../../blocks/Accordion.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
 import { navSections } from '../../data/navigation';
-import { latestResults as r } from '../../data/investor-results';
+import { latestResults as r, reportCards } from '../../data/investor-results';
 
 const base = import.meta.env.BASE_URL;
 const investors = navSections.find((s) => s.id === 'investors')!;
@@ -102,11 +102,7 @@ const faqItems = [
       currency={r.currency}
       stats={r.headline}
       secondary={r.secondary}
-      documents={[
-        { ...r.report, action: 'file', meta: `Published ${new Date(`${r.published}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}` },
-        { ...r.annualReport, action: 'file' },
-      ]}
-      next={r.next}
+      cards={reportCards}
     />
 
     <SplitMedia
