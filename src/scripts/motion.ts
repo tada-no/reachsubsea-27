@@ -119,7 +119,7 @@ function initPictogramLoops() {
 
   const loops = svgs.map((svg) => {
     const lead = svg.querySelector('.pg-lead');
-    const card = svg.closest<HTMLElement>('.card') ?? svg;
+    const card = svg.closest<HTMLElement>('.card, .card-grid__tile') ?? svg;
     const revealed = card.closest<HTMLElement>('[data-reveal]');
     let held = false; // hover / focus wants the loop to keep going
 

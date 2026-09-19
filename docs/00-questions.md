@@ -10,6 +10,27 @@ _No open questions right now._
 
 ## Answered log
 
+### Q64. Photo tint and scrims, site-wide (19 Sep 2026, Subsea review)
+Context: Ross's Figma card (Reach-Subsea 4773:22545) screen-blends the photo over navy, so every image carries a subtle brand colour.
+- [x] Site-wide on photos (hero, cards, media frames, video, social and statement photos; logos, SVGs and the 3D World poster untouched)
+- [ ] Subsea page only for now
+- [ ] Site-wide, but not people
+
+**Answer:** Site-wide. Token `image-tint` = navy/900; to soften, point it at navy/800. Follow-up (same review): photo scrims never fade to 0. They ramp from `scrim/solid` (navy/900) behind the text to `scrim/floor` (navy 10%) at the far edge, on every image-bg card, bento card and Split media banner. docs/05 §0. *Figma to add both tokens and the treatment.*
+
+### Q63. Subsea services page (19 Sep 2026, service single)
+Proposal answers and review rounds, `/services/subsea/`:
+- [x] Download the dev site's asset and project photos for the fleet bento and projects feed
+- [x] Named contact on the CTA panel: Emil Spieler Palmers, Subsea BD Manager (shared `ServiceContact` shape in services.ts, one per service line)
+- [x] Lifecycle as a **Focus** layout (the overview's Subsea row, zoomed in), not a new diagram
+- [x] Hero photo: rov-supporter-subsea; title shortened to "Subsea inspection, maintenance and repair", lead to one line
+- [x] Capabilities keep the PDF's **six boxes in its own wording**, as tint cards with 3-item scope lists (a first build merged them into four and read too text heavy)
+- [x] **No child pages, no links** on the capability cards (they would be thin pages; the detail lives here)
+- [x] "Industries we serve" (PDF pills) as an icon strip after Ross's "Where it's used" reference, not photo cards (too heavy). New Oil & gas and Offshore wind pictograms with the same loop feel (wave flow; rotor turn; crane luffs, pays out the hook line and runs a gap down the line into the sea)
+- [x] Lifecycle moved up under the industries strip on **navy**, to break up the text-heavy first half; capabilities follow on white
+
+**Answer:** Built as above; section list in docs/05 §3. **Open:** the lifecycle cell mapping and per-phase tasks are placeholders until Reach confirms. The Services overview's Subsea card sub-links point to child pages that won't exist: they should go to `/services/subsea/#what-we-do` or be dropped (overview chat), and the old dev child URLs redirect there too. The Supporter WROV depth rating is left out until confirmed.
+
 ### Q62. Investors overview: what comes back from the PDF (19 Sep 2026, Investors overview)
 Context: the first build cut the PDF's share-price card, Highlights tabs and CEO letter + video.
 - [x] Share price: show the live OMS graph on the Overview too (Split media Embed, same crop as Why invest)

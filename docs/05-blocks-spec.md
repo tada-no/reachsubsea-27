@@ -18,6 +18,7 @@ Phase 2 §0 still applies (binding, naming, states, focus ring, motion, code nam
 | Headings | Exactly one `h1` per page, and it lives in the Page hero. Section header titles are `h2`, card and item titles `h3`. Visual style is independent of level (a card title is `Heading/H4` but `<h3>`). |
 | Landmarks | `<section aria-labelledby="{heading id}">`. Every block has an optional `Anchor` field (used by Section subnav in-page links). |
 | Images | Aspect ratios 3:2 (cards, gallery), 4:3 (split media), 16:9 (video, 3D World). `object-fit: cover`, focal point from the media library. `loading="lazy"` everywhere except the Page hero, which gets `fetchpriority="high"`. |
+| Photo tint | **19 Sep 2026 (Q64):** every photo and video is screen-blended over `image-tint` (navy/900), so the library reads as one set: shadows lift to navy, whites stay white. The wrapper paints the tint and isolates the blend; placeholders stay grey. Applies to Page hero, Card image-top / image-bg, Media frame, Social feed and Statement photos; never to logos, SVGs or the 3D World poster. **Scrims** over photos ramp from `scrim/solid` (navy/900) behind the text to `scrim/floor` (navy 10%) at the far edge, never 0. Code: `base.css` + `tokens.css`. WordPress: the same rule on core Image / Cover / Media & Text. *Figma to add.* |
 | Conditional | Fields that are empty don't render, and neither do their wrappers (PDF p31). A block with no items renders nothing, except Feed grid filters, which show the empty state. |
 | Repetition | At most one CTA band and one Stats band per page. Stats come from one options source (brief §5.3). |
 
@@ -63,6 +64,7 @@ Tabs inside a block (Data list) reuse the **Subnav item** look with `role="tabli
 - Code: cards in a row are equal height (`align-items: stretch`) with the action pinned to the bottom (`margin-top: auto`). Figma rows align to the top, so a card whose title wraps shows taller there. The same rule applies to Feed grid.
 - Mobile: 1 column; Featured becomes Default. Tablet: 2 columns.
 - Cards are picked (link a post) or written in place. Manual cards default to the presets' fields.
+- **19 Sep 2026 (Subsea single, Q63).** *Figma to add.* **3 columns go 2 columns below 1200** (like 4 columns): at ~1100 three text cards wrap their titles to three lines. Card gains a **`scope`** field: 3 short items as a quiet list under the description (sage 12×2 dash, `Body/Small`, `text/secondary`), pinned to the card foot when there's no action, so lists line up across a row. Not links. New **`Strip`** layout: an eyebrow (no section header) over one row of `bg/accent-subtle` tiles, each a 64 looping pictogram beside a short label; 2×2 below 1200, compact rows (48 icons) below 600. It follows the section it annotates on the same ground and drops its top padding. Used for "Industries we serve".
 - Replaces: feature grids, capability cards, values, benefits, 3D World zone cards (`?zone=1–4`), Contact topic mailboxes, HSEQ document cards.
 
 ### 2.3 Feed grid (dynamic) · `reach/feed-grid`
@@ -73,7 +75,7 @@ Tabs inside a block (Data list) reuse the **Subnav item** look with `role="tabli
 | Source | News · Projects · Assets · Events · People · Offices · Documents · **Latest** (latest report + latest news + next event, one each) |
 | Card | Set by source: the matching Card preset, White surface. Latest = Document + News + Event presets side by side |
 | Scope | taxonomy term (e.g. service = Survey), related-to-current-post (service ↔ project, asset ↔ project), exclude current |
-| Count · columns | 3 / 6 / 9 / 12 · 3 columns (4 for Assets and People) |
+| Count · columns | 3 / 6 / 9 / 12 · 3 columns (4 for Assets and People). 4 columns go 2 × 2 below 1200 (19 Sep 2026). Image-top cards pin their meta line to the action at the foot, so meta rows line up when titles wrap differently |
 | Filters | Row of Filter chips per facet (Projects: service, asset, region, year; News: category, year), single select per facet, "Clear filters" Link. Result count in `Body/Small` with `aria-live="polite"`. Filters write URL params, so filtered views are shareable. Mobile: chips scroll sideways per facet |
 | More | Button Outline Medium "Load more" (not numbered pages); focus moves to the first new card |
 | Empty state | `Heading/H5` "No projects match these filters" + Link "Clear filters" |
@@ -84,6 +86,7 @@ Tabs inside a block (Data list) reuse the **Subnav item** look with `role="tabli
 - Text side (cols 1–5): Eyebrow, `Heading/H2` (or H3 when the block follows another on the same topic), core rich text, 0–2 actions. Media side cols 7–12, vertically centred.
 - **Image**: Media frame 4:3. **Video**: Media frame 16:9 with play → Video dialog (YouTube nocookie / Vimeo / mp4), plus Link Video under it. **Spec table**: Spec rows from the Asset spec schema, heading `Heading/H5`, Link File "Download spec sheet (PDF)" only if the file exists. **Numbered list**: 3–6 Numbered items (Reach Remote oversight levels, HOP).
 - Mobile: Image and Video stack **above** the text; Spec table and Numbered list stack **below** it. Spec rows split label and value equally, so values like "140 t AHC" stay on one line at 375.
+- **19 Sep 2026 (Subsea single):** optional `pictogram` (96 line pictogram above the eyebrow, pulled 12px left to line up with the heading; its loop plays once as the section scrolls in). Service singles use the line's own pictogram. *Figma to add.*
 - Replaces: Our story, Reach Remote sections, growth strategy, vessel spec card, HOP 5-up, charter slide v1 (Image + File link, Q26).
 
 **18 Sep 2026 (Why invest), new media options.** *Figma to add.*
@@ -201,7 +204,7 @@ Uses the Phase 2 **Subnav** set as is (no new Figma component; the Blocks page g
 |---|---|
 | Home | Hero Photo (Display) · Card grid Featured first (services) · Stats band · Live operations (§2.15, 17 Sep 2026) · Embed 3D World · Feed Projects · Feed Latest · CTA Band |
 | Services overview | Hero Text · Card grid 2 cols (Service preset) · Split media Image (crewed/uncrewed) · Feed Projects · CTA Band |
-| Service single | Hero Photo · Subnav In-page · Split media · Card grid 3 cols (capabilities) · Stats · Feed Projects (related) · Feed Assets (related) · Accordion (if FAQs exist) · CTA Band |
+| Service single | **Built 19 Sep 2026: Subsea (`/services/subsea/`, Q63).** Hero Photo (Animate, breadcrumb Home › Services › line) · Subnav Section pages (Services, line active) · Split media Image + line pictogram (white) · Card grid Strip "Industries we serve" (white) · Lifecycle Focus (navy: the line's row of the overview lifecycle, with its tasks per phase and a handoff link to the line that owns an off phase) · Card grid 3 cols, tint cards with scope lists (capabilities, the PDF's six boxes verbatim, no links) (white) · Card grid Bento (vessels and ROVs: image-bg cards + 2 stat cards from key figures) (tint) · Feed Projects scoped to the line, 4 cols (white) · Accordion (genuine FAQs only) (tint) · CTA Panel with the line's named contact (tint). All copy and cells from `src/data/services.ts`; projects from `src/data/projects.ts`. Survey, Monitoring and Technology singles reuse this template |
 | Asset single | Hero Photo (Badge status) · Split media Spec table · Gallery Photos · Feed Projects (related) · CTA Inline |
 | Project single | Hero Photo + Meta row · core content · Gallery · Feed Projects (same service) |
 | Projects archive | Hero Text · Feed Projects with Filters |

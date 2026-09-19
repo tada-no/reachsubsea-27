@@ -150,6 +150,14 @@
   --wp--custom--motion--duration-fast: 0.16s;
   --wp--custom--motion--duration-reveal: 0.8s;
   --wp--custom--motion--stagger: 70ms;
+
+  /* Photo tint (19 Sep 2026, Q-image-tint): every photo is screen-blended over this colour, so
+     blacks lift to navy and whites stay white. One place to soften it (navy-800) or switch it off. */
+  --wp--custom--color--image-tint: var(--wp--preset--color--navy-900);
+  /* Image scrims (text over a photo) ramp from solid navy behind the text to this floor at the far
+     edge. Never 0, so every photo card keeps a navy veil over its screen-blended image. */
+  --wp--custom--color--scrim--solid: var(--wp--preset--color--navy-900);
+  --wp--custom--color--scrim--floor: rgb(27 29 59 / 0.1);
 }
 
 /* ── Semantic colour · Light mode (default) ─────────────────── */

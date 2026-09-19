@@ -28,6 +28,7 @@ const {
   title,
   description,
   meta = [],
+  scope = [],
   action,
   headingLevel: Heading = 'h3',
   class: className,
@@ -102,6 +103,13 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
           {meta.map((item) => (
             <MetaItem icon={item.icon} text={item.text} href={item.href} as="li" />
           ))}
+        </ul>
+      )
+    }
+    {
+      scope.length > 0 && (
+        <ul class="card__scope text-small">
+          {scope.map((item) => <li>{item}</li>)}
         </ul>
       )
     }
@@ -181,11 +189,12 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     color: var(--wp--custom--color--text--secondary);
   }
   /* Image bg scrim: a bottom-up navy ramp (17 Sep 2026) so the photo stays a photo and the text
-     still clears AA; was a flat 64 % wash. Deepened through the text zone, with a light base wash. */
+     still clears AA; was a flat 64 % wash. Deepened through the text zone, with a light base wash.
+     19 Sep 2026: solid navy at the text edge down to the scrim floor (10 %), never 0. */
   .card__overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgb(27 29 59 / 0.96) 0%, rgb(27 29 59 / 0.86) 38%, rgb(27 29 59 / 0.5) 62%, rgb(27 29 59 / 0.22) 100%);
+    background: linear-gradient(to top, var(--wp--custom--color--scrim--solid) 0%, rgb(27 29 59 / 0.86) 38%, rgb(27 29 59 / 0.5) 62%, var(--wp--custom--color--scrim--floor) 100%);
   }
 
   .card__content {
@@ -300,6 +309,41 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
   }
   .card__action {
     margin-top: auto;
+  }
+  /* Image-top cards in a row: the meta line sits with the action at the foot, so a title that wraps
+     one line more than its neighbours doesn't knock the meta out of line (19 Sep 2026, Subsea) */
+  .card--media-image-top .card__meta:has(+ .card__action) {
+    margin-top: auto;
+  }
+  .card--media-image-top .card__meta + .card__action {
+    margin-top: 0;
+  }
+  /* Scope: a quiet list of 3 short items, sage dashes, regular weight in text/secondary so it steps
+     back behind the title (review 19 Sep 2026: a run-on line read as a second paragraph) */
+  .card__scope {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+    color: var(--wp--custom--color--text--secondary);
+    line-height: 1.3;
+  }
+  /* No action below it: the list takes the card's foot, so lists line up across a row even when one
+     summary wraps a line less */
+  .card__scope:last-child {
+    margin-top: auto;
+  }
+  .card__scope li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--wp--preset--spacing--12);
+  }
+  .card__scope li::before {
+    content: '';
+    flex: none;
+    width: 12px;
+    height: 2px;
+    align-self: center;
+    background-color: var(--wp--custom--color--icon--accent);
   }
 
   /* Stretched link: the whole card is the target, the ring moves to the card */

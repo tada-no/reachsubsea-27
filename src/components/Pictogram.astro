@@ -308,6 +308,92 @@ const live = Boolean(inner && inner.includes('class="pg-'));
   @keyframes pg-flow {
     to { transform: translate3d(27.2px, 0, 0); }
   }
+
+  /* Oil & gas, Offshore wind (19 Sep 2026, industry tiles): the same swell as Subsea infrastructure
+     (a stroked wave, two spare periods of 14.54 outside the clip, linear flow), on the same 3.2s
+     cycle. Offshore wind also turns its rotor once, eased with a hold at each end, like the spanner. */
+  .pictogram--oil-gas,
+  .pictogram--offshore-wind {
+    --pg-cycle: 3.2s;
+  }
+  :is(.pictogram--oil-gas, .pictogram--offshore-wind) .pg-sea {
+    clip-path: inset(0 10.7px 0 10.8px) view-box;
+  }
+  :is(.pictogram--oil-gas, .pictogram--offshore-wind) .pg-wave {
+    animation-timing-function: linear;
+  }
+  :is(.pictogram--oil-gas, .pictogram--offshore-wind).is-playing .pg-wave {
+    animation-name: pg-flow-wide;
+  }
+  .pictogram--offshore-wind .pg-rotor {
+    transform-box: view-box;
+    transform-origin: 48px 46.55px;
+  }
+  .pictogram--offshore-wind.is-playing .pg-rotor {
+    animation-name: pg-rotor;
+  }
+  /* Oil & gas crane: the jib luffs up 6° about its knuckle, pays out the hook line (a trimmed
+     stroke) with the hook following its end, winds it back in and luffs down. The hoist group
+     rises with the jib tip (20 × sin 6° ≈ 2.09) so the line always hangs straight down. The line from
+     the knuckle into the sea runs a gap down into the water while the hook pays out. It is drawn
+     bottom-up, so the gap sits past its far end at offset 0 and past its near end at 112. */
+  .pictogram--oil-gas .pg-jib {
+    transform-box: view-box;
+    transform-origin: 19.9px 30.28px;
+  }
+  .pictogram--oil-gas .pg-cable {
+    stroke-dasharray: 100 120;
+    stroke-dashoffset: 62;
+  }
+  .pictogram--oil-gas .pg-riser {
+    stroke-dasharray: 100 12 300 0;
+  }
+  .pictogram--oil-gas.is-playing .pg-riser {
+    animation-name: pg-riser;
+  }
+  .pictogram--oil-gas.is-playing .pg-jib {
+    animation-name: pg-luff;
+  }
+  .pictogram--oil-gas.is-playing .pg-hoist {
+    animation-name: pg-luff-lift;
+  }
+  .pictogram--oil-gas.is-playing .pg-cable {
+    animation-name: pg-payout;
+  }
+  .pictogram--oil-gas.is-playing .pg-hook {
+    animation-name: pg-hook;
+  }
+  @keyframes pg-luff {
+    0%, 8% { transform: rotate(0deg); }
+    30%, 72% { transform: rotate(-6deg); }
+    92%, 100% { transform: rotate(0deg); }
+  }
+  @keyframes pg-luff-lift {
+    0%, 8% { transform: translate3d(0, 0, 0); }
+    30%, 72% { transform: translate3d(-0.1px, -2.09px, 0); }
+    92%, 100% { transform: translate3d(0, 0, 0); }
+  }
+  @keyframes pg-payout {
+    0%, 30% { stroke-dashoffset: 62; }
+    48%, 56% { stroke-dashoffset: 10; }
+    74%, 100% { stroke-dashoffset: 62; }
+  }
+  @keyframes pg-riser {
+    0%, 28% { stroke-dashoffset: 0; }
+    60%, 100% { stroke-dashoffset: 112; }
+  }
+  @keyframes pg-hook {
+    0%, 30% { transform: translate3d(0, 0, 0); }
+    48%, 56% { transform: translate3d(0, 5.05px, 0); }
+    74%, 100% { transform: translate3d(0, 0, 0); }
+  }
+  @keyframes pg-flow-wide {
+    to { transform: translate3d(29.08px, 0, 0); }
+  }
+  @keyframes pg-rotor {
+    0%, 10% { transform: rotate(0deg); }
+    90%, 100% { transform: rotate(360deg); }
+  }
   @keyframes pg-ratchet {
     0%, 6%, 30%, 36%, 60%, 100% { transform: rotate(0deg); }
     18%, 48% { transform: rotate(11deg); }

@@ -133,7 +133,7 @@ const instanceId = makeId('feed-grid');
             </div>
           )}
 
-          <ul class:list={['feed-grid__list', layout === 'editorial' && 'feed-grid__list--editorial']} style={`--feed-grid-columns: ${columns}`}>
+          <ul class:list={['feed-grid__list', layout === 'editorial' && 'feed-grid__list--editorial', columns === 4 && 'feed-grid__list--cols-4']} style={`--feed-grid-columns: ${columns}`}>
             {items.map((item) => (
               <li class="feed-grid__item" data-facets={JSON.stringify(item.facets ?? {})}>
                 <Card {...item} />
@@ -228,6 +228,14 @@ const instanceId = makeId('feed-grid');
     }
     .feed-grid__list--editorial .feed-grid__item:first-child .card--media-image-bg {
       min-height: 0;
+    }
+  }
+
+  /* Four across only from 1200: below it the cards' kickers and meta wrap, so they go 2 × 2
+     (19 Sep 2026, Subsea projects) */
+  @media (max-width: 1199px) {
+    .feed-grid__list--cols-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 

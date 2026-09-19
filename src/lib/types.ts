@@ -88,6 +88,9 @@ export interface CardField {
   title: string;
   description?: string;
   meta?: MetaField[];
+  /** 3 short scope items as a quiet list under the text (19 Sep 2026, service singles).
+   * Not links. */
+  scope?: string[];
   action?: LinkField;
 }
 

@@ -22,6 +22,7 @@ import MediaFrame from '../components/MediaFrame.astro';
 import SpecRow from '../components/SpecRow.astro';
 import NumberedItem from '../components/NumberedItem.astro';
 import Card from '../components/Card.astro';
+import Pictogram from '../components/Pictogram.astro';
 import { makeId } from '../lib/ids';
 import type { BlockFields, CardField, ImageField, LinkField } from '../lib/types';
 
@@ -95,6 +96,9 @@ interface Props extends BlockFields {
   /** A quote in place of the visible heading (19 Sep 2026, Investors overview CEO letter). `title` stays the
    * section's accessible name (a visually hidden H2); the quote reads as H3, then the attribution. */
   quote?: { text: string; name: string; role?: string };
+  /** A 96 line pictogram above the heading (19 Sep 2026, service singles: the line's own pictogram,
+   * which plays its loop once as the section scrolls in). */
+  pictogram?: string;
   class?: string;
 }
 
@@ -118,6 +122,7 @@ const {
   card,
   embed,
   quote,
+  pictogram,
   background,
   spacing,
   anchor,
@@ -292,6 +297,7 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
   ) : (
   <div class="split-media__columns">
     <div class="split-media__text">
+      {pictogram && <Pictogram name={pictogram} size={96} class="split-media__pictogram" />}
       {eyebrow && <Eyebrow text={eyebrow} />}
       {quote ? (
         <Fragment>
@@ -446,6 +452,15 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
   .split-media--start .split-media__text {
     grid-column: 8 / span 5;
   }
+  /* The loop's travelling gaps are painted in the section ground. The art sits 12px inside the 96
+     grid, so pull it out to line up with the heading's left edge */
+  .split-media__pictogram {
+    --pg-bg: var(--wp--custom--color--bg--default);
+    margin-left: -12px;
+  }
+  .has-surface-tint .split-media__pictogram {
+    --pg-bg: var(--wp--custom--color--bg--tint);
+  }
   .split-media--start .split-media__media {
     grid-column: 1 / span 6;
   }
@@ -575,7 +590,7 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
      stays a photo */
   .split-media__banner .card__overlay {
     background:
-      linear-gradient(to right, rgb(27 29 59 / 0.94) 0%, rgb(27 29 59 / 0.82) 38%, rgb(27 29 59 / 0.3) 68%, rgb(27 29 59 / 0.08) 100%),
+      linear-gradient(to right, var(--wp--custom--color--scrim--solid) 0%, rgb(27 29 59 / 0.82) 38%, rgb(27 29 59 / 0.3) 68%, var(--wp--custom--color--scrim--floor) 100%),
       linear-gradient(to top, rgb(27 29 59 / 0.5) 0%, rgb(27 29 59 / 0) 45%);
   }
   @media (max-width: 899px) {
@@ -586,7 +601,7 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
       min-height: 440px;
     }
     .split-media__banner .card__overlay {
-      background: linear-gradient(to top, rgb(27 29 59 / 0.96) 0%, rgb(27 29 59 / 0.86) 45%, rgb(27 29 59 / 0.3) 75%, rgb(27 29 59 / 0.1) 100%);
+      background: linear-gradient(to top, var(--wp--custom--color--scrim--solid) 0%, rgb(27 29 59 / 0.86) 45%, rgb(27 29 59 / 0.3) 75%, var(--wp--custom--color--scrim--floor) 100%);
     }
   }
 

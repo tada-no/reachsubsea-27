@@ -337,3 +337,20 @@ html.js [data-reveal].is-settled {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Photo tint (19 Sep 2026) ─────────────────────────────── */
+/* Every photo and video is screen-blended over the brand navy, so a mixed library (stock, deck shots,
+   people, sunsets) reads as one set: the shadows lift to navy and the highlights stay clean. The
+   wrapper paints the tint and isolates the blend, so the photo never blends with the section
+   behind it; overlays and scrims are later siblings and still sit on top. :has() keeps empty
+   placeholders on their grey and out-ranks the components' own wrapper background. Photos only: logos, SVGs
+   and the 3D World poster (a render, and Embed has its own stage reveal) stay untouched. In
+   WordPress this is the same rule on the core Image / Cover / Media & Text wrappers. */
+:is(.page-hero__media, .card__media, .card__bg, .media-frame__frame, .social-feed__media, .statement__photo):has(> :is(img, video)) {
+  background-color: var(--wp--custom--color--image-tint);
+  isolation: isolate;
+}
+:is(.page-hero__media, .card__media, .card__bg, .media-frame__frame, .social-feed__media, .statement__photo)
+  > :is(img, video) {
+  mix-blend-mode: screen;
+}
