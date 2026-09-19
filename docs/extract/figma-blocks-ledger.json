@@ -681,7 +681,11 @@
     "date": "2026-09-17",
     "context": "Q49–Q53 (docs/00-questions.md). Pushed the 17 Sep coded Home redesign into Figma. Picked up mid-flight: container/wide, Card Media=Stat, CardGrid Layout=Bento, FeedGrid Layout=Editorial, CtaBand Style=Panel, PageHero Style=Video, Header Breakpoint=Desktop overlay + 6-link Nav, and the reimagined Site menu panel were already built in Figma before this session (see per-block variantIds above and figma-components-ledger.json). This session verified each against the current code, fixed two gaps, and did the remaining work: Stats band Style=Feature, the Embed 3D World no-eyebrow fix, the Card image-bg gradient scrim, the new Social feed block, and the Home page composition.",
     "containerToken": "Foundations Layout collection container/wide (VariableID:9:56) was found ALREADY at 1440 on both Desktop and Mobile modes when checked — not 1600 as the task brief assumed. No change made; verified via figma.variables.getLocalVariableCollectionsAsync() rather than trusting the brief.",
-    "newPage": { "name": "Pages", "id": "250:22", "position": "after Blocks (12:25), before the second '---' divider (12:26)" },
+    "newPage": {
+      "name": "Pages",
+      "id": "250:22",
+      "position": "after Blocks (12:25), before the second '---' divider (12:26)"
+    },
     "homeFrame": {
       "id": "260:22",
       "name": "Home",
@@ -730,5 +734,69 @@
       "Home's Card grid/Feed grid/Embed/Accordion/CTA band sections (everything after Live operations) were already in the file before this session and were not re-verified in this follow-up pass; only the Header→Page hero→Live operations→Card grid seam was screenshot-checked to confirm the swap didn't disturb neighbouring sections."
     ],
     "statsBandGapFix": "FIXED 17 Sep 2026 (second follow-up session). A fresh instance of the existing Stats band Feature variant (253:4781, see statsBandFeature above — no new component needed) was created and inserted into Home (260:22) at index 2, between Page hero (260:309) and Live operations (281:1002), matching src/pages/index.astro's actual order. Its root fill was rebound from bg/default (VariableID:8:22) to bg/tint (VariableID:8:23) to match the code's `background=\"tint\"` prop — none of the block's existing content needed to change since it already carried Home's real figures. New instance id 285:5903."
+  },
+  "phase4InvestorsOverview": {
+    "date": "2026-09-19",
+    "variables": {
+      "text/accent-display": "VariableID:292:8048 (Light sage/500, Navy sage/300, TEXT_FILL; Card Media=Stat values rebound: 245:2797, 245:2818, 245:2839)"
+    },
+    "components": {
+      "Date tile": {
+        "docFrame": "293:2302",
+        "set": "293:2318",
+        "variants": {
+          "Type=Date": "293:2307",
+          "Type=File": "293:2312"
+        },
+        "props": [
+          "Month",
+          "Day",
+          "File type"
+        ]
+      },
+      "Report card": {
+        "set": "294:2397",
+        "variants": {
+          "Tone=Tint, Layout=Stacked": "294:2303",
+          "Tone=Tint, Layout=Row": "294:2327",
+          "Tone=Navy, Layout=Stacked": "294:2351",
+          "Tone=Navy, Layout=Row": "294:2374"
+        },
+        "props": [
+          "Action 2",
+          "Action 3"
+        ],
+        "note": "No TEXT props (defaults would be shared across tones); edit kicker/title/meta and link labels per instance."
+      }
+    },
+    "blocks": {
+      "Block/Timeline": {
+        "set": "187:3005",
+        "newAxis": "Layout = List | Track",
+        "Layout=Track, Breakpoint=Desktop": "295:4868",
+        "todo": "Track Mobile variant (scrolling track + stacked report cards)"
+      },
+      "Block/Split media": {
+        "set": "166:2339",
+        "newAxis": "Text = Heading | Quote",
+        "Media=Video, Position=End, Breakpoint=Desktop, Text=Quote": "295:8270",
+        "Media=Embed, Position=Start, Breakpoint=Desktop, Text=Heading": "295:8285",
+        "todo": "Mobile variants of Quote and Embed; Figures and Card media (Why invest) still missing"
+      }
+    },
+    "pages": {
+      "Investors overview": "295:8326 (Pages page 250:22, right of Home 260:22)"
+    },
+    "gaps": [
+      "Page hero photo image not set (images cannot be placed via the API here)",
+      "Subnav component has 6 items; Investors has 7 (Share information missing)",
+      "CTA Panel has no contact card variant; code shows Arne Joa",
+      "Why invest page and its blocks (Stats band Results, Split media Figures/Card) not in Figma yet"
+    ],
+    "gotchas": [
+      "Editing text inside a nested instance can invalidate other cached sublayer IDs: re-query before each edit",
+      "A failed use_figma script rolls back entirely",
+      "Cloned variants keep TEXT property refs but instance setProperties may not reach overridden text; set characters directly"
+    ]
   }
 }
