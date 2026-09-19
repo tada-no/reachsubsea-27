@@ -1,0 +1,400 @@
+---
+// Values · reach/values (19 Sep 2026, Company › About). Learn · Teach · Reach, after the live site's pinned
+// values scroll, rebuilt without GSAP. Split layout (20 Sep 2026, Ross): from 900 up a full-bleed navy band
+// (figure 40% · words + copy 60%, 96px between) is pinned under the docked subnav, only as tall as its
+// content, while the page scrolls through an invisible runway; scroll only drives the change. The next
+// value rises up from below while the last leaves upward (clip + rise, no fades), each costs about a third
+// of a viewport of scroll, and the band lets go when the promise has held for one runway. The figure is one
+// person who never moves: only what she stands beside (book, board, target) changes, rolling in and out
+// with a clip. After the last value the promise ("Everything within Reach.") rises in and the figure keeps
+// standing at the target. The step list is the runway (its content hidden) and the accessible content; the
+// pinned figure and reel are a decorative copy. Below 900, and without JS, the same content reads as a
+// plain list on navy. Reduced motion keeps the state changes and drops the transitions (base.css).
+import BlockSection from '../components/BlockSection.astro';
+import Pictogram from '../components/Pictogram.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields } from '../lib/types';
+
+interface ValueItem {
+  word: string;
+  text: string;
+  pictogram?: string;
+}
+
+interface Props extends BlockFields {
+  eyebrow?: string;
+  /** The section's heading (visually hidden from 900 up, where the words themselves are the headings). */
+  title: string;
+  values: ValueItem[];
+  /** The closing promise: `lead` + the last value's word ("Everything within" + "Reach"). */
+  promise?: { lead: string; word: string };
+}
+
+const { eyebrow, title, values = [], promise, background = 'navy', spacing, anchor } = Astro.props;
+const titleId = makeId('values', title);
+const figure = values[0]?.pictogram;
+---
+
+{
+  values.length > 0 && (
+    <BlockSection slug="values" root="values" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId}>
+      <div class="values__layout" data-values data-active="0" style={`--values-count: ${values.length}`}>
+        <div class="values__band">
+          <div class="values__band-inner">
+            <div class="values__head">
+              {eyebrow && <p class="values__eyebrow text-eyebrow">{eyebrow}</p>}
+              <h2 id={titleId} class="values__title text-h1">{title}</h2>
+            </div>
+
+            {/* The pinned band (decorative; the list below carries the content) */}
+            {eyebrow && <p class="values__eyebrow values__eyebrow--band text-eyebrow" aria-hidden="true">{eyebrow}</p>}
+            <div class="values__grid" aria-hidden="true">
+              <div class="values__figure">
+                <div class="values__marks">
+                  {figure && <span class="values__person"><Pictogram name={figure} size={320} /></span>}
+                  {values.map((value, i) => value.pictogram && (
+                    <span class="values__mark" data-mark={i}><Pictogram name={value.pictogram} size={320} /></span>
+                  ))}
+                </div>
+              </div>
+              <div class="values__reel">
+                <div class="values__items">
+                  {values.map((value, i) => (
+                    <div class="values__item" data-item={i}>
+                      <p class="values__item-word text-display">{value.word}.</p>
+                      <p class="values__item-text text-lead">{value.text}</p>
+                    </div>
+                  ))}
+                  {promise && (
+                    <div class="values__item" data-item={values.length}>
+                      <p class="values__item-lead text-h1">{promise.lead}</p>
+                      <p class="values__item-word values__item-word--accent text-display">{promise.word}.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="values__runway">
+          <ol class="values__steps">
+            {values.map((value, i) => (
+              <li class="values__step" data-step={i}>
+                {value.pictogram && <Pictogram name={value.pictogram} size={96} class="values__pictogram" />}
+                <h3 class="values__step-word text-h2">{value.word}.</h3>
+                <p class="values__text text-lead">{value.text}</p>
+              </li>
+            ))}
+          </ol>
+          {promise && (
+            <div class="values__promise" data-step={values.length} data-promise>
+              <p class="values__promise-line text-h2">
+                {promise.lead} <strong>{promise.word}.</strong>
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .values {
+    --pg-bg: var(--wp--custom--color--bg--default);
+    /* The pinned figure's (and reel's) height, the band around them (a full viewport under the subnav, its
+       content centred) and the scroll each value costs */
+    --values-h: clamp(300px, 44vh, 400px);
+    --values-band: max(calc(var(--values-h) + 156px), calc(100vh - var(--reach-subnav-top, 0px) - 72px));
+    --values-run: clamp(240px, 34vh, 340px);
+  }
+  .values__layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
+  }
+  .values__eyebrow {
+    margin: 0;
+    color: var(--wp--custom--color--text--accent);
+  }
+  .values__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .values__title {
+    margin: 0;
+  }
+  .values__eyebrow--band,
+  .values__grid {
+    display: none;
+  }
+  .values__steps {
+    display: grid;
+    gap: var(--wp--preset--spacing--48);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .values__step {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .values__pictogram {
+    margin: 0 0 var(--wp--preset--spacing--8) calc(var(--wp--preset--spacing--12) * -1);
+  }
+  .values__step-word {
+    margin: 0;
+  }
+  .values__text {
+    margin: 0;
+    max-width: 36rem;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .values__promise {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    margin-top: var(--wp--preset--spacing--64);
+    padding-top: var(--wp--preset--spacing--32);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .values__promise-line {
+    margin: 0;
+  }
+  .values__promise-line strong {
+    color: var(--wp--custom--color--text--accent-display);
+  }
+
+  /* Tablet: the steps pair up two across under the heading, so the width is used; the promise spans. */
+  @media (min-width: 600px) and (max-width: 899px) {
+    .values__steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--wp--preset--spacing--48) var(--wp--preset--spacing--32);
+    }
+    .values__step:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* The figure: one person, drawn once (the first pictogram with its subject hidden). The three subjects are
+     stacked over it without the person; the one whose state is current rolls in, the others wait above (past)
+     or below (future) and roll out the way they came. Persons are identical in all three SVGs. */
+  .values__marks svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .values__person,
+  .values__mark {
+    position: absolute;
+    inset: 0;
+  }
+  .values__person svg > :not(.pg-person) {
+    display: none;
+  }
+  .values__mark svg .pg-person {
+    display: none;
+  }
+  .values__mark {
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 0.7s var(--wp--custom--motion--ease-in-out);
+  }
+  .values__mark[data-state='future'] {
+    clip-path: inset(100% 0 0 0);
+  }
+  .values__mark[data-state='current'] {
+    clip-path: inset(0 0 0 0);
+  }
+
+  /* ── 900 up, live: a navy band pinned under the subnav, an invisible runway under it ── */
+  @media (min-width: 900px) {
+    /* The section hands its colour to the band and its padding to the runway */
+    .wp-block-reach-values.values.is-live {
+      padding-block: 0;
+      background-color: var(--wp--preset--color--white);
+    }
+    .wp-block-reach-values.values.is-live > .container {
+      max-width: none;
+      padding-inline: 0;
+    }
+    .values.is-live .values__layout {
+      display: block;
+    }
+    .values.is-live .values__band {
+      position: sticky;
+      top: calc(var(--reach-subnav-top, 0px) + 72px);
+      height: var(--values-band);
+      display: flex;
+      align-items: center;
+      background-color: var(--wp--custom--color--bg--default);
+      color: var(--wp--custom--color--text--primary);
+    }
+    .values.is-live .values__band-inner {
+      width: 100%;
+      max-width: calc(
+        var(--wp--style--global--wide-size) + var(--wp--style--root--padding-left) + var(--wp--style--root--padding-right)
+      );
+      margin-inline: auto;
+      padding-inline: var(--wp--style--root--padding-left) var(--wp--style--root--padding-right);
+      display: flex;
+      flex-direction: column;
+      gap: var(--wp--custom--stack--lg);
+    }
+    .values.is-live .values__head {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .values.is-live .values__eyebrow--band {
+      display: block;
+    }
+    .values.is-live .values__grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      column-gap: var(--wp--preset--spacing--96);
+      align-items: center;
+      height: var(--values-h);
+    }
+    .values.is-live .values__marks {
+      position: relative;
+      margin-inline: auto;
+      width: min(100%, var(--values-h));
+      aspect-ratio: 1;
+    }
+
+    /* The reel: the current value's words + copy; the next rises from below, the last leaves upward */
+    .values__items {
+      display: grid;
+    }
+    .values__item {
+      grid-area: 1 / 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--wp--custom--stack--md);
+      clip-path: inset(0 0 100% 0);
+      transform: translate3d(0, -24px, 0);
+      transition:
+        clip-path 0.7s var(--wp--custom--motion--ease-in-out),
+        transform 0.7s var(--wp--custom--motion--ease-in-out);
+    }
+    .values__item[data-state='future'] {
+      clip-path: inset(100% 0 0 0);
+      transform: translate3d(0, 24px, 0);
+    }
+    .values__item[data-state='current'] {
+      clip-path: inset(0 0 0 0);
+      transform: none;
+      transition-delay: 0.12s;
+    }
+    .values__item p {
+      margin: 0;
+      color: var(--wp--custom--color--text--primary);
+    }
+    .values__item-text {
+      max-width: 52rem;
+      color: var(--wp--custom--color--text--secondary) !important;
+    }
+    .values__item-word--accent {
+      color: var(--wp--custom--color--text--accent-display) !important;
+    }
+
+    /* Runway: one --values-run per value (and for the promise), starting half a band up so each value
+       holds for exactly one runway; its content is visually hidden (the band shows a copy). */
+    .values.is-live .values__runway {
+      margin-top: calc(var(--values-band) / -2);
+      /* Inside the layout's content box (the band stops pinning at its end), so the promise holds a runway */
+      padding-bottom: calc(var(--values-band) / 2);
+    }
+    .values.is-live .values__steps {
+      gap: 0;
+    }
+    .values.is-live :is(.values__step, .values__promise) {
+      position: relative;
+      min-height: var(--values-run);
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+    .values.is-live :is(.values__step, .values__promise) > * {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+</style>
+
+<script>
+  // Stage state: the step crossing the middle of the viewport is the active one. Scroll-linked through an
+  // IntersectionObserver on a 1px band at the centre (no scroll handler). Its subject plays one cycle
+  // (motion.ts ends the loop at the cycle boundary). Every figure subject gets a state (past · current ·
+  // future) so it can roll away the way it came; the promise counts as one step past the last value while
+  // the figure keeps standing at the last subject.
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-values]').forEach((root) => {
+    if (!('IntersectionObserver' in window)) return;
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
+    const count = steps.filter((s) => !s.hasAttribute('data-promise')).length;
+    const marks = [...root.querySelectorAll<HTMLElement>('[data-mark]')];
+    const items = [...root.querySelectorAll<HTMLElement>('[data-item]')];
+    const section = root.closest<HTMLElement>('.values');
+    const band = root.querySelector<HTMLElement>('.values__band');
+    root.classList.add('is-live');
+    section?.classList.add('is-live');
+    const setState = (i: number) => {
+      const at = Math.min(i, count - 1);
+      root.classList.toggle('is-promise', i >= count);
+      root.dataset.active = String(at);
+      steps.forEach((step, n) => step.classList.toggle('is-current', n === i));
+      marks.forEach((mark) => {
+        const n = Number(mark.dataset.mark);
+        mark.dataset.state = n < at ? 'past' : n > at ? 'future' : 'current';
+      });
+      items.forEach((item) => {
+        const n = Number(item.dataset.item);
+        item.dataset.state = n < i ? 'past' : n > i ? 'future' : 'current';
+      });
+    };
+    setState(0);
+    const activate = (i: number) => {
+      setState(i);
+      if (reduce) return;
+      steps[i]?.querySelector('.pictogram--live')?.classList.add('is-playing');
+      // The figure stays at the target for the promise, and lets fly once more
+      root.querySelector(`[data-mark="${Math.min(i, count - 1)}"] .pictogram--live`)?.classList.add('is-playing');
+    };
+    // The change happens as a step crosses the middle of the pinned band (its `top` + half its height), so
+    // each value holds for exactly one runway; the band is re-measured when the viewport changes.
+    let observer: IntersectionObserver | undefined;
+    const observe = () => {
+      observer?.disconnect();
+      const centre = band && getComputedStyle(band).position === 'sticky'
+        ? parseFloat(getComputedStyle(band).top) + band.offsetHeight / 2
+        : window.innerHeight / 2;
+      const below = Math.max(0, window.innerHeight - centre - 1);
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) activate(steps.indexOf(entry.target as HTMLElement));
+          });
+        },
+        { rootMargin: `-${Math.round(centre)}px 0px -${Math.round(below)}px 0px`, threshold: 0 },
+      );
+      steps.forEach((step) => observer!.observe(step));
+    };
+    observe();
+    let resizing = 0;
+    window.addEventListener('resize', () => {
+      window.clearTimeout(resizing);
+      resizing = window.setTimeout(observe, 150);
+    });
+  });
+</script>

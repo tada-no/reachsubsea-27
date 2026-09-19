@@ -14,6 +14,9 @@ export const keyFigures: StatField[] = [
   { key: 'rov-systems', value: '15', label: 'ROV systems' },
   // Design Reference PDF p10 and p18, 2Q 2026: kept distinct from Countries reached (offices = physical locations)
   { key: 'offices', value: '8', label: 'Offices' },
+  // Design Reference PDF p30 (About us, "8, in 4 countries"): Norway, UK, Singapore and Australia.
+  // Distinct from Countries reached (clients in 9 countries). Added 19 Sep 2026
+  { key: 'office-countries', value: '4', label: 'Countries with an office' },
   { key: 'newbuilds', value: '4', label: 'Newbuilds joining the fleet' },
 ];
 

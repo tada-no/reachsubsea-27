@@ -1,0 +1,113 @@
+---
+// Company › About (19 Sep 2026): the Company landing page ("About Reach" in the nav). Content: client PDF
+// p30–31 ("12 — Company — About Us") in its own wording, the promise from the live /about/ page, and the ISO
+// certificates and management team from the dev /company/who-we-are/about-us/ page. Built for a prospective
+// client, investor or hire deciding whether Reach is credible and a good fit: who we are (vision, story, key
+// figures) · what we are certified to · how we work (Learn · Teach · Reach, ending in the promise) · who
+// leads us · quick facts (FAQ) · a way in. Copy and lists: src/data/company.ts; figures: key-figures.ts.
+// Redirects to this page: /about/ (live), /company/who-we-are/ and /company/who-we-are/about-us/ (dev), and
+// /company/who-we-are/vision-values-and-promise/ → /company/#values (dev).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import SectionSubnav from '../../blocks/SectionSubnav.astro';
+import SplitMedia from '../../blocks/SplitMedia.astro';
+import CardGrid from '../../blocks/CardGrid.astro';
+import StatsBand from '../../blocks/StatsBand.astro';
+import Values from '../../blocks/Values.astro';
+import Accordion from '../../blocks/Accordion.astro';
+import CtaBand from '../../blocks/CtaBand.astro';
+import { navSections } from '../../data/navigation';
+import { pickFigures } from '../../data/key-figures';
+import { vision, story, values, promise, management, certificates, companyFaqs } from '../../data/company';
+import type { CardField } from '../../lib/types';
+
+const base = import.meta.env.BASE_URL;
+const company = navSections.find((s) => s.id === 'company')!;
+const subnavItems = [
+  { label: 'About', href: company.href },
+  ...company.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+const certificateTiles: CardField[] = certificates.map((c) => ({
+  media: 'icon',
+  pictogram: 'shield-tick',
+  title: `${c.standard} · ${c.scope}`,
+}));
+---
+
+<BaseLayout title="About Reach Subsea" motion>
+  <Header current="company" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Company' }]}
+      eyebrow="Our vision"
+      title={vision.title}
+      lead={vision.text}
+      image={{ src: `${base}images/ocean-horizon-calm.jpg`, alt: '', focalPoint: { x: 0.5, y: 0.45 } }}
+    />
+
+    <SectionSubnav source="section-pages" label="Company" items={subnavItems} current={company.href} />
+
+    <SplitMedia
+      anchor="our-story"
+      layout="wide"
+      background="white"
+      eyebrow="Our story"
+      title={story.title}
+      body={story.body.map((p) => `<p>${p}</p>`).join('')}
+      image={{ src: `${base}images/vessel-olympic-zeus.jpg`, alt: 'Olympic Zeus, a Reach Subsea construction vessel, on a calm sea', focalPoint: { x: 0.5, y: 0.55 } }}
+    />
+
+    {/* Founded · offices · countries · people (PDF p30), the Home band's Feature style leading on people */}
+    <StatsBand
+      style="feature"
+      featureKey="people"
+      background="tint"
+      animate
+      stats={pickFigures(['people', 'established', 'offices', 'office-countries'])}
+    />
+
+    <CardGrid anchor="certificates" layout="strip" eyebrow="Certified management systems" background="white" spacing="sm" cards={certificateTiles} />
+
+    <Values anchor="values" eyebrow="Our values" title="Learn. Teach. Reach." values={values} promise={promise} />
+
+    <SplitMedia
+      anchor="leadership"
+      background="white"
+      media="spec-table"
+      title="Meet the people leading Reach Subsea"
+      body="<p>Our management team and Board of Directors bring together deep offshore, engineering and capital-markets experience.</p>"
+      actions={[{ label: 'Meet our leadership', url: '/company/leadership-board/' }]}
+      specHeading="Management team"
+      specs={management.map((m) => ({ label: m.role, value: m.name }))}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about who we are and where we work.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="company"
+      background="tint"
+      items={companyFaqs}
+    />
+
+    <CtaBand
+      anchor="contact"
+      title="Work with us"
+      text="Planning a project, or your next career move? We would like to hear from you."
+      actions={[
+        { label: 'Contact us', url: '/contact/', action: 'page' },
+        { label: 'Open positions', url: '/careers/', action: 'page' },
+      ]}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

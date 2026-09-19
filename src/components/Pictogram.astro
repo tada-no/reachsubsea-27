@@ -426,4 +426,117 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     0%, 60%, 90%, 100% { transform: translate3d(0, 0, 0); }
     75% { transform: translate3d(0, -2.5px, 0); }
   }
+  /* Company values (19 Sep 2026, About): Learn · Teach · Reach. The artwork is the dev site's icon set
+     (a figure beside its subject: open book, presentation board, target), scaled onto the 96 grid;
+     only the moving parts are tagged. Same trim-path feel as the service loops. Solid only.
+     Learn: the right page turns over the spine (scaleX 1 → -0.88; it is filled with the surface colour,
+     so it covers the left page) and the new page's lines write themselves in, one by one. At 100% the
+     turned page snaps back to the right, where it looks exactly like the page underneath.
+     Teach: the ship on the board sails out to the right and comes back in from the left (clipped to
+     the board).
+     Reach: the arrow draws back out of the target, flies in and lands; the rings ripple on impact. */
+  .pictogram--value-learn,
+  .pictogram--value-teach,
+  .pictogram--value-reach {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--value-learn .pg-page {
+    transform-box: view-box;
+    transform-origin: 60.67px 50px;
+  }
+  .pictogram--value-learn .pg-line {
+    stroke-dasharray: 100 120;
+  }
+  .pictogram--value-learn.is-playing .pg-page {
+    animation-name: pg-turn;
+  }
+  .pictogram--value-learn.is-playing .pg-line--1 {
+    animation-name: pg-write-1;
+  }
+  .pictogram--value-learn.is-playing .pg-line--2 {
+    animation-name: pg-write-2;
+  }
+  .pictogram--value-learn.is-playing .pg-line--3 {
+    animation-name: pg-write-3;
+  }
+  .pictogram--value-learn.is-playing .pg-line--4 {
+    animation-name: pg-write-4;
+  }
+  @keyframes pg-turn {
+    0%, 10% { transform: scaleX(1); }
+    42%, 99.9% { transform: scaleX(-0.88); }
+    100% { transform: scaleX(1); }
+  }
+  @keyframes pg-write-1 {
+    0%, 11% { stroke-dashoffset: 0; }
+    12%, 46% { stroke-dashoffset: 110; }
+    58%, 100% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-write-2 {
+    0%, 11% { stroke-dashoffset: 0; }
+    12%, 54% { stroke-dashoffset: 110; }
+    66%, 100% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-write-3 {
+    0%, 11% { stroke-dashoffset: 0; }
+    12%, 62% { stroke-dashoffset: 110; }
+    74%, 100% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-write-4 {
+    0%, 11% { stroke-dashoffset: 0; }
+    12%, 70% { stroke-dashoffset: 110; }
+    82%, 100% { stroke-dashoffset: 0; }
+  }
+  .pictogram--value-teach .pg-board {
+    clip-path: inset(25px 13.5px 34.5px 36px) view-box;
+  }
+  .pictogram--value-teach.is-playing .pg-ship {
+    animation-name: pg-sail;
+  }
+  @keyframes pg-sail {
+    0%, 12% { transform: translate3d(0, 0, 0); }
+    46% { transform: translate3d(44px, 0, 0); }
+    46.01% { transform: translate3d(-42px, 0, 0); }
+    82%, 100% { transform: translate3d(0, 0, 0); }
+  }
+  .pictogram--value-reach .pg-arrow {
+    transform-box: view-box;
+    transform-origin: 45.6px 55px;
+  }
+  .pictogram--value-reach .pg-ring {
+    transform-box: view-box;
+    transform-origin: 45.48px 55.07px;
+  }
+  .pictogram--value-reach.is-playing .pg-arrow {
+    animation-name: pg-shoot;
+  }
+  .pictogram--value-reach.is-playing .pg-ring--inner {
+    animation-name: pg-ripple-inner;
+  }
+  .pictogram--value-reach.is-playing .pg-ring--mid {
+    animation-name: pg-ripple-mid;
+  }
+  .pictogram--value-reach.is-playing .pg-ring--outer {
+    animation-name: pg-ripple-outer;
+  }
+  @keyframes pg-shoot {
+    0%, 8% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    28%, 40% { transform: translate3d(34px, 0, 0) rotate(0deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    52% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    58% { transform: translate3d(0, 0, 0) rotate(-4deg); }
+    64% { transform: translate3d(0, 0, 0) rotate(2.5deg); }
+    70%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  }
+  @keyframes pg-ripple-inner {
+    0%, 52%, 64%, 100% { transform: scale(1); }
+    57% { transform: scale(1.35); }
+  }
+  @keyframes pg-ripple-mid {
+    0%, 54%, 68%, 100% { transform: scale(1); }
+    60% { transform: scale(1.1); }
+  }
+  @keyframes pg-ripple-outer {
+    0%, 56%, 72%, 100% { transform: scale(1); }
+    63% { transform: scale(1.06); }
+  }
 </style>

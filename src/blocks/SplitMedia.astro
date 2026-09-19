@@ -13,6 +13,9 @@
 //   Card: a Card (usually Image bg, Featured) as the media, uncovered by a wipe as it enters.
 //   Embed: an iframe (ir.oms.no share graph) cropped to `crop` px, with a source line and link.
 // Any media except Numbered list can also carry `items` as a numbered list under the body copy.
+// Layout Wide (19 Sep 2026, About › Our story; Image only): for long copy. Heading on top, the body in
+// two columns (one paragraph each), then the image as a full-width 21:9 banner (16:9 tablet, 4:3 phone).
+// Below 900 the columns stack.
 // Layout Stacked (18 Sep 2026 review): heading on top, `items` as three numbered cards in columns,
 // and optionally a Card as a full-width banner below (left-to-right scrim, text bottom-left).
 import BlockSection from '../components/BlockSection.astro';
@@ -71,8 +74,9 @@ interface EmbedField {
 interface Props extends BlockFields {
   media?: 'image' | 'video' | 'spec-table' | 'numbered-list' | 'figures' | 'card' | 'embed';
   /** Card media only: `stacked` = heading, items in columns, the card as a full-width banner below.
-   * Figures media: `cards` = all points visible as cards (default `split` = sticky figure). */
-  layout?: 'split' | 'stacked' | 'cards';
+   * Figures media: `cards` = all points visible as cards (default `split` = sticky figure).
+   * Image media: `wide` = heading, two-column body, full-width banner image. */
+  layout?: 'split' | 'stacked' | 'cards' | 'wide';
   position?: 'end' | 'start';
   eyebrow?: string;
   title: string;
@@ -134,6 +138,7 @@ const shownActions = actions.slice(0, 2);
 const hasSpecFile = Boolean(specFile?.url);
 const listInText = media !== 'numbered-list' && items.length > 0;
 const stacked = layout === 'stacked' && media !== 'figures';
+const wide = layout === 'wide' && media === 'image';
 const figureCards = media === 'figures' && layout === 'cards';
 // Cards: value points stack in the left column; a split point becomes the feature card on the right.
 const valuePoints = figures.filter((p) => !p.split);
@@ -142,7 +147,7 @@ const splitPoint = figures.find((p) => p.split);
 const DONUT_R = 15.9155;
 // No gap between arcs (review round 6): gaps made a 100% split read as an incomplete ring.
 const DONUT_GAP = 0;
-const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-media--figure-cards', `split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
+const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked', figureCards && 'split-media--figure-cards', `split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
 ---
 
 <BlockSection
@@ -154,7 +159,21 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
   anchor={anchor}
   labelledBy={titleId}
 >
-  {stacked ? (
+  {wide ? (
+    <div class="split-media__stack">
+      <div class="split-media__stack-head">
+        {eyebrow && <Eyebrow text={eyebrow} />}
+        <Heading id={titleId} class:list={['split-media__title', Heading === 'h3' ? 'text-h3' : 'text-h2']}>{title}</Heading>
+      </div>
+      <div class="prose split-media__body split-media__body--cols">
+        {body && <Fragment set:html={body} />}
+        <slot />
+      </div>
+      <div class="split-media__wide-media">
+        <MediaFrame ratio="21:9" image={image} caption={caption} />
+      </div>
+    </div>
+  ) : stacked ? (
     <div class="split-media__stack">
       <div class="split-media__stack-head">
         {eyebrow && <Eyebrow text={eyebrow} />}
@@ -487,6 +506,29 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
 
   .split-media__body:empty {
     display: none;
+  }
+
+  /* Wide: two-column body, banner image */
+  .split-media__body--cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--wp--custom--stack--sm) var(--wp--custom--grid--gutter);
+  }
+  .split-media__body--cols > * + * {
+    margin-top: 0;
+  }
+  @media (max-width: 899px) {
+    .split-media__body--cols {
+      grid-template-columns: 1fr;
+    }
+    .split-media__wide-media .media-frame__frame {
+      aspect-ratio: 16 / 9;
+    }
+  }
+  @media (max-width: 599px) {
+    .split-media__wide-media .media-frame__frame {
+      aspect-ratio: 4 / 3;
+    }
   }
 
   .split-media__actions {
@@ -1037,6 +1079,7 @@ const rootClass = [stacked && 'split-media--stacked', figureCards && 'split-medi
     .split-media__columns {
       display: flex;
       flex-direction: column;
+      align-items: stretch;
       gap: var(--wp--custom--stack--xl);
     }
     .split-media--image .split-media__media,

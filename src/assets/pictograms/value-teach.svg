@@ -1,0 +1,10 @@
+<svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g class="pg-person"><circle cx="19.52" cy="17.39" r="6.72" stroke="currentColor" stroke-width="2.5"/><path d="M26.69,86.67l0.63-26.03c2.41-0.88,5.28-2.92,5.03-5.49l-1.96-19.81c-0.25-2.57-2.55-4.67-5.09-4.67h-11.56c-2.55,0-4.84,2.11-5.08,4.67l-1.97,19.81c-0.25,2.57,2.61,4.61,5.03,5.49l0.63,26.03" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+<path d="M36.13,63.84h41.59c3.56,0,6.47-2.91,6.47-6.47v-33.33" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M35 16.56L89.33 16.56L89.33 22.96L50.12 22.96" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M41.88 23.17L35 23.17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M52.11 69.91L52.11 86.67" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M52.04 77.27L39.15 86.67" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M65.15 86.67L52.24 77.27" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="pg-board"><g class="pg-ship pg-lead"><path d="M39.77,40.09l4.28,7.31-1.57,2.23h33.31v-5.73h-17.44v-3.8s-18.71,0.13-18.57,0Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M56.51 33.91L42.48 33.91" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M49.32 33.91L46.03 40.13L56.51 40.13L56.51 33.91" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M65.72 43.47L65.72 37.15L72.04 37.15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+</svg>

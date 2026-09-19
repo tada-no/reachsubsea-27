@@ -1,13 +1,13 @@
 ---
-// Media frame (docs/05 §1): Ratio 3:2 · 4:3 · 16:9, Show play, Show caption.
+// Media frame (docs/05 §1): Ratio 3:2 · 4:3 · 16:9 · 21:9, Show play, Show caption.
 // No image src → the Figma placeholder (bg/disabled + 24px photo icon).
-// Radius: lg for 3:2 (grids), xl for 4:3 and 16:9 (large media). object-fit cover + focal point.
+// Radius: lg for 3:2 (grids), xl for 4:3, 16:9 and 21:9 (large media). object-fit cover + focal point.
 import Icon from './Icon.astro';
 import IconButton from './IconButton.astro';
 import type { ImageField } from '../lib/types';
 
 interface Props {
-  ratio?: '3:2' | '4:3' | '16:9';
+  ratio?: '3:2' | '4:3' | '16:9' | '21:9';
   image?: ImageField;
   radius?: 'lg' | 'xl';
   caption?: string;
