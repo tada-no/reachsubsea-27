@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 const PAGES_BASE = '/reachsubsea-27/';
 const isDev = process.argv.includes('dev');
 
-/** Rewrites href="/…" to href="/reachsubsea-27/…" in the built HTML (skips // and already-prefixed). */
+/** Rewrites href/src/action="/…" to "/reachsubsea-27/…" in the built HTML (skips // and already-prefixed). */
 function prefixRootLinks(base) {
   return {
     name: 'prefix-root-links',
@@ -20,12 +20,12 @@ function prefixRootLinks(base) {
         const walk = (d) =>
           fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]));
         const escaped = base.slice(1).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const pattern = new RegExp(`href="/(?!/|${escaped})`, 'g');
+        const pattern = new RegExp(`\\b(href|src|action)="/(?!/|${escaped})`, 'g');
         walk(fileURLToPath(dir))
           .filter((f) => f.endsWith('.html'))
           .forEach((f) => {
             const html = fs.readFileSync(f, 'utf8');
-            const out = html.replace(pattern, `href="${base}`);
+            const out = html.replace(pattern, `$1="${base}`);
             if (out !== html) fs.writeFileSync(f, out);
           });
       },
