@@ -13,9 +13,10 @@
 //   Card: a Card (usually Image bg, Featured) as the media, uncovered by a wipe as it enters.
 //   Embed: an iframe (ir.oms.no share graph) cropped to `crop` px, with a source line and link.
 // Any media except Numbered list can also carry `items` as a numbered list under the body copy.
-// Layout Wide (19 Sep 2026, About › Our story; Image only): for long copy. Heading on top, the body in
+// Layout Wide (19 Sep 2026, About › Our story): for long copy. Heading on top, the body in
 // two columns (one paragraph each), then the image as a full-width 21:9 banner (16:9 tablet, 4:3 phone).
-// Below 900 the columns stack.
+// Below 900 the columns stack. The image is optional: Careers › Who thrives (20 Sep 2026) is the same
+// heading over two columns with no banner.
 // Layout Stacked (18 Sep 2026 review): heading on top, `items` as three numbered cards in columns,
 // and optionally a Card as a full-width banner below (left-to-right scrim, text bottom-left).
 import BlockSection from '../components/BlockSection.astro';
@@ -169,9 +170,11 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
         {body && <Fragment set:html={body} />}
         <slot />
       </div>
-      <div class="split-media__wide-media">
-        <MediaFrame ratio="21:9" image={image} caption={caption} />
-      </div>
+      {image && (
+        <div class="split-media__wide-media">
+          <MediaFrame ratio="21:9" image={image} caption={caption} />
+        </div>
+      )}
     </div>
   ) : stacked ? (
     <div class="split-media__stack">
@@ -516,6 +519,10 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
   }
   .split-media__body--cols > * + * {
     margin-top: 0;
+  }
+  /* A column holding several paragraphs keeps the normal paragraph rhythm */
+  .split-media__body--cols > div > * + * {
+    margin-top: var(--wp--custom--stack--sm);
   }
   @media (max-width: 899px) {
     .split-media__body--cols {

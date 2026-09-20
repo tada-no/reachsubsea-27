@@ -1,0 +1,206 @@
+---
+// Careers › Overview (20 Sep 2026): the landing page of the Careers section. Content: client PDF pp. 49–50
+// ("22 — Careers — Overview") for structure, the live /careers/ page for the values copy, Trainees block,
+// candidate-portal links and named recruiter, and the dev /careers/ tree for the Careers FAQ. Built for a
+// prospective hire deciding whether Reach is a good place to work and how to get in: who thrives here and the
+// figures · trainees · open positions · the sibling pages and two photo cards (PDF p. 49) · FAQ · a named person
+// to ask. Copy and lists: src/data/careers.ts; figures: key-figures.ts.
+// Not used from the PDF (illustrative or duplicated elsewhere): the 8 role-area tiles, the Learn/Teach/Reach explainer
+// (About › Values), the stats panel that overlapped the hero (now the first block below it).
+// Redirects to this page: /careers-subpage-contacts-questions/ (live and dev), and on dev /careers/people/ + its
+// five leaves, /careers/opportunities/* (vacancies, candidate portal, FAQ, trainees), /careers/explore-your-path/*.
+// Dev /careers/why-work-with-us/life-at-reach/ → /careers/life-at-reach/, /careers/people/our-culture/ →
+// /careers/our-culture/, the other Why-work leaves → /careers/why-work-with-us/.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import SectionSubnav from '../../blocks/SectionSubnav.astro';
+import StatsBand from '../../blocks/StatsBand.astro';
+import SplitMedia from '../../blocks/SplitMedia.astro';
+import CardGrid from '../../blocks/CardGrid.astro';
+import Accordion from '../../blocks/Accordion.astro';
+import CtaBand from '../../blocks/CtaBand.astro';
+import { navSections } from '../../data/navigation';
+import { pickFigures } from '../../data/key-figures';
+import { hrManager, vacancies, thrive, trainees, recruiter, careersFaqs } from '../../data/careers';
+import type { CardField } from '../../lib/types';
+
+const base = import.meta.env.BASE_URL;
+const careers = navSections.find((s) => s.id === 'careers')!;
+const subnavItems = [
+  { label: 'Overview', href: careers.href },
+  ...careers.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const shortDate = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} ${MONTHS[m - 1]} ${y}`;
+};
+
+const thriveCards: CardField[] = thrive.items.map((item) => ({
+  media: 'icon',
+  surface: 'tint',
+  pictogram: item.pictogram,
+  title: item.title,
+  description: item.text,
+}));
+
+const vacancyCards: CardField[] = vacancies.map((v) => ({
+  media: 'none',
+  eyebrow: v.workplace,
+  title: v.title,
+  meta: [{ icon: 'calendar', text: `Apply by ${shortDate(v.due)}` }],
+  action: { label: 'Apply', url: v.url, action: 'external', context: `for ${v.title}, ${v.workplace}` },
+}));
+
+// The PDF's Why work with us block (p. 49): three text cards to the sibling pages, then two photo cards, one wide
+// and one narrow (8 + 4 on 12 columns). The text cards are the client sitemap's three child pages (the PDF's
+// "Career growth" and "Meet our people" have no page); the two photo cards keep the PDF's wording. Tablet: the
+// text cards stack in a row of three, the photo cards go full width and half width.
+// Wording: dev /careers/why-work-with-us/life-at-reach/ and the PDF (p. 49).
+const siblingCards: CardField[] = [
+  {
+    media: 'none',
+    surface: 'tint',
+    span: { cols: 4, rows: 1 },
+    title: 'Life at Reach',
+    description: 'Working with us is about more than just a job, it’s about belonging to a team that values sharing knowledge and never leaving anyone behind.',
+    action: { label: 'Explore life at Reach', url: '/careers/life-at-reach/' },
+  },
+  {
+    media: 'none',
+    surface: 'tint',
+    span: { cols: 4, rows: 1 },
+    title: 'Our culture',
+    description: 'The same values that shape how we work with clients also shape how we work with each other.',
+    action: { label: 'Explore our culture', url: '/careers/our-culture/' },
+  },
+  {
+    media: 'none',
+    surface: 'tint',
+    span: { cols: 4, rows: 1 },
+    title: 'Why work with us',
+    description: 'Career growth at Reach Subsea is built around learning from experienced colleagues, teaching what you know, and reaching further, together.',
+    action: { label: 'See why work with us', url: '/careers/why-work-with-us/' },
+  },
+  {
+    media: 'image-bg',
+    size: 'featured',
+    span: { cols: 8, rows: 1 },
+    image: { src: `${base}images/team-lounge-harbour.jpg`, alt: 'Colleagues talking in a lounge overlooking the harbour', focalPoint: { x: 0.5, y: 0.5 } },
+    title: 'Offshore & onshore, side by side',
+    description: 'Vessel crews, ROV pilots and survey specialists working alongside engineering, HSEQ and support teams onshore.',
+  },
+  {
+    media: 'image-bg',
+    span: { cols: 4, rows: 1 },
+    image: { src: `${base}images/project-suction-anchors.jpg`, alt: 'A colleague in a helmet and red overalls watching a lift on a vessel deck', focalPoint: { x: 0.3, y: 0.85 } },
+    title: 'HSEQ first',
+    description: 'Safety and quality are built into every role, every project, every day at sea.',
+  },
+];
+---
+
+<BaseLayout title="Careers · Reach Subsea" motion>
+  <Header current="careers" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Careers' }]}
+      title="Within Reach"
+      lead="Are you ready to discover if your potential is within reach?"
+      image={{ src: `${base}images/ocean-horizon-calm.jpg`, alt: '', focalPoint: { x: 0.5, y: 0.5 } }}
+      actions={[{ label: 'Open positions', url: hrManager.vacancies, action: 'external' }]}
+    />
+
+    <SectionSubnav source="section-pages" label="Careers" items={subnavItems} current={careers.href} />
+
+    <SplitMedia
+      anchor="who-thrives"
+      layout="wide"
+      background="white"
+      eyebrow="Who thrives here"
+      title={thrive.title}
+      body={thrive.body.map((p) => `<p>${p}</p>`).join('')}
+    />
+
+    {/* The four points, each with its value pictogram (Learn · Teach · Reach, then the fourth) */}
+    <CardGrid anchor="values" layout="4-columns" media="icon" surface="tint" numbered joined background="white" cards={thriveCards} />
+
+    {/* The PDF's stats panel, moved out of the hero into the first block below it */}
+    <StatsBand
+      style="feature"
+      featureKey="people"
+      background="tint"
+      animate
+      stats={pickFigures(['people', 'countries', 'trainee-since', 'trainee-offer'])}
+    />
+
+    <SplitMedia
+      anchor="trainees"
+      media="image"
+      position="end"
+      background="white"
+      eyebrow="Start your career"
+      title={trainees.title}
+      body={trainees.body.map((p) => `<p>${p}</p>`).join('')}
+      {/* The PDF's "Learn about the trainee program" button. No trainee page exists in the client sitemap: target TBC (Q66) */}
+      actions={[{ label: 'Learn about the trainee program', url: '#', action: 'page', type: 'button' }]}
+      image={{ src: `${base}images/${trainees.image.file}`, alt: trainees.image.alt, focalPoint: trainees.image.focalPoint }}
+    />
+
+    {/* SAMPLE: a 20 Sep 2026 snapshot of the HR-Manager list (src/data/careers.ts); the developer's feed replaces it */}
+    <CardGrid
+      anchor="open-positions"
+      layout="4-columns"
+      media="none"
+      surface="white"
+      background="tint"
+      sectionHeader={{
+        eyebrow: 'Open positions',
+        title: 'Where you could fit in',
+        action: { label: 'All open positions', url: hrManager.vacancies, action: 'external' },
+      }}
+      cards={vacancyCards}
+    />
+
+    <CardGrid
+      anchor="more"
+      layout="bento"
+      background="white"
+      sectionHeader={{ title: 'More about working here' }}
+      cards={siblingCards}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about working at Reach Subsea.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="careers"
+      background="tint"
+      items={careersFaqs}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title="Ready to reach further?"
+      text="Browse current openings and apply through our Candidate Portal."
+      actions={[
+        { label: 'Go to Candidate Portal', url: hrManager.vacancies, action: 'external' },
+        { label: 'Register for new openings', url: hrManager.register, action: 'external', type: 'link' },
+      ]}
+      showContact
+      contact={recruiter}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

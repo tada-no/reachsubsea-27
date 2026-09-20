@@ -211,7 +211,19 @@ const logoInner = logoSvg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*
     text-underline-offset: 0.2em;
   }
 
+  /* Tablet (20 Sep 2026): the four link columns share the row under the brand. At 2 of 12 columns the email
+     link was wider than its column and pushed the page 12px past the viewport at 900. */
   @media (min-width: 900px) {
+    .site-footer__column {
+      grid-column: span 3;
+    }
+    .site-footer__legal {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+  @media (min-width: 1200px) {
     .site-footer__brand {
       grid-column: span 4;
     }
@@ -222,11 +234,6 @@ const logoInner = logoSvg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*
     }
     .site-footer__column {
       grid-column: span 2;
-    }
-    .site-footer__legal {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
     }
   }
 </style>

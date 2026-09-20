@@ -10,6 +10,29 @@ _No open questions right now._
 
 ## Answered log
 
+### Q66. Careers overview (20 Sep 2026, Careers overview)
+Proposal answers and review rounds, `/careers/`:
+- [x] Hero: calm sea photo (`ocean-horizon-calm`), Animate, "Open positions" to HR-Manager; the PDF's stats panel moves to the first block below the hero (never over its edge)
+- [x] Vacancies: a link plus a **sample snapshot** of the live HR-Manager list (20 Sep 2026), marked as a placeholder for the developer's feed
+- [x] Offshore / Onshore: the dev site's two paths were tried as cards, then dropped in review; the PDF's "Offshore & onshore, side by side" photo card covers it
+- [x] "Who thrives here": heading over two text columns (About's Wide layout, no image), copy from the live page unchanged. The four value cards use the animated Learn / Teach / Reach pictograms and a new **Never leave anyone behind** one (friend drifts along a rope)
+- [x] Trainees: Split media with the workshop photo (no stacked CTAs); the PDF's "Learn about the trainee program" link is back, pointing at `#`
+- [x] "More about working here": the PDF's composition (three text cards to the child pages, then a wide and a narrow photo card)
+- [x] CTA panel: PDF wording, short (rule in docs/05 §2.9); panel and contact stack below 1200
+- [x] Backgrounds do not have to alternate white / tint / navy
+
+**Answer:** Built as above; section list in docs/05 §3. **Redirects:** `/careers-subpage-contacts-questions/` (live and dev); dev `/careers/people/*`, `/careers/opportunities/*` and `/careers/explore-your-path/*` → `/careers/`; dev `/careers/why-work-with-us/life-at-reach/` → `/careers/life-at-reach/`; dev `/careers/people/our-culture/` → `/careers/our-culture/`; the other Why-work leaves → `/careers/why-work-with-us/`.
+**Photos (Ross, 20 Sep 2026):** every photo taken from the live or dev site is approved for the prototype as a rule, people included; no per-photo permission questions. Client-side licensing is the client's to clear at launch.
+**Open with the client:**
+- Target of "Learn about the trainee program" (no trainee page in the client sitemap: new page, or a section of an existing one?)
+- Dev role lists (ROV pilots, surveyors and so on: kept in the dev site's Explore your path, not shown) and the recruiter details (Alexander Nygård Bakke, from the live page)
+- A calmer, people-free hero shot and a better people photo than the lounge one
+- Real quotes and a benefits list (blocked for the Life at Reach and Why work with us pages)
+- Headcount: 400 on the live site vs 500+ in the PDF (the page uses 500+ from `key-figures.ts`)
+- Vacancies are a 20 Sep 2026 sample; two of the four closed that day
+- The PDF's "Career growth" and "Meet our people" cards have no page in the sitemap; the third card links Why work with us instead
+- Visa sponsorship and global rotation answers on the dev FAQ are not on the live site: left out until the client confirms
+
 ### Q64. Photo tint and scrims, site-wide (19 Sep 2026, Subsea review)
 Context: Ross's Figma card (Reach-Subsea 4773:22545) screen-blends the photo over navy, so every image carries a subtle brand colour.
 - [x] Site-wide on photos (hero, cards, media frames, video, social and statement photos; logos, SVGs and the 3D World poster untouched)

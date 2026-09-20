@@ -33,6 +33,9 @@ interface Props extends BlockFields {
   media?: CardField['media'];
   surface?: CardField['surface'];
   cards?: CardField[];
+  /** The grid continues the block above it on the same ground (Careers, 20 Sep 2026: four value cards under their
+   * text): it drops its top padding. Same-ground blocks otherwise keep both paddings. */
+  joined?: boolean;
 }
 
 const {
@@ -43,6 +46,7 @@ const {
   surface = 'white',
   cards = [],
   eyebrow,
+  joined = false,
   background,
   spacing,
   anchor,
@@ -77,6 +81,7 @@ if (bento) {
     <BlockSection
       slug="card-grid"
       root="card-grid"
+      class={joined ? 'card-grid--joined' : undefined}
       background={background}
       spacing={spacing}
       anchor={anchor}
@@ -136,8 +141,19 @@ if (bento) {
   .card-grid__item {
     display: flex;
   }
+  .card-grid.card-grid--joined {
+    padding-top: 0;
+  }
   .card-grid__item > * {
     width: 100%;
+  }
+  /* Text-only cards in a row (Careers vacancies, 20 Sep 2026): like image-top cards, the meta line sits
+     with the action at the foot, so a title that wraps one line more doesn't knock the meta out of line */
+  .card-grid .card--media-none .card__meta:has(+ .card__action) {
+    margin-top: auto;
+  }
+  .card-grid .card--media-none .card__meta + .card__action {
+    margin-top: 0;
   }
 
   /* Bento reveal (17 Sep 2026): tiles settle into their grid cell instead of rising, since a dense
