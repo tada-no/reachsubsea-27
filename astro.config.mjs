@@ -38,7 +38,7 @@ const base = isDev ? '/' : PAGES_BASE;
 export default defineConfig({
   output: 'static',
   trailingSlash: 'ignore',
-  server: { port: 4321, host: true },
+  server: { port: Number(process.env.PORT) || 4321, host: true },
   devToolbar: { enabled: false },
   site: 'https://tada-no.github.io',
   base,
