@@ -28,6 +28,7 @@ const {
   title,
   description,
   meta = [],
+  links = [],
   scope = [],
   action,
   headingLevel: Heading = 'h3',
@@ -38,7 +39,7 @@ const featured = size === 'featured';
 const navy = surface === 'navy' || media === 'image-bg';
 const actionType = action?.action ?? 'page';
 const showAction = Boolean(action && (action.url || actionType === 'expand'));
-const linked = showAction && Boolean(action?.url) && (actionType === 'page' || actionType === 'external');
+const linked = links.length === 0 && showAction && Boolean(action?.url) && (actionType === 'page' || actionType === 'external');
 const hasImage = media === 'image-top' || media === 'image-bg';
 const fp = image?.focalPoint;
 const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : undefined;
@@ -110,6 +111,20 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
       scope.length > 0 && (
         <ul class="card__scope text-small">
           {scope.map((item) => <li>{item}</li>)}
+        </ul>
+      )
+    }
+    {
+      links.length > 0 && (
+        <ul class="card__links">
+          {links.map((link) => (
+            <li>
+              <a class="card__sublink text-small" href={link.url}>
+                <Icon name="chevron-right" size={16} />
+                <span>{link.label}</span>
+              </a>
+            </li>
+          ))}
         </ul>
       )
     }
@@ -234,6 +249,11 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
   .card__body {
     display: contents;
   }
+  /* Stacked wide card (card under 600): the panel above the text is capped at 128, so a 2-column
+     row at 600–1199 doesn't blow the pictogram up to the card width (19 Sep 2026, Services overview) */
+  .card--featured .card__pictogram-panel {
+    width: 128px;
+  }
   /* Featured pictogram panel (Figma 217:8241): a 260 square panel beside the body. Keyed to the card's
      own width, not the viewport, so two wide cards in a 2-column row switch together; below 600 the
      text column would be too narrow and the card stacks like Default. */
@@ -243,7 +263,10 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
   @container (min-width: 600px) {
     .card--featured.card--media-pictogram-panel .card__content {
       flex-direction: row;
-      align-items: flex-start;
+      align-items: stretch;
+    }
+    .card--featured.card--media-pictogram-panel .card__pictogram-panel {
+      align-self: flex-start;
     }
     .card--featured .card__pictogram-panel {
       flex: none;
@@ -344,6 +367,41 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     height: 2px;
     align-self: center;
     background-color: var(--wp--custom--color--icon--accent);
+  }
+
+  /* Sub-page links: a quiet list under the text, 44px rows on touch via padding, no rules */
+  .card__links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    margin-top: calc(var(--wp--preset--spacing--8) - var(--wp--custom--stack--md));
+  }
+  .card__sublink {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--8);
+    padding-block: var(--wp--preset--spacing--4);
+    font-weight: var(--wp--custom--font-weight--medium);
+    color: var(--wp--custom--color--text--primary);
+    text-decoration: none;
+  }
+  .card__sublink .icon {
+    flex: none;
+    margin-top: 0.2em;
+    color: var(--wp--custom--color--icon--accent);
+    transition: transform 0.3s var(--wp--custom--motion--ease-out);
+  }
+  .card__sublink:hover span {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .card__sublink:hover .icon {
+    transform: translateX(3px);
+  }
+  .card__sublink:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+    border-radius: var(--wp--custom--radius--sm);
   }
 
   /* Stretched link: the whole card is the target, the ring moves to the card */

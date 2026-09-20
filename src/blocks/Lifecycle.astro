@@ -1,0 +1,792 @@
+---
+// Lifecycle · reach/lifecycle (19 Sep 2026, Services overview; a custom data visual outside the
+// 14-block budget, like Live operations). Which service line works at which stage of an offshore
+// asset's life: phases across, service lines down, a marker where a line works in a phase with a
+// two-to-three word label under it. A rail joins markers in neighbouring phases only, so a gap in the
+// rail is a phase the line sits out. The line under all the others (Technology & Innovation) has no
+// markers: one sentence naming its products (client PDF p15) in a subtle sage box across every phase.
+// Quiet axes, one highlight channel: markers are navy; hovering or focusing a row turns its markers
+// accent. Motion: each rail draws left to right and its markers land as it reaches them, labels
+// rise out of a clip (no fades). Below 900 each line becomes a short vertical list.
+// Layout Focus (19 Sep 2026, service singles): one line's row, zoomed in. The phases run across as
+// columns on one rail; where the line works, a marker, its label and 2–3 concrete tasks (`tasks`);
+// where it sits out, a quiet hand-off to the line that does work there, read from the other rows
+// (Subsea → "Survey · Site & route survey"). No panel: it sits straight on the section ground.
+// 600–899: the hand-off phase takes a full row, the rest go 2×2; below 600 a vertical list.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Pictogram from '../components/Pictogram.astro';
+import Icon from '../components/Icon.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+import type { LifecycleFoundation, LifecyclePhase, LifecycleRow, ServiceId, ServiceLine } from '../data/services';
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  /** `grid` = every line (overview). `focus` = one line's row, zoomed in (service singles). */
+  layout?: 'grid' | 'focus';
+  /** Focus: the line to zoom in on. */
+  focus?: ServiceId;
+  /** Focus: 2–3 short tasks per phase id. */
+  tasks?: Partial<Record<string, string[]>>;
+  phases: LifecyclePhase[];
+  rows: LifecycleRow[];
+  /** Optional band under the rows for the line that carries across every phase. */
+  foundation?: LifecycleFoundation;
+  /** Service lines, for each row's name, link and pictogram. */
+  services: ServiceLine[];
+}
+
+const { sectionHeader, layout = 'grid', focus, tasks = {}, phases, rows, foundation, services, background = 'tint', spacing, anchor } = Astro.props;
+const titleId = sectionHeader?.title ? makeId('lifecycle', sectionHeader.title) : undefined;
+
+const resolved = rows.flatMap((row) => {
+  const line = services.find((s) => s.id === row.service);
+  if (!line) return [];
+  const on = phases.map((p) => Boolean(row.cells[p.id]));
+  const cells = phases.map((p, i) => ({
+    phase: p,
+    label: row.cells[p.id],
+    on: on[i],
+    joinLeft: on[i] && i > 0 && on[i - 1],
+    joinRight: on[i] && i < phases.length - 1 && on[i + 1],
+    // Draw order: the rail reaches this phase's marker after the earlier segments of the row
+    step: on.slice(0, i + 1).filter(Boolean).length - 1,
+  }));
+  return [{ line, cells }];
+});
+const base = foundation ? services.find((s) => s.id === foundation.service) : undefined;
+
+// Focus: one row's phases, with a hand-off to another line where this one sits out
+const focusRow = layout === 'focus' ? rows.find((r) => r.service === focus) : undefined;
+const focusCells = focusRow
+  ? phases.map((phase, i) => {
+      const label = focusRow.cells[phase.id];
+      const other = label
+        ? undefined
+        : rows.find((r) => r.service !== focusRow.service && r.cells[phase.id]);
+      const otherLine = other ? services.find((l) => l.id === other.service) : undefined;
+      return {
+        phase,
+        index: i,
+        label,
+        tasks: tasks[phase.id] ?? [],
+        handoff: other && otherLine ? { line: otherLine, label: other.cells[phase.id]! } : undefined,
+        step: phases.slice(0, i + 1).filter((p) => focusRow.cells[p.id]).length - 1,
+      };
+    })
+  : [];
+const onIdx = focusCells.filter((c) => c.label).map((c) => c.index);
+const railFrom = onIdx[0] ?? 0;
+const railTo = onIdx[onIdx.length - 1] ?? 0;
+const show = layout === 'focus' ? focusCells.length > 0 : resolved.length > 0;
+---
+
+{
+  show && (
+    <BlockSection
+      slug="lifecycle"
+      root="lifecycle"
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : 'Asset lifecycle'}
+    >
+      <div class="block__body">
+        {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+        {layout === 'focus' ? (
+        <div
+          class="lifecycle__panel lifecycle__focus"
+          data-lifecycle
+          style={`--lc-cols: ${phases.length}; --lc-from: ${railFrom}; --lc-to: ${railTo}`}
+        >
+          <span class="lifecycle__focus-rail" aria-hidden="true" />
+          <ol class="lifecycle__focus-phases">
+            {focusCells.map((cell) => (
+              <li
+                class:list={['lifecycle__focus-phase', !cell.label && 'lifecycle__focus-phase--off']}
+                style={`--s: ${cell.step}`}
+              >
+                <span class:list={['lifecycle__marker', !cell.label && 'lifecycle__marker--other']} aria-hidden="true" />
+                <div class="lifecycle__text">
+                  <h3 class="lifecycle__focus-head">
+                    <span class="lifecycle__phase-index" aria-hidden="true">{String(cell.index + 1).padStart(2, '0')}</span>
+                    <span>{cell.phase.label}</span>
+                  </h3>
+                  {cell.label ? (
+                    <p class="lifecycle__focus-label">{cell.label}</p>
+                  ) : (
+                    cell.handoff && (
+                      <a class="lifecycle__focus-label lifecycle__handoff" href={cell.handoff.line.href}>
+                        <span>{cell.handoff.line.short}</span>
+                        <Icon name="arrow-right" size={16} />
+                      </a>
+                    )
+                  )}
+                  {cell.label && cell.tasks.length > 0 && (
+                    <ul class="lifecycle__focus-tasks">
+                      {cell.tasks.map((task) => <li>{task}</li>)}
+                    </ul>
+                  )}
+                  {!cell.label && cell.handoff && (
+                    <ul class="lifecycle__focus-tasks">
+                      <li>{cell.handoff.label}</li>
+                    </ul>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+        ) : (
+        <div class="lifecycle__panel has-surface-light" data-lifecycle>
+          <ol class="lifecycle__phases" aria-hidden="true">
+            {phases.map((p, i) => (
+              <li class="lifecycle__phase">
+                <span class="lifecycle__phase-index">{String(i + 1).padStart(2, '0')}</span>
+                <span class="lifecycle__phase-label">{p.label}</span>
+              </li>
+            ))}
+          </ol>
+          <ul class="lifecycle__rows" style={`--lc-rows: ${resolved.length}`}>
+            {resolved.map((row, r) => (
+              <li class="lifecycle__row" style={`--r: ${r}`}>
+                <h3 class="lifecycle__name">
+                  <a href={row.line.href}>
+                    <Pictogram name={row.line.pictogram} size={40} />
+                    <span>{row.line.short}</span>
+                  </a>
+                </h3>
+                  <ul class="lifecycle__cells">
+                    {row.cells.map((cell, c) =>
+                      cell.on ? (
+                        <li
+                          class:list={[
+                            'lifecycle__cell',
+                            cell.joinLeft && 'lifecycle__cell--join-l',
+                            cell.joinRight && 'lifecycle__cell--join-r',
+                          ]}
+                          style={`--c: ${c}; --s: ${cell.step}`}
+                        >
+                          <span class="lifecycle__seg" aria-hidden="true" />
+                          <span class="lifecycle__marker" aria-hidden="true" />
+                          <span class="lifecycle__text">
+                            <span class="lifecycle__cell-phase">{cell.phase.label}</span>
+                            <span class="visually-hidden">: </span>
+                            <span class="lifecycle__label">{cell.label}</span>
+                          </span>
+                        </li>
+                      ) : (
+                        <li class="lifecycle__cell lifecycle__cell--off" style={`--c: ${c}`} aria-hidden="true" />
+                      ),
+                    )}
+                  </ul>
+              </li>
+            ))}
+            {foundation && base && (
+              <li class="lifecycle__row lifecycle__row--foundation" style={`--r: ${resolved.length}`}>
+                <h3 class="lifecycle__name">
+                  <a href={base.href}>
+                    <Pictogram name={base.pictogram} size={40} />
+                    <span>{base.short}</span>
+                  </a>
+                </h3>
+                <p class="lifecycle__foundation"><span>
+                  <strong class="lifecycle__brand">{foundation.brand}</strong>{' '}
+                  {foundation.items.map((item, i) => (
+                    <>
+                      <a href={item.url}>{item.label}</a>
+                      {i < foundation.items.length - 2 ? ', ' : i === foundation.items.length - 2 ? ' and ' : ''}
+                    </>
+                  ))}
+                  : {foundation.caption}
+                </span></p>
+              </li>
+            )}
+          </ul>
+        </div>
+        )}
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  /* Geometry: name column 200, then one equal column per phase. The rail runs through the middle of a
+     row's first 48px (y 24), markers sit on it, labels start 20 below */
+  .lifecycle__panel {
+    --lc-name: 200px;
+    --lc-rail: 24px;
+    padding: var(--wp--preset--spacing--48);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--default);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .lifecycle__phases,
+  .lifecycle__cells {
+    display: grid;
+    grid-template-columns: repeat(var(--lc-cols, 5), minmax(0, 1fr));
+  }
+  .lifecycle__phases {
+    margin-left: var(--lc-name);
+    padding-bottom: var(--wp--preset--spacing--8);
+  }
+  .lifecycle__phase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    text-align: center;
+    font-size: var(--wp--preset--font-size--body-sm);
+    line-height: var(--wp--custom--line-height--body-sm);
+    font-weight: var(--wp--custom--font-weight--bold);
+  }
+  .lifecycle__phase-index {
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    font-weight: var(--wp--custom--font-weight--regular);
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lifecycle__rows {
+    display: flex;
+    flex-direction: column;
+  }
+  .lifecycle__row {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--lc-name) minmax(0, 1fr);
+    align-items: start;
+    padding-top: var(--wp--preset--spacing--32);
+  }
+  .lifecycle__name {
+    margin: 0;
+  }
+  .lifecycle__name a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--12);
+    min-height: 48px;
+    font-size: var(--wp--preset--font-size--body);
+    line-height: 1.2;
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: inherit;
+    text-decoration: none;
+  }
+  .lifecycle__name a:hover span {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .lifecycle__name a:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+    border-radius: var(--wp--custom--radius--sm);
+  }
+  /* Quiet axis behind every row: 1px border/subtle at rail height */
+  .lifecycle__row::before {
+    content: '';
+    position: absolute;
+    left: var(--lc-name);
+    right: 0;
+    top: calc(var(--wp--preset--spacing--32) + var(--lc-rail));
+    height: 1px;
+    background-color: var(--wp--custom--color--border--subtle);
+  }
+
+  .lifecycle__cell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 88px;
+    padding: calc(var(--lc-rail) + 20px) var(--wp--preset--spacing--8) 0;
+    text-align: center;
+  }
+  .lifecycle__seg {
+    position: absolute;
+    top: calc(var(--lc-rail) - 1px);
+    height: 2px;
+    left: 50%;
+    right: 50%;
+    background-color: var(--wp--custom--color--text--primary);
+    transform-origin: left center;
+  }
+  .lifecycle__cell--join-l .lifecycle__seg {
+    left: 0;
+  }
+  .lifecycle__cell--join-r .lifecycle__seg {
+    right: 0;
+  }
+  .lifecycle__marker {
+    position: absolute;
+    top: var(--lc-rail);
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--text--primary);
+    transition:
+      background-color 0.25s var(--wp--custom--motion--ease-out),
+      scale 0.25s var(--wp--custom--motion--ease-out);
+  }
+  /* Caption style for the short labels: set on the block so wrapped lines take its tight leading,
+     not the body line height an inline span would inherit */
+  .lifecycle__text {
+    display: block;
+    font-size: 0.875rem;
+    line-height: 1.3;
+    clip-path: inset(0);
+  }
+  /* The phase name is the column header on wide screens: kept for screen readers only */
+  .lifecycle__cell-phase {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .lifecycle__label {
+    color: var(--wp--custom--color--text--secondary);
+  }
+
+  /* Foundation row (Technology): the line under every other line, so the whole row is a subtle sage
+     card (name included). It bleeds 24 into the panel padding so its name lines up with the other
+     rows' names; one sentence across the phases, the product names are the links */
+  .lifecycle__row--foundation {
+    align-items: center;
+    margin: var(--wp--preset--spacing--32) calc(-1 * var(--wp--preset--spacing--24)) 0;
+    padding: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--custom--color--bg--accent-subtle);
+    --pg-bg: var(--wp--custom--color--bg--accent-subtle);
+    clip-path: inset(0 0 0 0 round var(--wp--custom--radius--md));
+  }
+  /* Same caption style as the phase labels. Starts in line with the first phase heading ("Plan &
+     survey"): the script below measures its offset into --lc-indent (0 without JS) */
+  .lifecycle__foundation {
+    margin: 0;
+    padding-left: var(--lc-indent, 0px);
+    text-align: left;
+    font-size: 0.875rem;
+    line-height: 1.3;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* Product names: bold in the primary colour (weight, not colour alone, marks them as links),
+     underlined on hover */
+  .lifecycle__brand,
+  .lifecycle__foundation a {
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--primary);
+    text-decoration: none;
+  }
+  .lifecycle__brand {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .lifecycle__foundation a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .lifecycle__foundation a:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+    border-radius: var(--wp--custom--radius--sm);
+  }
+  .lifecycle__row--foundation::before {
+    display: none;
+  }
+
+  /* The one highlight channel: a hovered or focused row's markers turn accent */
+  .lifecycle__row:is(:hover, :focus-within) .lifecycle__marker {
+    background-color: var(--wp--custom--color--icon--accent);
+    scale: 1.25;
+  }
+
+  /* Draw-in: rails run left to right, 0.18s per phase, rows 0.2s apart; markers land as the rail
+     reaches them, labels rise out of a clip */
+  html.js .lifecycle__panel {
+    --lc-step: 0.18s;
+  }
+  html.js .lifecycle__panel .lifecycle__seg {
+    transition: transform calc(var(--lc-step) * 1.2) linear calc(var(--r-delay, 0s) + var(--s, 0) * var(--lc-step));
+  }
+  html.js .lifecycle__row {
+    --r-delay: calc(var(--r) * 0.2s);
+  }
+  html.js .lifecycle__panel .lifecycle__marker {
+    transition:
+      transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--r-delay) + var(--s, 0) * var(--lc-step)),
+      background-color 0.25s var(--wp--custom--motion--ease-out),
+      scale 0.25s var(--wp--custom--motion--ease-out);
+  }
+  html.js .lifecycle__panel .lifecycle__text {
+    transition:
+      clip-path 0.45s var(--wp--custom--motion--ease-out) calc(var(--r-delay) + var(--s, 0) * var(--lc-step) + 0.15s),
+      translate 0.45s var(--wp--custom--motion--ease-out) calc(var(--r-delay) + var(--s, 0) * var(--lc-step) + 0.15s);
+  }
+  /* The band draws across from the left once the rows are in (clip, no fade) */
+  html.js .lifecycle__panel .lifecycle__row--foundation {
+    transition: clip-path 0.9s cubic-bezier(0.45, 0, 0.25, 1) calc(var(--r) * 0.2s + 0.3s);
+  }
+  html.js .lifecycle__panel:not(.is-drawn) .lifecycle__row--foundation {
+    clip-path: inset(0 100% 0 0 round var(--wp--custom--radius--md));
+  }
+  html.js .lifecycle__panel:not(.is-drawn) .lifecycle__seg {
+    transform: scaleX(0);
+  }
+  html.js .lifecycle__panel:not(.is-drawn) .lifecycle__marker {
+    transform: scale(0);
+  }
+  html.js .lifecycle__panel:not(.is-drawn) .lifecycle__text {
+    clip-path: inset(0 0 100% 0);
+    translate: 0 -6px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .lifecycle__panel * {
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+    }
+  }
+
+
+  /* ── Focus (service singles) ───────────────────────────────────────────────────────────────
+     Phases as equal columns with no gap (so column i starts at i/cols of the width); text starts at
+     the column's left edge, the marker sits on that edge, and the rail runs from the first marker's
+     centre to the last one's. A 1px quiet axis runs the full width under it. */
+  .lifecycle__panel.lifecycle__focus {
+    --lc-dot: 12px;
+    position: relative;
+    padding: 0;
+    border-radius: 0;
+    background-color: transparent;
+  }
+  .lifecycle__focus::before,
+  .lifecycle__focus-rail {
+    content: '';
+    position: absolute;
+    top: calc(var(--lc-dot) / 2);
+    height: 1px;
+    left: 0;
+    right: 0;
+    background-color: var(--wp--custom--color--border--subtle);
+  }
+  .lifecycle__focus-rail {
+    top: calc(var(--lc-dot) / 2 - 1px);
+    height: 2px;
+    left: calc(var(--lc-from) * 100% / var(--lc-cols) + var(--lc-dot) / 2);
+    right: auto;
+    width: calc((var(--lc-to) - var(--lc-from)) * 100% / var(--lc-cols));
+    background-color: var(--wp--custom--color--text--primary);
+    transform-origin: left center;
+  }
+  .lifecycle__focus-phases {
+    display: grid;
+    grid-template-columns: repeat(var(--lc-cols), minmax(0, 1fr));
+  }
+  /* Head · label · tasks share rows across the phases (subgrid), so a label that wraps at ~1100
+     keeps every column's tasks on one line with its neighbours */
+  .lifecycle__focus-phase {
+    position: relative;
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+    padding: calc(var(--lc-dot) + var(--wp--preset--spacing--32)) var(--wp--preset--spacing--32) 0 0;
+  }
+  .lifecycle__focus .lifecycle__marker {
+    top: 0;
+    left: 0;
+    margin: 0;
+    width: var(--lc-dot);
+    height: var(--lc-dot);
+  }
+  .lifecycle__focus .lifecycle__text {
+    display: grid;
+    grid-row: 1 / span 3;
+    grid-template-rows: subgrid;
+    row-gap: var(--wp--preset--spacing--8);
+    align-content: start;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  .lifecycle__focus-head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0 0 var(--wp--preset--spacing--8);
+    font-size: var(--wp--preset--font-size--body-sm);
+    line-height: 1.3;
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .lifecycle__handoff {
+    align-self: start;
+  }
+  /* Short labels: tight caption leading set on the block */
+  .lifecycle__focus-label {
+    margin: 0;
+    font-size: var(--wp--preset--font-size--h5);
+    line-height: 1.3;
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .lifecycle__focus-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    font-size: var(--wp--preset--font-size--body-sm);
+    line-height: 1.3;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* A phase another line covers: same label style as the others, as a link to that line */
+  .lifecycle__handoff {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    justify-self: start;
+    text-decoration: none;
+  }
+  .lifecycle__handoff .icon {
+    color: var(--wp--custom--color--icon--accent);
+    transition: transform 0.3s var(--wp--custom--motion--ease-out);
+  }
+  .lifecycle__handoff:hover span {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .lifecycle__handoff:hover .icon {
+    transform: translateX(3px);
+  }
+  .lifecycle__handoff:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+    border-radius: var(--wp--custom--radius--sm);
+  }
+  /* The one difference: an outline ring on the quiet axis instead of a filled marker (solid stroke,
+     no transparency), and it doesn't take the accent on hover */
+  .lifecycle__focus .lifecycle__marker--other {
+    border: 2px solid var(--wp--custom--color--border--default);
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  .lifecycle__focus-phase:hover .lifecycle__marker--other {
+    background-color: var(--wp--custom--color--bg--default);
+    scale: 1;
+  }
+  /* One highlight channel: the hovered phase's marker turns accent */
+  .lifecycle__focus-phase:hover .lifecycle__marker {
+    background-color: var(--wp--custom--color--icon--accent);
+    scale: 1.25;
+  }
+  /* Draw-in: the rail runs across, each marker lands as it arrives, the text rises out of a clip */
+  html.js .lifecycle__focus {
+    --lc-step: 0.28s;
+  }
+  html.js .lifecycle__focus .lifecycle__focus-rail {
+    transition: transform calc(var(--lc-step) * (var(--lc-to) - var(--lc-from))) linear;
+  }
+  html.js .lifecycle__focus:not(.is-drawn) .lifecycle__focus-rail {
+    transform: scaleX(0);
+  }
+  html.js .lifecycle__focus .lifecycle__focus-phase {
+    --r-delay: 0s;
+  }
+  html.js .lifecycle__focus .lifecycle__focus-phase--off .lifecycle__text {
+    transition-delay: 0s;
+  }
+
+  /* Medium: tighter name column */
+  @media (max-width: 1199px) {
+    .lifecycle__panel {
+      --lc-name: 168px;
+      padding: var(--wp--preset--spacing--32);
+    }
+  }
+
+  /* Below 900: one short vertical list per line (phase name + label), rail down the left */
+  @media (max-width: 899px) {
+    .lifecycle__phases,
+    .lifecycle__row::before,
+    .lifecycle__cell--off {
+      display: none;
+    }
+    .lifecycle__panel {
+      padding: var(--wp--preset--spacing--24);
+    }
+    /* 600–899: a 2×2 grid (Survey · Subsea / Monitoring · Technology), so the short lists fill the
+       panel's width; a hairline between the pairs */
+    .lifecycle__rows {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--wp--preset--spacing--32) var(--wp--preset--spacing--48);
+    }
+    .lifecycle__row:not(.lifecycle__row--foundation):nth-child(n + 3) {
+      padding-top: var(--wp--preset--spacing--32);
+      border-top: 1px solid var(--wp--custom--color--border--subtle);
+    }
+    .lifecycle__row {
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+      gap: var(--wp--preset--spacing--12);
+      padding-top: 0;
+    }
+    .lifecycle__cells {
+      display: flex;
+      flex-direction: column;
+    }
+    .lifecycle__cell {
+      display: block;
+      min-height: 0;
+      padding: 0 0 var(--wp--preset--spacing--16) var(--wp--preset--spacing--32);
+      text-align: left;
+    }
+    .lifecycle__cell:last-child {
+      padding-bottom: 0;
+    }
+    .lifecycle__cell.lifecycle__cell--off {
+      display: none;
+    }
+    .lifecycle__marker {
+      top: 10px;
+      left: 7px;
+    }
+    /* Vertical rail: from this marker down to the next, only between neighbouring phases */
+    .lifecycle__seg,
+    .lifecycle__cell--join-l .lifecycle__seg {
+      top: 10px;
+      bottom: -10px;
+      left: 6px;
+      right: auto;
+      width: 2px;
+      height: auto;
+      display: none;
+      transform-origin: center top;
+    }
+    .lifecycle__cell--join-r .lifecycle__seg {
+      display: block;
+    }
+    html.js .lifecycle__panel:not(.is-drawn) .lifecycle__seg {
+      transform: scaleY(0);
+    }
+    .lifecycle__cell-phase {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip-path: none;
+      white-space: normal;
+      font-size: var(--wp--preset--font-size--body-sm);
+      font-weight: var(--wp--custom--font-weight--bold);
+    }
+    .lifecycle__cell-phase::after {
+      content: ' · ';
+      font-weight: var(--wp--custom--font-weight--regular);
+      color: var(--wp--custom--color--text--secondary);
+    }
+    /* It wraps into a short paragraph here, so body-small with its own leading, not the label style */
+    .lifecycle__foundation {
+      padding-left: 0;
+      font-size: var(--wp--preset--font-size--body-sm);
+      line-height: var(--wp--custom--line-height--body-sm);
+    }
+    /* Hugs its content (no stretching to the neighbour's height); 32 on top so "Technology" sits
+       level with "Monitoring" beside it, whose row opens with 32 above its heading */
+    .lifecycle__row.lifecycle__row--foundation {
+      align-self: start;
+      align-content: start;
+      margin: 0;
+      padding: var(--wp--preset--spacing--32) var(--wp--preset--spacing--24);
+      border-top: 0;
+    }
+  }
+  @media (max-width: 599px) {
+    .lifecycle__rows {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .lifecycle__row:not(.lifecycle__row--foundation):nth-child(n + 2) {
+      padding-top: var(--wp--preset--spacing--32);
+      border-top: 1px solid var(--wp--custom--color--border--subtle);
+    }
+  }
+
+  /* Focus 600–899: the hand-off phase takes a full row, the working phases go 2×2; no rail (it would
+     run across a grid), each marker stays beside its phase heading */
+  @media (max-width: 899px) {
+    .lifecycle__focus::before,
+    .lifecycle__focus-rail {
+      display: none;
+    }
+    .lifecycle__focus-phases {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--wp--preset--spacing--32);
+    }
+    .lifecycle__focus-phase + .lifecycle__focus-phase {
+      margin-top: var(--wp--preset--spacing--40);
+    }
+    .lifecycle__focus-phase {
+      padding: 0 0 0 var(--wp--preset--spacing--32);
+    }
+    .lifecycle__focus-phase--off {
+      grid-column: 1 / -1;
+    }
+    .lifecycle__focus .lifecycle__marker {
+      top: 4px;
+    }
+  }
+  /* Below 600: one column, rail down the left from the first working phase to the last */
+  @media (max-width: 599px) {
+    .lifecycle__focus-phases {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .lifecycle__focus-phase + .lifecycle__focus-phase {
+      margin-top: var(--wp--preset--spacing--32);
+    }
+    .lifecycle__focus-phase:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: calc(var(--lc-dot) / 2 - 1px);
+      top: calc(4px + var(--lc-dot));
+      bottom: calc(-1 * var(--wp--preset--spacing--32) - 4px);
+      width: 2px;
+      background-color: var(--wp--custom--color--text--primary);
+    }
+    .lifecycle__focus-phase--off::after {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Draw each lifecycle panel on first view (content is visible without JS).
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-lifecycle]')];
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-drawn');
+          io.unobserve(entry.target);
+        }),
+      { threshold: 0.25 },
+    );
+    panels.forEach((panel) => io.observe(panel));
+  } else panels.forEach((panel) => panel.classList.add('is-drawn'));
+
+  // Line the Technology sentence up with the first phase heading, which is centred in its column, so
+  // its left edge moves with the label and the width. Measured, and again whenever the panel resizes.
+  const alignFoundation = (panel: HTMLElement) => {
+    const label = panel.querySelector<HTMLElement>('.lifecycle__phase-label');
+    const phases = panel.querySelector<HTMLElement>('.lifecycle__phases');
+    if (!label || !phases) return;
+    const offset = label.getBoundingClientRect().left - phases.getBoundingClientRect().left;
+    panel.style.setProperty('--lc-indent', `${Math.max(0, Math.round(offset))}px`);
+  };
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver((entries) => entries.forEach((e) => alignFoundation(e.target as HTMLElement)));
+    panels.forEach((panel) => ro.observe(panel));
+  } else panels.forEach(alignFoundation);
+  // The web font changes the heading's width once it loads
+  document.fonts?.ready.then(() => panels.forEach(alignFoundation));
+</script>

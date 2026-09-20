@@ -1,0 +1,254 @@
+---
+// Services › Overview (19 Sep 2026). Content: client PDF p5–7 ("02 — Services — Overview"), the dev site's
+// service child pages, and the Home/Investors patterns (Q63 in docs/00-questions.md).
+// The hub between Home and the service singles. It answers "which service do I need?": four service
+// lines with their sub-services · the asset lifecycle (which service works at which stage) · how we
+// deliver (crewed, uncrewed, Reach Horizon, the fleet) · project references · 3D World · FAQ · CTA.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import SectionSubnav from '../../blocks/SectionSubnav.astro';
+import CardGrid from '../../blocks/CardGrid.astro';
+import Lifecycle from '../../blocks/Lifecycle.astro';
+import FeedGrid from '../../blocks/FeedGrid.astro';
+import Embed from '../../blocks/Embed.astro';
+import Accordion from '../../blocks/Accordion.astro';
+import CtaBand from '../../blocks/CtaBand.astro';
+import Dialog from '../../components/Dialog.astro';
+import { pickFigures } from '../../data/key-figures';
+import { worldPath, worldSceneUrl } from '../../data/world';
+import type { CardField } from '../../lib/types';
+import { navSections } from '../../data/navigation';
+import { cardPresets } from '../../data/card-presets';
+import { serviceLines, lifecyclePhases, lifecycleRows, lifecycleFoundation } from '../../data/services';
+
+const base = import.meta.env.BASE_URL;
+const services = navSections.find((s) => s.id === 'services')!;
+const subnavItems = [
+  { label: 'Overview', href: services.href },
+  ...services.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+const serviceCards = serviceLines.map((line) =>
+  cardPresets.service({
+    pictogram: line.pictogram,
+    eyebrow: undefined,
+    title: line.title,
+    description: line.summary,
+    links: line.subServices,
+    action: { label: `Explore ${line.short.toLowerCase()}`, url: line.href, action: 'page' },
+  }),
+);
+
+// How we deliver: the PDF's "How we deliver", "Our platforms" and "Explore the full fleet" in one bento.
+// 12 columns: crewed (6×2) · fleet figure · Reach Remote (3×2) · uncrewed-days figure, then
+// Reach Horizon (5) · ROV systems figure (3) · the fleet link (4). Figures come from key-figures.ts.
+const [fleet, uncrewedDays, rovSystems] = pickFigures(['fleet', 'uncrewed-days', 'rov-systems']);
+const deliveryCards: CardField[] = [
+  {
+    media: 'image-bg',
+    size: 'featured',
+    span: { cols: 6, rows: 2 },
+    image: { src: `${base}images/vessel-olympic-zeus.jpg`, alt: 'Olympic Zeus, a Reach Subsea construction support vessel, in calm water', focalPoint: { x: 0.45, y: 0.55 } },
+    eyebrow: 'Crewed vessels',
+    title: 'Experienced crews on DP2 vessels',
+    description: 'Offshore personnel, engineers and project managers running work-class and inspection ROVs and survey spreads for complex subsea operations.',
+    action: { label: 'Our vessels', url: '/assets/vessels/' },
+  },
+  { media: 'stat', surface: 'navy', span: { cols: 3, rows: 1 }, statValue: fleet.value, title: fleet.label },
+  {
+    media: 'image-bg',
+    span: { cols: 3, rows: 2 },
+    image: { src: `${base}images/reach-remote-side.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel under way', focalPoint: { x: 0.5, y: 0.6 } },
+    eyebrow: 'Uncrewed vessels',
+    title: 'Reach Remote, operated from shore',
+    description: 'The same ROV and survey spreads, without a crew at sea. Reach Remote 1 and 2 are in service; 3 and 4 are in build.',
+    action: { label: 'Meet Reach Remote', url: '/assets/reach-remote/' },
+  },
+  { media: 'stat', surface: 'white', span: { cols: 3, rows: 1 }, statValue: uncrewedDays.value, title: uncrewedDays.label },
+  {
+    media: 'none',
+    surface: 'navy',
+    span: { cols: 5, rows: 1 },
+    eyebrow: 'Software platform',
+    title: 'Reach Horizon',
+    description: 'Real-time access to data, operations and expertise, on crewed and uncrewed vessels alike. Clients follow survey progress and review preliminary data remotely.',
+    action: { label: 'About Reach Horizon', url: '/services/technology-innovation/reach-horizon/' },
+  },
+  { media: 'stat', surface: 'white', span: { cols: 3, rows: 1 }, statValue: rovSystems.value, title: rovSystems.label },
+  {
+    media: 'none',
+    surface: 'tint',
+    span: { cols: 4, rows: 1 },
+    eyebrow: 'Assets & fleet',
+    title: 'Explore the full fleet',
+    description: 'Vessels, uncrewed surface vessels and ROVs: specs, capabilities and charter status.',
+    action: { label: 'View assets & fleet', url: '/assets/' },
+  },
+];
+
+// See it in action: the promo film as the lead (plays in the video dialog), then three real project
+// references from the PDF (reachsubsea.no/projects/). In WP: Projects query scoped to the service
+// taxonomy, lead = a manual video card.
+const actionItems: CardField[] = [
+  {
+    media: 'image-bg',
+    size: 'featured',
+    image: { src: `${base}images/promo-poster-subsea.jpg`, alt: 'A Reach Subsea ROV working on the seabed', focalPoint: { x: 0.5, y: 0.5 } },
+    eyebrow: 'Film · 0:57',
+    title: 'From the surface to the seabed',
+    description: 'Our vessels, ROVs and Reach Remote at work.',
+    action: { label: 'Watch the film', url: `${base}video/promo.mp4`, action: 'video' },
+  },
+  cardPresets.project({
+    media: 'none',
+    surface: 'white',
+    eyebrow: 'Monitoring · Equinor',
+    title: 'Reservoir monitoring with gWatch across Equinor gas fields',
+    description: undefined,
+    meta: [],
+    action: { label: 'Read project', url: '/projects/reservoir-monitoring-gwatch-equinor/' },
+  }),
+  cardPresets.project({
+    media: 'none',
+    surface: 'white',
+    eyebrow: 'Survey · Norske Shell',
+    title: 'Annual inspection of the Ormen Lange export pipeline',
+    description: undefined,
+    meta: [],
+    action: { label: 'Read project', url: '/projects/ormen-lange-pipeline-inspection/' },
+  }),
+  cardPresets.project({
+    media: 'none',
+    surface: 'white',
+    eyebrow: 'Monitoring · Research',
+    title: 'DigiMon: digital monitoring of CO2 storage',
+    description: undefined,
+    meta: [],
+    action: { label: 'Read project', url: '/projects/digimon/' },
+  }),
+];
+
+const faqItems = [
+  {
+    slug: 'which-service-lines',
+    question: 'What service lines does Reach Subsea offer?',
+    answer:
+      'Four: Subsea (inspection, maintenance, repair and construction support), Survey (seabed, cable and positioning data), Monitoring (gWatch, DepthWatch, Wellwatch and Drillwatch) and Technology & Innovation, the in-house technology under all three: Reach Pilot, Reach Remote, Reach Horizon and Reach Relay. All are delivered from crewed or uncrewed vessels.',
+    open: true,
+  },
+  {
+    slug: 'which-service-do-i-need',
+    question: 'How do I know whether I need Subsea, Survey or Monitoring?',
+    answer:
+      'Subsea covers physical work on the asset, Survey collects seabed and positioning data, and Monitoring measures reservoirs, wells and the environment over time. Many projects combine more than one. Tell us about the asset and we will help scope it.',
+  },
+  {
+    slug: 'crewed-or-uncrewed',
+    question: 'Do you use crewed or uncrewed vessels?',
+    answer:
+      'Both. Reach Remote runs uncrewed operations from shore through Reach Horizon, and our crewed vessels carry the same ROV and survey spreads. The project decides which fits, not the service line.',
+  },
+];
+---
+
+<BaseLayout title="Services · Reach Subsea" motion>
+  <Header current="services" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Services' }]}
+      title="Services built for the full offshore asset lifecycle"
+      lead="From inspection and repair to survey and long-term monitoring, delivered through crewed and uncrewed vessels, both equipped with ROV and survey capability."
+      image={{ src: `${base}images/usv-drix-wind.jpg`, alt: '', focalPoint: { x: 0.6, y: 0.55 } }}
+      actions={[
+        { label: 'Talk to our team', url: '/contact/', action: 'page' },
+        { label: 'Explore the 3D World', url: '#3d-world', action: 'anchor', type: 'link' },
+      ]}
+    />
+
+    <SectionSubnav source="section-pages" label="Services" items={subnavItems} current="/services/" />
+
+    <CardGrid
+      anchor="service-lines"
+      background="white"
+      sectionHeader={{ title: 'Our four service lines' }}
+      layout="2-columns"
+      media="pictogram-panel"
+      surface="tint"
+      cards={serviceCards}
+    />
+
+    {/* Custom visual (Q63): which line works at which stage. Placeholder mapping until Reach confirms */}
+    <Lifecycle
+      anchor="lifecycle"
+      background="tint"
+      sectionHeader={{
+        title: 'From first survey to decommissioning',
+        intro: 'Where each service line works across the life of an offshore asset.',
+      }}
+      phases={lifecyclePhases}
+      rows={lifecycleRows}
+      foundation={lifecycleFoundation}
+      services={serviceLines}
+    />
+
+    <CardGrid
+      anchor="how-we-deliver"
+      layout="bento"
+      background="white"
+      sectionHeader={{ title: 'One partner, two ways to reach the seabed' }}
+      cards={deliveryCards}
+    />
+
+    <FeedGrid
+      anchor="projects"
+      source="projects"
+      layout="editorial"
+      background="tint"
+      sectionHeader={{
+        title: 'See it in action',
+        action: { label: 'All projects', url: '/projects/' },
+      }}
+      items={actionItems}
+      showLoadMore={false}
+    />
+
+    <Embed
+      anchor="3d-world"
+      type="3d-world"
+      state="poster"
+      title="Walk through our operations in 3D"
+      text="Fly through four working zones, from the vessel on the surface to the ROV on the seabed. An 18 MB scene, best on a tablet or computer."
+      worldUrl={worldSceneUrl}
+      fullScreenUrl={worldPath}
+      poster={{ src: `${base}images/3d-world-poster.jpg`, alt: 'An ROV surveying a pipeline on the seabed in the Reach Subsea 3D World' }}
+      showZones
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'About choosing between our service lines.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="services"
+      background="tint"
+      items={faqItems}
+    />
+
+    <CtaBand
+      style="panel"
+      background="tint"
+      title="Not sure which service fits your project?"
+      text="Tell us about your asset and scope, and we will recommend an approach."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+    />
+  </main>
+  <Footer />
+  <Dialog type="video" />
+</BaseLayout>

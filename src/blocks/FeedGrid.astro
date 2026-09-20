@@ -266,6 +266,11 @@ const instanceId = makeId('feed-grid');
     .feed-grid__list--editorial .feed-grid__item:first-child {
       grid-column: 1 / -1;
     }
+    /* An odd number of side items would leave the last one beside a hole: it takes the full row
+       (19 Sep 2026, Services overview; also fixes Home and Investors, which have lead + 3) */
+    .feed-grid__list--editorial .feed-grid__item:last-child:nth-child(even) {
+      grid-column: 1 / -1;
+    }
   }
 
   @media (max-width: 599px) {

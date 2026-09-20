@@ -1,0 +1,236 @@
+---
+// Services › Subsea (19 Sep 2026): the first service single. Content: client PDF p8–9 ("03 — Services —
+// Subsea Services"), the dev site's Subsea department page and its four child pages, and the Services
+// overview (name, sub-services, lifecycle row and contact all come from src/data/services.ts).
+// Built for an operator looking for IMR or construction support: what we do (4 sub-services) · when in
+// the asset's life we do it (the Subsea lifecycle row, zoomed in) · what we do it with (vessels, ROVs,
+// key figures) · proof (subsea projects) · FAQ · a named contact.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import SplitMedia from '../../../blocks/SplitMedia.astro';
+import CardGrid from '../../../blocks/CardGrid.astro';
+import Lifecycle from '../../../blocks/Lifecycle.astro';
+import FeedGrid from '../../../blocks/FeedGrid.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { worldPath } from '../../../data/world';
+import { pickFigures } from '../../../data/key-figures';
+import { projectsFor } from '../../../data/projects';
+import { cardPresets } from '../../../data/card-presets';
+import { navSections } from '../../../data/navigation';
+import { serviceLines, lifecyclePhases, lifecycleRows, lifecycleTasks } from '../../../data/services';
+import type { CardField } from '../../../lib/types';
+
+const base = import.meta.env.BASE_URL;
+const line = serviceLines.find((l) => l.id === 'subsea')!;
+const services = navSections.find((s) => s.id === 'services')!;
+// Industries we serve (PDF p8 chips) as a row of pictogram tiles
+const industryCards: CardField[] = (line.industries ?? []).map((ind) => ({
+  media: 'icon',
+  title: ind.label,
+  pictogram: ind.pictogram,
+}));
+// What we deliver: the client's six capabilities (services.ts), linked where a page exists
+const capabilityCards: CardField[] = (line.capabilities ?? []).map((cap) => ({
+  media: 'none',
+  title: cap.title,
+  description: cap.summary,
+  scope: cap.scope,
+  action: cap.link && { ...cap.link, action: 'page', context: cap.title },
+}));
+
+// The spread behind the work: the vessel and ROVs the dev projects name, Reach Remote, and two key
+// figures. 12 columns: Havila Subsea (6×2) · ROV systems · Supporter (3×2) · fleet, then Reach Remote
+// and Constructor side by side. In WP: an Assets query picked on the Service (dev has no relation).
+const [rovSystems, fleet] = pickFigures(['rov-systems', 'fleet']);
+const fleetCards: CardField[] = [
+  {
+    media: 'image-bg',
+    size: 'featured',
+    span: { cols: 6, rows: 2 },
+    image: { src: `${base}images/asset-havila-subsea.jpg`, alt: 'Havila Subsea, a green-hulled DP2 subsea vessel, at sea', focalPoint: { x: 0.45, y: 0.5 } },
+    eyebrow: 'Vessel',
+    title: 'Havila Subsea',
+    description: 'DP2 IMR and light construction vessel with a 150 t heave-compensated crane and two ROV hangars.',
+    action: { label: 'View vessel', url: '/assets/havila-subsea/', context: 'Havila Subsea' },
+  },
+  { media: 'stat', surface: 'navy', span: { cols: 3, rows: 1 }, statValue: rovSystems.value, title: rovSystems.label },
+  {
+    media: 'image-bg',
+    span: { cols: 3, rows: 2 },
+    image: { src: `${base}images/asset-supporter-wrov.jpg`, alt: 'A Supporter work-class ROV lowered into the sea from its launch system', focalPoint: { x: 0.5, y: 0.45 } },
+    eyebrow: 'Work-class ROV',
+    title: 'Supporter WROV',
+    description: 'Our standard work-class ROV for IMR and construction support.',
+    action: { label: 'View ROV', url: '/assets/supporter-wrov/', context: 'Supporter WROV' },
+  },
+  { media: 'stat', surface: 'white', span: { cols: 3, rows: 1 }, statValue: fleet.value, title: fleet.label },
+  {
+    media: 'image-bg',
+    span: { cols: 6, rows: 1 },
+    image: { src: `${base}images/reach-remote-side.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel under way', focalPoint: { x: 0.5, y: 0.6 } },
+    eyebrow: 'Uncrewed vessel',
+    title: 'Reach Remote 1 & 2',
+    description: 'The same ROV spread, operated from shore.',
+    action: { label: 'Meet Reach Remote', url: '/assets/reach-remote/' },
+  },
+  {
+    media: 'image-bg',
+    span: { cols: 6, rows: 1 },
+    image: { src: `${base}images/asset-constructor-wrov.jpg`, alt: 'A Constructor work-class ROV on deck', focalPoint: { x: 0.6, y: 0.45 } },
+    eyebrow: 'Work-class ROV',
+    title: 'Constructor WROV',
+    description: 'More power and payload for heavy construction work.',
+    action: { label: 'View ROV', url: '/assets/constructor-wrov/', context: 'Constructor WROV' },
+  },
+];
+// Proof: the line's real projects, newest first (Projects query scoped to the service in WP)
+const projectItems: CardField[] = projectsFor(line.id, 4).map((p) =>
+  cardPresets.project({
+    media: 'image-top',
+    surface: 'white',
+    image: p.image,
+    eyebrow: `${p.work} · ${p.year}`,
+    title: p.title,
+    description: undefined,
+    meta: [{ icon: 'map-pin', text: p.field }],
+    action: { label: 'Read project', url: p.url, context: p.title },
+  }),
+);
+// The PDF's three FAQs: genuine operator questions (FAQ post type, topic Subsea)
+const faqItems = [
+  {
+    slug: 'what-is-imr',
+    question: 'What is IMR, and does Reach Subsea provide it?',
+    answer:
+      'IMR stands for inspection, maintenance and repair. It is the core of our subsea work, alongside asset integrity, light construction and intervention, delivered from crewed vessels or from Reach Remote, both carrying the same ROV capability.',
+    open: true,
+  },
+  {
+    slug: 'subsea-vessels-equipment',
+    question: 'What vessels and equipment do you use for subsea work?',
+    answer:
+      'Work-class ROVs such as Supporter and Constructor, deployed from DP2 vessels like Havila Subsea or from the uncrewed Reach Remote. The scope of work is the same either way.',
+  },
+  {
+    slug: 'uncrewed-intervention',
+    question: 'Can subsea intervention be done without a crew on the vessel?',
+    answer:
+      'Yes. Reach Remote carries a work-class ROV and delivers IMR and light construction scope, operated from shore through Reach Horizon.',
+  },
+];
+const subnavItems = [
+  { label: 'Overview', href: services.href },
+  ...services.links.map((l) => ({ label: l.label, href: l.href })),
+];
+---
+
+<BaseLayout title={`${line.title} · Reach Subsea`} motion>
+  <Header current="services" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Services', href: services.href }, { label: line.short }]}
+      title="Subsea inspection, maintenance and repair"
+      lead="For every stage of an asset’s life, from installation to decommissioning."
+      image={{ src: `${base}images/rov-supporter-subsea.jpg`, alt: '', focalPoint: { x: 0.62, y: 0.5 } }}
+      actions={[
+        { label: 'Discuss your project', url: '#contact', action: 'anchor' },
+        { label: 'See subsea work in 3D', url: `${worldPath}?zone=1`, action: 'external', type: 'link' },
+      ]}
+    />
+
+    <SectionSubnav source="section-pages" label="Services" items={subnavItems} current={line.href} />
+
+    {/* How we deliver (PDF p8), with the industries folded into the sentence instead of chips */}
+    <SplitMedia
+      anchor="how-we-deliver"
+      background="white"
+      pictogram={line.pictogram}
+      title="Work-class ROVs, from crewed and uncrewed vessels"
+      body={`<p>IMR, asset integrity, light construction and intervention for oil &amp; gas, offshore wind and other subsea infrastructure. Every job is scoped to the asset, then delivered from our DP2 vessels or from Reach Remote, run from shore, with the same ROV spread either way.</p>`}
+      actions={[{ label: 'Our vessels and ROVs', url: '#fleet', action: 'anchor' }]}
+      image={{ src: `${base}images/rov-supporter-launch.jpg`, alt: 'A yellow Supporter work-class ROV lowered through the splash zone from a Reach Subsea vessel', focalPoint: { x: 0.5, y: 0.5 } }}
+    />
+
+    <CardGrid anchor="industries" layout="strip" eyebrow="Industries we serve" background="white" spacing="sm" cards={industryCards} />
+
+    {/* The Subsea row of the overview's lifecycle, zoomed in. Placeholder mapping until Reach confirms */}
+    <Lifecycle
+      anchor="lifecycle"
+      background="navy"
+      layout="focus"
+      focus={line.id}
+      tasks={lifecycleTasks[line.id]}
+      sectionHeader={{ title: 'From installation to decommissioning' }}
+      phases={lifecyclePhases}
+      rows={lifecycleRows}
+      services={serviceLines}
+    />
+
+    <CardGrid
+      anchor="what-we-do"
+      background="white"
+      sectionHeader={{ title: 'What we deliver, end to end' }}
+      layout="3-columns"
+      media="none"
+      surface="tint"
+      cards={capabilityCards}
+    />
+
+    <CardGrid
+      anchor="fleet"
+      layout="bento"
+      background="tint"
+      sectionHeader={{
+        title: 'The vessels and ROVs behind the work',
+        action: { label: 'All assets', url: '/assets/' },
+      }}
+      cards={fleetCards}
+    />
+
+    <FeedGrid
+      anchor="projects"
+      source="projects"
+      scope={{ term: line.id }}
+      columns={4}
+      background="white"
+      sectionHeader={{
+        title: 'Subsea work in the field',
+        action: { label: 'All projects', url: '/projects/' },
+      }}
+      items={projectItems}
+      showLoadMore={false}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'About our subsea IMR, asset integrity and construction work.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="subsea"
+      background="tint"
+      items={faqItems}
+    />
+
+    {/* One named contact per service line (services.ts); the office directory stays on /contact/ */}
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title="Planning subsea work?"
+      text="Tell us about the asset and the scope, and we will propose the vessel, ROV spread and team."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact={Boolean(line.contact)}
+      contact={line.contact && { label: line.title, ...line.contact }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

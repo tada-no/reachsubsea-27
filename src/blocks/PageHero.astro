@@ -427,6 +427,15 @@ const objectPosition = image?.focalPoint
     opacity: 0;
     transition-duration: 0.6s;
   }
+  /* The photo tint (base.css) screen-blends every img and video in the media wrapper, so a poster left
+     under a playing video adds its own frame to the footage (a ghost ship over the moving scene). Fade
+     the poster out while the video is showing; it returns for the loop seam and before first play. */
+  .page-hero--video .page-hero__image {
+    transition: opacity 1.2s var(--wp--custom--motion--ease-out);
+  }
+  .page-hero__media:has(.page-hero__video.is-playing:not(.is-looping)) .page-hero__image {
+    opacity: 0;
+  }
   /* Gradient scrim instead of the flat one: solid navy at both sides (wider on the text side),
      a bottom ramp under the copy, a short top ramp under the header. */
   .page-hero--video .page-hero__scrim {

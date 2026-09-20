@@ -88,6 +88,9 @@ export interface CardField {
   title: string;
   description?: string;
   meta?: MetaField[];
+  /** Sub-page links under the text (19 Sep 2026, Services overview: a service line's sub-services).
+   * A card with links is not a stretched link: every link is its own target. */
+  links?: LinkField[];
   /** 3 short scope items as a quiet list under the text (19 Sep 2026, service singles).
    * Not links. */
   scope?: string[];
