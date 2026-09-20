@@ -422,18 +422,20 @@ const objectPosition = image?.focalPoint
   .page-hero__video.is-playing {
     opacity: 1;
   }
-  /* Loop seam: dip to the poster, seek, come back. */
+  /* First frame lands with no fade: the poster covers the wait, then hands over in one frame. */
+  .page-hero__video.is-instant {
+    transition: none;
+  }
+  /* Loop seam: dip to the navy tint, seek, come back. */
   .page-hero__video.is-looping {
     opacity: 0;
     transition-duration: 0.6s;
   }
   /* The photo tint (base.css) screen-blends every img and video in the media wrapper, so a poster left
-     under a playing video adds its own frame to the footage (a ghost ship over the moving scene). Fade
-     the poster out while the video is showing; it returns for the loop seam and before first play. */
-  .page-hero--video .page-hero__image {
-    transition: opacity 1.2s var(--wp--custom--motion--ease-out);
-  }
-  .page-hero__media:has(.page-hero__video.is-playing:not(.is-looping)) .page-hero__image {
+     under a playing video adds its own frame to the footage (a ghost ship over the moving scene). The
+     poster is only there until the video paints its first frame; after that the navy tint behind the
+     video is all it sits on, and the seam dips to that rather than back to the poster. */
+  .page-hero__media:has(.page-hero__video.is-playing) .page-hero__image {
     opacity: 0;
   }
   /* Gradient scrim instead of the flat one: solid navy at both sides (wider on the text side),
@@ -601,7 +603,17 @@ const objectPosition = image?.focalPoint
       video.src = video.dataset.src;
       toggle?.removeAttribute('hidden');
       setPaused(userPaused);
-      video.addEventListener('playing', () => video.classList.add('is-playing'));
+      // Reveal on the first painted frame (not on 'playing', which can fire before one exists), instantly,
+      // so the poster hands over to the video in a single frame with no cross-blend.
+      const showVideo = () => {
+        video.classList.add('is-instant', 'is-playing');
+        requestAnimationFrame(() => requestAnimationFrame(() => video.classList.remove('is-instant')));
+      };
+      video.addEventListener(
+        'playing',
+        () => ('requestVideoFrameCallback' in video ? video.requestVideoFrameCallback(showVideo) : showVideo()),
+        { once: true },
+      );
       if (!userPaused) video.play().catch(() => setPaused(true));
 
       if (loopEnd > 0) {
