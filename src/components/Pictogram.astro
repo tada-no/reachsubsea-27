@@ -539,4 +539,33 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     0%, 56%, 72%, 100% { transform: scale(1); }
     63% { transform: scale(1.06); }
   }
+  /* Never leave anyone behind (20 Sep 2026, Careers): a second figure beside the first (the same person as
+     Learn · Teach · Reach). The friend drifts away to the right, the line between them draws out to
+     reach them, and they are drawn back alongside. The friend is filled with the surface colour so the
+     line disappears behind them as they return. Trim path + transform only, solid; rests at 0% and 100%. */
+  .pictogram--value-behind {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--value-behind .pg-friend-body {
+    fill: var(--pg-bg, none);
+  }
+  .pictogram--value-behind .pg-rope {
+    stroke-dasharray: 100 120;
+  }
+  .pictogram--value-behind.is-playing .pg-friend {
+    animation-name: pg-drift;
+  }
+  .pictogram--value-behind.is-playing .pg-rope {
+    animation-name: pg-reach-out;
+  }
+  @keyframes pg-drift {
+    0%, 12% { transform: translate3d(0, 0, 0); }
+    34%, 52% { transform: translate3d(12px, 0, 0); }
+    76%, 100% { transform: translate3d(0, 0, 0); }
+  }
+  @keyframes pg-reach-out {
+    0%, 12% { stroke-dashoffset: 0; }
+    30%, 50% { stroke-dashoffset: 110; }
+    66%, 100% { stroke-dashoffset: 0; }
+  }
 </style>

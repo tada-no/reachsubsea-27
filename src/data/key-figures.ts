@@ -18,6 +18,10 @@ export const keyFigures: StatField[] = [
   // Distinct from Countries reached (clients in 9 countries). Added 19 Sep 2026
   { key: 'office-countries', value: '4', label: 'Countries with an office' },
   { key: 'newbuilds', value: '4', label: 'Newbuilds joining the fleet' },
+  // Live /careers/ Trainees block ("Since 2013 … each trainee who successfully completes their final exams
+  // … has been offered a full-time position") and the PDF's Careers stats (p22: 2013, 100%). Added 20 Sep 2026
+  { key: 'trainee-since', value: '2013', label: 'Trainee programme since' },
+  { key: 'trainee-offer', value: '100%', label: 'Trainees offered a full-time role' },
 ];
 
 /** Returns the figures for the given keys, in that order, skipping unknown keys. */

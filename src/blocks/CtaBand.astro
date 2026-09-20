@@ -276,7 +276,9 @@ const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
     flex-direction: column;
     gap: var(--wp--preset--spacing--8);
   }
-  @media (max-width: 899px) {
+  /* Below 1200 (20 Sep 2026, Careers review: squashed at ~900): the contact card goes under the actions, so
+     the message keeps the full panel width */
+  @media (max-width: 1199px) {
     .cta-band--panel .cta-band__inner--contact {
       grid-template-columns: 1fr;
     }

@@ -1,0 +1,5 @@
+<svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g class="pg-person"><circle cx="19.52" cy="17.39" r="6.72" stroke="currentColor" stroke-width="2.5"/><path d="M26.69,86.67l0.63-26.03c2.41-0.88,5.28-2.92,5.03-5.49l-1.96-19.81c-0.25-2.57-2.55-4.67-5.09-4.67h-11.56c-2.55,0-4.84,2.11-5.08,4.67l-1.97,19.81c-0.25,2.57,2.61,4.61,5.03,5.49l0.63,26.03" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+<path class="pg-rope" d="M31.5 44H67.9" pathLength="100" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="pg-friend pg-lead"><g transform="translate(48 0)"><circle cx="19.52" cy="17.39" r="6.72" stroke="currentColor" stroke-width="2.5"/><path class="pg-friend-body" d="M26.69,86.67l0.63-26.03c2.41-0.88,5.28-2.92,5.03-5.49l-1.96-19.81c-0.25-2.57-2.55-4.67-5.09-4.67h-11.56c-2.55,0-4.84,2.11-5.08,4.67l-1.97,19.81c-0.25,2.57,2.61,4.61,5.03,5.49l0.63,26.03" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+</svg>

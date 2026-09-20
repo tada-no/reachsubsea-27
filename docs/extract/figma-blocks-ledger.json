@@ -798,5 +798,47 @@
       "A failed use_figma script rolls back entirely",
       "Cloned variants keep TEXT property refs but instance setProperties may not reach overridden text; set characters directly"
     ]
+  },
+  "phase4CareersOverview": {
+    "date": "2026-09-20",
+    "pictograms": {
+      "docFrame": "33:74 (Components / Pictograms, tiles appended at the end)",
+      "Pictogram/value-learn": "301:2372",
+      "Pictogram/value-teach": "301:2391",
+      "Pictogram/value-reach": "301:2410",
+      "Pictogram/value-behind": "301:2423",
+      "note": "Static poses only (the loops live in code); strokes bound to icon/accent. value-learn/teach/reach are the original About icons, not the older learn-screen / teach-people / reach-way tiles."
+    },
+    "blocks": {
+      "Block/Split media": {
+        "set": "166:2339",
+        "Media=Wide, Position=Start, Breakpoint=Desktop, Text=Heading": "302:4980",
+        "note": "Heading over two text columns, no image (About › Our story without the banner). Code: layout=wide with no image. todo: Mobile variant, and the image banner version (About)."
+      }
+    },
+    "codeOnly": [
+      "Card grid `joined` option (drops the top padding under a same-ground block; the Figma frame keeps both paddings)",
+      "CTA panel + contact stacks below 1200 (Figma has Desktop only)",
+      "Vacancies meta pinned to the card foot"
+    ],
+    "pages": {
+      "Careers overview": "302:8729 (Pages page 250:22, right of Investors overview 295:8326)"
+    },
+    "frameBlocks": {
+      "Split media Wide": "302:9280",
+      "Card grid four values (Card Media=Icon Tint, pictograms swapped)": "302:9289",
+      "Stats band Feature (4th row hidden)": "302:9362",
+      "Split media Image (Trainees)": "302:9385",
+      "Card grid open positions (Media=None White cards)": "302:9405",
+      "Card grid Bento (detached; 3 text cards + 8/4 photo cards)": "303:3018",
+      "Accordion Split": "302:8748",
+      "CTA panel (detached, navy mode, contact card)": "305:2705"
+    },
+    "gaps": [
+      "Photos are not placed (images cannot be placed via the API here): hero, Trainees and the two bento photo cards show placeholders",
+      "The Block/CTA band Panel variant (246:9087) still shows the old white panel with a green glow; the Careers frame uses a detached navy copy with the contact card. Fold this back into the variant",
+      "Accordion variant has 3 questions, the page has 5",
+      "Page is Desktop only; no Mobile or tablet frames"
+    ]
   }
 }
