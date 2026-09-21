@@ -27,7 +27,13 @@
     "Data list": "195:3648",
     "Embed": "201:4459",
     "Section subnav": "207:4710",
-    "Live operations": "269:4799"
+    "Live operations": "269:4799",
+    "Card bento": "310:4981",
+    "Figures": "314:6177",
+    "Split embed": "319:6246",
+    "Results band": "321:6312",
+    "Lifecycle": "324:6654",
+    "Values": "329:6823"
   },
   "blocks": {
     "Page hero": {
@@ -841,6 +847,204 @@
       "Accordion variant has 3 questions, the page has 5",
       "Page is Desktop only; no Mobile or tablet frames",
       "Embed 3D World variant has no eyebrow (code shows 'Try it in 3D' above the title) and its poster is a placeholder; added 21 Sep 2026"
+    ]
+  },
+  "phase4Tidy21Sep": {
+    "date": "2026-09-21",
+    "context": "Q67 follow-up. The Blocks page (12:25) was missing the four blocks split out for editors (Card bento, Figures, Split embed, Results band) plus the two custom visuals that never had a Figma shape (Lifecycle, Values). All six were built here as Block/<Name> COMPONENT_SETs with Breakpoint Desktop/Mobile variants, doc frames stacked at x=0 with 160px gaps, and Light/Tint/Navy example groups. Ground truth was the block file in src/blocks/, its demo in src/demos/ and the reference screenshots of http://localhost:4321.",
+    "newTokens": {
+      "variables": {
+        "size/display-xl": "VariableID:308:22 (Typography, 64 → 128)",
+        "line-height/display-xl": "VariableID:308:23",
+        "size/figure": "VariableID:308:24 (Typography, 32 → 40)",
+        "line-height/figure": "VariableID:308:25",
+        "line-height/tight": "VariableID:308:26 (unitless 1.3, unscoped, applied by hand)"
+      },
+      "textStyles": {
+        "Heading/Display XL": "S:94c4e67b56cae34343b2423572183bb8b93055f1, (Inter Bold 128 / 115, -4%)",
+        "Heading/Figure": "S:aa0b7b7b587afc1589c346a863ba5333f22c198b, (Inter Bold 40 / 40, -3%)"
+      },
+      "note": "line-height/tight is a UNITLESS ratio (1.3). Figma FLOAT lineHeight bindings are in PIXELS, so binding a text node's lineHeight to it sets a 1.3px leading and silently collapses the node (hit while auditing Lifecycle, see gotchas). Do not bind it; keep it for hand-applied/code use only."
+    },
+    "docFrames": {
+      "Card bento": "310:4981",
+      "Figures": "314:6177",
+      "Split embed": "319:6246",
+      "Results band": "321:6312",
+      "Lifecycle": "324:6654",
+      "Values": "329:6823"
+    },
+    "blocks": {
+      "Card bento": {
+        "set": "312:10744",
+        "type": "COMPONENT_SET",
+        "variants": 10,
+        "axes": "Pattern (lead-quad, lead-tall-wide, lead-tall-trio-a, lead-tall-trio-b, trio-wide) × Breakpoint (Desktop, Mobile)",
+        "variantIds": {
+          "lead-quad Desktop": "310:4986",
+          "lead-tall-wide Desktop": "310:5156",
+          "lead-tall-trio-a Desktop": "312:5148",
+          "lead-tall-trio-b Desktop": "312:5378",
+          "trio-wide Desktop": "312:5575",
+          "lead-quad Mobile": "312:9932",
+          "lead-tall-wide Mobile": "312:10062",
+          "lead-tall-trio-a Mobile": "312:10226",
+          "lead-tall-trio-b Mobile": "312:10420",
+          "trio-wide Mobile": "312:10614"
+        },
+        "keys": {
+          "Show section header": "Show section header#312:0"
+        },
+        "layers": "Section header (exposed, FILL, visible bound to Show section header) · Grid (VERTICAL, FILL, gap grid/gutter) > Rows and Columns of Card instances from set 103:1110. Desktop cell geometry is the code's 12-column grid at 1440: column 87.333, gutter 24, so 3 cols = 310, 4 = 421.33, 5 = 532.67, 6 = 644, 8 = 866.67; one grid row is 264 high and a 2-row cell is 552. Mobile is a single 327 stack (one column, as in the code below 600), image-bg cards keep the code's 360 min-height and text/stat cards hug.",
+        "cards": "The demo pool, in order: 0 Image bg Featured (Subsea services), 1 Stat Navy (750+), 2 Image bg Navy (Work-class ROVs), 3 None Tint (News), 4 Stat White (15 ROV systems), 5 Image bg Navy (Pioneering uncrewed operations), 6 None Tint (Careers). Each pattern takes as many as it has cells, exactly like src/demos/card-bento.astro.",
+        "examples": {
+          "Home: lead-tall-trio-a on White": "313:5878",
+          "Subsea single: lead-tall-wide on Tint": "313:5999",
+          "Careers: trio-wide, Mobile": "313:6105"
+        },
+        "deviations": "Image-bg cards show the Card component's grey placeholder (images cannot be placed through this API). Cards in a fixed-height row take their content's minimum height when it exceeds the 264 track, which is what CSS minmax(264px, auto) does too, so neighbours in different grid rows can differ in height."
+      },
+      "Figures": {
+        "set": "316:6183",
+        "type": "COMPONENT_SET",
+        "variants": 4,
+        "axes": "Layout (Sticky, Cards) × Breakpoint (Desktop, Mobile)",
+        "variantIds": {
+          "Sticky Desktop": "314:6182",
+          "Sticky Mobile": "314:6207",
+          "Cards Desktop": "315:6183",
+          "Cards Mobile": "315:6225"
+        },
+        "keys": {
+          "Title": "Title#316:0",
+          "Show eyebrow": "Show eyebrow#316:5"
+        },
+        "layers": "Sticky Desktop: Head (cols 1–8, Eyebrow instance hidden by default + H2) · Columns (SPACE_BETWEEN, CENTER) > Stage (cols 1–5: value in Heading/Display XL bound to text/accent-display + caption Body/Body) + Points (cols 7–12, three 400-high Point frames, each Eyebrow kicker + H3 + Body/Lead capped at 560). Sticky Mobile: no stage, each Point carries its figure inline (Heading/Display, or the two-part split bar) above the kicker. Cards Desktop: Head (880) · Cards row > List (cols 1–7) of two tint value cards (padding space/48, radius/lg, text left + right-aligned Heading/Figure value and Body/Caption caption) + Feature card (cols 8–12, Navy mode forced, navy/800, donut + labels + body). Cards Mobile: cards stack at 327 with padding space/32, the value card goes title → body → right-aligned figure, and the donut drops to 263.",
+        "donut": "Two ELLIPSE nodes with arcData (innerRadius 0.559, 280Ø Desktop / 263 Mobile), first arc navy/200 for 54% starting at -π/2 and running clockwise, then sage/400 for 46%; a 'Centre' frame is placed absolutely at the ring's middle with the period (Body/Lead) over the measure (Body/Small). This matches the code's masked trim-path sweep, which also starts at 12 o'clock and runs clockwise, so sage sits on the left and navy on the right.",
+        "examples": {
+          "Why invest: Sticky on Navy": "316:6184",
+          "Why invest: Cards on White": "316:6211"
+        },
+        "deviations": "The code overrides the sticky figure colour to sage-400 inside .has-surface-navy; Figma binds it to text/accent-display throughout (sage/500 Light, sage/300 Navy). Only the first point's figure is shown in the Sticky stage; the wipe between points is code-only."
+      },
+      "Split embed": {
+        "set": "320:6274",
+        "type": "COMPONENT_SET",
+        "variants": 4,
+        "axes": "Position (End, Start) × Breakpoint (Desktop, Mobile)",
+        "variantIds": {
+          "End Desktop": "319:6251",
+          "Start Desktop": "319:6273",
+          "End Mobile": "319:6295",
+          "Start Mobile": "319:6317"
+        },
+        "keys": {
+          "Title": "Title#320:0",
+          "Body": "Body#320:5",
+          "Show eyebrow": "Show eyebrow#320:10",
+          "Show actions": "Show actions#320:15"
+        },
+        "layers": "Columns (HORIZONTAL, SPACE_BETWEEN, counterAxisAlignItems CENTER) > Text (cols 1–5 = 532.67; Eyebrow instance, H2, Body/Body, Actions row with a Link Page Medium) + Media (cols 7–12 = 644) > Frame (white, 1px border/subtle, radius/md, clips) > Crop (fixed 640 Desktop / 560 Mobile, centred provider label in text/disabled) + Caption (navy/50, 1px top rule, padding space/24 × space/12, source Body/Caption in navy/600 + Link Page Small). Position=Start swaps Text and Media inside Columns. Mobile: Columns is VERTICAL (text, then the frame), both FILL 327, and the Caption becomes VERTICAL so the source line does not overflow.",
+        "examples": {
+          "Investors overview: live share graph, Position End, on White": "320:6275",
+          "Why invest: dividend policy, Position Start, on Tint": "320:6300"
+        },
+        "deviations": "The iframe is a provider label on an empty white crop; Figma cannot render a third-party page. The block still loads its frame without the Embed block's consent placeholder, as in code (docs/05 §2.4c 'Open')."
+      },
+      "Results band": {
+        "set": "322:6434",
+        "type": "COMPONENT_SET",
+        "variants": 2,
+        "axes": "Breakpoint (Desktop, Mobile)",
+        "variantIds": {
+          "Desktop": "321:6317",
+          "Mobile": "321:6442"
+        },
+        "keys": {
+          "Title": "Title#322:0",
+          "Currency": "Currency#322:3",
+          "Published": "Published#322:6",
+          "Show published": "Show published#322:9"
+        },
+        "layers": "Group (gap space/0) > Top (SPACE_BETWEEN, BASELINE, bottom padding stack/lg: Title group [H2 + 'All figures in NOK' Body/Small] and Stamp [Badge Accent 'As reported' + date Body/Small]) · Headline (4 items, padding space/24 × space/32 × space/32, first item no left padding, 1px border/subtle left rule between; label Body/Small, value Heading/Figure, delta row with a 16px arrow-up-right bound to icon/accent and text/accent) · Secondary (1px top rule, 4 rows, label Body/Small + value Heading/H4) · Report cards (top padding stack/xl, three Report card instances from set 294:2397: Tone=Tint Stacked × 2 and Tone=Navy Stacked, exposed). Mobile: Top is VERTICAL, the figures go 2×2 with alternating left/right padding, and the Latest card drops its third action so 'Webcast' does not clip at 327.",
+        "examples": {
+          "Why invest: latest results on Tint": "322:6435",
+          "Mobile": "322:6549"
+        },
+        "deviations": "Report card kicker/title/meta are set directly on each instance's TEXT children (the set has no TEXT properties by design, see phase4InvestorsOverview). The count-up animation and the .ics generation are code-only."
+      },
+      "Lifecycle": {
+        "set": "328:6684",
+        "type": "COMPONENT_SET",
+        "variants": 4,
+        "axes": "Layout (Grid, Focus) × Breakpoint (Desktop, Mobile)",
+        "variantIds": {
+          "Grid Desktop": "324:6659",
+          "Focus Desktop": "325:6663",
+          "Grid Mobile": "327:6669",
+          "Focus Mobile": "327:6748"
+        },
+        "keys": {
+          "Show section header": "Show section header#328:0"
+        },
+        "layers": "Grid Desktop: Section header (exposed) · Panel (Light mode forced, bg/default, radius/lg, padding space/48, 1312 wide → 1216 inner) > Phases (plain FRAME, 5 columns of 203.2 each offset by the 200 name column: index Body/Caption + bold Body/Small label, centred) · Rows (plain FRAME, one 1216×120 Row per line): a 1px border/subtle Axis rect across the cells at y 56, the Name block (40 pictogram + bold Body/Body) centred on the rail, then per working phase a 2px text/primary Segment to the next marker, a 12px text/primary Marker and a centred Body/Caption label at y 76; the foundation band is an accent-subtle radius/md row bleeding −24 into the panel padding with a bold-then-regular sentence. Focus Desktop: no panel — a plain 1312 FRAME with a full-width 1px axis, a 2px rail from the first to the last working marker, and 5 columns of 262.4 (marker at the column's left edge, then index, bold phase label, Heading/H5 label and Body/Small tasks). Grid Mobile: panel padding space/24, one row per line (top rule from the second row), each a Name row over a vertical list of 'Phase · Label' cells with absolute 12px markers and 2px segments; the foundation is an accent-subtle card. Focus Mobile: the same phases as a vertical list with the marker beside each heading.",
+        "data": "Services overview mapping from src/data/services.ts (placeholder until Reach confirms): Survey 01/02/03/05, Subsea 02/03/04/05, Monitoring 01/03/04/05, Technology as the foundation line.",
+        "examples": {
+          "Services overview: Grid on Tint": "328:6685",
+          "Subsea single: Focus on Navy": "328:6768"
+        },
+        "deviations": "The code's `tight` (1.3) leading on the short labels is not reproduced — see the line-height/tight gotcha; those nodes keep their style's px leading (Body/Small 24, Body/Body 28). The foundation sentence starts just after the name column rather than measuring an indent to the first phase heading (the code does that with JS). Rail draw-in, marker hover accent and the 600–899 2×2 tablet arrangement are code-only."
+      },
+      "Values": {
+        "set": "331:6958",
+        "type": "COMPONENT_SET",
+        "variants": 4,
+        "axes": "State (Value, Payoff) × Breakpoint (Desktop, Mobile)",
+        "variantIds": {
+          "Value Desktop": "329:6828",
+          "Payoff Desktop": "329:6854",
+          "Value Mobile": "329:6879",
+          "Payoff Mobile": "329:6936"
+        },
+        "keys": {},
+        "layers": "Desktop (Navy Color mode forced on the component, fill bg/default, section/lg padding): Band > Eyebrow 'Our values' · Grid (HORIZONTAL, CENTER, gap space/48) > Copy (8/12) > Line (HORIZONTAL WRAP, gap space/0, three Heading/Display words with the full stops doing the separating) + either the current value's Body/Lead copy or the Heading/Display payoff 'Within Reach.' · Figure (4/12) > a 320 value pictogram instance. State=Value is shown at the last value (Learn and Teach tinted text/disabled as past, Reach text/primary as current, Reach's copy, Pictogram/value-reach); State=Payoff tints all three and shows the payoff. Mobile is the code's <900 fallback: eyebrow, Heading/H1 'Learn. Teach. Reach.', then a 96-pictogram + H2 word + Body/Lead per value, with the promise behind a 1px top rule on State=Payoff ('Reach' in text/accent-display).",
+        "pictograms": "Pictogram/value-learn 301:2372, value-teach 301:2391, value-reach 301:2410 (phase4CareersOverview.pictograms). Static poses only.",
+        "examples": {
+          "Opening state (Learn current, Teach and Reach clipped)": "332:11279",
+          "Second state (Learn past, Teach current, Reach clipped)": "332:11321",
+          "Below 900: the plain list on navy": "332:11362"
+        },
+        "deviations": "Only two states are variants; the per-word arrival is documented by the two example instances instead of a 4-value State axis (which would have doubled the matrix for one changed word). In code a word that has not arrived is translated out of a clip and therefore invisible while still holding its place — the examples reproduce that by hiding those Word nodes; the variants show the fully arrived line. The pinned band, the runway and the pictogram loops are code-only."
+      }
+    },
+    "audit": {
+      "scope": "The six new doc frames on page Blocks 12:25, instance internals skipped for bindings and included for overflow",
+      "result": "Unbound paints 0 · text without a style or bound type 0 · unbound padding/gap 0 · overflow 0",
+      "fixed": [
+        "Results band Mobile: headline and secondary figures overflowed their half columns (Delta 145 > 132, Value 113 > 100) — alternating space/0 / space/16 side padding and FILL on every label, value and delta row",
+        "Results band Mobile: the title row was a SPACE_BETWEEN wrap that squeezed 'Q2 2026 results' and clipped 'All figures in NOK' — the Top row is VERTICAL on Mobile with both groups FILL and hugging their wrapped height",
+        "Results band Mobile: the Latest report card's third action ('Webcast') clipped at 327 — Action 3 set false on that instance",
+        "Split embed Mobile: the caption source line was 379 in a 277 slot — the Caption frame is VERTICAL on Mobile with the source FILL",
+        "Figures: the Navy example instance rendered black (see the instance-fill gotcha)"
+      ]
+    },
+    "gotchas": [
+      "figma.variables.setBoundVariableForPaint captures the variable's value in the CURRENT resolution context as the paint's raw colour. Applied to a FRAME that already has an explicit mode this is fine, but a fill override set on an INSTANCE keeps that raw colour for rendering, so a Navy-mode example instance came out pure black even though boundVariables.color was correct. Fix: resolve the variable for the mode you want first (walk VARIABLE_ALIAS to the primitive, read valuesByMode[modeId]) and build the paint from that colour, then bind. Same helper is now used for every Tint/Navy example.",
+      "Hiding a child of an INSTANCE removes it from that node's `children` array. Iterating indices forward and setting visible=false throws 'cannot set property visible of undefined' on the next one. Hide from the highest index down, or re-read children after every change.",
+      "You cannot appendChild into a frame that lives inside an INSTANCE ('Cannot move node. New parent is an instance or is inside of an instance'). To change a nested pictogram in an example, call instance.swapComponent(newComponent) on the existing nested instance.",
+      "Setting fontName on a TEXT node that has a text style clears its textStyleId but KEEPS the style's bound fontSize/lineHeight/fontFamily variables. Heading/Display, Heading/H5, Heading/Figure and Heading/Display XL are already Bold, so never re-set fontName on them. Where the design system has no bold variant of a style (bold Body/Small, bold Body/Body in Lifecycle), keep the style applied and bind fontStyle to weight/bold (VariableID:10:25) — or setRangeBoundVariable(start, end, 'fontStyle', …) for a bold run inside a styled paragraph. The audit was widened to accept 'no textStyleId but fontSize + lineHeight + fontFamily all bound'.",
+      "Binding lineHeight to line-height/tight (VariableID:308:26, the unitless 1.3 ratio) sets a 1.3 PIXEL line height and collapses the text node to ~2px tall. It also drops the node's fontSize binding. Recovering needs an explicit re-bind of both fontSize and lineHeight to px variables plus textAutoResize = 'WIDTH_AND_HEIGHT' to re-measure.",
+      "layoutPositioning = 'ABSOLUTE' throws unless the parent has layoutMode !== NONE. For rail-and-marker diagrams (Lifecycle) build the container as a plain figma.createFrame() and place children by x/y instead.",
+      "Changing an auto-layout frame's layoutMode resets its sizing modes: a 327-wide FIXED row became 164 after switching HORIZONTAL → VERTICAL. Re-apply layoutSizingHorizontal = 'FILL' (and the children's) afterwards.",
+      "A doc frame created with y = max(child.y + child.height) + 160 drifts once the frames below it grow: five of the six new frames ended up stacked on the same y. Re-stack the whole page in one pass at the end (x = 0, 160 gaps) rather than trusting the per-script offset.",
+      "Figma ELLIPSE arcData is the clean way to draw a donut: { startingAngle, endingAngle, innerRadius }, angles in radians with 0 at 3 o'clock and positive running clockwise, so a 12-o'clock start is -π/2. No vector paths needed (cf. the Live operations vectorPaths gotcha)."
+    ],
+    "openItems": [
+      "Photos are still placeholders on every Card bento image-bg card (images cannot be placed through this API).",
+      "Lifecycle and Values have no §2 entry in docs/05 — they were built in Figma from the block files and the live pages instead (docs/09 §1 already flags the missing spec entries).",
+      "Values shows two states as variants; the per-word arrival lives in the doc-frame examples, not in the variant matrix.",
+      "The 600–899 tablet arrangements (Lifecycle Grid 2×2, Lifecycle Focus hand-off full row, Figures Cards 768–1279 side-by-side donut) are not represented: the sets only carry Desktop and Mobile, as everywhere else in this file.",
+      "docs/09-wordpress-handoff.md §1 still says 'Figma has only the original 15' blocks; it is now 21."
     ]
   }
 }
