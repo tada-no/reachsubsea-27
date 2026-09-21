@@ -1046,5 +1046,126 @@
       "The 600–899 tablet arrangements (Lifecycle Grid 2×2, Lifecycle Focus hand-off full row, Figures Cards 768–1279 side-by-side donut) are not represented: the sets only carry Desktop and Mobile, as everywhere else in this file.",
       "docs/09-wordpress-handoff.md §1 still says 'Figma has only the original 15' blocks; it is now 21."
     ]
+  },
+  "phase4Pages21Sep": {
+    "date": "2026-09-21",
+    "context": "Four more Desktop page frames on the Pages page (250:22), to the right of Careers overview and 200px apart, built the way the Careers frame was: instances of the existing Block/* sets, cloned from a block's own doc-frame example where one already carried the page's copy, detached only where the page needs a layout or a card count the set does not have. Ground truth was the coded pages (src/pages/investors/why-invest.astro, src/pages/company/index.astro, src/pages/services/index.astro, src/pages/services/subsea/index.astro), their data files and reference screenshots of http://localhost:4321 at 1440.",
+    "frames": {
+      "Why invest": {
+        "id": "346:2703",
+        "x": 4920,
+        "height": 5856,
+        "source": "src/pages/investors/why-invest.astro",
+        "sections": {
+          "Header (Breakpoint=Desktop overlay)": "346:2704",
+          "Page hero (Style=Photo, Desktop)": "346:2750",
+          "Section subnav (Investors, Why invest active)": "346:2817",
+          "Results band (cloned from example 322:6438)": "347:7030",
+          "Figures Cards (DETACHED from example 316:6214 to add a third value card)": "348:3023",
+          "Split embed (cloned from example 320:6303)": "347:7182",
+          "Split media Numbered list (DETACHED and restacked)": "349:3035",
+          "Accordion Split (3 investor FAQs)": "349:11533",
+          "CTA panel (clone of the Careers detached navy panel 305:2705, IR contact)": "349:11580",
+          "Footer": "349:11611"
+        }
+      },
+      "About": {
+        "id": "351:3194",
+        "x": 6560,
+        "height": 4465,
+        "source": "src/pages/company/index.astro",
+        "sections": {
+          "Header": "351:3195",
+          "Page hero (Photo, eyebrow 'Our vision')": "351:3241",
+          "Section subnav (Company, 4 items, 2 hidden)": "351:3291",
+          "Split media Media=Wide (Our story)": "351:3306",
+          "Stats band Count=5 Style=Feature (4th row hidden, cloned from Careers 302:9362)": "351:3315",
+          "Card grid strip — certificates (BUILT, no Layout=Strip variant)": "352:3191",
+          "Values State=Value (cloned from example 332:11279, Learn current)": "352:11695",
+          "Split media Media=Spec table (management team, 5 rows)": "352:11721",
+          "Accordion Split (3 company FAQs)": "352:11758",
+          "CTA band Style=Band (navy)": "352:11789",
+          "Footer": "352:11826"
+        }
+      },
+      "Services overview": {
+        "id": "355:3374",
+        "x": 8200,
+        "height": 8082,
+        "source": "src/pages/services/index.astro",
+        "sections": {
+          "Header": "355:3375",
+          "Page hero (Photo, two actions)": "355:3421",
+          "Section subnav (Services, Overview active)": "355:3488",
+          "Card grid 2 columns, Card Media=Pictogram panel Tint (DETACHED for a second row)": "355:5760",
+          "Lifecycle Layout=Grid (cloned from example 328:6688)": "357:10178",
+          "Card bento Pattern=lead-tall-trio-b (7 cells remapped)": "357:3532",
+          "Feed grid Layout=Editorial (film lead + 3 projects)": "357:10258",
+          "Embed 3D World Poster (zones on)": "357:10463",
+          "Accordion Split (3 services FAQs)": "357:10499",
+          "CTA panel (no contact card)": "357:10530",
+          "Footer": "357:10562"
+        }
+      },
+      "Subsea services": {
+        "id": "359:4009",
+        "x": 9840,
+        "height": 6702,
+        "source": "src/pages/services/subsea/index.astro",
+        "note": "No Subsea frame existed on the Pages page before this session (checked 250:22 first, as docs/prompts/subsea-figma.md asked); the earlier Subsea brief's items 1–7 (image-tint variables, Card Scope list, Card grid Layout=Strip, Split media pictogram, oil-gas / offshore-wind pictogram art) are still not in the file, so the frame works around them — see gaps.",
+        "sections": {
+          "Header": "359:4010",
+          "Page hero (Photo, two actions, Home / Services / Subsea)": "359:4056",
+          "Section subnav (Services, Subsea active)": "359:4123",
+          "Split media Media=Image (no pictogram slot in Figma)": "359:4138",
+          "Card grid strip — industries, 4 tiles (BUILT, no Layout=Strip variant)": "359:10376",
+          "Lifecycle Layout=Focus on navy (cloned from example 328:6771)": "359:10396",
+          "Card grid 3 columns, Media=None Tint (DETACHED for a second row; no scope lists)": "359:12630",
+          "Card bento Pattern=lead-tall-wide (cloned from example 313:6002, 6 cells remapped)": "359:12927",
+          "Feed grid 4 columns — built from Card grid Layout=4 columns, Media=Image top": "359:13194",
+          "Accordion Split (3 subsea FAQs)": "359:13403",
+          "CTA panel with the named contact (Emil Spieler Palmers)": "359:13434",
+          "Footer": "359:13464"
+        }
+      }
+    },
+    "detachments": [
+      "Why invest / Figures Cards (348:3023): the Cards Desktop variant carries two value cards beside the donut and the page has three, and a card cannot be appended inside an instance, so the example instance was detached and its second card cloned for 'A fleet built for growth'.",
+      "Why invest / Split media Numbered list (349:3035): the page uses SplitMedia layout='stacked' (heading over a 3-across numbered row); the set only has the two-column Numbered list. The instance was detached, its Columns frame switched to VERTICAL (gap stack/xl), Text and Media set to FILL, the List switched to HORIZONTAL (gap grid/gutter) and cut to three Numbered item instances. The items keep the block's own Numbered item component (top rule, number in a left column) rather than the page's tint cards.",
+      "Services overview / Card grid service lines (355:5760): Layout=2 columns has one row of two cards and the page has four, so the instance was detached and the Row cloned.",
+      "Subsea services / Card grid capabilities (359:12630): Layout=3 columns has one row of three and the page has six; detached and the Row cloned.",
+      "About 352:3191 and Subsea 359:10376 are not detachments but new bound frames: there is no Card grid Layout=Strip variant, so each strip was built from an Eyebrow instance plus bg/accent-subtle tiles (radius/md, space/24 padding, space/16 gap) holding a 64px Pictogram instance and a Body/Body label, every fill, radius and spacing bound to a token.",
+      "The three CTA panels with or without a contact card (349:11580, 357:10530, 359:13434) are clones of the Careers frame's detached navy panel (305:2705), since Block/CTA band Style=Panel still has no contact-card layout (see the Careers gap)."
+    ],
+    "gaps": [
+      "Photos are placeholders on every frame (images cannot be placed through this API): the four page heroes, the Subsea split-media image, all image-bg bento cards and the four Subsea project cards.",
+      "Card Media=Pictogram panel variants are NOT wired to the Card set's Title / Description / Show eyebrow properties — setProperties reports the new value but the text node keeps the component default. The Services service-line cards' titles and descriptions had to be written straight onto the text nodes and the Top row hidden by hand. Worth fixing in the Card component.",
+      "The pictogram inside Card Media=Pictogram panel is 352px and cannot be resized in an instance ('This property cannot be overridden in an instance: size'), so the Services service-line cards are ~590 tall stacked cards, where the coded 2-column page puts a smaller pictogram beside the text.",
+      "Card has no Scope list, so the six Subsea capability cards show title + summary only (the coded cards carry three sage-dashed scope items).",
+      "Block/Split media has no pictogram slot, so the Subsea 'Work-class ROVs' block is missing the 96px subsea-infrastructure pictogram above its heading.",
+      "Block/Card grid has no Layout=Strip variant (About certificates, Subsea industries) — both strips are hand-built frames.",
+      "Block/Feed grid has no 4-column layout, so Subsea's project row is a Card grid Layout=4 columns instance with Media=Image top cards.",
+      "The Investors subnav still has 6 items and the section has 7 (Share information missing) — unchanged from phase4InvestorsOverview.",
+      "The Header nav items are all State=Default on every page frame (no current-page state), as on the Home, Investors and Careers frames.",
+      "Desktop only: no Mobile or tablet frames for any of the four pages.",
+      "Split embed's iframe crop is the provider placeholder, and the 3D World poster is a placeholder, as elsewhere in the file."
+    ],
+    "audit": {
+      "scope": "The four new page frames (346:2703, 351:3194, 355:3374, 359:4009); instance internals skipped for bindings, included for overflow",
+      "result": "Unbound paints 0 · text without a style or bound type 0 (after the fix below) · unbound padding/gap 0 (after the fix below) · overflow 0 real",
+      "fixed": [
+        "The cloned CTA contact cards carried five unstyled text nodes (12/24/16px set by hand in the Careers frame) and unbound padding/gap: the label now uses UI/Eyebrow, the name Heading/H4 and the role, email and phone Body/Small, and the card's padding (space/8 / space/40) and gap (space/8) plus the Message gap (space/32) are bound. The same five nodes are still unstyled in the Careers frame's own panel (305:2705) — not touched here.",
+        "About / Our story: the two body columns were clipped by the Wide variant's fixed 400 height; Body columns, Text, Columns and the instance were set to hug, giving 512.",
+        "Services overview: the Lifecycle block was appended after the bento and moved back to index 4 to match the coded order (cards → lifecycle → bento → feed)."
+      ],
+      "falsePositive": "The third Accordion item in the About and Services frames reports width 880 against a 640 List, but renders at the list width and cannot be resized (FILL, resize and unbinding width all report success and leave 880). Screenshot-checked: no visible overflow."
+    },
+    "gotchas": [
+      "Clones of a Page hero whose Breadcrumb had its trailing Chevron and Current deleted or hidden (the Careers hero) come through without those nodes, and a hidden child of an instance drops out of node.children, so it cannot be reached again. instance.resetOverrides() on the Breadcrumb restores the full chain; then set Level 1 / Show level 2 / Current. Hiding is the only way to shorten a crumb — remove() on a breadcrumb child throws 'Removing this node is not allowed'.",
+      "setBoundVariable('fills', …) throws 'fills and strokes variable bindings must be set on paints directly': build the paint with figma.variables.setBoundVariableForPaint and assign node.fills.",
+      "A Card variant swap (setProperties({Media, Surface})) resets the card's height inside a fixed bento row: capture width/height first, then resize and/or set layoutSizingVertical = 'FILL' after the swap.",
+      "INSTANCE_SWAP via setProperties({'Pictogram#104:315': '<node id>'}) silently does nothing (and in one case the whole setProperties call was dropped). Swap the nested Pictogram instance with instance.swapComponent(component) instead.",
+      "Reading a child's width in the same script that just changed the layout gives intermediate numbers; re-read in a later call (three widths read as 1312/640/416 settled to 421 each)."
+    ]
   }
 }
