@@ -1,4 +1,5 @@
 ---
+import '../../../styles/tokens.css';
 // A block's frame inside a true 375px iframe. Browser windows (and headless Chrome) can't be
 // narrower than ~500px, so mobile screenshots go through this page. Query string is forwarded (?only=N).
 import { blocks } from '../../../review/registry';
@@ -21,14 +22,14 @@ const { slug } = Astro.params;
       html,
       body {
         margin: 0;
-        background: #e3e4ef;
+        background: var(--wp--preset--color--navy-100);
       }
       iframe {
         display: block;
         width: 375px;
         height: 1600px;
         border: 0;
-        background: #fff;
+        background: var(--wp--preset--color--white);
       }
     </style>
   </head>

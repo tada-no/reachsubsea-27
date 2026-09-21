@@ -10,6 +10,15 @@ _No open questions right now._
 
 ## Answered log
 
+### Q69. No stray type sizes, colours or spacings (21 Sep 2026, project tidy)
+Context: an audit of `src/` found 25 font sizes and 20 line heights off the token scale, 5 raw letter-spacings, 52 raw `rgb()` scrim and hairline colours, a duplicated card scrim, two hex colours in the mobile review frames and a handful of raw 2-12px gaps.
+- [x] Snap to the existing scale wherever the difference is a pixel or two: 13 px labels → `caption`, 15 px → `body-sm`, FAQ question and answer → `body` and `body-sm`, the Stats band lead figure → `display`, the mobile video hero title → `h2`, map markers → `eyebrow` and `caption`
+- [x] Add tokens only where a real, repeated role had none: **`display-xl`** (64 → 128, the Figures block's giant figure), **`figure`** (32 → 40, figures in cards and bands), `line-height/tight` (1.3), `letter-spacing/figure` and `letter-spacing/display-xl`
+- [x] Every `rgb(27 29 59 / a)` and white-alpha becomes `color-mix()` over a palette token; the two card scrims are tokens (`--wp--custom--scrim--card-up`, `--card-across`)
+- [ ] Leave the raw values
+
+**Answer:** Done in code, with no layout change beyond about a pixel (checked on Why invest, Investors, About, Subsea, Careers and the Home mobile hero). **Left on purpose:** 1-3px rules and rings, optical nudges in `em` (`-0.05em`, `0.12em`), fixed geometry (control heights, column widths, the 22px Date tile band) and animation timings, which are choreography rather than tokens. **Figma to add:** the six tokens above (Typography and Layout collections, Desktop and Mobile modes).
+
 ### Q68. Norwegian version (21 Sep 2026, WordPress handoff)
 - [x] No Norwegian version: the site is English only
 - [ ] Norwegian at launch

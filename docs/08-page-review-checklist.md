@@ -63,6 +63,23 @@ Headless can catch scroll reveals halfway through, and it leaves the OMS iframe 
 - One `h1`. Headings in order.
 - No horizontal page scroll at 375.
 
-## 7. Report
+## 7. Tokens
+
+Run from the project root before handing over. Every command should print nothing (or only the noted exceptions).
+
+```bash
+# raw colours (tokens.css is the only home for hex and rgb)
+grep -rnE '#[0-9a-fA-F]{3,8}\b|\brgba?\(' src --include=*.astro --include=*.css --include=*.ts | grep -vE 'tokens.css|href|url\(#|"#'
+# raw font sizes and leading (Values' min() and the Date tile's 22px band are the exceptions)
+grep -rnE 'font-size:' src --include=*.astro --include=*.css | grep -vE 'var\(--wp--preset--font-size|inherit|tokens.css'
+grep -rnE 'line-height:' src --include=*.astro --include=*.css | grep -vE 'var\(--wp|inherit|normal'
+grep -rnE 'letter-spacing:' src --include=*.astro --include=*.css | grep -vE 'var\(--wp|: (0|normal|inherit)|tokens.css'
+# raw spacing (1–3px rules, em nudges and negative optical margins are fine)
+grep -rnE '(padding|margin|gap)[a-z-]*:[^;]*[0-9](px|rem)' src/blocks src/components --include=*.astro | grep -vE 'var\(--wp--preset--spacing'
+```
+
+New size needed? Snap to the nearest token first. Only add a token if the role repeats and no token fits (Q69), then add the Figma variable too.
+
+## 8. Report
 
 When handing over, include a screenshot at the design width (and others if something changed shape), plus a line on what you checked and what you fixed. If a check needs Ross's call, ask with AskUserQuestion and log the answer in `docs/00-questions.md`.

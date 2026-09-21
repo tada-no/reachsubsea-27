@@ -161,11 +161,11 @@ const STAT_STAGGER = 160;
     display: flex;
     align-items: baseline;
     color: var(--wp--custom--color--text--primary);
-    /* One step below the H2 title (48) so the heading still leads (review round 4) */
-    font-size: clamp(2rem, 1.6479rem + 0.7512vw, 2.5rem); /* 32 → 40 */
-    line-height: 1;
+    /* One step below the H2 title so the heading still leads (review round 4) */
+    font-size: var(--wp--preset--font-size--figure);
+    line-height: var(--wp--custom--line-height--figure);
     font-weight: var(--wp--custom--font-weight--bold);
-    letter-spacing: -0.03em;
+    letter-spacing: var(--wp--custom--letter-spacing--figure);
     font-variant-numeric: tabular-nums lining-nums;
     white-space: nowrap;
   }
@@ -263,7 +263,6 @@ const STAT_STAGGER = 160;
     }
     .results__value {
       flex-wrap: wrap;
-      font-size: 2rem;
     }
     .results__unit {
       flex-basis: 100%;

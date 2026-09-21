@@ -19,13 +19,13 @@ const { name, props } = Astro.props;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 2px 16px;
-    padding: 10px var(--wp--style--root--padding-left);
+    gap: var(--wp--preset--spacing--4) var(--wp--preset--spacing--16);
+    padding: var(--wp--preset--spacing--8) var(--wp--style--root--padding-left);
     border-block: 1px dashed var(--wp--preset--color--navy-200);
     background-color: var(--wp--preset--color--white);
     color: var(--wp--preset--color--navy-600);
-    font-size: 12px;
-    line-height: 16px;
+    font-size: var(--wp--preset--font-size--eyebrow);
+    line-height: var(--wp--custom--line-height--eyebrow);
   }
   .review-variant__name {
     font-weight: var(--wp--custom--font-weight--bold);
@@ -33,6 +33,6 @@ const { name, props } = Astro.props;
   }
   .review-variant__props {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 11px;
+    font-size: var(--wp--preset--font-size--eyebrow);
   }
 </style>

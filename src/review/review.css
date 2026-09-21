@@ -12,9 +12,9 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px 24px;
+  gap: var(--wp--preset--spacing--12) var(--wp--preset--spacing--24);
   min-height: 64px;
-  padding: 12px 24px;
+  padding: var(--wp--preset--spacing--12) var(--wp--preset--spacing--24);
   background-color: var(--wp--preset--color--white);
   border-bottom: 1px solid var(--wp--preset--color--navy-100);
 }
@@ -24,21 +24,21 @@
   font-weight: var(--wp--custom--font-weight--bold);
 }
 .rv-top__home span {
-  margin-left: 8px;
+  margin-left: var(--wp--preset--spacing--8);
   font-weight: var(--wp--custom--font-weight--regular);
   color: var(--wp--preset--color--navy-600);
 }
 .rv-top__toggle {
   display: inline-flex;
-  gap: 4px;
-  padding: 4px;
+  gap: var(--wp--preset--spacing--4);
+  padding: var(--wp--preset--spacing--4);
   border-radius: var(--wp--custom--radius--full);
   background-color: var(--wp--preset--color--navy-50);
   box-shadow: inset 0 0 0 1px var(--wp--preset--color--navy-100);
 }
 .rv-top__toggle button {
   min-height: 32px;
-  padding-inline: 14px;
+  padding-inline: var(--wp--preset--spacing--16);
   border-radius: var(--wp--custom--radius--full);
   font-size: var(--wp--preset--font-size--label);
   font-weight: var(--wp--custom--font-weight--medium);
@@ -60,13 +60,13 @@
   align-self: start;
   max-height: calc(100vh - 64px);
   overflow-y: auto;
-  padding: 24px 12px;
+  padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--12);
   border-right: 1px solid var(--wp--preset--color--navy-100);
 }
 .rv-nav a {
   display: flex;
-  gap: 10px;
-  padding: 8px 12px;
+  gap: var(--wp--preset--spacing--8);
+  padding: var(--wp--preset--spacing--8) var(--wp--preset--spacing--12);
   border-radius: var(--wp--custom--radius--sm);
   font-size: var(--wp--preset--font-size--label);
   line-height: var(--wp--custom--line-height--label);
@@ -86,15 +86,15 @@
 .rv-main {
   display: flex;
   flex-direction: column;
-  gap: 72px;
+  gap: var(--wp--preset--spacing--72);
   min-width: 0;
-  padding: 32px 32px 96px;
+  padding: var(--wp--preset--spacing--32) var(--wp--preset--spacing--32) var(--wp--preset--spacing--96);
 }
 
 .rv-intro {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--wp--preset--spacing--8);
   max-width: 880px;
 }
 .rv-intro p {
@@ -109,25 +109,25 @@
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px 32px;
-  margin-bottom: 20px;
+  gap: var(--wp--preset--spacing--12) var(--wp--preset--spacing--32);
+  margin-bottom: var(--wp--preset--spacing--24);
 }
 .rv-block__heading {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--wp--preset--spacing--4);
 }
 .rv-block__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 12px;
+  gap: var(--wp--preset--spacing--4) var(--wp--preset--spacing--12);
   font-size: var(--wp--preset--font-size--caption);
   line-height: var(--wp--custom--line-height--caption);
   color: var(--wp--preset--color--navy-600);
 }
 .rv-block__meta code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
+  font-size: var(--wp--preset--font-size--eyebrow);
 }
 .rv-block__title {
   font-size: var(--wp--preset--font-size--h3);
@@ -142,7 +142,7 @@
 .rv-block__links {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 20px;
+  gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--24);
   font-size: var(--wp--preset--font-size--label);
   font-weight: var(--wp--custom--font-weight--medium);
 }
@@ -158,14 +158,14 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 377px;
   align-items: start;
-  gap: 32px;
+  gap: var(--wp--preset--spacing--32);
 }
 .rv-vp {
   min-width: 0;
   margin: 0;
 }
 .rv-vp figcaption {
-  margin-bottom: 8px;
+  margin-bottom: var(--wp--preset--spacing--8);
   font-size: var(--wp--preset--font-size--caption);
   line-height: var(--wp--custom--line-height--caption);
   font-weight: var(--wp--custom--font-weight--medium);
@@ -222,7 +222,7 @@
 
 @media (max-width: 599px) {
   .rv-main {
-    padding-inline: 16px;
+    padding-inline: var(--wp--preset--spacing--16);
   }
   .rv-vp--mobile .rv-vp__screen {
     width: 100%;

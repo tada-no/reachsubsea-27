@@ -255,8 +255,8 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
     width: calc(var(--w) * 100%);
     padding-top: var(--wp--preset--spacing--12);
     text-align: center;
-    font-size: 0.8125rem;
-    line-height: 1;
+    font-size: var(--wp--preset--font-size--caption);
+    line-height: var(--wp--custom--line-height--figure);
     white-space: nowrap;
     color: var(--wp--custom--color--text--secondary);
   }
@@ -346,7 +346,7 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
     left: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--wp--preset--spacing--4);
     width: max-content;
     max-width: 152px;
     padding-left: var(--wp--preset--spacing--8);
@@ -369,8 +369,8 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
     border-right: 1px solid var(--wp--custom--color--border--strong);
   }
   .track__title {
-    font-size: 0.9375rem;
-    line-height: 1.3;
+    font-size: var(--wp--preset--font-size--body-sm);
+    line-height: var(--wp--custom--line-height--tight);
     font-weight: var(--wp--custom--font-weight--bold);
     color: var(--wp--custom--color--text--primary);
   }
@@ -378,8 +378,8 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
     font-weight: var(--wp--custom--font-weight--medium);
   }
   .track__date {
-    font-size: 0.8125rem;
-    line-height: 1.3;
+    font-size: var(--wp--preset--font-size--caption);
+    line-height: var(--wp--custom--line-height--tight);
     color: var(--wp--custom--color--text--secondary);
     font-variant-numeric: tabular-nums;
   }

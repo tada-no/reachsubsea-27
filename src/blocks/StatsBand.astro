@@ -155,8 +155,8 @@ const STAT_STAGGER = 160;
   .stats-band__lead-value {
     color: var(--wp--custom--color--text--accent);
     font-variant-numeric: tabular-nums lining-nums;
-    font-size: clamp(3.5rem, 2.4rem + 2.2vw, 5rem);
-    line-height: 1;
+    font-size: var(--wp--preset--font-size--display);
+    line-height: var(--wp--custom--line-height--figure);
     /* Optical: pull the display digits back onto the label's left edge */
     margin-left: -0.05em;
   }
@@ -185,7 +185,7 @@ const STAT_STAGGER = 160;
   .stats-band__row-value {
     color: var(--wp--custom--color--text--primary);
     font-variant-numeric: tabular-nums lining-nums;
-    line-height: 1;
+    line-height: var(--wp--custom--line-height--figure);
   }
   .stats-band__row-label {
     color: var(--wp--custom--color--text--secondary);

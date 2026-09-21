@@ -277,7 +277,7 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
      grid, so pull it out to line up with the heading's left edge */
   .split-media__pictogram {
     --pg-bg: var(--wp--custom--color--bg--default);
-    margin-left: -12px;
+    margin-left: calc(-1 * var(--wp--preset--spacing--12));
   }
   .has-surface-tint .split-media__pictogram {
     --pg-bg: var(--wp--custom--color--bg--tint);

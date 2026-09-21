@@ -139,8 +139,8 @@ const menuOpen = siteMenuOpen || mobileMenuOpen;
     --wp--custom--color--text--primary: var(--wp--preset--color--white);
     --wp--custom--color--icon--primary: var(--wp--preset--color--white);
     --wp--custom--color--icon--accent: var(--wp--preset--color--sage-300);
-    --wp--custom--color--border--default: rgb(255 255 255 / 0.4);
-    --wp--custom--color--action--outline--bg-hover: rgb(255 255 255 / 0.14);
+    --wp--custom--color--border--default: color-mix(in srgb, var(--wp--preset--color--white) 40%, transparent);
+    --wp--custom--color--action--outline--bg-hover: color-mix(in srgb, var(--wp--preset--color--white) 14%, transparent);
   }
   .site-header__logo,
   .nav-item__target,
@@ -241,7 +241,7 @@ const menuOpen = siteMenuOpen || mobileMenuOpen;
     }
     /* The last icon button is pulled in so its glyph aligns with the container edge (docs/04 §16) */
     .site-header__actions .site-header__trigger:last-child {
-      margin-right: -12px;
+      margin-right: calc(-1 * var(--wp--preset--spacing--12));
     }
   }
 

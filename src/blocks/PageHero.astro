@@ -366,18 +366,18 @@ const objectPosition = image?.focalPoint
   }
   .page-hero--photo:not(.page-hero--video) .page-hero__scrim {
     background:
-      linear-gradient(to right, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0) 30%),
-      linear-gradient(to left, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0) 22%),
+      linear-gradient(to right, var(--wp--preset--color--navy-900) 0%, transparent 30%),
+      linear-gradient(to left, var(--wp--preset--color--navy-900) 0%, transparent 22%),
       /* Heavy under the copy only: an ellipse from the bottom-left corner carries the lead, so the
          subject at the bottom right stays lit. A short full-width ramp joins the subnav */
-      radial-gradient(ellipse 85% 75% at 0% 100%, rgb(27 29 59 / 0.9) 0%, rgb(27 29 59 / 0.6) 45%, rgb(27 29 59 / 0) 100%),
-      linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0) 24%),
-      rgb(27 29 59 / 0.45);
+      radial-gradient(ellipse 85% 75% at 0% 100%, color-mix(in srgb, var(--wp--preset--color--navy-900) 90%, transparent) 0%, color-mix(in srgb, var(--wp--preset--color--navy-900) 60%, transparent) 45%, transparent 100%),
+      linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, transparent 24%),
+      color-mix(in srgb, var(--wp--preset--color--navy-900) 45%, transparent);
   }
   @media (max-width: 899px) {
     .page-hero--photo:not(.page-hero--video) .page-hero__scrim {
       background:
-        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, var(--wp--preset--color--navy-900) 34%, rgb(27 29 59 / 0.6) 70%, rgb(27 29 59 / 0.45) 100%);
+        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, var(--wp--preset--color--navy-900) 34%, color-mix(in srgb, var(--wp--preset--color--navy-900) 60%, transparent) 70%, color-mix(in srgb, var(--wp--preset--color--navy-900) 45%, transparent) 100%);
     }
   }
 
@@ -442,9 +442,9 @@ const objectPosition = image?.focalPoint
      a bottom ramp under the copy, a short top ramp under the header. */
   .page-hero--video .page-hero__scrim {
     background:
-      linear-gradient(to right, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0.82) 22%, rgb(27 29 59 / 0.35) 48%, rgb(27 29 59 / 0) 66%, rgb(27 29 59 / 0) 80%, var(--wp--preset--color--navy-900) 100%),
-      linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, rgb(27 29 59 / 0.7) 22%, rgb(27 29 59 / 0) 56%),
-      linear-gradient(to bottom, rgb(27 29 59 / 0.78) 0%, rgb(27 29 59 / 0) 26%);
+      linear-gradient(to right, var(--wp--preset--color--navy-900) 0%, color-mix(in srgb, var(--wp--preset--color--navy-900) 82%, transparent) 22%, color-mix(in srgb, var(--wp--preset--color--navy-900) 35%, transparent) 48%, transparent 66%, transparent 80%, var(--wp--preset--color--navy-900) 100%),
+      linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, color-mix(in srgb, var(--wp--preset--color--navy-900) 70%, transparent) 22%, transparent 56%),
+      linear-gradient(to bottom, color-mix(in srgb, var(--wp--preset--color--navy-900) 78%, transparent) 0%, transparent 26%);
   }
   /* Below 900 the copy spans the full width, so the side fades give way to an even wash plus a
      deeper bottom ramp; the footage reads through the top half.
@@ -456,8 +456,8 @@ const objectPosition = image?.focalPoint
   @media (max-width: 899px) {
     .page-hero--video .page-hero__scrim {
       background:
-        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, var(--wp--preset--color--navy-900) 40%, rgb(27 29 59 / 0.55) 72%, rgb(27 29 59 / 0.3) 100%),
-        linear-gradient(to right, rgb(27 29 59 / 0.5) 0%, rgb(27 29 59 / 0) 12%, rgb(27 29 59 / 0) 88%, rgb(27 29 59 / 0.5) 100%);
+        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, var(--wp--preset--color--navy-900) 40%, color-mix(in srgb, var(--wp--preset--color--navy-900) 55%, transparent) 72%, color-mix(in srgb, var(--wp--preset--color--navy-900) 30%, transparent) 100%),
+        linear-gradient(to right, color-mix(in srgb, var(--wp--preset--color--navy-900) 50%, transparent) 0%, transparent 12%, transparent 88%, color-mix(in srgb, var(--wp--preset--color--navy-900) 50%, transparent) 100%);
     }
   }
   .page-hero--video .page-hero__content {
@@ -477,9 +477,9 @@ const objectPosition = image?.focalPoint
      2-3 lines and the eyebrow stays low, over the darker wash. */
   @media (max-width: 599px) {
     .page-hero--video .page-hero__title.text-display {
-      font-size: 2.25rem;
-      line-height: 2.75rem;
-      letter-spacing: var(--wp--custom--letter-spacing--h1);
+      font-size: var(--wp--preset--font-size--h2);
+      line-height: var(--wp--custom--line-height--h2);
+      letter-spacing: var(--wp--custom--letter-spacing--h2);
     }
   }
 
@@ -554,8 +554,8 @@ const objectPosition = image?.focalPoint
     height: 48px;
     border-radius: var(--wp--custom--radius--full);
     color: var(--wp--custom--color--text--on-overlay);
-    background-color: rgb(27 29 59 / 0.4);
-    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.24);
+    background-color: color-mix(in srgb, var(--wp--preset--color--navy-900) 40%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--wp--preset--color--white) 24%, transparent);
     transition:
       background-color var(--wp--custom--motion--duration) ease,
       transform var(--wp--custom--motion--duration-fast) var(--wp--custom--motion--ease-out);
@@ -565,7 +565,7 @@ const objectPosition = image?.focalPoint
   }
   @media (hover: hover) and (pointer: fine) {
     .page-hero__toggle:hover {
-      background-color: rgb(27 29 59 / 0.7);
+      background-color: color-mix(in srgb, var(--wp--preset--color--navy-900) 70%, transparent);
     }
   }
   .page-hero__toggle-icon--play,

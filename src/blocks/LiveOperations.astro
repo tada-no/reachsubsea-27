@@ -778,7 +778,7 @@ const wb = WORLD_BOX;
   .live-ops .maplibregl-ctrl-attrib.maplibregl-compact-show {
     background-color: transparent;
     color: var(--wp--custom--color--text--secondary);
-    font-size: 11px;
+    font-size: var(--wp--preset--font-size--eyebrow);
   }
   .live-ops .maplibregl-ctrl-attrib a {
     color: inherit;
@@ -817,7 +817,7 @@ const wb = WORLD_BOX;
     background-color: var(--wp--custom--color--alpha--navy-8);
   }
   .live-ops.has-surface-navy .live-ops__control:hover:not(:disabled) {
-    background-color: rgb(255 255 255 / 0.08);
+    background-color: color-mix(in srgb, var(--wp--preset--color--white) 8%, transparent);
   }
   .live-ops__control:disabled {
     color: var(--wp--custom--color--text--disabled);
@@ -859,7 +859,7 @@ const wb = WORLD_BOX;
     border-radius: var(--wp--custom--radius--full);
     background-color: var(--wp--custom--color--border--accent);
     color: var(--wp--preset--color--navy-900);
-    font-size: 13px;
+    font-size: var(--wp--preset--font-size--eyebrow);
     font-weight: var(--wp--custom--font-weight--bold);
     font-variant-numeric: tabular-nums;
     box-shadow: 0 0 0 0 var(--wp--preset--color--navy-900);
@@ -868,7 +868,7 @@ const wb = WORLD_BOX;
       box-shadow 240ms var(--wp--custom--motion--easing);
   }
   .live-ops__marker--cluster .live-ops__marker-dot {
-    font-size: 15px;
+    font-size: var(--wp--preset--font-size--caption);
   }
   .live-ops__marker-pulse {
     position: absolute;
@@ -897,7 +897,7 @@ const wb = WORLD_BOX;
     translate: 0 -50%;
     white-space: nowrap;
     color: var(--wp--custom--color--text--primary);
-    font-size: 15px;
+    font-size: var(--wp--preset--font-size--body-sm);
     font-weight: var(--wp--custom--font-weight--medium);
     text-shadow:
       0 0 4px var(--wp--custom--color--bg--default),
@@ -958,7 +958,7 @@ const wb = WORLD_BOX;
     background-color: var(--wp--custom--color--alpha--navy-8);
   }
   .live-ops.has-surface-navy .live-ops__region.is-hover {
-    background-color: rgb(255 255 255 / 0.05);
+    background-color: color-mix(in srgb, var(--wp--preset--color--white) 5%, transparent);
   }
   /* Open (persistent) or keyboard-focused (transient, from Tab or a marker click moving
      focus here): a solid fill reads better here than the sage focus outline, which looked
@@ -1200,7 +1200,7 @@ const wb = WORLD_BOX;
       border-radius: 0;
     }
     .live-ops__marker-label {
-      font-size: 13px;
+      font-size: var(--wp--preset--font-size--caption);
     }
   }
 </style>

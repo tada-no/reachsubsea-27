@@ -94,11 +94,12 @@ const panelId = `${id}-answer`;
   }
 
   /* 24 padding all round, 16 (stack/sm) between question and answer */
-  /* Question: Medium weight at 18px rather than Bold H5 (17 Sep 2026), so the list reads lighter */
+  /* Question: Medium weight at Body size rather than Bold H5 (17 Sep 2026), so the list reads lighter */
   .faq-item__title {
-    font-size: 1.125rem;
+    font-size: var(--wp--preset--font-size--body);
+    line-height: var(--wp--custom--line-height--body);
     font-weight: var(--wp--custom--font-weight--medium);
-    letter-spacing: -0.005em;
+    letter-spacing: var(--wp--custom--letter-spacing--h3);
   }
   .faq-item__question {
     display: flex;
@@ -141,10 +142,10 @@ const panelId = `${id}-answer`;
     visibility: visible;
     transition-delay: 0s;
   }
-  /* 16px answers under the 18px question (17 Sep 2026) */
+  /* Body Small answers under the Body question (17 Sep 2026) */
   .faq-item__answer-content {
-    font-size: 1rem;
-    line-height: 1.5rem;
+    font-size: var(--wp--preset--font-size--body-sm);
+    line-height: var(--wp--custom--line-height--body-sm);
     padding: 0 var(--wp--preset--spacing--24) var(--wp--preset--spacing--16);
     color: var(--wp--custom--color--text--secondary);
   }

@@ -353,9 +353,9 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobi
      bottom, plus a lighter ramp from the right behind the zone list. The scene stays visible top centre. */
   .embed__scrim {
     background:
-      linear-gradient(to right, rgb(27 29 59 / 0.88) 0%, rgb(27 29 59 / 0.5) 40%, rgb(27 29 59 / 0.1) 70%),
-      linear-gradient(to left, rgb(27 29 59 / 0.72) 0%, rgb(27 29 59 / 0.4) 26%, rgb(27 29 59 / 0) 48%),
-      linear-gradient(to top, rgb(27 29 59 / 0.9) 0%, rgb(27 29 59 / 0.35) 45%, rgb(27 29 59 / 0) 70%);
+      linear-gradient(to right, color-mix(in srgb, var(--wp--preset--color--navy-900) 88%, transparent) 0%, color-mix(in srgb, var(--wp--preset--color--navy-900) 50%, transparent) 40%, color-mix(in srgb, var(--wp--preset--color--navy-900) 10%, transparent) 70%),
+      linear-gradient(to left, color-mix(in srgb, var(--wp--preset--color--navy-900) 72%, transparent) 0%, color-mix(in srgb, var(--wp--preset--color--navy-900) 40%, transparent) 26%, transparent 48%),
+      linear-gradient(to top, color-mix(in srgb, var(--wp--preset--color--navy-900) 90%, transparent) 0%, color-mix(in srgb, var(--wp--preset--color--navy-900) 35%, transparent) 45%, transparent 70%);
   }
   .embed__poster-image,
   .embed__poster-video {
@@ -472,7 +472,7 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobi
     align-items: center;
     gap: var(--wp--preset--spacing--16);
     min-height: 48px;
-    border-top: 1px solid rgb(255 255 255 / 0.24);
+    border-top: 1px solid color-mix(in srgb, var(--wp--preset--color--white) 24%, transparent);
     color: var(--wp--custom--color--text--primary);
   }
   .embed__zone-number {

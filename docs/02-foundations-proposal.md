@@ -142,6 +142,7 @@ Code syntax: size `var(--wp--preset--font-size--{style})` (fluid preset, min = M
 
 | Style | Desktop size/LH | Mobile size/LH | Weight | Tracking | Use | Replaces |
 |---|---|---|---|---|---|---|
+| display-xl | 128 / 0.9 | 64 / 0.9 | Bold | −4% | the one giant data figure (Figures block). Added 21 Sep 2026 | none |
 | display | 80 / 88 | 44 / 48 | Bold | −2% | hero headline | old H2 80, dev hero 112 |
 | h1 | 64 / 72 | 40 / 48 | Bold | −1.5% | page title, stat value | old H3 64, dev h1 56 |
 | h2 | 48 / 56 | 32 / 40 | Bold | −1% | section header | old H4.5 48, dev h2 48 |
@@ -151,6 +152,7 @@ Code syntax: size `var(--wp--preset--font-size--{style})` (fluid preset, min = M
 | lead | 20 / 32 | 18 / 28 | Regular | 0 | intro paragraph | old Paragraph large 18/32 |
 | body | 18 / 28 | 16 / 24 | Regular | 0 | body copy | dev body 16→18 |
 | body-sm | 16 / 24 | 14 / 20 | Regular | 0 | card text, meta list | old Paragraph regular 16 |
+| figure | 40 / 1 | 32 / 1 | Bold | −3% | a data figure inside a card, row or band (Results band, Figures cards). One step below h2. Added 21 Sep 2026 | none |
 | caption | 14 / 20 | 14 / 20 | Regular | 0 | footnotes, image credits, legal | old Body small 14 |
 | eyebrow | 14 / 20 | 12 / 16 | Bold | +6%, UPPER | eyebrow, badge, table head | old Label small 11, dev 11–12 |
 | label | 14 / 20 | 14 / 20 | Medium | 0 | nav, chips, form labels | dev nav 14 |
@@ -158,6 +160,8 @@ Code syntax: size `var(--wp--preset--font-size--{style})` (fluid preset, min = M
 | button-sm | 14 / 20 | 14 / 20 | Bold | 0 | small button | old Button Small Bold 14 |
 
 This replaces the dev theme's 8+ one-off hero `h1` ranges and the old file's 30 text styles. Dropped: H1 112, mobile-only duplicates, typo'd styles.
+
+Two more tokens for text that is not a style: `line-height/tight` = 1.3 (unitless; short labels, dates and chart captions, never running text) and `letter-spacing/figure` −0.03em, `letter-spacing/display-xl` −0.04em. Figure and display-xl set their own unitless leading (1 and 0.9). Added 21 Sep 2026 (Q69) so no block sets a raw size, leading or tracking.
 
 Typography variables: `font/family/sans = Inter`, `font/weight/regular|medium|bold` (style strings), plus `font/size/{style}` and `font/line-height/{style}` × 14 styles × 2 modes.
 
