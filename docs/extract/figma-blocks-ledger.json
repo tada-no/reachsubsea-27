@@ -832,13 +832,15 @@
       "Card grid open positions (Media=None White cards)": "302:9405",
       "Card grid Bento (detached; 3 text cards + 8/4 photo cards)": "303:3018",
       "Accordion Split": "302:8748",
-      "CTA panel (detached, navy mode, contact card)": "305:2705"
+      "CTA panel (detached, navy mode, contact card)": "305:2705",
+      "Embed 3D World Poster (careers route, zones row hidden)": "307:2690"
     },
     "gaps": [
       "Photos are not placed (images cannot be placed via the API here): hero, Trainees and the two bento photo cards show placeholders",
       "The Block/CTA band Panel variant (246:9087) still shows the old white panel with a green glow; the Careers frame uses a detached navy copy with the contact card. Fold this back into the variant",
       "Accordion variant has 3 questions, the page has 5",
-      "Page is Desktop only; no Mobile or tablet frames"
+      "Page is Desktop only; no Mobile or tablet frames",
+      "Embed 3D World variant has no eyebrow (code shows 'Try it in 3D' above the title) and its poster is a placeholder; added 21 Sep 2026"
     ]
   }
 }

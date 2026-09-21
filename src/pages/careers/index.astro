@@ -20,8 +20,10 @@ import StatsBand from '../../blocks/StatsBand.astro';
 import SplitMedia from '../../blocks/SplitMedia.astro';
 import CardGrid from '../../blocks/CardGrid.astro';
 import Accordion from '../../blocks/Accordion.astro';
+import Embed from '../../blocks/Embed.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
 import { navSections } from '../../data/navigation';
+import { worldCareersUrl } from '../../data/world';
 import { pickFigures } from '../../data/key-figures';
 import { hrManager, vacancies, thrive, trainees, recruiter, careersFaqs } from '../../data/careers';
 import type { CardField } from '../../lib/types';
@@ -150,6 +152,20 @@ const siblingCards: CardField[] = [
       {/* The PDF's "Learn about the trainee program" button. No trainee page exists in the client sitemap: target TBC (Q66) */}
       actions={[{ label: 'Learn about the trainee program', url: '#', action: 'page', type: 'button' }]}
       image={{ src: `${base}images/${trainees.image.file}`, alt: trainees.image.alt, focalPoint: trainees.image.focalPoint }}
+    />
+
+    {/* The 3D World's careers route (reach-world v45+): the same poster embed as Home, opened on its careers view.
+        Wording is the world's own start view ("From ship to seabed", the five stops, the hands-on survey line). */}
+    <Embed
+      anchor="try-it-in-3d"
+      type="3d-world"
+      state="poster"
+      eyebrow="Try it in 3D"
+      title="From ship to seabed"
+      text="Five stops, about two minutes: each one a Reach asset at work, with the role behind it. Or pilot the mini-ROV along a pipeline. An 18 MB scene, best on a tablet or computer."
+      worldUrl={worldCareersUrl}
+      fullScreenUrl={worldCareersUrl}
+      poster={{ src: `${base}images/3d-world-poster.jpg`, alt: 'An ROV surveying a pipeline on the seabed in the Reach Subsea 3D World' }}
     />
 
     {/* SAMPLE: a 20 Sep 2026 snapshot of the HR-Manager list (src/data/careers.ts); the developer's feed replaces it */}
