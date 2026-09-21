@@ -105,7 +105,8 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
       {track ? (
         <div class="timeline__inner timeline__inner--track">
           {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} class="timeline__header" />}
-          <div class="track-scroll">
+          {/* Focusable so keyboard users can scroll it with the arrow keys (WCAG 2.1.1) */}
+          <div class="track-scroll" tabindex="0" role="region" aria-label={`${sectionHeader?.title ?? 'Timeline'}, scrollable`}>
             <div class="track" data-track style={`--today: ${todayX}; --draw: ${DRAW}s`}>
               <ol class="track__months" aria-hidden="true">
                 {months.map((m) => (
@@ -213,6 +214,10 @@ function deriveStatus(m: MilestoneField): 'done' | 'current' | 'upcoming' {
     scrollbar-width: none;
     margin-inline: calc(-1 * var(--wp--style--root--padding-left));
     padding-inline: var(--wp--style--root--padding-left);
+  }
+  /* Inset ring: the track bleeds to the page edge, so an outside ring would be clipped */
+  .track-scroll:focus-visible {
+    outline-offset: -2px;
   }
   .track-scroll::-webkit-scrollbar {
     display: none;

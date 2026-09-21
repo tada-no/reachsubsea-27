@@ -24,6 +24,7 @@ import Link from '../components/Link.astro';
 import IconButton from '../components/IconButton.astro';
 import Icon from '../components/Icon.astro';
 import Pictogram from '../components/Pictogram.astro';
+import MediaToggle from '../components/MediaToggle.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import { makeId } from '../lib/ids';
 import type { BlockFields, ImageField, SectionHeaderField } from '../lib/types';
@@ -171,6 +172,7 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobi
             )}
           </div>
           <div class="embed__scrim" aria-hidden="true" />
+          {posterVideo && <MediaToggle subject="background film" class="embed__loop-toggle" />}
           <div class="embed__mock" aria-hidden="true" hidden={state !== 'loaded'}>
             <Pictogram name="global-monitoring" size={96} />
             <p class="embed__mock-text text-small">
@@ -219,7 +221,7 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobi
             <Link label="Open 3D World" href={fullScreenUrl} action={worldInSite ? 'page' : 'external'} />
             <p class="embed__note text-caption">Opens the full-screen 3D World. Best on a tablet or computer.</p>
             {showZones && zoneList.length > 0 && (
-              <ol class="embed__zones-list embed__zones-list--mobile" aria-label="Jump to a zone in the 3D World">
+              <ol class="embed__zones-list embed__zones-list--mobile" role="list" aria-label="Jump to a zone in the 3D World">
                 {zoneList.map((z) => (
                   <li>
                     <a class="embed__zone" href={zoneHref(z.zone)} {...zoneExternal}>
@@ -423,6 +425,13 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobi
     height: 100%;
     border: 0;
   }
+  /* Poster loop pause / play: top right, where the toolbar sits once the scene runs */
+  .embed__loop-toggle {
+    position: absolute;
+    top: var(--wp--preset--spacing--24);
+    right: var(--wp--preset--spacing--24);
+    z-index: 2;
+  }
   .embed__toolbar {
     top: var(--wp--preset--spacing--24);
     right: var(--wp--preset--spacing--24);
@@ -547,34 +556,49 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobi
 
     let iframeEl: HTMLIFrameElement | null = null;
 
-    // Poster loop: plays a segment while the stage is on screen and the scene isn't running.
-    // Skipped for reduced motion and Save-Data, where the still poster image stays.
+    // Poster loop: plays a segment while the stage is on screen and the scene isn't running, with a
+    // pause control (WCAG 2.2.2). Skipped for reduced motion and Save-Data, where the still poster stays.
     const loop = root.querySelector<HTMLVideoElement>('.embed__poster-video');
+    const loopToggle = root.querySelector<HTMLButtonElement>('[data-media-toggle]');
+    const loopToggleLabel = loopToggle?.querySelector<HTMLElement>('[data-media-toggle-label]');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const loopData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+    let loopPaused = false;
+    let loopVisible = false;
+    const setLoopPaused = (paused: boolean) => {
+      loopPaused = paused;
+      loopToggle?.setAttribute('aria-pressed', String(paused));
+      if (loopToggleLabel) loopToggleLabel.textContent = `${paused ? 'Play' : 'Pause'} ${loopToggle?.dataset.subject}`;
+    };
+    // Plays only when on screen, not paused by the visitor, and the scene isn't running
+    const syncLoop = () => {
+      if (!loop?.src) return;
+      if (loopVisible && !loopPaused && root.dataset.embedState !== 'loaded') loop.play().catch(() => undefined);
+      else loop.pause();
+    };
     if (loop?.dataset.src && !reduceMotion && !loopData) {
       const start = Number(loop.dataset.start) || 0;
       const end = Number(loop.dataset.end) || 0;
-      let started = false;
       loop.addEventListener('playing', () => loop.classList.add('is-playing'));
       loop.addEventListener('timeupdate', () => {
         if (end > 0 && loop.currentTime >= end) loop.currentTime = start;
       });
       loop.addEventListener('ended', () => {
         loop.currentTime = start;
-        loop.play().catch(() => undefined);
+        syncLoop();
+      });
+      loopToggle?.removeAttribute('hidden');
+      loopToggle?.addEventListener('click', () => {
+        setLoopPaused(!loopPaused);
+        syncLoop();
       });
       new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting && root.dataset.embedState !== 'loaded') {
-          if (!started) {
-            loop.src = loop.dataset.src!;
-            loop.currentTime = start;
-            started = true;
-          }
-          loop.play().catch(() => undefined);
-        } else {
-          loop.pause();
+        loopVisible = entry.isIntersecting;
+        if (loopVisible && !loop.src) {
+          loop.src = loop.dataset.src!;
+          loop.currentTime = start;
         }
+        syncLoop();
       }, { threshold: 0.25 }).observe(frame);
     }
     const coarsePointer = window.matchMedia('(any-pointer: coarse)').matches;
@@ -599,7 +623,8 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobi
       zones?.setAttribute('hidden', '');
       toolbar?.removeAttribute('hidden');
       root.dataset.embedState = 'loaded';
-      loop?.pause();
+      loopToggle?.setAttribute('hidden', '');
+      syncLoop();
       iframeEl.focus();
     });
 
@@ -611,7 +636,8 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobi
       panel?.removeAttribute('hidden');
       zones?.removeAttribute('hidden');
       root.dataset.embedState = 'poster';
-      if (loop?.src) loop.play().catch(() => undefined);
+      if (loop?.src) loopToggle?.removeAttribute('hidden');
+      syncLoop();
       launchBtn?.focus();
     });
   }

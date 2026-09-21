@@ -19,7 +19,7 @@ import Badge from '../components/Badge.astro';
 import MetaItem from '../components/MetaItem.astro';
 import Button from '../components/Button.astro';
 import Link from '../components/Link.astro';
-import Icon from '../components/Icon.astro';
+import MediaToggle from '../components/MediaToggle.astro';
 import { makeId } from '../lib/ids';
 import type { ActionField, BadgeField, BlockFields, ImageField, MetaField } from '../lib/types';
 
@@ -143,7 +143,9 @@ const objectPosition = image?.focalPoint
             )
           }
           {hasMotion ? (
-            <h1 id={titleId} class:list={['page-hero__title', titleStyle === 'display' ? 'text-display' : 'text-h1']} aria-label={title}>
+            <h1 id={titleId} class:list={['page-hero__title', titleStyle === 'display' ? 'text-display' : 'text-h1']}>
+              {/* Screen readers get the title as one piece; the animated word spans are visual only */}
+              <span class="visually-hidden">{title}</span>
               {titleWords.map((word, i) => (
                 <Fragment>
                   <span class="page-hero__word" aria-hidden="true" style={`--word-i: ${i}`}>
@@ -187,11 +189,7 @@ const objectPosition = image?.focalPoint
           }
         </div>
         {isVideo && (
-          <button type="button" class="page-hero__toggle" data-hero-toggle aria-pressed="false" hidden>
-            <Icon name="player-pause" size={20} class="page-hero__toggle-icon page-hero__toggle-icon--pause" />
-            <Icon name="player-play" size={20} class="page-hero__toggle-icon page-hero__toggle-icon--play" />
-            <span class="visually-hidden" data-hero-toggle-label>Pause background video</span>
-          </button>
+          <MediaToggle class="page-hero__toggle" />
         )}
       </div>
     </div>
@@ -542,38 +540,12 @@ const objectPosition = image?.focalPoint
     }
   }
 
-  /* Pause / play: quiet, bottom right, where the photo credit used to sit. */
+  /* Pause / play (MediaToggle): quiet, bottom right, where the photo credit used to sit. */
   .page-hero__toggle {
     position: absolute;
     z-index: 1;
     right: var(--wp--style--root--padding-right);
     bottom: 0;
-    display: grid;
-    place-items: center;
-    width: 48px;
-    height: 48px;
-    border-radius: var(--wp--custom--radius--full);
-    color: var(--wp--custom--color--text--on-overlay);
-    background-color: color-mix(in srgb, var(--wp--preset--color--navy-900) 40%, transparent);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--wp--preset--color--white) 24%, transparent);
-    transition:
-      background-color var(--wp--custom--motion--duration) ease,
-      transform var(--wp--custom--motion--duration-fast) var(--wp--custom--motion--ease-out);
-  }
-  .page-hero__toggle:active {
-    transform: scale(0.96);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .page-hero__toggle:hover {
-      background-color: color-mix(in srgb, var(--wp--preset--color--navy-900) 70%, transparent);
-    }
-  }
-  .page-hero__toggle-icon--play,
-  .page-hero__toggle[aria-pressed='true'] .page-hero__toggle-icon--pause {
-    display: none;
-  }
-  .page-hero__toggle[aria-pressed='true'] .page-hero__toggle-icon--play {
-    display: block;
   }
 </style>
 
@@ -584,8 +556,8 @@ const objectPosition = image?.focalPoint
     const media = root.querySelector<HTMLElement>('[data-hero-media]');
     const content = root.querySelector<HTMLElement>('.page-hero__content');
     const video = root.querySelector<HTMLVideoElement>('.page-hero__video');
-    const toggle = root.querySelector<HTMLButtonElement>('[data-hero-toggle]');
-    const toggleLabel = root.querySelector<HTMLElement>('[data-hero-toggle-label]');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-media-toggle]');
+    const toggleLabel = root.querySelector<HTMLElement>('[data-media-toggle-label]');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const saveData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
 
@@ -597,7 +569,7 @@ const objectPosition = image?.focalPoint
 
       const setPaused = (paused: boolean) => {
         toggle?.setAttribute('aria-pressed', String(paused));
-        if (toggleLabel) toggleLabel.textContent = paused ? 'Play background video' : 'Pause background video';
+        if (toggleLabel) toggleLabel.textContent = `${paused ? 'Play' : 'Pause'} ${toggle?.dataset.subject}`;
       };
 
       video.src = video.dataset.src;

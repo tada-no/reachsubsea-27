@@ -1,0 +1,57 @@
+---
+// Media toggle: the round pause / play control for any moving background (WCAG 2.2.2 Pause, Stop,
+// Hide). Shared by the Page hero video and the 3D World poster loop. Rendered `hidden`; the owning
+// block's script reveals it, keeps `aria-pressed` (true = paused) and sets the label in
+// [data-media-toggle-label] to `${paused ? 'Play' : 'Pause'} ${data-subject}`. Position comes from
+// the caller's `class`.
+import Icon from './Icon.astro';
+
+interface Props {
+  /** What moves, for the label: "Pause {subject}" / "Play {subject}" */
+  subject?: string;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { subject = 'background video', class: className, ...attrs } = Astro.props;
+---
+
+<button type="button" class:list={['media-toggle', className]} data-media-toggle data-subject={subject} aria-pressed="false" hidden {...attrs}>
+  <Icon name="player-pause" size={20} class="media-toggle__icon media-toggle__icon--pause" />
+  <Icon name="player-play" size={20} class="media-toggle__icon media-toggle__icon--play" />
+  <span class="visually-hidden" data-media-toggle-label>Pause {subject}</span>
+</button>
+
+<style is:global>
+  .media-toggle {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--wp--custom--radius--full);
+    color: var(--wp--custom--color--text--on-overlay);
+    background-color: color-mix(in srgb, var(--wp--preset--color--navy-900) 40%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--wp--preset--color--white) 24%, transparent);
+    transition:
+      background-color var(--wp--custom--motion--duration) ease,
+      transform var(--wp--custom--motion--duration-fast) var(--wp--custom--motion--ease-out);
+  }
+  .media-toggle[hidden] {
+    display: none;
+  }
+  .media-toggle:active {
+    transform: scale(0.96);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .media-toggle:hover {
+      background-color: color-mix(in srgb, var(--wp--preset--color--navy-900) 70%, transparent);
+    }
+  }
+  .media-toggle__icon--play,
+  .media-toggle[aria-pressed='true'] .media-toggle__icon--pause {
+    display: none;
+  }
+  .media-toggle[aria-pressed='true'] .media-toggle__icon--play {
+    display: block;
+  }
+</style>

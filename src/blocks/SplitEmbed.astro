@@ -78,9 +78,10 @@ const shownActions = actions.slice(0, 2);
               <iframe
                 src={embed.src}
                 title={embed.title}
-                width="100%"
                 height={embed.height}
                 loading="lazy"
+                {/* Deprecated in HTML but still the only way to stop an inner scrollbar in a cropped
+                    third-party frame; browsers honour it. Width comes from CSS. */}
                 scrolling="no"
                 referrerpolicy="strict-origin-when-cross-origin"
               />

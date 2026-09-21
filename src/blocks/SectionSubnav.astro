@@ -34,7 +34,7 @@ const { source, label, items, current } = Astro.props;
 
 {
   items.length > 0 && (
-    <nav class="wp-block-reach-subnav subnav has-surface-light" aria-label={label} data-subnav data-subnav-source={source}>
+    <nav class="wp-block-reach-subnav subnav has-surface-light" aria-label={`${label} section`} data-subnav data-subnav-source={source}>
       <div class="subnav__row container">
         {items.map((item) => (
           <SubnavItem

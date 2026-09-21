@@ -55,6 +55,8 @@ const band = style === 'band' || panel;
 const titleId = makeId('cta', title);
 const shownActions = actions.slice(0, 2);
 const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
+// Phone numbers never wrap mid-number
+const nbsp = (phone: string) => phone.replace(/ /g, '\u00a0');
 ---
 
 <BlockSection
@@ -99,7 +101,7 @@ const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
         )}
         {contact.phone && (
           <a class="cta-band__contact-link" href={telHref(contact.phone)}>
-            <MetaItem icon="phone" text={contact.phone} as="span" />
+            <MetaItem icon="phone" text={nbsp(contact.phone)} as="span" />
           </a>
         )}
       </div>
@@ -119,7 +121,7 @@ const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
             </div>
             {contact.phone && (
               <a class="cta-band__contact-link" href={telHref(contact.phone)}>
-                <MetaItem icon="phone" text={contact.phone} as="span" />
+                <MetaItem icon="phone" text={nbsp(contact.phone)} as="span" />
               </a>
             )}
             {contact.email && (
@@ -173,6 +175,12 @@ const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
     gap: var(--wp--preset--spacing--12) var(--wp--preset--spacing--24);
     padding-top: var(--wp--preset--spacing--16);
     font-style: normal;
+  }
+  /* WCAG 2.5.8: at least 24px tall to tap */
+  .cta-band__contact-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--wp--preset--spacing--24);
   }
   .cta-band__contact-link:hover span {
     text-decoration: underline;

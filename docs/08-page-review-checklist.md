@@ -62,6 +62,11 @@ Headless can catch scroll reveals halfway through, and it leaves the OMS iframe 
 - Repeated link labels ("Report", "Download") carry hidden context.
 - One `h1`. Headings in order.
 - No horizontal page scroll at 375.
+- Anything that moves for more than 5 seconds (video, loop) has a pause control: use `MediaToggle`.
+- A sideways-scrolling area is keyboard-reachable: `tabindex="0"`, `role="region"`, an `aria-label` and a visible focus ring.
+- `aria-label` only on elements with a role (landmarks, lists, buttons, links), never on a plain `div` or `span`. Landmarks of one type need different names.
+- Tap targets at least 24px tall.
+- Run axe-core (WCAG 2.2 AA + best practice) and an HTML validator on the built page: zero violations (Q70).
 
 ## 7. Tokens
 

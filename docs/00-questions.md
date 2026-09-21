@@ -10,6 +10,13 @@ _No open questions right now._
 
 ## Answered log
 
+### Q70. Web standards and accessibility audit (21 Sep 2026, WordPress handoff)
+Context: HTML validator (html-validate) and axe-core (WCAG 2.2 AA + best practice) on the 8 built pages, plus manual checks of motion, focus, keyboard and contrast over photos. Nothing seriously wrong. Two WCAG failures: the 3D World poster loop had no pause control (2.2.2) and the Investors Timeline track couldn't be scrolled by keyboard (2.1.1).
+- [x] Fix the failures and the minor validity items, and log the WordPress handover points
+- [ ] Log only
+
+**Answer:** Fixed. New shared **`MediaToggle`** component (pause/play), used by the hero video and the 3D World poster loop. The Timeline track is a focusable region with an inset focus ring. Mega-menu panels lose their stray `aria-label`. Hero `h1` uses a `visually-hidden` full title instead of `aria-label`. Section subnav is named "{Section} section", so it no longer clashes with the footer's "Company" nav. `#3d-world` becomes `#world-3d`. The Euronext iframe loses `width="100%"` (CSS sets it). Phone numbers don't wrap, and CTA contact links are at least 24px tall. Result: axe finds zero violations on all 8 pages. Handover points are in docs/09 §10, and the new checks are in docs/08 §6. **Figma to add:** the `MediaToggle` component (48px round, navy-900 at 40%, pause/play icons) on the 3D World embed stage, top right.
+
 ### Q69. No stray type sizes, colours or spacings (21 Sep 2026, project tidy)
 Context: an audit of `src/` found 25 font sizes and 20 line heights off the token scale, 5 raw letter-spacings, 52 raw `rgb()` scrim and hairline colours, a duplicated card scrim, two hex colours in the mobile review frames and a handful of raw 2-12px gaps.
 - [x] Snap to the existing scale wherever the difference is a pixel or two: 13 px labels → `caption`, 15 px → `body-sm`, FAQ question and answer → `body` and `body-sm`, the Stats band lead figure → `display`, the mobile video hero title → `h2`, map markers → `eyebrow` and `caption`

@@ -50,6 +50,7 @@ A block does one job. If a field only applies to one of its media types or style
 | `Pictogram` | `name` (file in `src/assets/pictograms`), `size` 64/96 |
 | `Eyebrow` | `text`, `tone` accent/muted, `as` |
 | `Badge` | `label`, `tone` neutral/accent/navy/success/error, `icon` |
+| `MediaToggle` | `subject` (label text, e.g. "background video"), `class` for position. Round pause/play for any loop over 5s (WCAG 2.2.2); the block's script shows it and keeps `aria-pressed` |
 | `MetaItem` | `icon`, `text`, `href` (tel:/mailto:; sits above a card's stretched link), `as` |
 | `Stat` | `value`, `label`, `note`, `size` large/medium, `align`, `as` |
 | `FilterChip` | `label`, `count`, `selected` (aria-pressed), `disabled` |

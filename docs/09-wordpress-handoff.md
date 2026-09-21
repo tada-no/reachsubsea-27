@@ -207,7 +207,40 @@ Nothing below may be presented as real until confirmed.
 
 ---
 
-## 10. Handoff package checklist
+## 10. Accessibility and web standards (WCAG 2.2 AA)
+
+**Target:** WCAG 2.2 AA, the level the EU Web Accessibility Directive and the European Accessibility Act point to (via EN 301 549). The prototype passes axe-core (WCAG 2.2 AA + best practice) with zero violations on all 8 built pages, and validates as HTML apart from three deliberate exceptions (below). Audit: 21 Sep 2026 (Q70).
+
+**Keep when porting.** These are easy to lose in a theme rebuild:
+- Skip link, `lang="en"`, one `h1` per page, headings in order, `:focus-visible` rings (every `outline: none` has a replacement ring).
+- Reduced motion: `base.css` clamps every animation, and each block's script also checks `prefers-reduced-motion`.
+- **Pause controls** (WCAG 2.2.2): the hero video and the 3D World poster loop both use `MediaToggle`. Any new looping video or animation gets one.
+- **The Timeline track** is a keyboard-focusable region, so it scrolls with the arrow keys.
+- **Hero titles** are split into animated words (`aria-hidden`) with the full title in a `visually-hidden` span. Don't swap this for `aria-label` on the `h1`.
+- **External links** say "(opens in a new tab)" in hidden text. Repeated labels ("Report", "Download") carry hidden context.
+- **Accordions and the mobile menu** follow the APG disclosure pattern: `aria-expanded` and `aria-controls`, and panels are `role="region"` + `aria-labelledby`.
+
+**Deliberate validator exceptions.** They're fine as they are:
+- `role="list"` on the labelled `ul`/`ol` (Social feed rail, mobile 3D World zone list). The validator calls it redundant, but Safari/VoiceOver drops list semantics when bullets are styled off.
+- `scrolling="no"` on the cropped Euronext iframe. It's deprecated, but still the only way to stop an inner scrollbar.
+- A hidden site-menu panel shares the name "Reach Newsroom" with the Home newsroom section. The menu is `hidden` until opened.
+
+**For the WordPress build.** The prototype can't cover these:
+- [ ] **3D World:** WebGL is not accessible in itself. Keep the text panel and zone links as the equivalent, and make Launch/Exit keyboard-operable with focus moved into and back out of the iframe (already done in the prototype).
+- [ ] **Live operations map:** the region list next to the map is the keyboard and screen-reader route. Don't make the map the only way in. Keep MapLibre's `cooperativeGestures` on so the map never traps page scrolling.
+- [ ] **Films:** captions on every film with speech (YouTube/Vimeo captions or a WebVTT track on `<video>`), plus a transcript or audio description where the picture carries the meaning.
+- [ ] **PDFs** (annual reports, presentations, policies): tagged, accessible PDFs from the source files, with titles and reading order. Say in the link when a file is a PDF (the Data list already does).
+- [ ] **Forms** (if any return after Q39): visible labels, errors in text linked with `aria-describedby`, no placeholder-only labels, `autocomplete` attributes.
+- [ ] **Cookie/consent banner:** keyboard-operable, focus moves to it and back, and no dark patterns. The Embed consent placeholder should stay a real `button`.
+- [ ] **Third-party embeds** (Euronext, Newsweb, Elfsight, HR-Manager): each needs an iframe `title`. Check the vendor's own accessibility and note it in the statement if it's out of our control.
+- [ ] **Editor guardrails:** make image `alt` required in ACF (empty is allowed only for decorative images), lock heading levels in blocks, and keep link text meaningful (no "Read more" without context).
+- [ ] **Accessibility statement** page, linked from the footer: conformance level, known exceptions (3D World, third-party embeds) and a contact for problems.
+- [ ] **Before launch:** run axe (or Lighthouse) on every template, do one keyboard-only pass and one screen-reader pass (VoiceOver + Safari, NVDA + Firefox), and zoom to 200% and 400% (reflow at 320px).
+- [ ] **SEO basics** (not WCAG): `<meta name="description">` and Open Graph tags via Yoast. The prototype has none.
+
+---
+
+## 11. Handoff package checklist
 
 | Deliverable (brief §7 Phase 5) | Status |
 |---|---|
