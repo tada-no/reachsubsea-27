@@ -19,6 +19,7 @@ import SectionSubnav from '../../blocks/SectionSubnav.astro';
 import StatsBand from '../../blocks/StatsBand.astro';
 import SplitMedia from '../../blocks/SplitMedia.astro';
 import CardGrid from '../../blocks/CardGrid.astro';
+import CardBento from '../../blocks/CardBento.astro';
 import Accordion from '../../blocks/Accordion.astro';
 import Embed from '../../blocks/Embed.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
@@ -66,7 +67,6 @@ const siblingCards: CardField[] = [
   {
     media: 'none',
     surface: 'tint',
-    span: { cols: 4, rows: 1 },
     title: 'Life at Reach',
     description: 'Working with us is about more than just a job, it’s about belonging to a team that values sharing knowledge and never leaving anyone behind.',
     action: { label: 'Explore life at Reach', url: '/careers/life-at-reach/' },
@@ -74,7 +74,6 @@ const siblingCards: CardField[] = [
   {
     media: 'none',
     surface: 'tint',
-    span: { cols: 4, rows: 1 },
     title: 'Our culture',
     description: 'The same values that shape how we work with clients also shape how we work with each other.',
     action: { label: 'Explore our culture', url: '/careers/our-culture/' },
@@ -82,7 +81,6 @@ const siblingCards: CardField[] = [
   {
     media: 'none',
     surface: 'tint',
-    span: { cols: 4, rows: 1 },
     title: 'Why work with us',
     description: 'Career growth at Reach Subsea is built around learning from experienced colleagues, teaching what you know, and reaching further, together.',
     action: { label: 'See why work with us', url: '/careers/why-work-with-us/' },
@@ -90,14 +88,12 @@ const siblingCards: CardField[] = [
   {
     media: 'image-bg',
     size: 'featured',
-    span: { cols: 8, rows: 1 },
     image: { src: `${base}images/team-lounge-harbour.jpg`, alt: 'Colleagues talking in a lounge overlooking the harbour', focalPoint: { x: 0.5, y: 0.5 } },
     title: 'Offshore & onshore, side by side',
     description: 'Vessel crews, ROV pilots and survey specialists working alongside engineering, HSEQ and support teams onshore.',
   },
   {
     media: 'image-bg',
-    span: { cols: 4, rows: 1 },
     image: { src: `${base}images/project-suction-anchors.jpg`, alt: 'A colleague in a helmet and red overalls watching a lift on a vessel deck', focalPoint: { x: 0.3, y: 0.85 } },
     title: 'HSEQ first',
     description: 'Safety and quality are built into every role, every project, every day at sea.',
@@ -183,9 +179,9 @@ const siblingCards: CardField[] = [
       cards={vacancyCards}
     />
 
-    <CardGrid
+    <CardBento
       anchor="more"
-      layout="bento"
+      pattern="trio-wide"
       background="white"
       sectionHeader={{ title: 'More about working here' }}
       cards={siblingCards}

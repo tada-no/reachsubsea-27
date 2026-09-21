@@ -10,6 +10,7 @@ import Footer from '../../components/Footer.astro';
 import PageHero from '../../blocks/PageHero.astro';
 import SectionSubnav from '../../blocks/SectionSubnav.astro';
 import CardGrid from '../../blocks/CardGrid.astro';
+import CardBento from '../../blocks/CardBento.astro';
 import Lifecycle from '../../blocks/Lifecycle.astro';
 import FeedGrid from '../../blocks/FeedGrid.astro';
 import Embed from '../../blocks/Embed.astro';
@@ -49,38 +50,34 @@ const deliveryCards: CardField[] = [
   {
     media: 'image-bg',
     size: 'featured',
-    span: { cols: 6, rows: 2 },
     image: { src: `${base}images/vessel-olympic-zeus.jpg`, alt: 'Olympic Zeus, a Reach Subsea construction support vessel, in calm water', focalPoint: { x: 0.45, y: 0.55 } },
     eyebrow: 'Crewed vessels',
     title: 'Experienced crews on DP2 vessels',
     description: 'Offshore personnel, engineers and project managers running work-class and inspection ROVs and survey spreads for complex subsea operations.',
     action: { label: 'Our vessels', url: '/assets/vessels/' },
   },
-  { media: 'stat', surface: 'navy', span: { cols: 3, rows: 1 }, statValue: fleet.value, title: fleet.label },
+  { media: 'stat', surface: 'navy', statValue: fleet.value, title: fleet.label },
   {
     media: 'image-bg',
-    span: { cols: 3, rows: 2 },
     image: { src: `${base}images/reach-remote-side.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel under way', focalPoint: { x: 0.5, y: 0.6 } },
     eyebrow: 'Uncrewed vessels',
     title: 'Reach Remote, operated from shore',
     description: 'The same ROV and survey spreads, without a crew at sea. Reach Remote 1 and 2 are in service; 3 and 4 are in build.',
     action: { label: 'Meet Reach Remote', url: '/assets/reach-remote/' },
   },
-  { media: 'stat', surface: 'white', span: { cols: 3, rows: 1 }, statValue: uncrewedDays.value, title: uncrewedDays.label },
+  { media: 'stat', surface: 'white', statValue: uncrewedDays.value, title: uncrewedDays.label },
   {
     media: 'none',
     surface: 'navy',
-    span: { cols: 5, rows: 1 },
     eyebrow: 'Software platform',
     title: 'Reach Horizon',
     description: 'Real-time access to data, operations and expertise, on crewed and uncrewed vessels alike. Clients follow survey progress and review preliminary data remotely.',
     action: { label: 'About Reach Horizon', url: '/services/technology-innovation/reach-horizon/' },
   },
-  { media: 'stat', surface: 'white', span: { cols: 3, rows: 1 }, statValue: rovSystems.value, title: rovSystems.label },
+  { media: 'stat', surface: 'white', statValue: rovSystems.value, title: rovSystems.label },
   {
     media: 'none',
     surface: 'tint',
-    span: { cols: 4, rows: 1 },
     eyebrow: 'Assets & fleet',
     title: 'Explore the full fleet',
     description: 'Vessels, uncrewed surface vessels and ROVs: specs, capabilities and charter status.',
@@ -195,9 +192,9 @@ const faqItems = [
       services={serviceLines}
     />
 
-    <CardGrid
+    <CardBento
       anchor="how-we-deliver"
-      layout="bento"
+      pattern="lead-tall-trio-b"
       background="white"
       sectionHeader={{ title: 'One partner, two ways to reach the seabed' }}
       cards={deliveryCards}

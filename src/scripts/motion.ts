@@ -8,8 +8,10 @@
 const REVEAL_TARGETS = [
   '.section-header',
   '.card-grid__item',
+  '.card-bento__item',
   '.feed-grid__item',
   '.stats-band__group',
+  '.results-band__group',
   '.embed__frame',
   '.embed__mobile',
   '.newsroom__lead',

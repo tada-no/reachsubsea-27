@@ -1,0 +1,52 @@
+---
+import CardBento from '../blocks/CardBento.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+import { bentoPatterns, type BentoPatternId } from '../data/bento-patterns';
+import type { CardField } from '../lib/types';
+
+const base = import.meta.env.BASE_URL;
+const sectionHeader = { title: 'Ocean operations, reimagined' };
+
+// One pool of plausible cards; each pattern takes as many as it has cells, in order.
+const pool: CardField[] = [
+  {
+    media: 'image-bg',
+    size: 'featured',
+    image: { src: `${base}images/vessel-agalas.jpg`, alt: 'Reach Subsea vessel at sea in evening light', focalPoint: { x: 0.55, y: 0.5 } },
+    eyebrow: 'Subsea services',
+    title: 'Subsea services, delivered worldwide',
+    description: 'Inspection, maintenance, construction support, survey and monitoring for offshore clients.',
+    action: { label: 'Explore subsea services', url: '#' },
+  },
+  { media: 'stat', surface: 'navy', statValue: '750+', title: 'Uncrewed operational days, per quarter', action: { label: 'Reach Remote', url: '#' } },
+  {
+    media: 'image-bg',
+    image: { src: `${base}images/rov-supporter-launch.jpg`, alt: 'Work-class ROV being launched from a vessel', focalPoint: { x: 0.5, y: 0.4 } },
+    eyebrow: 'ROV & intervention',
+    title: 'Work-class ROVs for IMR, survey and monitoring',
+    action: { label: 'See our ROVs', url: '#' },
+  },
+  { media: 'none', surface: 'tint', eyebrow: 'News', title: 'Reach Remote 1 cleared for operations without a supporting vessel', action: { label: 'Read more', url: '#' } },
+  { media: 'stat', surface: 'white', statValue: '15', title: 'ROV systems', action: { label: 'See our ROVs', url: '#' } },
+  {
+    media: 'image-bg',
+    image: { src: `${base}images/reach-remote-side.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel under way', focalPoint: { x: 0.5, y: 0.6 } },
+    eyebrow: 'Reach Remote',
+    title: 'Pioneering uncrewed operations',
+    description: "The world's first of its kind, controlled from shore.",
+    action: { label: 'Meet Reach Remote', url: '#' },
+  },
+  { media: 'none', surface: 'tint', eyebrow: 'Careers', title: 'Work with us', description: 'Roles offshore and onshore.', action: { label: 'Open positions', url: '#' } },
+];
+const cardsFor = (id: BentoPatternId) => Array.from({ length: bentoPatterns[id].cells.length }, (_, i) => pool[i % pool.length]);
+const ids = Object.keys(bentoPatterns) as BentoPatternId[];
+---
+
+{
+  ids.map((id) => (
+    <>
+      <VariantLabel name={`Pattern · ${bentoPatterns[id].label} (${bentoPatterns[id].cells.length} cards)`} props={`pattern="${id}" · used on ${bentoPatterns[id].usedOn}`} />
+      <CardBento pattern={id} sectionHeader={sectionHeader} cards={cardsFor(id)} />
+    </>
+  ))
+}

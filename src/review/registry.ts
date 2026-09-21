@@ -1,4 +1,5 @@
-// The 14 blocks (docs/05-blocks-spec.md §2), in spec order. Drives the /blocks review route.
+// The blocks with a demo (docs/05-blocks-spec.md §2), in spec order; split blocks (Q67) sit beside their parent.
+// Drives the /blocks review route. `figma` is empty where the Figma component is still to add.
 // Each block's variants live in src/demos/<slug>.astro; the block itself in src/blocks/<component>.astro.
 export interface BlockEntry {
   slug: string;
@@ -13,9 +14,13 @@ export interface BlockEntry {
 export const blocks: BlockEntry[] = [
   { slug: 'page-hero', name: 'Page hero', component: 'PageHero', spec: '§2.1', figma: '141:827', variants: 'Style Text · Photo' },
   { slug: 'card-grid', name: 'Card grid', component: 'CardGrid', spec: '§2.2', figma: '148:1288', variants: 'Layout 2 columns · 3 columns · 4 columns · Featured first' },
+  { slug: 'card-bento', name: 'Card bento', component: 'CardBento', spec: '§2.2b', figma: '', variants: 'Pattern lead-quad · lead-tall-wide · lead-tall-trio-a · lead-tall-trio-b · trio-wide' },
   { slug: 'feed-grid', name: 'Feed grid', component: 'FeedGrid', spec: '§2.3', figma: '156:2012', variants: 'Filters Off · On; sources incl. Latest; empty state' },
   { slug: 'split-media', name: 'Split media', component: 'SplitMedia', spec: '§2.4', figma: '166:2339', variants: 'Media Image · Video · Spec table · Numbered list × Position End · Start' },
+  { slug: 'figures', name: 'Figures', component: 'Figures', spec: '§2.4b', figma: '', variants: 'Layout Sticky · Cards' },
+  { slug: 'split-embed', name: 'Split embed', component: 'SplitEmbed', spec: '§2.4c', figma: '', variants: 'Position End · Start' },
   { slug: 'stats', name: 'Stats band', component: 'StatsBand', spec: '§2.5', figma: '169:2557', variants: 'Count 3 · 4 × Style Plain · Panel' },
+  { slug: 'results-band', name: 'Results band', component: 'ResultsBand', spec: '§2.5b', figma: '', variants: 'Latest results with report cards' },
   { slug: 'accordion', name: 'Accordion / FAQ', component: 'Accordion', spec: '§2.6', figma: '175:2673', variants: 'Layout Stacked · Split' },
   { slug: 'data-list', name: 'Data list', component: 'DataList', spec: '§2.7', figma: '200:4079', variants: 'Type Reports · Documents · Dates · Publications' },
   { slug: 'timeline', name: 'Timeline', component: 'Timeline', spec: '§2.8', figma: '187:3005', variants: 'One layout; milestones Done · Current · Upcoming' },

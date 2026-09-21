@@ -1,0 +1,176 @@
+---
+// Card bento · reach/card-bento (docs/05 §2.2b). Split out of Card grid on 21 Sep 2026 (Q67): a grid where
+// the cards differ, so image, stat, news and event cards tile into one composition. The editor picks a
+// `pattern` (src/data/bento-patterns.ts) and fills its cells in order; a card carries no span of its own.
+// Each card keeps its own Media / Surface. Give exactly as many cards as the pattern has cells: extra
+// cards are dropped, and a warning is logged at build time for a short list.
+// Tablet (600–1199): 6 columns (wide cards full width, the rest halves); mobile: one column.
+// No cards → render nothing (docs/05 §0).
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Card from '../components/Card.astro';
+import { makeId } from '../lib/ids';
+import { bentoPatterns, type BentoPatternId } from '../data/bento-patterns';
+import type { BlockFields, CardField, SectionHeaderField } from '../lib/types';
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  /** The layout. Fixes each card's cell on the 12-column grid. */
+  pattern: BentoPatternId;
+  /** Filled in order, one per cell of the pattern. */
+  cards: CardField[];
+}
+
+const { sectionHeader, pattern, cards: allCards = [], background, spacing, anchor } = Astro.props;
+
+const cells = bentoPatterns[pattern].cells;
+if (allCards.length !== cells.length) {
+  console.warn(`[card-bento] pattern "${pattern}" has ${cells.length} cells but got ${allCards.length} cards`);
+}
+const cards = allCards.slice(0, cells.length);
+const hasCards = cards.length > 0;
+const titleId = sectionHeader?.title ? makeId('card-bento', sectionHeader.title) : undefined;
+
+// Tablet (6 columns): wide cards go full width, the rest halves and one row tall. If that leaves a hole, the
+// last single-row wide card drops to a half so it fills the gap beside its neighbour; failing that,
+// the last single-row card grows to full width (17 Sep 2026).
+const wide = cards.map((_, i) => cells[i].cols >= 6);
+const area = () => cards.reduce((sum, _, i) => sum + (wide[i] ? 6 * cells[i].rows : 3), 0);
+for (let i = cards.length - 1; i >= 0 && area() % 6 !== 0; i--) {
+  if (wide[i] && cells[i].rows === 1) wide[i] = false;
+}
+for (let i = cards.length - 1; i >= 0 && area() % 6 !== 0; i--) {
+  if (!wide[i] && cells[i].rows === 1) wide[i] = true;
+}
+---
+
+{
+  hasCards && (
+    <BlockSection
+      slug="card-bento"
+      root="card-bento"
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : 'Highlights'}
+    >
+      <div class="block__body">
+        {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+        <ul class="card-bento__list">
+          {cards.map((card, i) => (
+            <li
+              class:list={['card-bento__item', wide[i] && 'card-bento__item--wide', cells[i].rows === 1 && 'card-bento__item--short']}
+              style={`--span-cols: ${cells[i].cols}; --span-rows: ${cells[i].rows}`}
+            >
+              <Card {...card} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .card-bento__list {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+    align-items: stretch;
+    grid-auto-rows: minmax(264px, auto);
+    grid-auto-flow: dense;
+  }
+  .card-bento__item {
+    display: flex;
+    grid-column: span var(--span-cols, 4);
+    grid-row: span var(--span-rows, 1);
+  }
+  .card-bento__item > * {
+    width: 100%;
+  }
+  /* Text-only cards in a row: like image-top cards, the meta line sits with the action at the foot, so a
+     title that wraps one line more doesn't knock the meta out of line */
+  .card-bento .card--media-none .card__meta:has(+ .card__action) {
+    margin-top: auto;
+  }
+  .card-bento .card--media-none .card__meta + .card__action {
+    margin-top: 0;
+  }
+
+  /* Reveal (17 Sep 2026): tiles settle into their grid cell instead of rising, since a dense
+     multi-row grid has no shared "below" direction for a translate to read from. Wide cards move less
+     — they already fill most of the row, so a big scale jump reads as a glitch rather than a tile
+     dropping into place. */
+  html.js .card-bento__item[data-reveal] {
+    transform: scale(0.95);
+  }
+  html.js .card-bento__item--wide[data-reveal] {
+    transform: scale(0.97);
+  }
+  html.js .card-bento__item[data-reveal].is-revealed {
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .card-bento__item[data-reveal] {
+      transform: none;
+    }
+  }
+
+  .card-bento .card--media-image-bg {
+    min-height: 0;
+  }
+  /* Short image cards (one row, 17 Sep 2026): read like their text neighbours. Eyebrow at the top on
+     the shared padding line, action pinned to the bottom, and a left-to-right scrim so the right of
+     the photo stays clear. Tall image cards keep the bottom-up ramp and bottom-anchored text. */
+  .card-bento__item--short .card--media-image-bg .card__content {
+    flex: 1 1 auto;
+    margin-top: 0;
+  }
+  .card-bento__item--short .card__overlay {
+    background: linear-gradient(to right, var(--wp--custom--color--scrim--solid) 0%, rgb(27 29 59 / 0.82) 45%, rgb(27 29 59 / 0.4) 80%, var(--wp--custom--color--scrim--floor) 100%);
+  }
+  @media (max-width: 1199px) {
+    /* Tablet: every half-width card is one row tall, so all of them take the short treatment */
+    .card-bento__item:not(.card-bento__item--wide) .card--media-image-bg .card__content {
+      flex: 1 1 auto;
+      margin-top: 0;
+    }
+    .card-bento__item:not(.card-bento__item--wide) .card__overlay {
+      background: linear-gradient(to right, var(--wp--custom--color--scrim--solid) 0%, rgb(27 29 59 / 0.82) 45%, rgb(27 29 59 / 0.4) 80%, var(--wp--custom--color--scrim--floor) 100%);
+    }
+    .card-bento__list {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .card-bento__item {
+      grid-column: span 3;
+      grid-row: span 1;
+    }
+    .card-bento__item--wide {
+      grid-column: span 6;
+      grid-row: span var(--span-rows, 1);
+    }
+  }
+  @media (max-width: 599px) {
+    .card-bento__list {
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
+    }
+    .card-bento__item,
+    .card-bento__item--wide {
+      grid-column: span 1;
+      grid-row: auto;
+    }
+    .card-bento .card--media-image-bg {
+      min-height: 360px;
+    }
+    /* Phones: stacked full width, so every image card goes back to bottom-anchored text */
+    .card-bento__list .card-bento__item .card--media-image-bg .card__content {
+      flex: 0 0 auto;
+      margin-top: auto;
+    }
+    .card-bento__list .card-bento__item .card__overlay {
+      background: linear-gradient(to top, var(--wp--custom--color--scrim--solid) 0%, rgb(27 29 59 / 0.86) 38%, rgb(27 29 59 / 0.5) 62%, var(--wp--custom--color--scrim--floor) 100%);
+    }
+  }
+</style>

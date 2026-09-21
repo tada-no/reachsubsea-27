@@ -1,6 +1,6 @@
 # Blocks (Phase 3b)
 
-Static Astro versions of the 14 WordPress section blocks in [docs/05-blocks-spec.md](../../docs/05-blocks-spec.md). Figma file `HAvCQCXzWNFOKQ1AZxqNTX`, page **Blocks** (`12:25`), is the source of truth; node ids are in [docs/extract/figma-blocks-ledger.json](../../docs/extract/figma-blocks-ledger.json).
+Static Astro versions of the WordPress section blocks (22 in code, 21 Sep 2026; the original 14 plus Live operations, Lifecycle, Values, Social feed and the four blocks split out for editors: Card bento, Figures, Split embed, Results band) in [docs/05-blocks-spec.md](../../docs/05-blocks-spec.md). Figma file `HAvCQCXzWNFOKQ1AZxqNTX`, page **Blocks** (`12:25`), is the source of truth; node ids are in [docs/extract/figma-blocks-ledger.json](../../docs/extract/figma-blocks-ledger.json).
 
 ```bash
 npm run dev    # http://localhost:4321/blocks/
@@ -30,6 +30,10 @@ npm run dev    # http://localhost:4321/blocks/
 9. **Images.** `MediaFrame` (3:2, 4:3, 16:9), lazy by default; Page hero passes `priority`.
 10. **JS.** A `<script>` in the block file: vanilla TypeScript, event delegation on `document`, works for every instance on the page, progressive enhancement (content visible without JS). Motion respects `prefers-reduced-motion` (base.css already shortens transitions).
 11. **No viewport-height units** in blocks (`vh`, `dvh`, `svh`): the review iframes size to content and would grow forever. Use the spec's px min-heights.
+
+## Split blocks (21 Sep 2026, Q67)
+
+A block does one job. If a field only applies to one of its media types or styles, split it. Card grid → **Card bento** (`pattern` from `src/data/bento-patterns.ts`, cards fill the cells in order, no per-card span); Split media → **Figures** and **Split embed** (Card media dropped); Stats band → **Results band**. Each is a normal block file with its own root class (`.card-bento`, `.figures`, `.split-embed`, `.results-band`), a demo in `src/demos/` and an entry in `src/review/registry.ts`.
 
 ## Shared components
 

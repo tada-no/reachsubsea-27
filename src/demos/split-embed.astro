@@ -1,0 +1,33 @@
+---
+import SplitEmbed from '../blocks/SplitEmbed.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+
+// The review never fetches the third-party page: about:blank stands in for the iframe.
+const embed = {
+  src: 'about:blank',
+  title: 'Share price, live from Euronext (stand-in)',
+  height: 640,
+  crop: 640,
+  source: 'REACH · Oslo Stock Exchange (Euronext). Live data: OMS',
+  link: { label: 'Full share information', url: '#' },
+};
+---
+
+<VariantLabel name="Position · End" props='position="end" embed={…}' />
+<SplitEmbed
+  eyebrow="The share"
+  title="REACH on Euronext Oslo"
+  body="<p>Reach Subsea ASA is listed on the Oslo Stock Exchange (Euronext) under the ticker REACH.</p>"
+  actions={[{ label: 'Share information', url: '#' }]}
+  embed={embed}
+/>
+
+<VariantLabel name="Position · Start, on Tint" props='position="start" background="tint"' />
+<SplitEmbed
+  position="start"
+  background="tint"
+  eyebrow="Capital allocation"
+  title="A dividend of around 50% of adjusted net profit"
+  body="<p>Balanced against continued investment in fleet growth and the Reach Remote programme.</p>"
+  embed={embed}
+/>

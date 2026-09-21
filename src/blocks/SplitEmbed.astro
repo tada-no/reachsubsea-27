@@ -1,0 +1,176 @@
+---
+// Split embed · reach/split-embed (docs/05 §2.4c). Split out of Split media on 21 Sep 2026 (Q67): text on one
+// side (eyebrow, H2/H3, rich text, 0–2 actions, cols 1–5), a third-party page in an iframe on the other
+// (cols 7–12), cropped to `crop` px, with a source line and link underneath. Position Start swaps the sides.
+// Used for the ir.oms.no share graph (the standardPage cropped to quote + chart until OMS supplies a compact
+// module, Q60). Mobile (≤899): text, then the frame.
+// TODO for WordPress: route the iframe through the Embed block's consent placeholder (docs/05 §2.13) before
+// launch; the prototype loads it straight away (docs/09 §9).
+import BlockSection from '../components/BlockSection.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Link from '../components/Link.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, LinkField } from '../lib/types';
+
+interface EmbedField {
+  src: string;
+  title: string;
+  /** Full iframe height (px); the frame shows only the top `crop` px. */
+  height: number;
+  crop?: number;
+  source?: string;
+  link?: LinkField;
+}
+
+interface Props extends BlockFields {
+  position?: 'end' | 'start';
+  eyebrow?: string;
+  title: string;
+  headingLevel?: 'h2' | 'h3';
+  /** Rich text HTML string, rendered in .prose via set:html. A default slot also renders in .prose. */
+  body?: string;
+  /** 0–2 action Links under the body copy. */
+  actions?: LinkField[];
+  embed: EmbedField;
+}
+
+const { position = 'end', eyebrow, title, headingLevel: Heading = 'h2', body, actions = [], embed, background, spacing, anchor } = Astro.props;
+
+const titleId = makeId('split-embed', title);
+const shownActions = actions.slice(0, 2);
+---
+
+{
+  embed?.src && (
+    <BlockSection
+      slug="split-embed"
+      root="split-embed"
+      class={`split-embed--${position}`}
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+    >
+      <div class="split-embed__columns">
+        <div class="split-embed__text">
+          {eyebrow && <Eyebrow text={eyebrow} />}
+          <Heading id={titleId} class:list={['split-embed__title', Heading === 'h3' ? 'text-h3' : 'text-h2']}>
+            {title}
+          </Heading>
+          <div class="prose split-embed__body">
+            {body && <Fragment set:html={body} />}
+            <slot />
+          </div>
+          {
+            shownActions.length > 0 && (
+              <div class="split-embed__actions">
+                {shownActions.map((action) => (
+                  <Link label={action.label} href={action.url} action={action.action ?? 'page'} context={action.context} />
+                ))}
+              </div>
+            )
+          }
+        </div>
+
+        <div class="split-embed__media">
+          <figure class="split-embed__frame">
+            <div class="split-embed__crop" style={`height: ${embed.crop ?? embed.height}px`}>
+              <iframe
+                src={embed.src}
+                title={embed.title}
+                width="100%"
+                height={embed.height}
+                loading="lazy"
+                scrolling="no"
+                referrerpolicy="strict-origin-when-cross-origin"
+              />
+            </div>
+            {(embed.source || embed.link) && (
+              <figcaption class="split-embed__caption text-caption">
+                {embed.source && <span>{embed.source}</span>}
+                {embed.link && <Link label={embed.link.label} href={embed.link.url} action={embed.link.action ?? 'page'} size="small" />}
+              </figcaption>
+            )}
+          </figure>
+        </div>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .split-embed__columns {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    align-items: center;
+  }
+  /* Both sides on row 1: with Position start the media column comes before the text in the grid,
+     and auto-placement would otherwise push it to a second row */
+  .split-embed__text {
+    grid-row: 1;
+    grid-column: 1 / span 5;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    min-width: 0;
+  }
+  .split-embed__media {
+    grid-row: 1;
+    grid-column: 7 / span 6;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--16);
+    min-width: 0;
+  }
+  .split-embed--start .split-embed__text {
+    grid-column: 8 / span 5;
+  }
+  .split-embed--start .split-embed__media {
+    grid-column: 1 / span 6;
+  }
+  .split-embed__body:empty {
+    display: none;
+  }
+  .split-embed__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+  }
+
+  .split-embed__frame {
+    overflow: hidden;
+    border: 1px solid var(--wp--custom--color--border--subtle);
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--preset--color--white);
+  }
+  .split-embed__crop {
+    overflow: hidden;
+  }
+  .split-embed__frame iframe {
+    display: block;
+    width: 100%;
+    border: 0;
+  }
+  .split-embed__caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--16);
+    padding: var(--wp--preset--spacing--12) var(--wp--preset--spacing--24);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+    background-color: var(--wp--preset--color--navy-50);
+    color: var(--wp--preset--color--navy-600);
+  }
+
+  @media (max-width: 899px) {
+    .split-embed__columns {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--wp--custom--stack--xl);
+    }
+  }
+</style>

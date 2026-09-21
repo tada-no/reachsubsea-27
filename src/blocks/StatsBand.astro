@@ -5,23 +5,17 @@
 // Panel = white panel in flow (bg/default, Light forced, radius lg, Shadow/sm).
 // Feature (17 Sep 2026, proposal v2): one figure leads in a navy tile, the others sit beside it as equal
 // columns with a rule between, all sharing one bottom line with the lead's label. Stacks below 900.
-// Results (18 Sep 2026, Why invest): the latest reported quarter. Title + "As reported" badge + date,
-// 4 headline figures (unit · value · scale, change line) over a 2px navy rule, 4 secondary figures in
-// a ruled row, then the shared Report cards (annual · latest · next, 19 Sep 2026). Reads the
-// Latest results options page (src/data/investor-results.ts). Replaces the PDF's overlapping card.
+// Results moved to its own block, Results band (src/blocks/ResultsBand.astro), on 21 Sep 2026 (Q67).
 // Max one Stats band per page (docs/05 §0).
 import BlockSection from '../components/BlockSection.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import Stat from '../components/Stat.astro';
-import Badge from '../components/Badge.astro';
-import Icon from '../components/Icon.astro';
-import ReportCards from '../components/ReportCards.astro';
 import { makeId } from '../lib/ids';
-import type { BlockFields, ReportCardField, SectionHeaderField, StatField } from '../lib/types';
+import type { BlockFields, SectionHeaderField, StatField } from '../lib/types';
 
 interface Props extends BlockFields {
   sectionHeader?: SectionHeaderField;
-  style?: 'plain' | 'panel' | 'feature' | 'results';
+  style?: 'plain' | 'panel' | 'feature';
   /** Feature style: key of the figure that leads. Defaults to the first. */
   featureKey?: string;
   /** 3–4 figures; count is derived from the length. */
@@ -30,13 +24,6 @@ interface Props extends BlockFields {
   align?: 'start' | 'center';
   /** Stats enter one by one and count up from 0 when the band scrolls into view (17 Sep 2026). */
   animate?: boolean;
-  /** Results style: ISO publication date, the secondary figures, the report downloads and the next report. */
-  published?: string;
-  /** Results style: stated once in the stamp ("All figures in NOK"), never on each figure. */
-  currency?: string;
-  secondary?: StatField[];
-  /** Results style: the shared Report cards under the figures (annual · latest · next, 19 Sep 2026). */
-  cards?: ReportCardField[];
   class?: string;
 }
 
@@ -47,10 +34,6 @@ const {
   stats,
   align,
   animate = false,
-  published,
-  currency,
-  secondary = [],
-  cards = [],
   background,
   spacing,
   anchor,
@@ -59,9 +42,6 @@ const {
 
 const panel = style === 'panel';
 const feature = style === 'feature';
-const results = style === 'results';
-const longDate = (iso: string) =>
-  new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 const leadIndex = Math.max(0, featureKey ? stats.findIndex((s) => s.key === featureKey) : 0);
 const lead = stats[leadIndex];
 const rest = stats.filter((_, i) => i !== leadIndex);
@@ -85,56 +65,8 @@ const STAT_STAGGER = 160;
       label={titleId ? undefined : 'Key figures'}
     >
       <div class="stats-band__body">
-        {sectionHeader && !results && <SectionHeader {...sectionHeader} align={alignment} id={titleId} />}
-        {results ? (
-          <div class="stats-band__group stats-band__results">
-            <div class="results__top">
-              <div class="results__title">
-                {sectionHeader && <h2 id={titleId} class="text-h2">{sectionHeader.title}</h2>}
-                {currency && <p class="results__currency text-small">All figures in {currency}</p>}
-              </div>
-              {published && (
-                <p class="results__stamp text-small">
-                  <Badge label="As reported" tone="accent" />
-                  <span>Published <time datetime={published}>{longDate(published)}</time></span>
-                </p>
-              )}
-            </div>
-            <ul class="results__headline">
-              {stats.map((stat, i) => (
-                <li class="results__item" style={`--stat-i: ${i}`}>
-                  <p class="results__label text-small">{stat.label}</p>
-                  {/* The scale ("m", "bn") is part of the counted text, so it always sits hard against the digits */}
-                  <p class="results__value">
-                    {stat.unit && <span class="results__unit">{stat.unit}</span>}
-                    {animate ? (
-                      <span data-count-up data-count-up-delay={150 + i * STAT_STAGGER}>{stat.value}{stat.suffix}</span>
-                    ) : (
-                      `${stat.value}${stat.suffix ?? ''}`
-                    )}
-                  </p>
-                  {stat.delta && (
-                    <p class:list={['results__delta text-small', stat.trend && `results__delta--${stat.trend}`]}>
-                      {stat.trend && <Icon name={stat.trend === 'up' ? 'arrow-up-right' : 'arrow-down-right'} size={16} />}
-                      {stat.delta}
-                    </p>
-                  )}
-                </li>
-              ))}
-            </ul>
-            {secondary.length > 0 && (
-              <dl class="results__secondary">
-                {secondary.map((stat) => (
-                  <div class="results__row">
-                    <dt class="text-small">{stat.label}</dt>
-                    <dd class="text-h4">{stat.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            )}
-            <ReportCards cards={cards} class="results__cards" />
-          </div>
-        ) : feature ? (
+        {sectionHeader && <SectionHeader {...sectionHeader} align={alignment} id={titleId} />}
+        {feature ? (
           <div class="stats-band__group stats-band__feature has-surface-light">
             <div class="stats-band__lead has-surface-navy">
               <p class="stats-band__lead-value text-display">
@@ -337,175 +269,7 @@ const STAT_STAGGER = 160;
     transform: none;
   }
 
-  /* ── Results (18 Sep 2026) ─────────────────────────────────── */
-  .results__top {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--wp--preset--spacing--16) var(--wp--preset--spacing--32);
-    margin-bottom: var(--wp--custom--stack--lg);
-  }
-  .stats-band__results {
-    display: flex;
-    flex-direction: column;
-  }
-  .results__title {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--wp--preset--spacing--4) var(--wp--preset--spacing--16);
-  }
-  .results__currency {
-    color: var(--wp--custom--color--text--secondary);
-  }
-  .results__stamp {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--12);
-    color: var(--wp--custom--color--text--secondary);
-  }
-  .results__headline {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .results__item {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wp--preset--spacing--8);
-    min-width: 0;
-    padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--32) var(--wp--preset--spacing--32);
-  }
-  .results__item:first-child {
-    padding-left: 0;
-  }
-  .results__item + .results__item {
-    border-left: 1px solid var(--wp--custom--color--border--subtle);
-  }
-  .results__label {
-    color: var(--wp--custom--color--text--secondary);
-  }
-  .results__value {
-    display: flex;
-    align-items: baseline;
-    color: var(--wp--custom--color--text--primary);
-    /* One step below the H2 title (48) so the heading still leads (review round 4) */
-    font-size: clamp(2rem, 1.6479rem + 0.7512vw, 2.5rem); /* 32 → 40 */
-    line-height: 1;
-    font-weight: var(--wp--custom--font-weight--bold);
-    letter-spacing: -0.03em;
-    font-variant-numeric: tabular-nums lining-nums;
-    white-space: nowrap;
-  }
-  .results__unit {
-    margin-right: var(--wp--preset--spacing--8);
-    font-size: var(--wp--preset--font-size--body);
-    font-weight: var(--wp--custom--font-weight--medium);
-    letter-spacing: 0;
-    color: var(--wp--custom--color--text--secondary);
-  }
-  /* The arrow sits on the first line: when the change wraps (2-up on phones) it must not drop to the
-     middle of the block. (1lh − 16) / 2 centres the 16px icon on one line box */
-  .results__delta {
-    display: inline-flex;
-    align-items: flex-start;
-    gap: var(--wp--preset--spacing--4);
-    margin-top: var(--wp--preset--spacing--4);
-    color: var(--wp--custom--color--text--secondary);
-    font-weight: var(--wp--custom--font-weight--medium);
-  }
-  .results__delta .icon {
-    flex: none;
-    margin-top: calc((1lh - 16px) / 2);
-  }
-  .results__delta--up {
-    color: var(--wp--custom--color--text--accent);
-  }
-  /* One rule, between the headline and secondary rows (review round 2) */
-  /* Same distance above the cards as under the Investors overview track */
-  .results__cards {
-    margin-top: var(--wp--custom--stack--xl);
-  }
-  .results__secondary {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    border-top: 1px solid var(--wp--custom--color--border--subtle);
-  }
-  .results__row {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wp--preset--spacing--4);
-    padding: var(--wp--preset--spacing--16) var(--wp--preset--spacing--32) var(--wp--preset--spacing--24);
-  }
-  .results__row:first-child {
-    padding-left: 0;
-  }
-  .results__row + .results__row {
-    border-left: 1px solid var(--wp--custom--color--border--subtle);
-  }
-  .results__row dt {
-    color: var(--wp--custom--color--text--secondary);
-  }
-  .results__row dd {
-    font-variant-numeric: tabular-nums lining-nums;
-    white-space: nowrap;
-  }
-  /* Footer (review round 4): a full-width tint strip that closes the section, flush with its bottom
-     edge; three items evenly spaced on the container (no rules, round 5). The strip bleeds with
-     a box-shadow + clip-path pair, so it never causes a horizontal scrollbar. */
-  html.js .stats-band--animate .results__item {
-    opacity: 0;
-    transform: translate3d(0, 16px, 0);
-    transition:
-      opacity 0.7s var(--wp--custom--motion--ease-out),
-      transform 0.7s var(--wp--custom--motion--ease-out);
-    transition-delay: calc(0.15s + var(--stat-i, 0) * 0.16s);
-  }
-  html.js .stats-band--animate .is-revealed .results__item {
-    opacity: 1;
-    transform: none;
-  }
-  @media (max-width: 1099px) {
-    .results__headline,
-    .results__secondary {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .results__item:nth-child(3) {
-      padding-left: 0;
-      border-left: 0;
-    }
-    .results__row:nth-child(3) {
-      padding-left: 0;
-      border-left: 0;
-    }
-  }
-  /* Phones: two columns of ~160px, so the unit moves onto its own line above the figure */
-  @media (max-width: 599px) {
-    .results__item,
-    .results__row {
-      padding: var(--wp--preset--spacing--16) var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
-    }
-    .results__item:nth-child(odd),
-    .results__row:nth-child(odd) {
-      padding-left: 0;
-    }
-    .results__value {
-      flex-wrap: wrap;
-      font-size: 2rem;
-    }
-    .results__unit {
-      flex-basis: 100%;
-      margin: 0 0 var(--wp--preset--spacing--4);
-      font-size: var(--wp--preset--font-size--caption);
-    }
-    .results__row dd {
-      white-space: normal;
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    html.js .stats-band--animate .results__item,
     html.js .stats-band--animate .stats-band__list > li,
     html.js .stats-band--animate .stats-band__row,
     html.js .stats-band--animate .stats-band__lead > * {

@@ -1,0 +1,38 @@
+---
+import Figures from '../blocks/Figures.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+
+const points = [
+  {
+    kicker: 'Results',
+    title: 'Operational excellence, record results',
+    text: 'Revenue and EBIT both grew sharply, and higher activity is turning into utilisation and earnings.',
+    figure: '+84%',
+    caption: 'Net profit growth, year on year.',
+  },
+  {
+    kicker: 'Reach Remote',
+    title: 'Reach Remote is scaling commercially',
+    text: 'Uncrewed operations delivered every quarter, with remote-sailing permits in place in several countries.',
+    figure: '750+',
+    caption: 'Uncrewed operational days per quarter.',
+  },
+  {
+    kicker: 'Markets',
+    title: 'Revenue diversifying beyond oil & gas',
+    text: 'Renewables and other segments now make up a growing share of revenue.',
+    caption: 'Revenue by segment',
+    period: 'Q2 2026',
+    split: [
+      { label: 'Oil & gas', value: 54 },
+      { label: 'Renewables & other', value: 46 },
+    ],
+  },
+];
+---
+
+<VariantLabel name="Layout · Sticky" props='layout="sticky" figures={3 points}' />
+<Figures layout="sticky" background="navy" title="Three reasons, each with its proof" figures={points} />
+
+<VariantLabel name="Layout · Cards" props='layout="cards" figures={3 points, one split}' />
+<Figures layout="cards" background="white" spacing="lg" title="Three reasons, each with its proof" figures={points} />

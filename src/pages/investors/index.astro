@@ -17,7 +17,9 @@ import PageHero from '../../blocks/PageHero.astro';
 import SectionSubnav from '../../blocks/SectionSubnav.astro';
 import Timeline from '../../blocks/Timeline.astro';
 import CardGrid from '../../blocks/CardGrid.astro';
+import CardBento from '../../blocks/CardBento.astro';
 import SplitMedia from '../../blocks/SplitMedia.astro';
+import SplitEmbed from '../../blocks/SplitEmbed.astro';
 import Dialog from '../../components/Dialog.astro';
 import FeedGrid from '../../blocks/FeedGrid.astro';
 import Accordion from '../../blocks/Accordion.astro';
@@ -43,7 +45,6 @@ const glanceCards: CardField[] = [
   {
     media: 'image-bg',
     size: 'featured',
-    span: { cols: 6, rows: 2 },
     image: { src: `${base}images/vessel-olympic-zeus.jpg`, alt: 'Olympic Zeus at anchor in calm water', focalPoint: { x: 0.5, y: 0.55 } },
     title: 'Why invest in Reach Subsea',
     description: 'Record results, an uncrewed operations platform that is scaling commercially, and a fleet built for the next phase of offshore energy.',
@@ -52,28 +53,24 @@ const glanceCards: CardField[] = [
   {
     media: 'stat',
     surface: 'navy',
-    span: { cols: 3, rows: 1 },
     statValue: `${fig('revenue').value}${fig('revenue').suffix}`,
     title: `NOK revenue, ${fig('revenue').delta}`,
   },
   {
     media: 'stat',
     surface: 'white',
-    span: { cols: 3, rows: 1 },
     statValue: `${fig('backlog').value}${fig('backlog').suffix}`,
     title: `NOK order backlog, ${fig('backlog').delta}`,
   },
   {
     media: 'stat',
     surface: 'white',
-    span: { cols: 3, rows: 1 },
     statValue: `${fig('pipeline').value}${fig('pipeline').suffix}`,
     title: 'NOK tender pipeline in active opportunities',
   },
   // White, like the stat cards: a tint card on the tint section loses its edge
   cardPresets.document({
     surface: 'white',
-    span: { cols: 3, rows: 1 },
     eyebrow: 'One-pager',
     badge: { label: 'PDF', tone: 'neutral' },
     title: 'Charter agreement overview',
@@ -174,8 +171,8 @@ const faqItems = [
       panels={reportCards}
     />
 
-    <CardGrid
-      layout="bento"
+    <CardBento
+      pattern="lead-quad"
       background="tint"
       sectionHeader={{
         title: `${r.period} at a glance`,
@@ -204,8 +201,7 @@ const faqItems = [
       }}
     />
 
-    <SplitMedia
-      media="embed"
+    <SplitEmbed
       position="start"
       background="tint"
       eyebrow="The share"

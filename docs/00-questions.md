@@ -10,6 +10,25 @@ _No open questions right now._
 
 ## Answered log
 
+### Q68. Norwegian version (21 Sep 2026, WordPress handoff)
+- [x] No Norwegian version: the site is English only
+- [ ] Norwegian at launch
+- [ ] English first, Norwegian later
+
+**Answer:** English only, with no translation plugin. Fields stay single-language. If a translation is ever wanted, it is a separate project (WPML or Polylang plus translatable fields).
+
+### Q67. Split three flexible blocks (21 Sep 2026, WordPress handoff review, docs/09)
+Context: the review found three blocks too flexible for editors: Card grid's Bento (a column and row span on every card), Split media (7 media types × 4 layouts, most fields apply to one type) and Stats band's Results style (a different block).
+- [x] Split them now, in the prototype, before the developer starts
+- [ ] Leave them for the developer
+
+**Answer:** Split now. Built:
+- **Card bento** (`reach/card-bento`): pick a `pattern`, fill its cells in order. Five patterns, lifted from the approved bentos: lead-quad (Investors), lead-tall-wide (Subsea), lead-tall-trio-a (Home), lead-tall-trio-b (Services), trio-wide (Careers). `CardField.span` removed.
+- **Figures** (`reach/figures`) and **Split embed** (`reach/split-embed`) out of Split media. Split media is Image · Video · Spec table · Numbered list. The Card media (and the banner card under a stacked list) was **dropped: unused on every page** (git history and `backups/SplitMedia.astro.2026-09-21-pre-split` have it if it is wanted back).
+- **Results band** (`reach/results-band`) out of Stats band, which is now Plain · Panel · Feature.
+- **Checked:** no visual change. Every element's position, size and 16 computed styles on the seven built pages at 1440 · 1100 · 800 · 375 were compared before and after (zero differences), plus the reveal start states. Block count in code: 22. Demos and registry entries added for the four new blocks.
+- **Open:** Figma still has the old shapes (*Figma to add*: Card bento patterns, Figures, Split embed, Results band). The Split embed loads its iframe without the Embed block's consent placeholder (as before): route it through consent before launch. Why invest's four reasons still type a few figures (`+84%`, `750+`, `1,172.5m`) that should be quoted from the options pages.
+
 ### Q66. Careers overview (20 Sep 2026, Careers overview)
 Proposal answers and review rounds, `/careers/`:
 - [x] Hero: calm sea photo (`ocean-horizon-calm`), Animate, "Open positions" to HR-Manager; the PDF's stats panel moves to the first block below the hero (never over its edge)

@@ -12,6 +12,7 @@ import PageHero from '../../../blocks/PageHero.astro';
 import SectionSubnav from '../../../blocks/SectionSubnav.astro';
 import SplitMedia from '../../../blocks/SplitMedia.astro';
 import CardGrid from '../../../blocks/CardGrid.astro';
+import CardBento from '../../../blocks/CardBento.astro';
 import Lifecycle from '../../../blocks/Lifecycle.astro';
 import FeedGrid from '../../../blocks/FeedGrid.astro';
 import Accordion from '../../../blocks/Accordion.astro';
@@ -50,27 +51,24 @@ const fleetCards: CardField[] = [
   {
     media: 'image-bg',
     size: 'featured',
-    span: { cols: 6, rows: 2 },
     image: { src: `${base}images/asset-havila-subsea.jpg`, alt: 'Havila Subsea, a green-hulled DP2 subsea vessel, at sea', focalPoint: { x: 0.45, y: 0.5 } },
     eyebrow: 'Vessel',
     title: 'Havila Subsea',
     description: 'DP2 IMR and light construction vessel with a 150 t heave-compensated crane and two ROV hangars.',
     action: { label: 'View vessel', url: '/assets/havila-subsea/', context: 'Havila Subsea' },
   },
-  { media: 'stat', surface: 'navy', span: { cols: 3, rows: 1 }, statValue: rovSystems.value, title: rovSystems.label },
+  { media: 'stat', surface: 'navy', statValue: rovSystems.value, title: rovSystems.label },
   {
     media: 'image-bg',
-    span: { cols: 3, rows: 2 },
     image: { src: `${base}images/asset-supporter-wrov.jpg`, alt: 'A Supporter work-class ROV lowered into the sea from its launch system', focalPoint: { x: 0.5, y: 0.45 } },
     eyebrow: 'Work-class ROV',
     title: 'Supporter WROV',
     description: 'Our standard work-class ROV for IMR and construction support.',
     action: { label: 'View ROV', url: '/assets/supporter-wrov/', context: 'Supporter WROV' },
   },
-  { media: 'stat', surface: 'white', span: { cols: 3, rows: 1 }, statValue: fleet.value, title: fleet.label },
+  { media: 'stat', surface: 'white', statValue: fleet.value, title: fleet.label },
   {
     media: 'image-bg',
-    span: { cols: 6, rows: 1 },
     image: { src: `${base}images/reach-remote-side.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel under way', focalPoint: { x: 0.5, y: 0.6 } },
     eyebrow: 'Uncrewed vessel',
     title: 'Reach Remote 1 & 2',
@@ -79,7 +77,6 @@ const fleetCards: CardField[] = [
   },
   {
     media: 'image-bg',
-    span: { cols: 6, rows: 1 },
     image: { src: `${base}images/asset-constructor-wrov.jpg`, alt: 'A Constructor work-class ROV on deck', focalPoint: { x: 0.6, y: 0.45 } },
     eyebrow: 'Work-class ROV',
     title: 'Constructor WROV',
@@ -182,9 +179,9 @@ const subnavItems = [
       cards={capabilityCards}
     />
 
-    <CardGrid
+    <CardBento
       anchor="fleet"
-      layout="bento"
+      pattern="lead-tall-wide"
       background="tint"
       sectionHeader={{
         title: 'The vessels and ROVs behind the work',

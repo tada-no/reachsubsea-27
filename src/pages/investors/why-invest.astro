@@ -10,7 +10,9 @@ import Header from '../../components/header/Header.astro';
 import Footer from '../../components/Footer.astro';
 import PageHero from '../../blocks/PageHero.astro';
 import SectionSubnav from '../../blocks/SectionSubnav.astro';
-import StatsBand from '../../blocks/StatsBand.astro';
+import ResultsBand from '../../blocks/ResultsBand.astro';
+import Figures from '../../blocks/Figures.astro';
+import SplitEmbed from '../../blocks/SplitEmbed.astro';
 import SplitMedia from '../../blocks/SplitMedia.astro';
 import Accordion from '../../blocks/Accordion.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
@@ -94,10 +96,9 @@ const faqItems = [
 
     <SectionSubnav source="section-pages" label="Investors" items={subnavItems} current="/investors/why-invest/" />
 
-    <StatsBand
-      style="results"
+    <ResultsBand
       animate
-      sectionHeader={{ title: `${r.period} results` }}
+      title={`${r.period} results`}
       published={r.published}
       currency={r.currency}
       stats={r.headline}
@@ -105,8 +106,7 @@ const faqItems = [
       cards={reportCards}
     />
 
-    <SplitMedia
-      media="figures"
+    <Figures
       layout="cards"
       background="white"
       spacing="lg"
@@ -114,8 +114,7 @@ const faqItems = [
       figures={reasons}
     />
 
-    <SplitMedia
-      media="embed"
+    <SplitEmbed
       position="start"
       background="tint"
       eyebrow="Capital allocation"

@@ -4,31 +4,26 @@
 // media side cols 7–12, vertically centred; Position=Start swaps the sides.
 // Mobile (≤899): Image/Video stack above the text; Spec table/Numbered list stack below it (DOM order
 // is always text-then-media; only Image/Video get `order: -1` at the mobile breakpoint).
-// 18 Sep 2026 (Why invest), three more media options:
-//   Figures: a sequence of 2–4 points, each with its own proof figure. Title spans the top; the
-//     figure column (cols 1–5) is sticky and swaps to the point crossing the middle of the viewport
-//     (a clip + rise wipe, never a fade); the points scroll past in cols 7–12. A point's figure can
-//     be a value or a split bar (e.g. revenue mix) that grows in. Mobile: no sticky, each point shows
-//     its figure inline.
-//   Card: a Card (usually Image bg, Featured) as the media, uncovered by a wipe as it enters.
-//   Embed: an iframe (ir.oms.no share graph) cropped to `crop` px, with a source line and link.
+// 21 Sep 2026 (Q67): Figures, Card and Embed media moved out. Figures is its own block (src/blocks/Figures.astro),
+// the share-graph embed is Split embed (src/blocks/SplitEmbed.astro), and the Card media (unused on any page)
+// was dropped: a Card in a section is Card grid / Card bento. This block is now Image · Video · Spec table ·
+// Numbered list, so every field applies to what the editor picked.
 // Any media except Numbered list can also carry `items` as a numbered list under the body copy.
 // Layout Wide (19 Sep 2026, About › Our story): for long copy. Heading on top, the body in
 // two columns (one paragraph each), then the image as a full-width 21:9 banner (16:9 tablet, 4:3 phone).
 // Below 900 the columns stack. The image is optional: Careers › Who thrives (20 Sep 2026) is the same
 // heading over two columns with no banner.
-// Layout Stacked (18 Sep 2026 review): heading on top, `items` as three numbered cards in columns,
-// and optionally a Card as a full-width banner below (left-to-right scrim, text bottom-left).
+// Layout Stacked (18 Sep 2026 review, Numbered list only): heading on top, `items` as three numbered cards in
+// columns.
 import BlockSection from '../components/BlockSection.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import Link from '../components/Link.astro';
 import MediaFrame from '../components/MediaFrame.astro';
 import SpecRow from '../components/SpecRow.astro';
 import NumberedItem from '../components/NumberedItem.astro';
-import Card from '../components/Card.astro';
 import Pictogram from '../components/Pictogram.astro';
 import { makeId } from '../lib/ids';
-import type { BlockFields, CardField, ImageField, LinkField } from '../lib/types';
+import type { BlockFields, ImageField, LinkField } from '../lib/types';
 
 interface VideoField {
   url: string;
@@ -47,37 +42,11 @@ interface NumberedListItem {
   text: string;
 }
 
-interface FigurePoint {
-  /** Short label above the point title, e.g. "Reach Remote". */
-  kicker?: string;
-  title: string;
-  text: string;
-  /** The proof figure, e.g. "+111%". Ignored when `split` is set. */
-  figure?: string;
-  /** One line under the figure: what it measures and when. */
-  caption: string;
-  /** Two-part split bar instead of a figure; values are percentages. */
-  split?: { label: string; value: number }[];
-  /** Split only: the period, shown first in the donut centre ("Q2 2026"). */
-  period?: string;
-}
-
-interface EmbedField {
-  src: string;
-  title: string;
-  /** Full iframe height (px); the frame shows only the top `crop` px. */
-  height: number;
-  crop?: number;
-  source?: string;
-  link?: LinkField;
-}
-
 interface Props extends BlockFields {
-  media?: 'image' | 'video' | 'spec-table' | 'numbered-list' | 'figures' | 'card' | 'embed';
-  /** Card media only: `stacked` = heading, items in columns, the card as a full-width banner below.
-   * Figures media: `cards` = all points visible as cards (default `split` = sticky figure).
+  media?: 'image' | 'video' | 'spec-table' | 'numbered-list';
+  /** Numbered list media: `stacked` = heading, then the items as numbered cards in columns.
    * Image media: `wide` = heading, two-column body, full-width banner image. */
-  layout?: 'split' | 'stacked' | 'cards' | 'wide';
+  layout?: 'split' | 'stacked' | 'wide';
   position?: 'end' | 'start';
   eyebrow?: string;
   title: string;
@@ -95,9 +64,6 @@ interface Props extends BlockFields {
   specFile?: LinkField;
   /** 3–6 numbered items (Reach Remote oversight levels, HOP). */
   items?: NumberedListItem[];
-  figures?: FigurePoint[];
-  card?: CardField;
-  embed?: EmbedField;
   /** A quote in place of the visible heading (19 Sep 2026, Investors overview CEO letter). `title` stays the
    * section's accessible name (a visually hidden H2); the quote reads as H3, then the attribution. */
   quote?: { text: string; name: string; role?: string };
@@ -123,9 +89,6 @@ const {
   specs = [],
   specFile,
   items = [],
-  figures = [],
-  card,
-  embed,
   quote,
   pictogram,
   background,
@@ -138,17 +101,9 @@ const titleId = makeId('split-media', title);
 const shownActions = actions.slice(0, 2);
 const hasSpecFile = Boolean(specFile?.url);
 const listInText = media !== 'numbered-list' && items.length > 0;
-const stacked = layout === 'stacked' && media !== 'figures';
+const stacked = layout === 'stacked' && media === 'numbered-list';
 const wide = layout === 'wide' && media === 'image';
-const figureCards = media === 'figures' && layout === 'cards';
-// Cards: value points stack in the left column; a split point becomes the feature card on the right.
-const valuePoints = figures.filter((p) => !p.split);
-const splitPoint = figures.find((p) => p.split);
-// Donut geometry: r = 100/2π, so the circumference is exactly 100 and dash lengths are percentages.
-const DONUT_R = 15.9155;
-// No gap between arcs (review round 6): gaps made a 100% split read as an incomplete ring.
-const DONUT_GAP = 0;
-const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked', figureCards && 'split-media--figure-cards', `split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
+const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked', `split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
 ---
 
 <BlockSection
@@ -190,131 +145,6 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
           ))}
         </ol>
       )}
-      {card && (
-        <div class="split-media__banner" data-wipe>
-          <Card {...card} />
-        </div>
-      )}
-    </div>
-  ) : figureCards ? (
-    <div class="split-media__stack">
-      <div class="split-media__stack-head">
-        {eyebrow && <Eyebrow text={eyebrow} />}
-        <Heading id={titleId} class:list={['split-media__title', 'text-h2']}>{title}</Heading>
-      </div>
-      <div class:list={['figures__cards', !splitPoint && 'figures__cards--single']}>
-        <ul class="figures__list">
-          {valuePoints.map((point) => (
-            <li class="figures__card">
-              <div class="figures__card-text">
-                <h3 class="text-h4">{point.title}</h3>
-                <p class="figures__text text-small">{point.text}</p>
-              </div>
-              <div class="figures__proof">
-                <p class="figures__value"><span data-count-up>{point.figure}</span></p>
-                <p class="figures__caption text-caption">{point.caption}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-        {splitPoint?.split && (
-          <div class="figures__card figures__card--feature has-surface-navy">
-            <h3 class="text-h4">{splitPoint.title}</h3>
-            <figure class="figures__donut">
-              <div class="figures__donut-chart">
-                <svg viewBox="0 0 42 42" aria-hidden="true" focusable="false">
-                  <mask id={`${titleId}-sweep`} maskUnits="userSpaceOnUse" x="0" y="0" width="42" height="42">
-                    <circle class="figures__sweep" cx="21" cy="21" r={DONUT_R} fill="none" stroke="#fff" stroke-width="9" />
-                  </mask>
-                  <g mask={`url(#${titleId}-sweep)`}>
-                  {splitPoint.split.map((part, n) => {
-                    const offset = splitPoint.split!.slice(0, n).reduce((sum, p) => sum + p.value, 0);
-                    return (
-                      <circle
-                        class={`figures__arc figures__arc--${n}`}
-                        cx="21"
-                        cy="21"
-                        r={DONUT_R}
-                        fill="none"
-                        style={`--arc: ${part.value - DONUT_GAP}; --arc-offset: ${-offset}`}
-                      />
-                    );
-                  })}
-                  </g>
-                </svg>
-                <p class="figures__donut-centre">
-                  {splitPoint.period && <strong class="figures__donut-period">{splitPoint.period}</strong>}
-                  <span class="text-small">{splitPoint.caption}</span>
-                </p>
-              </div>
-            </figure>
-            {/* Arcs start at 12 o'clock and run clockwise, so the first share sits on the right and
-                the second on the left: under the ring each label sits beside its own arc */}
-            <div class="figures__donut-labels">
-              {splitPoint.split.slice(0, 2).map((part, n) => (
-                <p class={`figures__donut-label figures__donut-label--${n === 0 ? 'end' : 'start'}`}>
-                  <span class="figures__donut-value">{part.value}%</span>
-                  <span class="figures__donut-name text-small">
-                    <span class={`figures__swatch figures__swatch--${n}`} aria-hidden="true" />
-                    {part.label}
-                  </span>
-                </p>
-              ))}
-            </div>
-            <p class="figures__text text-small">{splitPoint.text}</p>
-          </div>
-        )}
-      </div>
-    </div>
-  ) : media === 'figures' ? (
-    <div class="split-media__figures" data-figures>
-      <div class="split-media__figures-head">
-        {eyebrow && <Eyebrow text={eyebrow} />}
-        <Heading id={titleId} class:list={['split-media__title', 'text-h2']}>{title}</Heading>
-      </div>
-      <div class="figures__stage" aria-hidden="true">
-        {figures.map((point, i) => (
-          <div class:list={['figures__slot', i === 0 && 'is-active']} data-figure-slot={i}>
-            {point.split ? (
-              <div class="figures__split" style={`--split-a: ${point.split[0]?.value ?? 50}%`}>
-                <div class="figures__bar">
-                  {point.split.map((part) => <span class="figures__part">{part.value}%</span>)}
-                </div>
-                <div class="figures__keys text-small">
-                  {point.split.map((part) => <span>{part.label}</span>)}
-                </div>
-              </div>
-            ) : (
-              <p class="figures__value">{point.figure}</p>
-            )}
-            <p class="figures__caption text-body">{point.caption}</p>
-          </div>
-        ))}
-      </div>
-      <ol class="figures__points">
-        {figures.map((point, i) => (
-          <li class="figures__point" data-figure-point={i}>
-            <div class="figures__inline">
-              {point.split ? (
-                <div class="figures__split" style={`--split-a: ${point.split[0]?.value ?? 50}%`}>
-                  <div class="figures__bar">
-                    {point.split.map((part) => <span class="figures__part">{part.value}%</span>)}
-                  </div>
-                  <div class="figures__keys text-small">
-                    {point.split.map((part) => <span>{part.label}</span>)}
-                  </div>
-                </div>
-              ) : (
-                <p class="figures__value">{point.figure}</p>
-              )}
-              <p class="figures__caption text-small">{point.caption}</p>
-            </div>
-            {point.kicker && <Eyebrow text={point.kicker} as="span" />}
-            <h3 class="figures__title text-h3">{point.title}</h3>
-            <p class="figures__text text-lead">{point.text}</p>
-          </li>
-        ))}
-      </ol>
     </div>
   ) : (
   <div class="split-media__columns">
@@ -410,37 +240,6 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
         )
       }
 
-      {
-        media === 'card' && card && (
-          <div class="split-media__card" data-wipe>
-            <Card {...card} />
-          </div>
-        )
-      }
-
-      {
-        media === 'embed' && embed && (
-          <figure class="split-media__embed">
-            <div class="split-media__embed-crop" style={`height: ${embed.crop ?? embed.height}px`}>
-              <iframe
-                src={embed.src}
-                title={embed.title}
-                width="100%"
-                height={embed.height}
-                loading="lazy"
-                scrolling="no"
-                referrerpolicy="strict-origin-when-cross-origin"
-              />
-            </div>
-            {(embed.source || embed.link) && (
-              <figcaption class="split-media__embed-caption text-caption">
-                {embed.source && <span>{embed.source}</span>}
-                {embed.link && <Link label={embed.link.label} href={embed.link.url} action={embed.link.action ?? 'page'} size="small" />}
-              </figcaption>
-            )}
-          </figure>
-        )
-      }
     </div>
   </div>
   )}
@@ -573,21 +372,7 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
     padding-top: 0;
   }
 
-  /* ── Card ─────────────────────────────────────────────────── */
-  .split-media--card .split-media__columns {
-    align-items: stretch;
-  }
-  .split-media__card {
-    display: flex;
-    flex: 1;
-    min-height: 560px;
-  }
-  .split-media__card > .card {
-    flex: 1;
-  }
-
-
-  /* ── Stacked (Card) ───────────────────────────────────────── */
+  /* ── Stacked (Numbered list) ──────────────────────────────── */
   .split-media__stack {
     display: flex;
     flex-direction: column;
@@ -625,462 +410,12 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
   .split-media__cols .numbered-item__body {
     display: contents;
   }
-  .split-media__banner {
-    display: flex;
-    min-height: 480px;
-  }
-  .split-media__banner > .card {
-    flex: 1;
-  }
-  .split-media__banner .card__content {
-    max-width: 720px;
-  }
-  /* Wide banner: the scrim runs from the text side instead of from the bottom, so the right half
-     stays a photo */
-  .split-media__banner .card__overlay {
-    background:
-      linear-gradient(to right, var(--wp--custom--color--scrim--solid) 0%, rgb(27 29 59 / 0.82) 38%, rgb(27 29 59 / 0.3) 68%, var(--wp--custom--color--scrim--floor) 100%),
-      linear-gradient(to top, rgb(27 29 59 / 0.5) 0%, rgb(27 29 59 / 0) 45%);
-  }
   @media (max-width: 899px) {
     .split-media__cols {
       grid-template-columns: 1fr;
     }
-    .split-media__banner {
-      min-height: 440px;
-    }
-    .split-media__banner .card__overlay {
-      background: linear-gradient(to top, var(--wp--custom--color--scrim--solid) 0%, rgb(27 29 59 / 0.86) 45%, rgb(27 29 59 / 0.3) 75%, var(--wp--custom--color--scrim--floor) 100%);
-    }
   }
 
-
-  /* ── Figures · Cards (review round 4) ─────────────────────── */
-  /* Reading order inside each card: title → body → proof figure. Value points stack on the left;
-     the split (revenue mix) is the feature card on the right, drawn as a donut. */
-  .figures__cards {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--wp--custom--grid--gutter);
-  }
-  .figures__list {
-    grid-column: 1 / span 7;
-    display: flex;
-    flex-direction: column;
-    gap: var(--wp--custom--grid--gutter);
-  }
-  .figures__cards--single .figures__list {
-    grid-column: 1 / -1;
-  }
-  .figures__card {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: var(--wp--preset--spacing--24) var(--wp--preset--spacing--48);
-    /* Card · Featured metrics (docs/04): these cards are 7 and 5 columns wide, past the 416 Default */
-    padding: var(--wp--preset--spacing--48);
-    border-radius: var(--wp--custom--radius--lg);
-    background-color: var(--wp--custom--color--bg--tint);
-  }
-  .figures__card-text {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wp--preset--spacing--8);
-  }
-  .figures__card .figures__text {
-    color: var(--wp--custom--color--text--secondary);
-  }
-  .figures__proof {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: var(--wp--preset--spacing--4);
-    text-align: right;
-    min-width: 176px;
-  }
-  .figures__card .figures__value {
-    font-size: clamp(2.25rem, 1.8979rem + 0.7512vw, 2.75rem); /* 36 → 44 */
-    line-height: 1;
-    letter-spacing: -0.03em;
-  }
-  .figures__proof .figures__caption {
-    max-width: 200px;
-  }
-  /* The feature card is Navy (review round 5): the section's one chart, and a break in the run of
-     tint cards. Its tokens flip through `has-surface-navy`; the ground is set explicitly to navy/800 */
-  .figures__card--feature {
-    background-color: var(--wp--preset--color--navy-800);
-    grid-column: 8 / span 5;
-    display: flex;
-    flex-direction: column;
-    /* Heading → ring → body: the heading lines up with the value cards' titles */
-    gap: var(--wp--preset--spacing--24);
-  }
-  /* Donut (review rounds 5–7). Tall card (1280+): heading → ring → labels → body. The value cards
-     alone set the row height; the figure takes the height left over (flex 1 with size containment,
-     so it adds nothing to the row) and the ring is the largest square that fits. Arcs meet with no
-     gap, so a 100% split reads as a full ring; the centre names the period and measure */
-  .figures__donut {
-    flex: 1 1 0;
-    align-self: stretch; /* size containment gives it no content width of its own */
-    min-height: 240px;
-    container-type: size;
-    display: grid;
-    place-items: center;
-  }
-  .figures__donut-chart {
-    position: relative;
-    width: min(100cqw, 100cqh, 400px);
-    aspect-ratio: 1;
-  }
-  /* Under the ring each label sits on its own arc's side: renewables (the last share, closing the
-     ring on the left) left, oil & gas right */
-  .figures__donut-labels {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--wp--preset--spacing--24);
-  }
-  .figures__donut-label--start {
-    order: -1;
-  }
-  .figures__donut-centre {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--wp--preset--spacing--4);
-    padding: 0 24%;
-    text-align: center;
-    color: var(--wp--custom--color--text--secondary);
-  }
-  .figures__donut-period {
-    font-size: var(--wp--preset--font-size--lead);
-    font-weight: var(--wp--custom--font-weight--bold);
-    line-height: 1.2;
-    color: var(--wp--custom--color--text--primary);
-  }
-  .figures__donut-label {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wp--preset--spacing--4);
-  }
-  .figures__donut-label--end {
-    align-items: flex-end;
-    text-align: right;
-  }
-  /* A dot beside the name keys the colour (a dash above the value read as a minus sign) */
-  .figures__donut-name {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--wp--preset--spacing--8);
-    white-space: nowrap;
-  }
-  .figures__donut-name .figures__swatch {
-    flex: none;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-  }
-  .figures__donut-value {
-    font-size: var(--wp--preset--font-size--h4);
-    font-weight: var(--wp--custom--font-weight--bold);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    font-variant-numeric: tabular-nums;
-    color: var(--wp--custom--color--text--primary);
-  }
-  .figures__donut-name {
-    color: var(--wp--custom--color--text--secondary);
-  }
-  .figures__donut-chart svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-    transform: rotate(-90deg);
-  }
-  /* The arcs sit at their final lengths; one trim-path sweep in a mask draws the whole ring clockwise
-     in a single continuous motion (review round 7). Per-arc draws eased out separately and hitched at
-     the seam where the first slowed as the second began */
-  .figures__arc {
-    stroke-width: 7;
-    stroke-dasharray: var(--arc) calc(100 - var(--arc));
-    stroke-dashoffset: var(--arc-offset);
-  }
-  .figures__sweep {
-    stroke-dasharray: 100 0;
-    transition: stroke-dasharray 1.4s var(--wp--custom--motion--ease-in-out) 0.3s;
-  }
-  html.js .figures__card--feature[data-reveal]:not(.is-revealed) .figures__sweep {
-    stroke-dasharray: 0 100;
-    transition-duration: 0s;
-    transition-delay: 0s;
-  }
-  /* Review round 6: the counterpart is navy/200, a light neutral that makes the sage (the share the
-     point is about, and the chart's only hue) pop. navy/400 read as disabled (the text/disabled token) */
-  .figures__arc--0,
-  .figures__swatch--0 {
-    stroke: var(--wp--preset--color--navy-200);
-    background-color: var(--wp--preset--color--navy-200);
-  }
-  .figures__arc--1,
-  .figures__swatch--1 {
-    stroke: var(--wp--preset--color--sage-400);
-    background-color: var(--wp--preset--color--sage-400);
-  }
-  .figures__swatch {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-  }
-  /* Below 1280 a 5-column navy card is too narrow (heavy wrapping, a small ring), so the feature
-     card spans the full width under the value cards */
-  @media (max-width: 1279px) {
-    .figures__list,
-    .figures__card--feature {
-      grid-column: 1 / -1;
-    }
-  }
-  /* Full-width feature card (768–1279, review round 7): one reading column on the left (heading →
-     body → the two shares, side by side) and the donut on the right as the image, both vertically
-     centred */
-  @media (min-width: 768px) and (max-width: 1279px) {
-    .figures__card--feature {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-rows: 1fr auto auto auto 1fr;
-      grid-template-areas: '. fig' 'title fig' 'text fig' 'labels fig' '. fig';
-      column-gap: var(--wp--preset--spacing--64);
-      row-gap: 0;
-    }
-    .figures__card--feature > h3 {
-      grid-area: title;
-    }
-    .figures__card--feature > .figures__text {
-      grid-area: text;
-      margin-top: var(--wp--preset--spacing--12);
-      max-width: 520px;
-    }
-    .figures__card--feature > .figures__donut-labels {
-      grid-area: labels;
-      justify-content: flex-start;
-      gap: var(--wp--preset--spacing--48);
-      margin-top: var(--wp--preset--spacing--32);
-    }
-    .figures__card--feature .figures__donut-label--end {
-      align-items: flex-start;
-      text-align: left;
-    }
-    .figures__card--feature > .figures__donut {
-      grid-area: fig;
-      width: clamp(280px, 30vw, 360px);
-      height: clamp(280px, 30vw, 360px);
-    }
-  }
-  /* Stacked on small screens: heading → ring → labels → body, the ring at a fixed height */
-  @media (max-width: 767px) {
-    .figures__donut {
-      flex: none;
-      height: min(100vw - 112px, 400px);
-    }
-  }
-  @media (max-width: 599px) {
-    .figures__card {
-      grid-template-columns: 1fr;
-      padding: var(--wp--preset--spacing--32); /* Featured falls back to Default on phones */
-    }
-    .figures__proof {
-      align-items: flex-start;
-      text-align: left;
-      min-width: 0;
-    }
-  }
-
-  /* ── Embed ────────────────────────────────────────────────── */
-  .split-media__embed {
-    overflow: hidden;
-    border: 1px solid var(--wp--custom--color--border--subtle);
-    border-radius: var(--wp--custom--radius--md);
-    background-color: var(--wp--preset--color--white);
-  }
-  .split-media__embed-crop {
-    overflow: hidden;
-  }
-  .split-media__embed iframe {
-    display: block;
-    width: 100%;
-    border: 0;
-  }
-  .split-media__embed-caption {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--16);
-    padding: var(--wp--preset--spacing--12) var(--wp--preset--spacing--24);
-    border-top: 1px solid var(--wp--custom--color--border--subtle);
-    background-color: var(--wp--preset--color--navy-50);
-    color: var(--wp--preset--color--navy-600);
-  }
-
-  /* ── Figures ──────────────────────────────────────────────── */
-  .split-media__figures {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--wp--custom--grid--gutter);
-  }
-  .split-media__figures-head {
-    grid-column: 1 / span 8;
-    display: flex;
-    flex-direction: column;
-    gap: var(--wp--custom--stack--md);
-    margin-bottom: var(--wp--custom--stack--xl);
-  }
-  .split-media__figures-head .split-media__title {
-    text-wrap: balance;
-  }
-  .figures__stage {
-    grid-column: 1 / span 5;
-    position: sticky;
-    top: calc(50svh - 180px);
-    align-self: start;
-    height: 360px;
-  }
-  /* Directional swap (18 Sep 2026): the outgoing figure exits up through a ceiling quickly; the
-     incoming one rises from a floor just behind it with a crisper ease-out, so each change lands as
-     one decisive beat instead of two figures cross-wiping at once. No fades. */
-  .figures__slot {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: var(--wp--preset--spacing--16);
-    clip-path: inset(100% 0 0 0);
-    transform: translate3d(0, 48px, 0);
-    transition:
-      clip-path 0.32s var(--wp--custom--motion--ease-in-out),
-      transform 0.32s var(--wp--custom--motion--ease-in-out);
-  }
-  .figures__slot.is-past {
-    clip-path: inset(0 0 100% 0);
-    transform: translate3d(0, -48px, 0);
-  }
-  .figures__slot.is-active {
-    clip-path: inset(0 0 0 0);
-    transform: none;
-    transition-duration: 0.55s;
-    transition-timing-function: var(--wp--custom--motion--ease-out);
-    transition-delay: 0.14s;
-  }
-  .figures__value {
-    color: var(--wp--custom--color--text--accent-display);
-    font-size: clamp(4rem, 2.5915rem + 6.0094vw, 8rem); /* 64 → 128 */
-    line-height: 0.9;
-    font-weight: var(--wp--custom--font-weight--bold);
-    letter-spacing: -0.04em;
-    font-variant-numeric: tabular-nums lining-nums;
-    white-space: nowrap;
-  }
-  .has-surface-navy .figures__value {
-    color: var(--wp--preset--color--sage-400);
-  }
-  .figures__caption {
-    color: var(--wp--custom--color--text--secondary);
-  }
-  .figures__split {
-    width: 100%;
-    max-width: 520px;
-  }
-  .figures__bar {
-    display: grid;
-    grid-template-columns: var(--split-a) 1fr;
-    gap: 4px;
-    height: 64px;
-    transition: grid-template-columns 1.1s var(--wp--custom--motion--ease-out) 0.15s;
-  }
-  .figures__part {
-    display: flex;
-    align-items: center;
-    padding-inline: var(--wp--preset--spacing--16);
-    border-radius: var(--wp--custom--radius--sm);
-    font-size: var(--wp--preset--font-size--h4);
-    font-weight: var(--wp--custom--font-weight--bold);
-    font-variant-numeric: tabular-nums;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-  .figures__part:first-child {
-    background-color: var(--wp--preset--color--navy-600);
-    color: var(--wp--preset--color--white);
-  }
-  .figures__part:last-child {
-    background-color: var(--wp--preset--color--sage-400);
-    color: var(--wp--preset--color--navy-900);
-  }
-  /* Grows from an all-oil-&-gas bar to the real split each time the point becomes active */
-  html.js .figures__slot:not(.is-active) .figures__bar {
-    grid-template-columns: calc(100% - 8px) 1fr;
-    transition-duration: 0s;
-  }
-  .figures__keys {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--wp--preset--spacing--16);
-    margin-top: var(--wp--preset--spacing--12);
-    color: var(--wp--custom--color--text--secondary);
-  }
-  .figures__points {
-    grid-column: 7 / span 6;
-  }
-  .figures__point {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: var(--wp--preset--spacing--16);
-    min-height: 400px;
-    padding-block: var(--wp--preset--spacing--48);
-  }
-  .figures__text {
-    color: var(--wp--custom--color--text--secondary);
-    max-width: 560px;
-  }
-  .figures__inline {
-    display: none;
-  }
-  @media (max-width: 899px) {
-    .split-media__figures {
-      display: block;
-    }
-    .figures__stage {
-      display: none;
-    }
-    .figures__point {
-      min-height: 0;
-      padding-block: var(--wp--preset--spacing--32);
-    }
-    .figures__inline {
-      display: flex;
-      flex-direction: column;
-      gap: var(--wp--preset--spacing--8);
-      margin-bottom: var(--wp--preset--spacing--8);
-    }
-    .figures__inline .figures__value {
-      font-size: var(--wp--preset--font-size--display);
-    }
-    .split-media__card {
-      min-height: 440px;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .figures__slot {
-      transform: none;
-    }
-    .figures__sweep {
-      transition-delay: 0s;
-    }
-  }
 
   @media (max-width: 899px) {
     .split-media__columns {
@@ -1095,27 +430,3 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
     }
   }
 </style>
-
-<script>
-  // Figures: the point nearest the middle of the viewport owns the sticky figure.
-  document.querySelectorAll<HTMLElement>('[data-figures]').forEach((root) => {
-    const slots = [...root.querySelectorAll<HTMLElement>('[data-figure-slot]')];
-    const points = [...root.querySelectorAll<HTMLElement>('[data-figure-point]')];
-    if (slots.length === 0 || !('IntersectionObserver' in window)) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const i = Number((entry.target as HTMLElement).dataset.figurePoint);
-          slots.forEach((slot) => {
-            const n = Number(slot.dataset.figureSlot);
-            slot.classList.toggle('is-active', n === i);
-            slot.classList.toggle('is-past', n < i);
-          });
-        });
-      },
-      { rootMargin: '-45% 0px -45% 0px' },
-    );
-    points.forEach((point) => observer.observe(point));
-  });
-</script>

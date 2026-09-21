@@ -9,6 +9,7 @@ import Header from '../components/header/Header.astro';
 import Footer from '../components/Footer.astro';
 import PageHero from '../blocks/PageHero.astro';
 import CardGrid from '../blocks/CardGrid.astro';
+import CardBento from '../blocks/CardBento.astro';
 import StatsBand from '../blocks/StatsBand.astro';
 import Embed from '../blocks/Embed.astro';
 import FeedGrid from '../blocks/FeedGrid.astro';
@@ -27,7 +28,6 @@ const bentoCards: CardField[] = [
   {
     media: 'image-bg',
     size: 'featured',
-    span: { cols: 6, rows: 2 },
     image: { src: `${import.meta.env.BASE_URL}images/vessel-agalas.jpg`, alt: 'Reach Subsea vessel at sea in evening light', focalPoint: { x: 0.55, y: 0.5 } },
     eyebrow: 'Subsea services',
     title: 'Subsea services, delivered worldwide',
@@ -37,14 +37,12 @@ const bentoCards: CardField[] = [
   {
     media: 'stat',
     surface: 'navy',
-    span: { cols: 3, rows: 1 },
     statValue: '750+',
     title: 'Uncrewed operational days, per quarter',
     action: { label: 'Reach Remote', url: '/assets/reach-remote/' },
   },
   {
     media: 'image-bg',
-    span: { cols: 3, rows: 2 },
     image: { src: `${import.meta.env.BASE_URL}images/rov-supporter-launch.jpg`, alt: 'Work-class ROV being launched from a vessel', focalPoint: { x: 0.5, y: 0.4 } },
     eyebrow: 'ROV & intervention',
     title: 'Work-class ROVs for IMR, survey and monitoring',
@@ -53,7 +51,6 @@ const bentoCards: CardField[] = [
   cardPresets.news({
     media: 'none',
     surface: 'tint',
-    span: { cols: 3, rows: 1 },
     eyebrow: '04.08.2026',
     badge: { label: 'News', tone: 'accent' },
     title: 'MoA signed for sale of Viking Reach and onboard WROV',
@@ -62,7 +59,6 @@ const bentoCards: CardField[] = [
   }),
   cardPresets.event({
     surface: 'white',
-    span: { cols: 4, rows: 1 },
     title: 'Ocean Business 2027',
     meta: [
       { icon: 'calendar', text: '14-16 April 2027' },
@@ -72,7 +68,6 @@ const bentoCards: CardField[] = [
   }),
   {
     media: 'image-bg',
-    span: { cols: 5, rows: 1 },
     image: { src: `${import.meta.env.BASE_URL}images/reach-remote-side.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel under way', focalPoint: { x: 0.5, y: 0.6 } },
     eyebrow: 'Reach Remote',
     title: 'Pioneering uncrewed operations',
@@ -82,7 +77,6 @@ const bentoCards: CardField[] = [
   {
     media: 'none',
     surface: 'tint',
-    span: { cols: 3, rows: 1 },
     eyebrow: 'Careers',
     title: 'Work with us',
     description: 'Roles offshore and onshore.',
@@ -254,12 +248,12 @@ const faqItems = [
         SAMPLE DATA until the Current operations feed exists (docs/07-live-operations.md). */}
     <LiveOperations feed={liveOperations} />
 
-    <CardGrid
+    <CardBento
       sectionHeader={{
         title: 'Ocean operations, reimagined',
         action: { label: 'All services', url: '/services/' },
       }}
-      layout="bento"
+      pattern="lead-tall-trio-a"
       cards={bentoCards}
     />
 

@@ -1,0 +1,283 @@
+---
+// Results band · reach/results-band (docs/05 §2.5b). Split out of Stats band on 21 Sep 2026 (Q67): the latest
+// reported quarter. Title + "All figures in {currency}", an "As reported" badge + publication date, 4 headline
+// figures (unit · value · scale, change line) over a 2px navy rule, 4 secondary figures in a ruled row, then the
+// shared Report cards (annual · latest · next, 19 Sep 2026). Everything comes from the Latest results options page
+// (src/data/investor-results.ts): the editor updates one record per quarter and every page that shows it
+// follows. Headline figures count up when `animate` is on. Max one per page. Replaces the PDF's overlapping card.
+import BlockSection from '../components/BlockSection.astro';
+import Badge from '../components/Badge.astro';
+import Icon from '../components/Icon.astro';
+import ReportCards from '../components/ReportCards.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, ReportCardField, StatField } from '../lib/types';
+
+interface Props extends BlockFields {
+  /** The section's H2, e.g. "Q2 2026 results". */
+  title: string;
+  /** ISO publication date. */
+  published?: string;
+  /** Stated once after the title ("All figures in NOK"), never on each figure. */
+  currency?: string;
+  /** The 4 headline figures. */
+  stats: StatField[];
+  /** The 4 secondary figures in the ruled row. */
+  secondary?: StatField[];
+  /** The shared Report cards under the figures (annual · latest · next). */
+  cards?: ReportCardField[];
+  /** Headline figures rise in one by one and count up when the band scrolls into view. */
+  animate?: boolean;
+}
+
+const { title, published, currency, stats = [], secondary = [], cards = [], animate = false, background, spacing, anchor } = Astro.props;
+
+const longDate = (iso: string) =>
+  new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const titleId = makeId('results', title);
+const STAT_STAGGER = 160;
+---
+
+{
+  stats.length > 0 && (
+    <BlockSection
+      slug="results-band"
+      root="results-band"
+      class={animate ? 'results-band--animate' : undefined}
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+    >
+      <div class="results-band__body">
+          <div class="results-band__group">
+            <div class="results__top">
+              <div class="results__title">
+                <h2 id={titleId} class="text-h2">{title}</h2>
+                {currency && <p class="results__currency text-small">All figures in {currency}</p>}
+              </div>
+              {published && (
+                <p class="results__stamp text-small">
+                  <Badge label="As reported" tone="accent" />
+                  <span>Published <time datetime={published}>{longDate(published)}</time></span>
+                </p>
+              )}
+            </div>
+            <ul class="results__headline">
+              {stats.map((stat, i) => (
+                <li class="results__item" style={`--stat-i: ${i}`}>
+                  <p class="results__label text-small">{stat.label}</p>
+                  {/* The scale ("m", "bn") is part of the counted text, so it always sits hard against the digits */}
+                  <p class="results__value">
+                    {stat.unit && <span class="results__unit">{stat.unit}</span>}
+                    {animate ? (
+                      <span data-count-up data-count-up-delay={150 + i * STAT_STAGGER}>{stat.value}{stat.suffix}</span>
+                    ) : (
+                      `${stat.value}${stat.suffix ?? ''}`
+                    )}
+                  </p>
+                  {stat.delta && (
+                    <p class:list={['results__delta text-small', stat.trend && `results__delta--${stat.trend}`]}>
+                      {stat.trend && <Icon name={stat.trend === 'up' ? 'arrow-up-right' : 'arrow-down-right'} size={16} />}
+                      {stat.delta}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+            {secondary.length > 0 && (
+              <dl class="results__secondary">
+                {secondary.map((stat) => (
+                  <div class="results__row">
+                    <dt class="text-small">{stat.label}</dt>
+                    <dd class="text-h4">{stat.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            <ReportCards cards={cards} class="results__cards" />
+          </div>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .results-band__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
+  }
+
+  /* ── Results (18 Sep 2026) ─────────────────────────────────── */
+  .results__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--16) var(--wp--preset--spacing--32);
+    margin-bottom: var(--wp--custom--stack--lg);
+  }
+  .results-band__group {
+    display: flex;
+    flex-direction: column;
+  }
+  .results__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--wp--preset--spacing--4) var(--wp--preset--spacing--16);
+  }
+  .results__currency {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .results__stamp {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--12);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .results__headline {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .results__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+    min-width: 0;
+    padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--32) var(--wp--preset--spacing--32);
+  }
+  .results__item:first-child {
+    padding-left: 0;
+  }
+  .results__item + .results__item {
+    border-left: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .results__label {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .results__value {
+    display: flex;
+    align-items: baseline;
+    color: var(--wp--custom--color--text--primary);
+    /* One step below the H2 title (48) so the heading still leads (review round 4) */
+    font-size: clamp(2rem, 1.6479rem + 0.7512vw, 2.5rem); /* 32 → 40 */
+    line-height: 1;
+    font-weight: var(--wp--custom--font-weight--bold);
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+  }
+  .results__unit {
+    margin-right: var(--wp--preset--spacing--8);
+    font-size: var(--wp--preset--font-size--body);
+    font-weight: var(--wp--custom--font-weight--medium);
+    letter-spacing: 0;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* The arrow sits on the first line: when the change wraps (2-up on phones) it must not drop to the
+     middle of the block. (1lh − 16) / 2 centres the 16px icon on one line box */
+  .results__delta {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--4);
+    margin-top: var(--wp--preset--spacing--4);
+    color: var(--wp--custom--color--text--secondary);
+    font-weight: var(--wp--custom--font-weight--medium);
+  }
+  .results__delta .icon {
+    flex: none;
+    margin-top: calc((1lh - 16px) / 2);
+  }
+  .results__delta--up {
+    color: var(--wp--custom--color--text--accent);
+  }
+  /* One rule, between the headline and secondary rows (review round 2) */
+  /* Same distance above the cards as under the Investors overview track */
+  .results__cards {
+    margin-top: var(--wp--custom--stack--xl);
+  }
+  .results__secondary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .results__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    padding: var(--wp--preset--spacing--16) var(--wp--preset--spacing--32) var(--wp--preset--spacing--24);
+  }
+  .results__row:first-child {
+    padding-left: 0;
+  }
+  .results__row + .results__row {
+    border-left: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .results__row dt {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .results__row dd {
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+  }
+  /* Footer (review round 4): a full-width tint strip that closes the section, flush with its bottom
+     edge; three items evenly spaced on the container (no rules, round 5). The strip bleeds with
+     a box-shadow + clip-path pair, so it never causes a horizontal scrollbar. */
+  html.js .results-band--animate .results__item {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+    transition:
+      opacity 0.7s var(--wp--custom--motion--ease-out),
+      transform 0.7s var(--wp--custom--motion--ease-out);
+    transition-delay: calc(0.15s + var(--stat-i, 0) * 0.16s);
+  }
+  html.js .results-band--animate .is-revealed .results__item {
+    opacity: 1;
+    transform: none;
+  }
+  @media (max-width: 1099px) {
+    .results__headline,
+    .results__secondary {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .results__item:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+    .results__row:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+  /* Phones: two columns of ~160px, so the unit moves onto its own line above the figure */
+  @media (max-width: 599px) {
+    .results__item,
+    .results__row {
+      padding: var(--wp--preset--spacing--16) var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+    }
+    .results__item:nth-child(odd),
+    .results__row:nth-child(odd) {
+      padding-left: 0;
+    }
+    .results__value {
+      flex-wrap: wrap;
+      font-size: 2rem;
+    }
+    .results__unit {
+      flex-basis: 100%;
+      margin: 0 0 var(--wp--preset--spacing--4);
+      font-size: var(--wp--preset--font-size--caption);
+    }
+    .results__row dd {
+      white-space: normal;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.js .results-band--animate .results__item {
+      transform: none;
+    }
+  }
+</style>

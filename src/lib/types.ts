@@ -81,8 +81,6 @@ export interface CardField {
   image?: ImageField;
   /** Media `stat`: the figure, e.g. "750+". Pick it from the Key figures options page. */
   statValue?: string;
-  /** Card grid Layout `bento` only: the cell this card fills on the 12-column desktop grid. */
-  span?: { cols: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 12; rows?: 1 | 2 };
   eyebrow?: string;
   badge?: BadgeField;
   title: string;

@@ -1,0 +1,16 @@
+---
+import ResultsBand from '../blocks/ResultsBand.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+import { latestResults as r, reportCards } from '../data/investor-results';
+---
+
+<VariantLabel name="Latest results · with report cards" props='title="Q2 2026 results" stats={4} secondary={4} cards={3}' />
+<ResultsBand
+  animate
+  title={`${r.period} results`}
+  published={r.published}
+  currency={r.currency}
+  stats={r.headline}
+  secondary={r.secondary}
+  cards={reportCards}
+/>

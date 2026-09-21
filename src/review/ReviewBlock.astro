@@ -25,7 +25,7 @@ const number = String(index + 1).padStart(2, '0');
     </div>
     <p class="rv-block__links">
       <a href={frame} target="_blank">Open frame</a>
-      <a href={figmaUrl(block.figma)} target="_blank" rel="noopener noreferrer">Figma {block.figma}</a>
+      {block.figma ? <a href={figmaUrl(block.figma)} target="_blank" rel="noopener noreferrer">Figma {block.figma}</a> : <span>Figma: to add</span>}
       {Heading === 'h2' && <a href={`/blocks/${block.slug}/`}>Review alone</a>}
     </p>
   </header>
