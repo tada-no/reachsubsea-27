@@ -26,8 +26,9 @@ interface Props extends BlockFields {
   /** The section's heading (visually hidden from 900 up, where the words themselves are the headings). */
   title: string;
   values: ValueItem[];
-  /** The closing promise: `lead` + the last value's word ("Everything within" + "Reach"). */
-  promise?: { lead: string; word: string };
+  /** The closing promise: `lead` + the last value's word ("Everything within" + "Reach").
+   * `short` is the form the `line` layout sets under the finished line ("Within Reach.", the PDF's heading). */
+  promise?: { lead: string; word: string; short?: string };
 }
 
 const { eyebrow, title, values = [], promise, background = 'navy', spacing, anchor } = Astro.props;
@@ -49,6 +50,13 @@ const figure = values[0]?.pictogram;
             {/* The pinned band (decorative; the list below carries the content) */}
             {eyebrow && <p class="values__eyebrow values__eyebrow--band text-eyebrow" aria-hidden="true">{eyebrow}</p>}
             <div class="values__grid" aria-hidden="true">
+              <p class="values__line">
+                {values.map((value, i) => (
+                  <span class="values__line-word" data-word={i}>
+                    <span class="values__line-clip"><span class="values__line-text">{value.word}.</span></span>
+                  </span>
+                ))}
+              </p>
               <div class="values__figure">
                 <div class="values__marks">
                   {figure && <span class="values__person"><Pictogram name={figure} size={320} /></span>}
@@ -61,14 +69,12 @@ const figure = values[0]?.pictogram;
                 <div class="values__items">
                   {values.map((value, i) => (
                     <div class="values__item" data-item={i}>
-                      <p class="values__item-word text-display">{value.word}.</p>
                       <p class="values__item-text text-lead">{value.text}</p>
                     </div>
                   ))}
                   {promise && (
-                    <div class="values__item" data-item={values.length}>
-                      <p class="values__item-lead text-h1">{promise.lead}</p>
-                      <p class="values__item-word values__item-word--accent text-display">{promise.word}.</p>
+                    <div class="values__item values__item--promise" data-item={values.length}>
+                      <p class="values__item-promise">{promise.short ?? `${promise.lead} ${promise.word}.`}</p>
                     </div>
                   )}
                 </div>
@@ -104,10 +110,15 @@ const figure = values[0]?.pictogram;
   .values {
     --pg-bg: var(--wp--custom--color--bg--default);
     /* The pinned figure's (and reel's) height, the band around them (a full viewport under the subnav, its
-       content centred) and the scroll each value costs */
+       content centred) and the scroll each value costs (about half a viewport: at a third of one the
+       values flew past, 20 Sep 2026) */
     --values-h: clamp(300px, 44vh, 400px);
     --values-band: max(calc(var(--values-h) + 156px), calc(100vh - var(--reach-subnav-top, 0px) - 72px));
-    --values-run: clamp(240px, 34vh, 340px);
+    --values-run: clamp(420px, 65vh, 680px);
+    /* The figure beside the copy: big enough to balance the word line, and tied to the width rather than
+       the height, because the word line grows with the width too — at 1100 a height-based size reached back
+       into "Reach." (20 Sep 2026) */
+    --values-figure: clamp(200px, 21vw, 320px);
   }
   .values__layout {
     display: flex;
@@ -254,17 +265,21 @@ const figure = values[0]?.pictogram;
     .values.is-live .values__eyebrow--band {
       display: block;
     }
+    /* The word line runs across the top; under it the copy (and the payoff) on the left, the figure on the
+       right, centred in its own column so it is not pinned to the container's edge and balances the type
+       (20 Sep 2026, Ross) */
     .values.is-live .values__grid {
       display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-      column-gap: var(--wp--preset--spacing--96);
-      align-items: center;
-      height: var(--values-h);
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+      column-gap: var(--wp--preset--spacing--48);
+      row-gap: var(--wp--preset--spacing--16);
+      align-items: start;
+    }
+    .values.is-live .values__line {
+      grid-column: 1 / -1;
+      grid-row: 1;
     }
     .values.is-live .values__marks {
-      position: relative;
-      margin-inline: auto;
-      width: min(100%, var(--values-h));
       aspect-ratio: 1;
     }
 
@@ -300,9 +315,6 @@ const figure = values[0]?.pictogram;
       max-width: 52rem;
       color: var(--wp--custom--color--text--secondary) !important;
     }
-    .values__item-word--accent {
-      color: var(--wp--custom--color--text--accent-display) !important;
-    }
 
     /* Runway: one --values-run per value (and for the promise), starting half a band up so each value
        holds for exactly one runway; its content is visually hidden (the band shows a copy). */
@@ -329,27 +341,123 @@ const figure = values[0]?.pictogram;
       clip-path: inset(50%);
       white-space: nowrap;
     }
+  
+    /* ── Line layout (20 Sep 2026, Ross): the three words on one line, each arriving as it is reached and
+       tinting once it is past; the copy sits under them with the figure; the promise arrives under the
+       finished line. Each word holds its place from the start (the clip only hides it), so the line never
+       reflows as words arrive. */
+    .values.is-live .values__line {
+      display: flex;
+      flex-wrap: wrap;
+      /* No word spaces: the full stops already separate them, and the tighter line leaves the figure room
+         (20 Sep 2026, Ross) */
+      gap: 0;
+      margin: 0;
+      line-height: var(--wp--custom--line-height--figure);
+      font-weight: var(--wp--custom--font-weight--bold);
+      /* The three words stay on one line at every width: Display, but never wider than the container
+         allows (the line runs about 15 characters wide, so width / 15 is its largest safe size) */
+      font-size: min(
+        var(--wp--preset--font-size--display),
+        calc((100vw - 2 * var(--wp--style--root--padding-left)) / 15)
+      );
+    }
+    .values.is-live .values__line-word {
+      color: var(--wp--custom--color--text--disabled);
+      transition: color 0.5s var(--wp--custom--motion--ease-out);
+    }
+    .values.is-live .values__line-clip {
+      display: block;
+      overflow: clip;
+      overflow-clip-margin: 0.12em;
+      padding-bottom: 0.08em;
+    }
+    .values.is-live .values__line-text {
+      display: block;
+      transform: translate3d(0, 110%, 0);
+      transition: transform 0.6s var(--wp--custom--motion--ease-in-out);
+    }
+    .values.is-live .values__line-word[data-state='current'],
+    .values.is-live .values__line-word[data-state='past'] {
+      color: var(--wp--custom--color--text--primary);
+    }
+    .values.is-live .values__line-word[data-state='past'] {
+      color: var(--wp--custom--color--text--disabled);
+    }
+    .values.is-live .values__line-word:is([data-state='current'], [data-state='past']) .values__line-text {
+      transform: none;
+    }
+    /* Under the line: the copy on the left, under the words it belongs to, and the figure on the right
+       (20 Sep 2026, Ross), so the payoff lands directly under Learn · Teach · Reach */
+    /* Row 2: the copy (and the payoff) sit straight under the line, so the row is only as tall as the text.
+       The figure takes no height of its own (20 Sep 2026, Ross) and is centred on that text, rather than on a
+       row its own height had stretched, which had pushed the copy down and left the icon sitting low. */
+    .values.is-live .values__reel {
+      grid-row: 2;
+      grid-column: 1;
+      align-self: start;
+    }
+    .values.is-live .values__figure {
+      position: relative;
+      /* Spans the word line and the copy, so the figure centres on the whole text block rather than on the
+         copy alone, which left it sitting low (20 Sep 2026, Ross) */
+      grid-row: 1 / span 2;
+      grid-column: 2;
+      /* Stretches to the row the copy sets; the figure itself is out of flow, so it adds no height */
+      align-self: stretch;
+    }
+    .values.is-live .values__marks {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      translate: -50% -50%;
+      width: min(100%, var(--values-figure));
+    }
+    /* The payoff takes the copy's place, in the line's own size and weight */
+    .values.is-live .values__item-promise {
+      margin: 0;
+      line-height: var(--wp--custom--line-height--figure);
+      font-weight: var(--wp--custom--font-weight--bold);
+      font-size: min(
+        var(--wp--preset--font-size--display),
+        calc((100vw - 2 * var(--wp--style--root--padding-left)) / 15)
+      );
+      color: var(--wp--custom--color--text--primary);
+    }
+    .values.is-live .values__item-text {
+      max-width: 44rem;
+    }
+    .values.is-live .values__band-inner {
+      gap: var(--wp--custom--stack--md);
+    }
   }
 </style>
 
 <script>
-  // Stage state: the step crossing the middle of the viewport is the active one. Scroll-linked through an
-  // IntersectionObserver on a 1px band at the centre (no scroll handler). Its subject plays one cycle
-  // (motion.ts ends the loop at the cycle boundary). Every figure subject gets a state (past · current ·
-  // future) so it can roll away the way it came; the promise counts as one step past the last value while
-  // the figure keeps standing at the last subject.
+  // Stage state: which value is at the middle of the pinned band. Derived from the scroll position rather
+  // than from an IntersectionObserver: a fling crosses a 1px line between frames, so the observer skipped
+  // Teach and Reach and the reel jumped straight from Learn to the promise (20 Sep 2026). Reading the
+  // runway's own offsets can't skip a state, and a fling simply lands on the value it stops at. Every figure
+  // subject gets a state (past · current · future) so it can roll away the way it came; the promise counts
+  // as one step past the last value, and the figure keeps standing at the last subject without replaying it.
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.querySelectorAll<HTMLElement>('[data-values]').forEach((root) => {
-    if (!('IntersectionObserver' in window)) return;
     const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
     const count = steps.filter((s) => !s.hasAttribute('data-promise')).length;
     const marks = [...root.querySelectorAll<HTMLElement>('[data-mark]')];
     const items = [...root.querySelectorAll<HTMLElement>('[data-item]')];
+    const words = [...root.querySelectorAll<HTMLElement>('[data-word]')];
     const section = root.closest<HTMLElement>('.values');
     const band = root.querySelector<HTMLElement>('.values__band');
+    if (steps.length === 0 || !band) return;
     root.classList.add('is-live');
     section?.classList.add('is-live');
+
+    let current = -1;
     const setState = (i: number) => {
+      if (i === current) return;
+      const first = current === -1;
+      current = i;
       const at = Math.min(i, count - 1);
       root.classList.toggle('is-promise', i >= count);
       root.dataset.active = String(at);
@@ -358,43 +466,50 @@ const figure = values[0]?.pictogram;
         const n = Number(mark.dataset.mark);
         mark.dataset.state = n < at ? 'past' : n > at ? 'future' : 'current';
       });
+      words.forEach((word) => {
+        const n = Number(word.dataset.word);
+        word.dataset.state = n < i ? 'past' : n > i ? 'future' : 'current';
+      });
       items.forEach((item) => {
         const n = Number(item.dataset.item);
         item.dataset.state = n < i ? 'past' : n > i ? 'future' : 'current';
       });
+      if (reduce || first) return;
+      steps[i]?.querySelector('.pictogram--live')?.classList.add('is-playing');
+      // The figure stays at the target through the promise, so nothing replays there
+      if (i < count) root.querySelector(`[data-mark="${i}"] .pictogram--live`)?.classList.add('is-playing');
     };
     setState(0);
-    const activate = (i: number) => {
+
+    // Each step's top in page coordinates, and the line the change happens on: the middle of the pinned
+    // band (its sticky `top` + half its height), or the middle of the viewport before it pins.
+    let tops: number[] = [];
+    let centre = 0;
+    const measure = () => {
+      tops = steps.map((step) => step.getBoundingClientRect().top + window.scrollY);
+      const style = getComputedStyle(band);
+      centre = style.position === 'sticky' ? parseFloat(style.top) + band.offsetHeight / 2 : window.innerHeight / 2;
+    };
+    const update = () => {
+      const line = window.scrollY + centre;
+      let i = 0;
+      for (let n = 0; n < tops.length; n++) if (line >= tops[n]) i = n;
       setState(i);
-      if (reduce) return;
-      steps[i]?.querySelector('.pictogram--live')?.classList.add('is-playing');
-      // The figure stays at the target for the promise, and lets fly once more
-      root.querySelector(`[data-mark="${Math.min(i, count - 1)}"] .pictogram--live`)?.classList.add('is-playing');
     };
-    // The change happens as a step crosses the middle of the pinned band (its `top` + half its height), so
-    // each value holds for exactly one runway; the band is re-measured when the viewport changes.
-    let observer: IntersectionObserver | undefined;
-    const observe = () => {
-      observer?.disconnect();
-      const centre = band && getComputedStyle(band).position === 'sticky'
-        ? parseFloat(getComputedStyle(band).top) + band.offsetHeight / 2
-        : window.innerHeight / 2;
-      const below = Math.max(0, window.innerHeight - centre - 1);
-      observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) activate(steps.indexOf(entry.target as HTMLElement));
-          });
-        },
-        { rootMargin: `-${Math.round(centre)}px 0px -${Math.round(below)}px 0px`, threshold: 0 },
-      );
-      steps.forEach((step) => observer!.observe(step));
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => { frame = 0; update(); });
     };
-    observe();
+    measure();
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
     let resizing = 0;
     window.addEventListener('resize', () => {
       window.clearTimeout(resizing);
-      resizing = window.setTimeout(observe, 150);
+      resizing = window.setTimeout(() => { measure(); update(); }, 150);
     });
+    // Late layout shifts (fonts, images above the section) move the runway under the line
+    window.addEventListener('load', () => { measure(); update(); });
   });
 </script>

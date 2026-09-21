@@ -58,7 +58,7 @@ export const values: CompanyValue[] = [
 ];
 
 /** The promise (live /about/, dev vision-values-and-promise). The last word is the one the values carry. */
-export const promise = { lead: 'Everything within', word: 'Reach' };
+export const promise = { lead: 'Everything within', word: 'Reach', short: 'Within Reach.' };
 
 /** Management team (dev /company/who-we-are/about-us/, Sep 2026). Names and roles only on About;
  * portraits and bios live on Leadership & Board. */
