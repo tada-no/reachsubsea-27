@@ -1167,5 +1167,15 @@
       "INSTANCE_SWAP via setProperties({'Pictogram#104:315': '<node id>'}) silently does nothing (and in one case the whole setProperties call was dropped). Swap the nested Pictogram instance with instance.swapComponent(component) instead.",
       "Reading a child's width in the same script that just changed the layout gives intermediate numbers; re-read in a later call (three widths read as 1312/640/416 settled to 421 each)."
     ]
+  },
+  "phase4MediaToggle22Sep": {
+    "date": "2026-09-22",
+    "context": "Q70 follow-up: the MediaToggle component (WCAG 2.2.2 pause control) pushed to Figma and placed in the two blocks that use it.",
+    "component": "Media toggle set 365:2391 on Components (doc frame 365:2366); new icon player-pause 365:2358",
+    "placements": {
+      "Page hero Style=Video, Breakpoint=Desktop (246:7829)": "Media toggle instance 365:12915 replaces the hand-drawn 'Video control' frame; same position (1328, 756), constraints right/bottom",
+      "Embed Type=3D World, State=Poster, Breakpoint=Desktop, Stage (201:4465)": "Media toggle instance 365:12918, absolute top right 24 inset, constraints right/top. Not on the Loaded state (code hides it while the scene runs) or Mobile (no loop there)"
+    },
+    "propagation": "4 instances on the Pages page inherit it through the page frames' block instances"
   }
 }

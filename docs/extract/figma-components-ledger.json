@@ -27,7 +27,8 @@
     "Site menu panel": "122:1862",
     "Mobile menu": "123:2493",
     "Search panel": "124:2565",
-    "Footer": "125:2893"
+    "Footer": "125:2893",
+    "Media toggle": "365:2366"
   },
   "components": {
     "Logo": {
@@ -268,6 +269,20 @@
       "variants": 2,
       "variantIds": { "Desktop": "125:2898", "Mobile": "125:2953" },
       "notes": "Navy mode on each variant; Mobile also sets Layout/Typography Mobile modes. No component properties: link text is edited in place."
+    },
+    "Media toggle": {
+      "id": "365:2391",
+      "type": "COMPONENT_SET",
+      "variants": 6,
+      "variantIds": {
+        "State=Playing, Interaction=Default": "365:2371",
+        "State=Playing, Interaction=Hover": "365:2374",
+        "State=Playing, Interaction=Focus": "365:2377",
+        "State=Paused, Interaction=Default": "365:2381",
+        "State=Paused, Interaction=Hover": "365:2384",
+        "State=Paused, Interaction=Focus": "365:2387"
+      },
+      "notes": "Added 22 Sep 2026 (Q70). Code: src/components/MediaToggle.astro. 48px round, fill navy/900 at 40% (Hover 70%), inner 1px stroke white at 24%, radius/full, 20px icon instance (player-pause for Playing, player-play for Paused) with Glyph stroke re-bound to text/on-overlay. Focus: absolute 56px ring, 2px border/focus, -4 inset (matches the global :focus-visible 2px + 2px offset). Doc frame below Date tile with an 'In use' group: Page hero bottom right, 3D World stage top right."
     }
   },
   "ledgers": {
