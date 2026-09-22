@@ -10,6 +10,14 @@ _No open questions right now._
 
 ## Answered log
 
+### Q76. Favicon from the brand icon (22 Sep 2026, deploy sweep)
+Context: the site had no icon link, so browsers asked for /favicon.ico and got a 404. Ross supplied `Reach-icon-600x600.svg` (navy R, sage bars bleeding to both edges). On the full 600 canvas the R is 40% of the square and smudges at 16px; a 478px crop around the R keeps 60px of each bar and reads. Comparison sheet: full canvas and crop, bare and on a navy tile, at 16 / 32 / 64 / 180 on light and dark.
+- [x] Tab icon: the bare mark, 478 crop (`public/favicon.svg`, navy R in light tabs, white in dark; `favicon.ico` 16 + 32 for old browsers). Matches the header logo
+- [ ] Tab icon: navy tile with the white R
+- [x] iOS home screen: navy tile, white R, sage bars (`apple-touch-icon.png`, 180)
+
+**Answer:** bare mark for the tab, tile for iOS. Built by `scripts/favicon.mjs`; listed for the WordPress developer in docs/09 §11.
+
 ### Q75. Contact page: open with the map, cards under it, pictogram contact cards (22 Sep 2026, Contact review)
 Context: first build had a Text hero, the map beside a column of office rows, and the six mailboxes as two columns of rows. Ross found the right-hand address column confusing, the emails too far from their topics, and asked whether the hero was needed.
 - [x] No hero: "Get in touch" (the page's h1) and the PDF lead are the map block's own header; the map follows straight under the site header. One-off to the "h1 lives in the Page hero" rule (docs/05 §0), because Contact has no siblings and nothing else to say first
