@@ -283,6 +283,21 @@
         "State=Paused, Interaction=Focus": "365:2387"
       },
       "notes": "Added 22 Sep 2026 (Q70). Code: src/components/MediaToggle.astro. 48px round, fill navy/900 at 40% (Hover 70%), inner 1px stroke white at 24%, radius/full, 20px icon instance (player-pause for Playing, player-play for Paused) with Glyph stroke re-bound to text/on-overlay. Focus: absolute 56px ring, 2px border/focus, -4 inset (matches the global :focus-visible 2px + 2px offset). Doc frame below Date tile with an 'In use' group: Page hero bottom right, 3D World stage top right."
+    },
+    "Favicon": {
+      "id": "386:2393",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "props": ["Scheme (Light, Dark)"],
+      "variantIds": { "Light": "386:2387", "Dark": "386:2388" },
+      "in": "Components / Logo 54:22, Group/Favicon 386:2390",
+      "note": "Tab icon from Reach-icon-600x600.svg, 478 px crop around the R, drawn at 64. Fills bound: R navy/800 (Light) or white (Dark), bars sage/400, tile bg/default or navy/900. Site files public/favicon.svg (R follows prefers-color-scheme) and favicon.ico 16 + 32, built by scripts/favicon.mjs (22 Sep 2026, Q76)."
+    },
+    "Touch icon": {
+      "id": "386:2389",
+      "type": "COMPONENT",
+      "in": "Components / Logo 54:22, Group/Favicon 386:2390",
+      "note": "apple-touch-icon.png at 180: tile navy/800, R white, bars sage/400."
     }
   },
   "ledgers": {
