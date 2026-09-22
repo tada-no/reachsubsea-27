@@ -33,7 +33,8 @@
     "Split embed": "319:6246",
     "Results band": "321:6312",
     "Lifecycle": "324:6654",
-    "Values": "329:6823"
+    "Values": "329:6823",
+    "Offices map": "373:7048"
   },
   "blocks": {
     "Page hero": {
@@ -513,6 +514,58 @@
       "examples": {
         "note": "No separate Group/Examples frame — the 3 State variants are themselves the full set of examples for this block (same harmless structural omission already on record for Accordion/CTA band/Statement)."
       }
+    },
+    "Offices map": {
+      "id": "377:7539",
+      "type": "COMPONENT_SET",
+      "variants": 1,
+      "axes": "Breakpoint (Desktop). Background and Heading level are instance overrides (fill bg/tint or Navy mode; the section header Title takes Heading/H1 when the block opens a page)",
+      "variantIds": {
+        "Breakpoint=Desktop": "373:7053"
+      },
+      "notes": "ADDED 22 Sep 2026 (Contact page, Q73-Q75; docs/05 §2.16; 16th block, outside the 14-block budget like Live operations). Ground truth: src/blocks/OfficesMap.astro, src/components/DotMap.astro, src/lib/dot-map-client.ts, src/data/contact.ts.",
+      "layers": "1440 wide, VERTICAL, padding section/md × grid/margin, gap space/64, fill bg/default. Section header instance (Align=Start, Breakpoint=Desktop; eyebrow 'Global presence', title 'Our offices', intro) · Map FRAME 1312×656 (radius/md, clipsContent, fill bg/default): 'Land dots' = ONE locked VECTOR (375:7048) of 1,552 cubic-Bézier circles (r 1.95) generated from the code's own band-xl poster for a 1312-wide map (src/lib/world-dots.ts output read from the served /contact/ page, scaled 1.39× from the poster viewBox), fill navy/300 — the real Mercator dot field this time, not a hand-placed approximation; 'Pins' FRAME (376:7048) with the home-view markers: solid 26px ellipse border/accent + Body/Small Medium label (Harstad, Singapore, West Perth), the '5 offices' cluster (26px dot with count + 38px dashed ring border/accent 1.5 at 80%) at the centroid of Haugesund/Bergen/Sandnes/Billingstad/Aberdeen/Göteborg, and quiet 16px hollow pins (bg/default fill, 2px border/accent) for Cyprus and Rio de Janeiro; labels sit left or right as the code places them · Grid (VERTICAL gap space/32) of two Rows (HORIZONTAL gap space/32) × 4 Card instances (cloned from Card preset/Office's card 115:890; Surface=Tint, Media=None, eyebrow + title + up to 3 Meta items with map-pin/phone/mail icons, action hidden), copy from src/data/contact.ts · Note text Body/Small text/secondary 'Also present in Sweden, Brazil and Cyprus.'",
+      "childIds": {
+        "docHeader": "373:7049",
+        "sectionHeader": "373:7054",
+        "map": "373:7064",
+        "landDots": "375:7048",
+        "pins": "376:7048",
+        "markers": [
+          "376:7049",
+          "376:7052",
+          "376:7057",
+          "376:7060",
+          "376:7063",
+          "376:7066"
+        ],
+        "grid": "373:7065",
+        "rows": [
+          "377:7076",
+          "377:7314"
+        ],
+        "cards": [
+          "377:7077",
+          "377:7146",
+          "377:7202",
+          "377:7258",
+          "377:7315",
+          "377:7371",
+          "377:7427",
+          "377:7483"
+        ],
+        "note": "373:7066"
+      },
+      "gotchas": [
+        "vectorPaths DOES accept a long path of 'M … C … C … C … C … Z' cubic-Bézier circles (284 KB, 1,552 circles) and renders it — the earlier 'h0' and 'A' rejections were about those commands, not path size. Build the path string inside the script from a compact rows array ([y, [x…]]) so the code parameter stays under 50 KB.",
+        "A VECTOR's x/y is its path bounding box, not the path's coordinate origin: after assigning vectorPaths, set x/y to the path's min x/y (minus the radius) or the whole field shifts to the frame corner.",
+        "Meta item (91:286) was changed for this block: counterAxisAlignItems MIN, icon box 24 tall, text HEIGHT auto-resize + FILL (the code rule 'icon on the first line of the text', docs/08 §2). Card instances also need their Meta frame and Meta item instances set to FILL, or the address stays one clipped line.",
+        "Section header 'Title' text style can be overridden per instance to Heading/H1 for a page opener (done on the Contact page instance)."
+      ],
+      "openItems": [
+        "Mobile not built (code: 5:4 map edge to edge, one card column, the address card docks along the bottom of the map).",
+        "The address-card overlay, the hovered/active pin states and the 'All offices' button are not represented (static home view only)."
+      ]
     }
   },
   "components": {
@@ -1177,5 +1230,81 @@
       "Embed Type=3D World, State=Poster, Breakpoint=Desktop, Stage (201:4465)": "Media toggle instance 365:12918, absolute top right 24 inset, constraints right/top. Not on the Loaded state (code hides it while the scene runs) or Mobile (no loop there)"
     },
     "propagation": "4 instances on the Pages page inherit it through the page frames' block instances"
+  },
+  "phase4MobileHeroScrim22Sep": {
+    "date": "2026-09-22",
+    "context": "Q74 round pushed to Figma: photo hero (desktop height, left-pinned photo with 30% right fade, breadcrumb pinned top; mobile photo band over navy panel, lead in Body), Image bg card mobile, pictogram card rows open on mobile, Services mobile page frame.",
+    "pageHero": {
+      "Style=Photo, Breakpoint=Desktop (138:418)": "1440x680. Frame fill navy/900. Image 138:419 at x100, 1340x680 (left edge of a centred 1240 photo, runs to the right edge), fills navy/900 + photo (screen blend, the code's photo tint), example photo usv-drix-wind. Overlay 138:420 same box: navy 45% + bottom ramp 24% + ellipse 1054 x 75% bottom-left (90/60/0) + right fade 30% + left fade 372px. Breadcrumb 138:422 moved out of Content, absolute 64/120 (Q58), keeps its Show breadcrumb property.",
+      "Style=Photo, Breakpoint=Mobile (138:471)": "375 wide, hugs height, padding top 236 (70% of the band), bottom 64, align top. Image 138:472 and Overlay 138:473: 375x338 band at the top (min(90vw,560)). Overlay: navy 30% + top ramp 60%->0 over 30% + bottom solid 0-12%, 82% at 32%, 0 at 70%. Breadcrumb 138:475 absolute 24/96. Lead 138:487 text style Body/Body.",
+      "gotcha": "Colour variables bound to gradient stops or to a translucent solid force alpha/opacity to 1 in instances: the scrim layers use the navy/900 value unbound; only opaque fills are bound."
+    },
+    "card": {
+      "Media=Image bg, Surface=Navy, Size=Mobile": "370:12896 (new variant in Card 103:1110; set resized to 3119x5896). 327 wide, fill navy/900, Image frame in flow 4:3 (327x245), Overlay over the band (solid 0-16%, 0 at 64%), Content overlaps by 32 (item spacing -32). Text property references copied from 103:1040."
+    },
+    "cardGridMobile": {
+      "variants": [
+        "147:1100",
+        "147:1191",
+        "147:1302",
+        "147:1446"
+      ],
+      "change": "Open rows: Grid gap 0, cards no fill/radius, border/subtle hairline on top of every card after the first, Content padding-inline 0, first/last row flush."
+    },
+    "cardBentoMobile": {
+      "variants": [
+        "312:9932",
+        "312:10062",
+        "312:10226",
+        "312:10420",
+        "312:10614"
+      ],
+      "change": "13 Image bg instances swapped to 370:12896 (fill width, hug height)."
+    },
+    "pageFrames": {
+      "heroPhotos": "Page-specific photos on the hero Image of each desktop frame: Investors overview 295:8373, Careers 302:8731, About 351:3241 (ocean-horizon-calm); Why invest 346:2750 (windfarm-turbine-install); Services 355:3421 (usv-drix-wind); Subsea 359:4056 (rov-supporter-subsea). All heroes now 680 tall (inherited).",
+      "Services overview · Mobile (Q74 blocks)": {
+        "id": "370:13225",
+        "x": 11480,
+        "sections": {
+          "Header Mobile": "370:13226",
+          "Page hero Photo Mobile": "370:13282",
+          "Section subnav Mobile": "370:13354",
+          "Card grid service lines (open rows, Icon/Tint cards)": "370:13939",
+          "Card bento lead-tall-trio-b Mobile": "370:13379"
+        },
+        "note": "Only the blocks this round changed; the rest of the page follows the desktop frame."
+      }
+    },
+    "imageHashes": {
+      "usv-drix-wind": "7cfeff99d9ebce91ab358931d24869ecf2e9505b",
+      "rov-supporter-subsea": "75532952ec198f727184d3b09c3074321bcef0ef",
+      "ocean-horizon-calm": "3b550055c1b947491800d7fb4819200d11a95fb9",
+      "windfarm-turbine-install": "128e86e0256a3d88c6596a2bb88bca87e899c60d"
+    }
+  },
+  "phase4Contact22Sep": {
+    "date": "2026-09-22",
+    "context": "Contact page (Q73-Q75). Coded first (src/pages/contact/index.astro), then pushed to Figma: the Offices map block (docFrame 373:7048, set 377:7539) and a Contact page frame on the Pages page.",
+    "contactFrame": {
+      "id": "378:5002",
+      "x": 13120,
+      "y": 0,
+      "children": {
+        "header": "378:5003 (Breakpoint=Desktop, no overlay: the page has no hero)",
+        "officesMap": "378:5082 (instance of 373:7053; section header eyebrow hidden, title 'Get in touch' restyled Heading/H1, intro = the PDF lead)",
+        "cardGrid": "378:13652 (Card grid 3 columns Desktop 145:974 detached for a second row; fill bg/tint; six Card Media=Icon Surface=White with Pictogram swaps 36:99, 45:82, 49:109, 51:131, 41:112, 43:108 and one mail Meta item each: cards 378:13656, 378:13657, 378:13658, 378:13669, 378:13670, 378:13671)",
+        "accordion": "378:13883 (Accordion Split Desktop 174:2623 instance; the PDF's three FAQs, first open; 'See all FAQs' link)",
+        "footer": "378:5466 (Footer Desktop 125:2898)"
+      }
+    },
+    "componentChanges": [
+      "Meta item 91:286: icon aligned to the first text line, text wraps (see the Offices map gotcha).",
+      "Footer 125:2898 / 125:2953: 'Contact' link moved from the Company column to the top of Get in touch (Q75)."
+    ],
+    "openItems": [
+      "Pictogram/chat-active (45:82): the code draws the dots smaller (r 1.6 against the library's 2.03 rings, Ross 22 Sep 2026); the Figma glyph should follow.",
+      "Pictogram loops (six topic pictograms traced as strokes and animated) have no Figma representation, as before."
+    ]
   }
 }
