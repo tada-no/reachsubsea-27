@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 96 96">
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <g>
+    <path d="M51.243,76.149c-1.136,0-2.063-.955-2.063-2.09v-32.596c0-1.135.928-2.064,2.063-2.064h22.31c1.136,0,2.063.93,2.063,2.064v32.596c0,1.135-.928,2.09-2.063,2.09h-22.31Z" fill="none" stroke="#6eaa8c" stroke-linejoin="round" stroke-width="2.5"/>
+    <line x1="53.551" y1="51.504" x2="75.562" y2="51.504" fill="none" stroke="#6eaa8c" stroke-miterlimit="10" stroke-width="2.5"/>
+    <line x1="58.007" y1="51.632" x2="58.007" y2="75.983" fill="none" stroke="#6eaa8c" stroke-miterlimit="10" stroke-width="2.5"/>
+    <line x1="66.834" y1="51.607" x2="66.834" y2="75.951" fill="none" stroke="#6eaa8c" stroke-miterlimit="10" stroke-width="2.5"/>
+    <line x1="53.551" y1="59.693" x2="75.562" y2="59.693" fill="none" stroke="#6eaa8c" stroke-miterlimit="10" stroke-width="2.5"/>
+    <line x1="53.551" y1="67.881" x2="66.671" y2="67.881" fill="none" stroke="#6eaa8c" stroke-miterlimit="10" stroke-width="2.5"/>
+  </g>
+  <g>
+    <polyline points="33.232 25.273 33.232 32.734 25.762 32.734" fill="none" stroke="#6eaa8c" stroke-miterlimit="10" stroke-width="2.5"/>
+    <polyline points="43.652 76.149 20.384 76.149 20.384 30.773 31.309 19.851 62.667 19.851 62.667 34.232" fill="none" stroke="#6eaa8c" stroke-linejoin="round" stroke-width="2.5"/>
+  </g>
+</svg>

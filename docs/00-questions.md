@@ -49,6 +49,20 @@ Context: Ross's notes with ref/side scrim.jpg, ref/mobile hero.jpg and ref/servi
 
 **Answer:** as ticked (Ross's proposals; details decided by Claude, open to change). ref/image cards.jpg arrived later; it shows the before state (text over the photo) that the image card change fixes.
 
+### Q73. Contact page: source conflicts and page shape (22 Sep 2026, Contact)
+Context: the client PDF (p59, "27 — Contact") and the dev site's /contact/ disagree on a few values, and the dev map pins places the PDF only mentions. Every address, number and email on the page must come from one of the two, cited per entry in `src/data/contact.ts`.
+- [x] Singapore: the PDF's 100G Pasir Panjang Road, #03-07/08, Singapore 118523 (the client's newer document)
+- [ ] Singapore: the dev site's 22 Pandan Road, 609274
+- [x] Aberdeen: both the PDF's email (commercial.abz@reachsubsea.com) and the dev site's phone (+44 (0)1224 418210)
+- [ ] Aberdeen: one of them only
+- [x] Presence pins: the PDF's three "also present" places (Göteborg, Rio de Janeiro, Cyprus) as quieter pins without cards; Houston and Trinidad & Tobago (dev only) left off
+- [ ] All dev pins, including Houston
+- [ ] Offices only, presence as a text line
+- [x] No CTA band: the FAQ closes the page, as in the PDF (the footer carries phone, email and socials)
+- [ ] CTA panel (Open positions or Investors)
+
+**Answer:** as ticked. Also decided by Claude, open to change: the office keeps the client's label "Sandnes (Stavanger)" with "Sandnes" on the map pin; no mailbox is tied to an office (they are company-wide) and the HQ row carries the general phone and post@ from `contactDetails`. Page: Hero Text (navy) · **Offices map** (new block: dot-matrix map beside the office list, HQ first, "Also present in…" under the list) (white) · **Contact list** (the six topic mailboxes as a two-column list of rows, not six cards) (tint) · Accordion Split, the PDF's three FAQs with answers built from the data (white). The map is the homepage's dot-matrix map, extracted into shared pieces (`src/lib/dot-map-client.ts`, `src/components/DotMap.astro`) that Live operations and Offices map both use; the Live operations block was checked element by element before and after (docs/07 §3).
+
 ### Q72. Live operations map: dot density (22 Sep 2026, Live operations)
 Context: with the dots no longer cut at coastlines (Q71), the density was a free choice. Compared live on the review page with a temporary Dot density toggle (Regular · Fine · Finer) and a stacked comparison image at 1440.
 - [x] Regular: about the size of the old map's dots (3.4px on a 13px pitch at 1440)
