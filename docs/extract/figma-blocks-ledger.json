@@ -1294,7 +1294,7 @@
         "header": "378:5003 (Breakpoint=Desktop, no overlay: the page has no hero)",
         "officesMap": "378:5082 (instance of 373:7053; section header eyebrow hidden, title 'Get in touch' restyled Heading/H1, intro = the PDF lead)",
         "cardGrid": "378:13652 (Card grid 3 columns Desktop 145:974 detached for a second row; fill bg/tint; six Card Media=Icon Surface=White with Pictogram swaps 36:99, 45:82, 49:109, 51:131, 41:112, 43:108 and one mail Meta item each: cards 378:13656, 378:13657, 378:13658, 378:13669, 378:13670, 378:13671)",
-        "accordion": "378:13883 (Accordion Split Desktop 174:2623 instance; the PDF's three FAQs, first open; 'See all FAQs' link)",
+        "accordion": "380:5650 (Accordion Split Desktop 174:2623, detached so the open item can sit first: an instance cannot reorder its children; the PDF's three FAQs, first open; 'See all FAQs' link)",
         "footer": "378:5466 (Footer Desktop 125:2898)"
       }
     },
