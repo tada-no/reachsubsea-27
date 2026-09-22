@@ -1,0 +1,27 @@
+<svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Traced from Figma Pictogram/money-stack-dollars (41:112): stroke 2.5 on the outline's centreline -->
+<g stroke="currentColor" stroke-width="2.5">
+<g class="pg-coin pg-lead" stroke-linecap="round">
+<path d="M54.6 49.9A17.55 17.55 0 1 1 50.4 53.7"/>
+<path d="M68.67 60.62A4.8 3.7 0 1 0 59.06 60.62C59.06 62.3 61.5 63.5 63.9 64.5C66.3 65.5 68.67 66.7 68.67 68.38A4.8 3.7 0 1 1 59.06 68.38"/>
+<path stroke-linecap="butt" d="M63.87 53.46V56.91M63.87 72.1V75.72"/>
+</g>
+<g class="pg-stack pg-stack--upper">
+<ellipse class="pg-band pg-band--1" cx="45.49" cy="19.12" rx="12.02" ry="5.56"/>
+<path d="M33.47 24.91V38.77"/>
+<path class="pg-band pg-band--2" d="M33.47 26.02A12.02 5.56 0 0 0 57.51 26.02"/>
+<path class="pg-band pg-band--3" d="M33.47 32.92A12.02 5.56 0 0 0 57.51 32.92"/>
+<path class="pg-band pg-band--4" stroke-linecap="round" d="M42.9 45.25A12.02 5.56 0 0 0 57.51 39.82"/>
+<path stroke-linecap="round" d="M57.51 19.34V47.79"/>
+<path class="pg-band pg-band--5" d="M38.6 51.28A12.02 5.56 0 0 0 45.7 52.28"/>
+<path class="pg-band pg-band--6" d="M38.4 58.11A12.02 5.56 0 0 0 43.3 59.09"/>
+<path class="pg-band pg-band--7" d="M38.7 65.11A12.02 5.56 0 0 0 42.8 65.94"/>
+</g>
+<g class="pg-stack pg-stack--lower">
+<ellipse class="pg-band pg-band--5" cx="26.51" cy="47.4" rx="12.02" ry="5.56"/>
+<path class="pg-band pg-band--6" d="M14.49 54.3A12.02 5.56 0 0 0 38.53 54.3"/>
+<path class="pg-band pg-band--7" d="M14.49 61.2A12.02 5.56 0 0 0 38.53 61.2"/>
+<path class="pg-band pg-band--8" d="M14.49 53.28V68.15A12.02 5.56 0 0 0 38.53 68.15V47.49"/>
+</g>
+</g>
+</svg>

@@ -8,7 +8,8 @@ import type { SectionHeaderField } from '../lib/types';
 interface Props extends SectionHeaderField {
   /** Heading id, for the block's aria-labelledby. */
   id?: string;
-  as?: 'h2' | 'h3';
+  /** h1 only when the block opens a page without a Page hero (Contact, Q75). */
+  as?: 'h1' | 'h2' | 'h3';
   class?: string;
 }
 
@@ -20,7 +21,7 @@ const { eyebrow, title, intro, action, align = 'start', id, as: Heading = 'h2', 
 >
   <div class="section-header__text">
     {eyebrow && <Eyebrow text={eyebrow} />}
-    <Heading id={id} class="section-header__title text-h2">{title}</Heading>
+    <Heading id={id} class:list={['section-header__title', Heading === 'h1' ? 'text-h1' : 'text-h2']}>{title}</Heading>
     {intro && <p class="section-header__intro text-lead">{intro}</p>}
   </div>
   {

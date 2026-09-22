@@ -77,8 +77,9 @@ export const certificates = [
   { standard: 'ISO 45001:2018', scope: 'Health and safety' },
 ];
 
-/** Office locations (PDF p31 FAQ). */
-export const officeCities = ['Haugesund (HQ)', 'Bergen', 'Sandnes', 'Harstad', 'Billingstad', 'Aberdeen', 'Singapore', 'West Perth'];
+/** Office locations (PDF p31 FAQ), from the Contact data (22 Sep 2026): one list for the whole site. */
+export { officeCities } from './contact';
+import { officeCities } from './contact';
 
 /** PDF p31 FAQs: genuine questions, answers built from the figures above (FAQ post type, topic Company). */
 export const companyFaqs = [

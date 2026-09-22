@@ -10,6 +10,22 @@ _No open questions right now._
 
 ## Answered log
 
+### Q75. Contact page: open with the map, cards under it, pictogram contact cards (22 Sep 2026, Contact review)
+Context: first build had a Text hero, the map beside a column of office rows, and the six mailboxes as two columns of rows. Ross found the right-hand address column confusing, the emails too far from their topics, and asked whether the hero was needed.
+- [x] No hero: "Get in touch" (the page's h1) and the PDF lead are the map block's own header; the map follows straight under the site header. One-off to the "h1 lives in the Page hero" rule (docs/05 §0), because Contact has no siblings and nothing else to say first
+- [ ] Keep a slim Text hero
+- [x] Offices map: full-width map, the eight offices as a 4 × 2 grid of cards under it. A pin click opens an address card on the map and highlights its grid card; hovering a card lights its pin; a cluster click zooms until it splits and an "All offices" button appears to zoom back out. No zoom pill, no row buttons
+- [ ] Keep the − / + pill too
+- [ ] Keep the list beside the map
+- [x] Key contacts by topic: six cards (3 × 2) with a line pictogram each from the design system's own library (Figma `33:74`, 74 pictograms), the mailbox as the card's link: `increase-percent-arrows` (Investor relations), `chat-active` (Press & media), `team` (Careers & recruitment), `handshake` (Sales), `money-stack-dollars` (Invoices), `shield-tick` (HSEQ). Ross's rule (22 Sep 2026): never invent a pictogram; if one is missing, ask. The library glyphs are flattened fills; their parts are tagged and moved by transform in Pictogram.astro. All six are traced as 2.5px strokes on the outline's centreline (Ross, third review: "redraw if it helps, line for line"; the handshake buttons keep the library's filled rings; the chat dots are drawn smaller than the library's, r 1.6 against 2.03, at Ross's request, so the Figma glyph should follow), checked by overlaying the trace on the glyph. Loops (after Ross's fourth review): the hands draw back, clasp with a spring and shake with a dying-away wobble; the coin spins and a settle ripple runs down both stacks; the tick trims and redraws while the ring turns; the arrowheads redraw first, the speed lines stay hidden until then and draw in column by column, then the percent pops; the bubbles take turns with small dot pops; the team does a plain roll call (each lifts in turn, no leaning)
+- [ ] Library pictograms only
+- [ ] Keep the list, address under the topic
+
+- [x] Follow-up (Ross, second review): the address card and the "All offices" button had no padding (they used a spacing token that doesn't exist, `--20`; now 16/24 and 16). The full-width map's dots were coarser than Home's (columns are fixed per width band, and the Contact map is 1312 wide against Home's 828), so `DOT_PRESETS` gets a third band from 960px of map width (regular 88 columns; fine 128; finer 176) and the poster CSS a matching container query: the pitch now stays near 11–15px on both pages. Also from this review: a cluster click fits every office in the cluster in one go (`clusterClick: 'fit'`; Home keeps the one-step `expand`), and the map pans when an address card would open past its edge.
+- [x] Third review: hovering a grid card pulses its pin once (the Live operations pulse, one cycle, only on maps that aren't already pulsing). Address card padding 24 all round; the card itself takes focus on open (the close button's focus ring showed on every pointer open). Footer: the Contact link moves from the Company column to the top of Get in touch. Rule (docs/08 §2): an icon beside text aligns to the first line of the text (MetaItem), never the middle of a wrapped address.
+
+**Answer:** as ticked. The Contact list block (§2.17 draft) is dropped: the mailboxes are a Card grid, 3 columns, icon media. The 4:3 `offices` map frame from the first build is removed again: the full-width map uses the standard `wide` frame.
+
 ### Q74. Site-wide mobile and scrim notes (22 Sep 2026, all pages)
 Context: Ross's notes with ref/side scrim.jpg, ref/mobile hero.jpg and ref/service cards mobile.jpg. On phones the photo heroes and image cards ran the photo behind all the text, so both read as busy; the tint service cards inside the page gutter left the text about 260 wide.
 - [x] Photo hero, right fade: 22% → 10% of the photo, and only above 1240, where the photo has an edge to hide

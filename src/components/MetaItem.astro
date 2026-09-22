@@ -22,12 +22,15 @@ const { icon, text, href, as: Tag = 'div', class: className } = Astro.props;
 <style is:global>
   .meta-item {
     display: flex;
-    align-items: center;
+    /* Rule (Ross, 22 Sep 2026): the icon sits on the FIRST line of the text, never the middle of a
+       wrapped address. The icon box is one line tall and the glyph centres inside it. */
+    align-items: flex-start;
     gap: var(--wp--preset--spacing--8);
     color: var(--wp--custom--color--text--secondary);
   }
   .meta-item .icon {
     flex: none;
+    height: var(--wp--custom--line-height--body-sm);
     color: var(--wp--custom--color--icon--accent);
   }
   .meta-item__link {

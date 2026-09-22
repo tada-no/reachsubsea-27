@@ -120,12 +120,15 @@ export interface DotSpec {
   tall: number;
 }
 export const DOT_PRESETS: Record<DotPreset, DotSpec> = {
-  regular: { dot: 0.26, wide: [{ min: 680, cols: 60 }, { min: 0, cols: 44 }], tall: 36 },
-  fine: { dot: 0.24, wide: [{ min: 680, cols: 88 }, { min: 0, cols: 64 }], tall: 52 },
-  finer: { dot: 0.22, wide: [{ min: 680, cols: 120 }, { min: 0, cols: 88 }], tall: 72 },
+  // Three bands keep the pitch near 11–15px from a 535px map to a 1312px one (the full-width Offices
+  // map on Contact), so a wide map has the same dot feel as Home's two-thirds-width map (22 Sep 2026).
+  regular: { dot: 0.26, wide: [{ min: 960, cols: 88 }, { min: 680, cols: 60 }, { min: 0, cols: 44 }], tall: 36 },
+  fine: { dot: 0.24, wide: [{ min: 960, cols: 128 }, { min: 680, cols: 88 }, { min: 0, cols: 64 }], tall: 52 },
+  finer: { dot: 0.22, wide: [{ min: 960, cols: 176 }, { min: 680, cols: 120 }, { min: 0, cols: 88 }], tall: 72 },
 };
-/** The container-query breakpoint the `wide` bands switch at (px of map width). */
+/** The container-query breakpoints the `wide` bands switch at (px of map width): sm < 680 ≤ lg < 960 ≤ xl. */
 export const WIDE_BREAK = 680;
+export const WIDE_BREAK_XL = 960;
 
 export function colsFor(spec: DotSpec, frame: FrameKey, width: number) {
   if (frame === 'tall') return spec.tall;

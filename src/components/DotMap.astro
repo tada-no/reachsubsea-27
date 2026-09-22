@@ -1,0 +1,329 @@
+---
+// Dot map (22 Sep 2026, shared by Live operations and Offices map; docs/07 §3). The brand dot-matrix
+// world map as a <figure>: a static poster first (one SVG per width band, the whole map without JS),
+// then, when the block's script calls createDotMap() (src/lib/dot-map-client.ts), a MapLibre camera
+// with a canvas dot overlay and HTML markers that fade in over the poster. Poster and live map are the
+// same picture: same Mercator framing box (FRAMES in src/lib/dot-map.ts), same grid, same land mask.
+//
+// The block owns the meaning of the points and the list that is the real content; this figure is a
+// picture of that list, and its markers are pointer shortcuts (aria-hidden). `summary` labels the map
+// region for assistive tech. Without `points` the figure is poster-only.
+//
+// Surfaces: `--map-dot` is set per surface here (Light: navy/300; Navy: navy/600; Tint keeps the
+// Light value) and read by the overlay script, so the same block works on white, tint and navy.
+// Aspect: 2:1 (`wide` frame) above 600px, 5:4 (`tall`) on phones. Keep these in step with FRAMES.
+//
+// WordPress: the theme ships land-mask.png, the poster SVGs (one per band and density) and
+// dot-map-client.js as static files; the block passes its points as JSON, exactly as here.
+import { posters } from '../lib/world-dots';
+import type { DotPreset } from '../lib/dot-map';
+import type { DotMapPoint } from '../lib/dot-map-client';
+
+interface Props {
+  /** Markers. Omit for a poster-only map. */
+  points?: DotMapPoint[];
+  /** Text summary of the map for assistive tech (the region's accessible name). */
+  summary?: string;
+  /** Dot density (DOT_PRESETS). Regular is the site default (Q72). */
+  dots?: DotPreset;
+  /** Markers pulse and cluster rings turn (Live operations, Live state). */
+  pulse?: boolean;
+  /** Every single marker carries its label at all zooms (offices), not only once clusters split. */
+  labels?: boolean;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { points, summary = 'World map.', dots = 'regular', pulse = false, labels = false, class: className, ...attrs } = Astro.props;
+
+const posterSet = await posters(dots);
+// One poster per `wide` width band, plus the phone (tall) frame; CSS shows one
+const posterClass = (p: (typeof posterSet)[number]) =>
+  `dot-map__poster dot-map__poster--${p.frame === 'tall' ? 'tall' : p.min >= 960 ? 'band-xl' : p.min > 0 ? 'band-lg' : 'band-sm'}`;
+---
+
+<figure
+  class:list={['dot-map', pulse && 'dot-map--pulse', labels && 'dot-map--labels', className]}
+  data-dot-map
+  data-dots={dots}
+  {...attrs}
+>
+  {posterSet.map((p) => (
+    <svg class={posterClass(p)} viewBox={`${p.box.x} ${p.box.y} ${p.box.w} ${p.box.h}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <path class="dot-map__land" d={p.d} stroke-width={p.dot} />
+    </svg>
+  ))}
+  {
+    points && (
+      <Fragment>
+        <div class="dot-map__canvas" data-dot-map-canvas role="region" aria-label={summary} />
+        <script type="application/json" data-dot-map-points set:html={JSON.stringify(points)} />
+      </Fragment>
+    )
+  }
+</figure>
+
+<style is:global>
+  .dot-map {
+    /* Map colours from tokens (read by the script): Light surface values here, Navy below */
+    --map-dot: var(--wp--preset--color--navy-300);
+    /* The ground behind the map, for label halos */
+    --map-ground: var(--wp--custom--color--bg--default);
+    position: relative;
+    margin: 0;
+    /* Frame aspect: 'wide' in src/lib/dot-map.ts. Keep the two in step. */
+    aspect-ratio: 2 / 1;
+    border-radius: var(--wp--custom--radius--md);
+    overflow: hidden;
+    /* Poster variants switch on the map's own width (WIDE_BREAK in dot-map.ts) */
+    container-type: inline-size;
+  }
+  .has-surface-tint .dot-map {
+    --map-ground: var(--wp--custom--color--bg--tint);
+  }
+  .has-surface-navy .dot-map {
+    --map-dot: var(--wp--preset--color--navy-600);
+  }
+  /* Poster variants: one per width band, matching the overlay's choice in the script */
+  .dot-map__poster {
+    display: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 400ms var(--wp--custom--motion--easing);
+  }
+  /* Bands: WIDE_BREAK and WIDE_BREAK_XL in src/lib/dot-map.ts */
+  @container (width >= 960px) {
+    .dot-map__poster--band-xl {
+      display: block;
+    }
+  }
+  @container (680px <= width < 960px) {
+    .dot-map__poster--band-lg {
+      display: block;
+    }
+  }
+  @container (width < 680px) {
+    .dot-map__poster--band-sm {
+      display: block;
+    }
+  }
+  .dot-map__land {
+    fill: none;
+    stroke: var(--map-dot);
+    stroke-linecap: round;
+  }
+  /* The live dots: a canvas the script draws over the (empty) GL canvas, under the markers */
+  .dot-map__dots {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  /* Doubled class: MapLibre's CSS (loaded later) sets .maplibregl-map { position: relative } */
+  .dot-map__canvas.dot-map__canvas {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 400ms var(--wp--custom--motion--easing);
+  }
+  .dot-map.is-ready .dot-map__canvas {
+    opacity: 1;
+  }
+  .dot-map.is-ready .dot-map__poster {
+    opacity: 0;
+  }
+  /* MapLibre chrome, brought onto the tokens */
+  .dot-map .maplibregl-map {
+    font-family: var(--wp--preset--font-family--inter);
+  }
+  .dot-map .maplibregl-canvas:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: -2px;
+  }
+  .dot-map .maplibregl-ctrl-attrib,
+  .dot-map .maplibregl-ctrl-attrib.maplibregl-compact,
+  .dot-map .maplibregl-ctrl-attrib.maplibregl-compact-show {
+    background-color: transparent;
+    color: var(--wp--custom--color--text--secondary);
+    font-size: var(--wp--preset--font-size--eyebrow);
+  }
+  .dot-map .maplibregl-ctrl-attrib a {
+    color: inherit;
+  }
+  .has-surface-navy .dot-map .maplibregl-ctrl-attrib-button {
+    filter: invert(1);
+  }
+  .dot-map .maplibregl-cooperative-gesture-screen {
+    background: var(--wp--custom--color--bg--overlay);
+    color: var(--wp--custom--color--text--on-overlay);
+    font-size: var(--wp--preset--font-size--body-sm);
+    border-radius: inherit;
+  }
+
+  /* ── Markers (HTML, positioned by the map) ─────────────── */
+  .dot-map__marker {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    font-family: var(--wp--preset--font-family--inter);
+  }
+  .dot-map__marker--cluster {
+    width: 34px;
+    height: 34px;
+    cursor: zoom-in;
+  }
+  .dot-map__marker::before {
+    /* larger hit area */
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+  .dot-map__marker-dot {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--border--accent);
+    color: var(--wp--preset--color--navy-900);
+    font-size: var(--wp--preset--font-size--eyebrow);
+    font-weight: var(--wp--custom--font-weight--bold);
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 0 0 0 var(--wp--preset--color--navy-900);
+    transition:
+      transform 240ms var(--wp--custom--motion--easing),
+      box-shadow 240ms var(--wp--custom--motion--easing);
+  }
+  .dot-map__marker--cluster .dot-map__marker-dot {
+    font-size: var(--wp--preset--font-size--caption);
+  }
+  /* Quiet marker (a place without a card): a smaller hollow dot */
+  .dot-map__marker--quiet .dot-map__marker-dot {
+    width: 16px;
+    height: 16px;
+    background-color: var(--map-ground);
+    box-shadow: inset 0 0 0 2px var(--wp--custom--color--border--accent);
+  }
+  .dot-map__marker-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--border--accent);
+    opacity: 0;
+  }
+  .dot-map__marker-ring {
+    position: absolute;
+    inset: -6px;
+    border: 1.5px dashed var(--wp--custom--color--border--accent);
+    border-radius: var(--wp--custom--radius--full);
+    opacity: 0.8;
+  }
+  .dot-map--pulse .dot-map__marker-pulse {
+    animation: dot-map-pulse 3.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  }
+  .dot-map--pulse .dot-map__marker-ring {
+    animation: dot-map-spin 18s linear infinite;
+  }
+  /* A card hovered in the block's list pulses its pin once (Offices map; Q75). Not on a live map,
+     whose pins already pulse. */
+  .dot-map:not(.dot-map--pulse) .dot-map__marker.is-hover .dot-map__marker-pulse {
+    animation: dot-map-pulse 1.4s cubic-bezier(0.2, 0.6, 0.3, 1) 1 both;
+  }
+  .dot-map__marker-label {
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    translate: 0 -50%;
+    white-space: nowrap;
+    color: var(--wp--custom--color--text--primary);
+    font-size: var(--wp--preset--font-size--body-sm);
+    font-weight: var(--wp--custom--font-weight--medium);
+    text-shadow:
+      0 0 4px var(--map-ground),
+      0 0 2px var(--map-ground);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms var(--wp--custom--motion--easing);
+  }
+  .dot-map__marker.is-label-left .dot-map__marker-label {
+    left: auto;
+    right: calc(100% + 10px);
+  }
+  .dot-map__marker--cluster .dot-map__marker-label {
+    left: calc(100% + 14px);
+  }
+  .dot-map__marker--cluster.is-label-left .dot-map__marker-label {
+    right: calc(100% + 14px);
+  }
+  .dot-map__marker:hover .dot-map__marker-dot,
+  .dot-map__marker.is-hover .dot-map__marker-dot {
+    transform: scale(1.15);
+  }
+  .dot-map__marker.is-active .dot-map__marker-dot {
+    transform: scale(1.25);
+    box-shadow: 0 0 0 3px var(--wp--preset--color--navy-900);
+  }
+  .dot-map__marker:hover .dot-map__marker-label,
+  .dot-map__marker.is-hover .dot-map__marker-label,
+  .dot-map__marker.is-active .dot-map__marker-label,
+  .dot-map.is-detail .dot-map__marker:not(.dot-map__marker--cluster) .dot-map__marker-label,
+  .dot-map--labels .dot-map__marker-label {
+    opacity: 1;
+  }
+  .dot-map.has-selection .dot-map__marker:not(.is-active):not(:hover):not(.is-hover) {
+    opacity: 0.6;
+  }
+
+  @keyframes dot-map-pulse {
+    0% {
+      opacity: 0.55;
+      transform: scale(1);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(2.8);
+    }
+  }
+  @keyframes dot-map-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot-map__marker-pulse,
+    .dot-map__marker-ring {
+      animation: none !important;
+    }
+    .dot-map--pulse .dot-map__marker-pulse {
+      opacity: 0.25;
+      transform: scale(1.6);
+    }
+  }
+
+  @media (max-width: 599px) {
+    .dot-map {
+      /* Frame aspect: 'tall' in src/lib/dot-map.ts */
+      aspect-ratio: 5 / 4;
+    }
+    .dot-map__poster--band-xl,
+    .dot-map__poster--band-lg,
+    .dot-map__poster--band-sm {
+      display: none;
+    }
+    .dot-map__poster--tall {
+      display: block;
+    }
+    .dot-map__marker-label {
+      font-size: var(--wp--preset--font-size--caption);
+    }
+  }
+</style>

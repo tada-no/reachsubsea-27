@@ -1,0 +1,405 @@
+---
+// Offices map · reach/offices-map (22 Sep 2026, Contact, Q73–Q75; docs/05 §2.16). Where Reach's offices
+// are: the brand dot-matrix world map, full width, with the offices as a grid of cards under it. The
+// CARDS are the content (address, phone, email, readable with no JS, no CSS and no map); the map is a
+// picture of them, and its pins are pointer shortcuts: a pin click opens the office's address card on
+// the map (docked along the bottom of the map on phones) and highlights its grid card, hovering a grid
+// card lights its pin, a cluster click zooms in until it splits, and an "All offices" button appears to
+// zoom back out. No zoom buttons otherwise (Q75). The HQ leads the grid; "also present" places are quiet pins plus a line under the cards.
+//
+// Map: DotMap.astro + src/lib/dot-map-client.ts, shared with Live operations. Differences: no status
+// line, filters or "Sample data" badge; pins carry the city name at every zoom; the Norwegian offices
+// (and Aberdeen, at the world view) cluster and split on zoom; the zoom is capped at city level (no
+// privacy issue here, but a street-level zoom on a dot map is pointless). Works on white, tint and
+// navy (DotMap sets the dot colour per surface; the cards flip surface to stay in contrast).
+//
+// `first` + `headingLevel="h1"`: the block opens the page with no Page hero (Contact, Q75): it clears
+// the fixed header like the Page hero does, and its title is the page's h1.
+//
+// WordPress: the Office post type (src/data/contact.ts header) is the data; the theme ships
+// land-mask.png, the poster SVGs (one per width band and density) and dot-map-client.js as static
+// files. Fields: `sectionHeader`, `offices` (query, or a manual pick), `dots`, `headingLevel`, plus
+// background, spacing, anchor.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import DotMap from '../components/DotMap.astro';
+import Card from '../components/Card.astro';
+import MetaItem from '../components/MetaItem.astro';
+import IconButton from '../components/IconButton.astro';
+import Icon from '../components/Icon.astro';
+import { makeId } from '../lib/ids';
+import type { DotPreset } from '../lib/dot-map';
+import type { DotMapPoint } from '../lib/dot-map-client';
+import type { Office } from '../data/contact';
+import type { BlockFields, MetaField, SectionHeaderField } from '../lib/types';
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  /** Offices (cards and pins) and presence places (pins only). */
+  offices: Office[];
+  /** Dot density of the land (src/lib/dot-map.ts DOT_PRESETS). */
+  dots?: DotPreset;
+  /** h1 when the block opens the page (no Page hero). */
+  headingLevel?: 'h1' | 'h2';
+  /** First block on the page: pads for the fixed header, like the Page hero. */
+  first?: boolean;
+}
+
+const {
+  sectionHeader = { eyebrow: 'Global presence', title: 'Our offices' },
+  offices,
+  dots = 'regular',
+  headingLevel = 'h2',
+  first = false,
+  background = 'white',
+  spacing,
+  anchor = 'offices',
+} = Astro.props;
+
+const list = offices.filter((o) => o.type === 'office');
+const presence = offices.filter((o) => o.type === 'presence');
+const joinAnd = (items: string[]) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items.join(''));
+const presenceCountries = [...new Set(presence.map((o) => o.country))];
+
+const titleId = makeId('offices-map', sectionHeader.title);
+const points: DotMapPoint[] = offices.map((o) => ({ id: o.id, name: o.city, lon: o.lon, lat: o.lat, count: 1, quiet: o.type === 'presence' }));
+const summary = `Map of ${list.length} offices: ${list.map((o) => o.city).join(', ')}${presence.length ? `, with presence in ${joinAnd(presenceCountries)}` : ''}. Details in the cards below.`;
+// Phone numbers never wrap mid-number
+const nbsp = (s: string) => s.replace(/ /g, ' ');
+const kicker = (o: Office) => (o.hq ? `Headquarters · ${o.country}` : o.country);
+const metaOf = (o: Office): MetaField[] => [
+  ...(o.address.length ? [{ icon: 'map-pin', text: o.address.join(', ') }] : []),
+  ...(o.phone ? [{ icon: 'phone', text: nbsp(o.phone.label), href: o.phone.href }] : []),
+  ...(o.email ? [{ icon: 'mail', text: o.email.label, href: o.email.href }] : []),
+];
+// Cards keep their contrast with the ground: tint cards on white, white cards on tint and navy
+const cardSurface = background === 'white' ? 'tint' : 'white';
+/** Office cards sit one level under the block's heading (h1 → h2, h2 → h3), so headings stay in order. */
+const cardHeading = headingLevel === 'h1' ? 'h2' : 'h3';
+---
+
+{
+  list.length > 0 && (
+    <BlockSection
+      slug="offices-map"
+      root="offices-map"
+      class={first ? 'offices-map--first' : undefined}
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      data-offices-map
+    >
+      <div class="block__body">
+        <SectionHeader
+          as={headingLevel}
+          eyebrow={sectionHeader.eyebrow}
+          title={sectionHeader.title}
+          intro={sectionHeader.intro}
+          action={sectionHeader.action}
+          id={titleId}
+        />
+
+        <div class="offices-map__stage">
+          <DotMap class="offices-map__map" points={points} summary={summary} dots={dots} labels data-offices-map-map="" />
+          {/* Back to the world view once a cluster has been zoomed into (the only zoom there is) */}
+          <button type="button" class="offices-map__all text-button-sm" data-offices-map-all hidden>
+            <Icon name="arrow-back-up" size={18} />
+            All offices
+          </button>
+          {/* Address cards the script pins to the map when a marker is clicked (hidden until then) */}
+          {list.map((o) => (
+            <div class="offices-map__popup has-surface-light" data-office-popup={o.id} tabindex="-1" hidden>
+              <p class="offices-map__popup-kicker text-eyebrow">{kicker(o)}</p>
+              <p class="offices-map__popup-title text-h5">{o.label ?? o.city}</p>
+              <ul class="offices-map__popup-meta">
+                {metaOf(o).map((m) => (
+                  <MetaItem as="li" icon={m.icon} text={m.text} href={m.href} />
+                ))}
+              </ul>
+              <IconButton icon="x" label={`Close ${o.city}`} variant="ghost" size="small" class="offices-map__popup-close" data-office-popup-close="" />
+            </div>
+          ))}
+        </div>
+
+        <div class="offices-map__grid-wrap">
+          <ul class="offices-map__grid">
+            {list.map((o) => (
+              <li class="offices-map__cell" data-office={o.id}>
+                <Card media="none" surface={cardSurface} eyebrow={kicker(o)} title={o.label ?? o.city} meta={metaOf(o)} headingLevel={cardHeading} />
+              </li>
+            ))}
+          </ul>
+          {presence.length > 0 && <p class="offices-map__note text-small">Also present in {joinAnd(presenceCountries)}.</p>}
+          <p class="visually-hidden" aria-live="polite" data-offices-map-announce />
+        </div>
+      </div>
+    </BlockSection>
+  )
+}
+
+<script>
+  import { createDotMap } from '../lib/dot-map-client';
+
+  /** City level: the dot grid says nothing closer than this. */
+  const MAX_ZOOM = 7;
+  /** Clusters split from this zoom up (the Norwegian offices need it to separate). */
+  const CLUSTER_MAX_ZOOM = 6;
+
+  function initOfficesMap(root: HTMLElement) {
+    root.classList.add('is-enhanced');
+    const figure = root.querySelector<HTMLElement>('[data-offices-map-map]')!;
+    const stage = figure.parentElement!;
+    const cellFor = (id: string) => root.querySelector<HTMLElement>(`[data-office="${id}"]`);
+    const popupFor = (id: string) => root.querySelector<HTMLElement>(`[data-office-popup="${id}"]`);
+    const allButton = root.querySelector<HTMLButtonElement>('[data-offices-map-all]')!;
+    const announce = root.querySelector<HTMLElement>('[data-offices-map-announce]');
+    const say = (text: string) => announce && (announce.textContent = text);
+    // Phones: the card docks to the bottom of the map instead of floating over its pin (it would run
+    // off the edge of a 375px map)
+    const phone = window.matchMedia('(max-width: 599px)');
+    let openId: string | null = null;
+
+    const dotMap = createDotMap(figure, {
+      maxZoom: MAX_ZOOM,
+      fitMaxZoom: MAX_ZOOM,
+      clusterMaxZoom: CLUSTER_MAX_ZOOM,
+      clusterClick: 'fit',
+      clusterRadius: 40,
+      // Offices are plain dots; only clusters carry a number
+      showCount: 'clusters',
+      clusterLabel: (_points, n) => `${n} ${n === 1 ? 'office' : 'offices'}`,
+      announce: say,
+      // A pin click opens the office's address card on the map (again = close); presence pins have no card
+      onSelect: (id) => (popupFor(id) ? open(openId === id ? null : id) : undefined),
+      onHover: (ids, on) => ids.forEach((id) => cellFor(id)?.classList.toggle('is-hover', on)),
+      onView: (home) => {
+        allButton.hidden = home;
+      },
+    });
+
+    /** One address card open at a time, pinned above its marker (docked on phones); its grid card is marked too. */
+    function open(id: string | null) {
+      if (openId) {
+        cellFor(openId)?.classList.remove('is-active');
+        const was = popupFor(openId);
+        if (was?.classList.contains('is-docked')) {
+          was.classList.remove('is-docked');
+          was.hidden = true;
+        } else dotMap.hideOverlay();
+      }
+      openId = id;
+      dotMap.setActive(id);
+      if (!id) return;
+      const popup = popupFor(id)!;
+      if (phone.matches) {
+        popup.classList.add('is-docked');
+        popup.hidden = false;
+      } else dotMap.showOverlay(id, popup);
+      cellFor(id)?.classList.add('is-active');
+      // Focus the card itself (not its close button, whose focus ring would show on every pointer open);
+      // Escape closes from here and Tab reaches the address links, then the close button
+      popup.focus({ preventScroll: true });
+      say(`${popup.querySelector('.offices-map__popup-title')?.textContent ?? id} address shown on the map`);
+    }
+
+    stage.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('[data-office-popup-close]')) open(null);
+      // A click on the map itself (not a marker or the open card) closes the card
+      else if (openId && !target.closest('.dot-map__marker, .offices-map__popup, [data-offices-map-all]')) open(null);
+    });
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && openId) open(null);
+    });
+    allButton.addEventListener('click', () => {
+      open(null);
+      dotMap.fitHome();
+      say('Map showing all offices');
+    });
+
+    // Hovering or focusing a grid card lights its pin
+    root.querySelectorAll<HTMLElement>('[data-office]').forEach((cell) => {
+      const id = cell.dataset.office!;
+      const hover = (on: boolean) => dotMap.setHover(on ? [id] : []);
+      cell.addEventListener('pointerenter', () => hover(true));
+      cell.addEventListener('pointerleave', () => hover(false));
+      cell.addEventListener('focusin', () => hover(true));
+      cell.addEventListener('focusout', () => hover(false));
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-offices-map]').forEach(initOfficesMap);
+</script>
+
+<style is:global>
+  /* Opens the page: clear the fixed header, as the Page hero does (fixed values, not --header-offset,
+     which shrinks on scroll) */
+  .offices-map--first {
+    padding-top: calc(72px + var(--wp--custom--section--md));
+  }
+  @media (min-width: 900px) {
+    .offices-map--first {
+      padding-top: calc(96px + var(--wp--custom--section--md));
+    }
+  }
+
+  /* ── Map ──────────────────────────────────────────────── */
+  .offices-map__stage {
+    position: relative;
+  }
+  /* "All offices": outline button look, in the map's top-right corner, only while zoomed in */
+  .offices-map__all {
+    position: absolute;
+    top: var(--wp--preset--spacing--16);
+    right: var(--wp--preset--spacing--16);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    height: 40px;
+    padding-inline: var(--wp--preset--spacing--16);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--bg--default);
+    color: var(--wp--custom--color--action--outline--fg);
+    box-shadow: inset 0 0 0 2px var(--wp--custom--color--action--outline--border);
+    transition: background-color 160ms var(--wp--custom--motion--easing);
+  }
+  .offices-map__all:hover {
+    background-color: var(--wp--custom--color--action--outline--bg-hover);
+  }
+  .offices-map__all:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+  }
+  .offices-map__all[hidden] {
+    display: none;
+  }
+
+  /* Address card on the map: a small white panel above the pin (the script pins it with a marker) */
+  .offices-map__popup {
+    position: relative;
+    display: grid;
+    gap: var(--wp--preset--spacing--4);
+    width: max-content;
+    max-width: 300px;
+    padding: var(--wp--preset--spacing--24);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--default);
+    color: var(--wp--custom--color--text--primary);
+    box-shadow:
+      var(--wp--preset--shadow--md),
+      0 0 0 1px var(--wp--custom--color--border--subtle);
+    text-align: start;
+    font-family: var(--wp--preset--font-family--inter);
+  }
+  .offices-map__popup[hidden] {
+    display: none;
+  }
+  .offices-map__popup:focus {
+    outline: none;
+  }
+  /* The pointer under the card, towards the pin */
+  .offices-map__popup::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    width: 12px;
+    height: 12px;
+    translate: -50% 0;
+    rotate: 45deg;
+    background-color: inherit;
+    box-shadow: 1px 1px 0 0 var(--wp--custom--color--border--subtle);
+  }
+  /* Only the kicker and title clear the close button; the address lines run the full width */
+  .offices-map__popup-kicker,
+  .offices-map__popup-title {
+    margin: 0;
+    padding-inline-end: var(--wp--preset--spacing--32);
+  }
+  .offices-map__popup-kicker {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .offices-map__popup-meta {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--wp--preset--spacing--4);
+    margin-top: var(--wp--preset--spacing--4);
+  }
+  .offices-map__popup-meta .meta-item {
+    align-items: flex-start;
+  }
+  .offices-map__popup-close {
+    position: absolute;
+    top: var(--wp--preset--spacing--12);
+    right: var(--wp--preset--spacing--12);
+  }
+
+  /* ── Office cards ─────────────────────────────────────── */
+  .offices-map__grid-wrap {
+    display: grid;
+    gap: var(--wp--preset--spacing--24);
+  }
+  .offices-map__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .offices-map__cell {
+    display: grid;
+    border-radius: var(--wp--custom--radius--lg);
+    transition: box-shadow 200ms var(--wp--custom--motion--easing);
+  }
+  /* The map lights this card: hover from the pin, or its address card open on the map */
+  .offices-map__cell.is-hover {
+    box-shadow: 0 0 0 2px var(--wp--custom--color--border--strong);
+  }
+  .offices-map__cell.is-active {
+    box-shadow: 0 0 0 2px var(--wp--custom--color--border--accent);
+  }
+  /* Long addresses (commercial.abz@…) break rather than overflow the card at four across */
+  .offices-map__cell .meta-item > :last-child,
+  .offices-map__popup-meta .meta-item > :last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .offices-map__note {
+    color: var(--wp--custom--color--text--secondary);
+  }
+
+  @media (max-width: 1199px) {
+    .offices-map__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 599px) {
+    .offices-map__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .offices-map__map {
+      /* Edge to edge on phones (DotMap sets the 5:4 frame) */
+      margin-inline: calc(-1 * var(--wp--preset--spacing--16));
+      border-radius: 0;
+    }
+    .offices-map__all {
+      right: 0;
+    }
+    /* Docked: full width along the bottom of the map, no pointer */
+    .offices-map__popup.is-docked {
+      position: absolute;
+      inset: auto var(--wp--preset--spacing--16) var(--wp--preset--spacing--16) var(--wp--preset--spacing--16);
+      z-index: 2;
+      width: auto;
+      max-width: none;
+    }
+    .offices-map__popup.is-docked::after {
+      display: none;
+    }
+  }
+</style>

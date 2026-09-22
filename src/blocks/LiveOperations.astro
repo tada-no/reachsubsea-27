@@ -23,6 +23,10 @@
 // (Regular, chosen 22 Sep 2026 over Fine and Finer, Q72).
 // Performance: the poster renders first; MapLibre (JS + CSS) and the mask only load when the block
 // nears the viewport, then the live map fades in over the poster.
+// Shared (22 Sep 2026): the map itself (poster, camera, dot overlay, markers, clusters, zoom pill,
+// reduced motion) is DotMap.astro + src/lib/dot-map-client.ts, also used by the Contact page's
+// Offices map. This block owns the status line, filters, region list and the Live/Stale/Unavailable
+// state, and drives the map through the handle createDotMap() returns.
 //
 // States: live · stale (feed older than STALE_AFTER_HOURS) · unavailable (no feed: static map only).
 // The script re-checks staleness in the browser, because a cached WordPress page can outlive its data.
@@ -31,8 +35,9 @@ import FilterChip from '../components/FilterChip.astro';
 import Icon from '../components/Icon.astro';
 import Badge from '../components/Badge.astro';
 import Link from '../components/Link.astro';
+import DotMap from '../components/DotMap.astro';
+import DotMapZoom from '../components/DotMapZoom.astro';
 import { makeId } from '../lib/ids';
-import { posters } from '../lib/world-dots';
 import type { DotPreset } from '../lib/dot-map';
 import { assetTypes, STALE_AFTER_HOURS, type LiveOperationsFeed } from '../data/live-operations';
 import type { BlockFields, LinkField } from '../lib/types';
@@ -97,16 +102,14 @@ const counts = Object.fromEntries(
 const totalAssets = regions.reduce((sum, r) => sum + r.operations.length, 0);
 
 // Region points for the map. Label points are whole degrees (docs/07 §2): never a vessel position.
-const mapData = regions.map((r) => ({ id: r.id, name: r.name, lon: r.lon, lat: r.lat }));
+// `count` = assets in the region (shown in the marker; clusters add them up).
+const mapData = regions.map((r) => ({ id: r.id, name: r.name, lon: r.lon, lat: r.lat, count: r.operations.length }));
 
 const mapSummary =
   state === 'unavailable'
     ? 'World map.'
     : `Map of ${n} active ${regionWord(n)}: ${regions.map((r) => r.name).join(', ')}. Details in the list.`;
 const typeOf = (type: string) => assetTypes.find((t) => t.key === type)!;
-// Poster variants: one per width band (wide frame) plus the phone (tall) frame; CSS shows one
-const posterSet = await posters(dots);
-const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-ops__poster--${p.frame}${p.frame === 'wide' ? (p.min > 0 ? '-lg' : '-sm') : ''}`;
 ---
 
 <BlockSection
@@ -170,37 +173,21 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
               ))}
             </div>
           )}
-          {/* Zoom, in the toolbar row (17 Sep 2026). Disabled until the map has loaded. No "world" button:
-              "All", closing a row and zoom out already get back to the full view. */}
-          <div class="live-ops__controls" role="group" aria-label="Map zoom" data-live-ops-controls>
-            <button type="button" class="live-ops__control" data-map-zoom-out aria-label="Zoom out" disabled>
-              <Icon name="minus" size={20} />
-            </button>
-            <button type="button" class="live-ops__control" data-map-zoom-in aria-label="Zoom in" disabled>
-              <Icon name="plus" size={20} />
-            </button>
-          </div>
+          {/* Zoom, in the toolbar row (17 Sep 2026): the shared pill, enabled once the map has loaded */}
+          <DotMapZoom class="live-ops__controls" data-live-ops-controls />
         </div>
       )
     }
 
-    <figure class="live-ops__map" data-live-ops-map>
-      {/* Poster: static dot map, shown until the GL map is ready (and the whole map without JS).
-          Same framing, grid and land mask as the live map, so the fade shows no jump. */}
-      {posterSet.map((p) => (
-        <svg class={posterClass(p)} viewBox={`${p.box.x} ${p.box.y} ${p.box.w} ${p.box.h}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-          <path class="live-ops__land" d={p.d} stroke-width={p.dot} />
-        </svg>
-      ))}
-      {
-        state !== 'unavailable' && (
-          <Fragment>
-            <div class="live-ops__canvas" data-live-ops-canvas role="region" aria-label={mapSummary} />
-            <script type="application/json" data-live-ops-points set:html={JSON.stringify(mapData)} />
-          </Fragment>
-        )
-      }
-    </figure>
+    {/* The map: poster first, live map over it once the script loads. Pulse only while Live. */}
+    <DotMap
+      class="live-ops__map"
+      points={state !== 'unavailable' ? mapData : undefined}
+      summary={mapSummary}
+      dots={dots}
+      pulse={state === 'live'}
+      data-live-ops-map=""
+    />
 
     <div class="live-ops__side">
       {
@@ -270,49 +257,15 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
 </BlockSection>
 
 <script>
-  import type { GeoJSONSource, Map as GLMap, Marker } from 'maplibre-gl';
-  // MapLibre loads its tile worker from a URL next to the library, which breaks once Vite pre-bundles it.
-  // Bundle the worker (with its shared chunk) ourselves and hand MapLibre the URL.
-  import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
-  import { DOT_PRESETS, FRAMES, MASK_H, MASK_W, cameraFor, colsFor, frameBox, frameFor, gridPoints, maskIndex, mercX, mercY, type DotPreset } from '../lib/dot-map';
+  import { createDotMap } from '../lib/dot-map-client';
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const MASK_URL = `${import.meta.env.BASE_URL}data/land-mask.png`;
   /** Region level: never close enough to read as a position. */
   const MAX_ZOOM = 5;
   /** Zoom when a region is opened from the list or a marker: its sea area with context around it. */
   const REGION_ZOOM = 3.5;
   /** Clusters split from this zoom up. */
   const CLUSTER_MAX_ZOOM = 2;
-
-  /** The land mask, one byte per pixel, shared by every block on the page. */
-  let maskPromise: Promise<Uint8Array> | undefined;
-  function loadMask() {
-    maskPromise ??= (async () => {
-      const img = new Image();
-      img.src = MASK_URL;
-      await img.decode();
-      const c = document.createElement('canvas');
-      c.width = MASK_W;
-      c.height = MASK_H;
-      const ctx = c.getContext('2d', { willReadFrequently: true })!;
-      ctx.drawImage(img, 0, 0, MASK_W, MASK_H);
-      const { data } = ctx.getImageData(0, 0, MASK_W, MASK_H);
-      const bits = new Uint8Array(MASK_W * MASK_H);
-      for (let i = 0; i < bits.length; i++) bits[i] = data[i * 4] > 127 ? 1 : 0;
-      return bits;
-    })();
-    return maskPromise;
-  }
-
-  interface Point {
-    id: string;
-    name: string;
-    lon: number;
-    lat: number;
-  }
-
-  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
   function initLiveOps(root: HTMLElement) {
     root.classList.add('is-enhanced');
@@ -321,8 +274,7 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
     const rowFor = (id: string) => toggleFor(id)?.closest<HTMLElement>('li');
     const announce = root.querySelector<HTMLElement>('[data-live-ops-announce]');
     const say = (text: string) => announce && (announce.textContent = text);
-    const points: Point[] = JSON.parse(root.querySelector('[data-live-ops-points]')?.textContent ?? '[]');
-    const pointFor = (id: string) => points.find((p) => p.id === id);
+    const figure = root.querySelector<HTMLElement>('[data-live-ops-map]')!;
 
     /** Assets shown per region under the current filter. */
     const shownBy: Record<string, number> = {};
@@ -330,8 +282,6 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
       const id = t.dataset.liveOpsToggle!;
       shownBy[id] = rowFor(id)!.querySelectorAll('.live-ops__op').length;
     });
-    let activeId: string | null = null;
-    let hoverIds: string[] = [];
 
     // ── Staleness re-check (a cached page can outlive its data) ────────────────
     const updated = root.dataset.updated ? new Date(root.dataset.updated) : undefined;
@@ -341,6 +291,7 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
       const status = root.querySelector<HTMLElement>('[data-live-ops-status]');
       if (hours > staleHours) {
         root.dataset.state = 'stale';
+        figure.classList.remove('dot-map--pulse');
         root.querySelector('[data-live-ops-prefix]')!.textContent = 'Recently active in';
         root.querySelector('[data-live-ops-suffix]')!.textContent = '';
         root.querySelector('.live-ops__status-live')?.remove();
@@ -352,287 +303,39 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
       }
     }
 
-    // ── Map (loaded lazily) ─────────────────────────────────────────────────────
-    let map: GLMap | undefined;
-    let refreshMarkers = () => {};
-
-    const figure = root.querySelector<HTMLElement>('[data-live-ops-map]')!;
-    const canvas = root.querySelector<HTMLElement>('[data-live-ops-canvas]');
-
-    const featureCollection = () => ({
-      type: 'FeatureCollection' as const,
-      features: points
-        .filter((p) => shownBy[p.id] > 0)
-        .map((p) => ({
-          type: 'Feature' as const,
-          properties: { id: p.id, name: p.name, assets: shownBy[p.id] },
-          geometry: { type: 'Point' as const, coordinates: [p.lon, p.lat] },
-        })),
+    // ── Map (shared; loads lazily when the figure nears the viewport) ───────────
+    const dotMap = createDotMap(figure, {
+      controls: root.querySelector<HTMLElement>('[data-live-ops-controls]'),
+      maxZoom: MAX_ZOOM,
+      focusZoom: REGION_ZOOM,
+      fitMaxZoom: 3.5,
+      clusterMaxZoom: CLUSTER_MAX_ZOOM,
+      clusterRadius: 48,
+      showCount: 'always',
+      clusterLabel: (n) => `${n} regions`,
+      countOf: (id) => shownBy[id] ?? 0,
+      announce: say,
+      // A marker click opens (or closes) its row and moves focus there
+      onSelect: (id) => {
+        const t = toggleFor(id);
+        if (!t) return;
+        select(t.getAttribute('aria-expanded') === 'true' ? null : id);
+        t.focus({ preventScroll: true });
+        if (window.matchMedia('(min-width: 900px)').matches)
+          t.closest('li')!.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      },
+      onHover: (ids, on) => ids.forEach((id) => rowFor(id)?.classList.toggle('is-hover', on)),
     });
+    // Debug handle for review tooling (harmless in production)
+    Object.defineProperty(root, 'liveOpsMap', { get: () => dotMap.map, configurable: true });
 
-    /** The home view for the map's current size: the frame box as a MapLibre camera. */
-    const homeCamera = () => cameraFor(frameBox(FRAMES[frameFor(figure.clientWidth, figure.clientHeight)]), figure.clientWidth);
-
-    async function loadMap() {
-      if (!canvas || map) return;
-      const [ml, bits] = await Promise.all([import('maplibre-gl'), loadMask(), import('maplibre-gl/dist/maplibre-gl.css')]);
-      ml.setWorkerUrl(workerUrl);
-      const css = getComputedStyle(figure);
-      const token = (name: string) => css.getPropertyValue(name).trim();
-
-      map = new ml.Map({
-        container: canvas,
-        style: {
-          version: 8,
-          sources: {
-            regions: {
-              type: 'geojson',
-              data: featureCollection(),
-              cluster: true,
-              clusterRadius: 48,
-              clusterMaxZoom: CLUSTER_MAX_ZOOM,
-              clusterProperties: { assets: ['+', ['get', 'assets']] },
-            },
-          },
-          layers: [
-            // Markers are HTML; this invisible layer only makes the clustered source load and be queryable
-            { id: 'regions-query', type: 'circle', source: 'regions', paint: { 'circle-radius': 1, 'circle-opacity': 0 } },
-          ],
-        },
-        ...homeCamera(),
-        maxZoom: MAX_ZOOM,
-        renderWorldCopies: false,
-        dragRotate: false,
-        pitchWithRotate: false,
-        touchPitch: false,
-        cooperativeGestures: true,
-        attributionControl: false,
-        fadeDuration: reduceMotion.matches ? 0 : 300,
-      });
-      map.touchZoomRotate.disableRotation();
-      map.keyboard.disableRotation();
-      const m = map;
-      // Debug handle for review tooling (harmless in production)
-      (root as HTMLElement & { liveOpsMap?: GLMap }).liveOpsMap = m;
-
-      // ── Dot-matrix land: a canvas overlay, redrawn every frame ─────────────────
-      // A hex grid fixed to the screen (the land moves under it). Each grid point is unprojected to
-      // Mercator and looked up in the land mask: a whole dot on land, nothing at sea. Same grid and
-      // mask as the poster, so the fade-in shows no change.
-      const overlay = document.createElement('canvas');
-      overlay.className = 'live-ops__dots';
-      overlay.setAttribute('aria-hidden', 'true');
-      m.getCanvasContainer().appendChild(overlay);
-      const ctx = overlay.getContext('2d')!;
-      const preset: DotPreset = (root.dataset.dots as DotPreset) in DOT_PRESETS ? (root.dataset.dots as DotPreset) : 'regular';
-
-      function drawDots() {
-        const w = figure.clientWidth;
-        const h = figure.clientHeight;
-        if (!w || !h) return;
-        const dpr = Math.min(3, window.devicePixelRatio || 1);
-        if (overlay.width !== Math.round(w * dpr) || overlay.height !== Math.round(h * dpr)) {
-          overlay.width = Math.round(w * dpr);
-          overlay.height = Math.round(h * dpr);
-        }
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0, 0, w, h);
-        // No rotation or pitch, so screen → Mercator is linear: two corners are enough
-        const tl = m.unproject([0, 0]);
-        const br = m.unproject([w, h]);
-        const x0 = mercX(tl.lng);
-        const y0 = mercY(tl.lat);
-        const sx = (mercX(br.lng) - x0) / w;
-        const sy = (mercY(br.lat) - y0) / h;
-        const spec = DOT_PRESETS[preset];
-        const cols = colsFor(spec, frameFor(w, h), w);
-        const r = ((w / cols) * spec.dot) / 2;
-        ctx.fillStyle = token('--map-dot');
-        ctx.beginPath();
-        for (const [gx, gy] of gridPoints(w, h, cols)) {
-          const i = maskIndex(x0 + gx * sx, y0 + gy * sy);
-          if (i >= 0 && bits[i]) {
-            ctx.moveTo(gx + r, gy);
-            ctx.arc(gx, gy, r, 0, Math.PI * 2);
-          }
-        }
-        ctx.fill();
-      }
-      m.on('render', drawDots);
-
-      m.on('load', () => {
-        drawDots();
-        figure.classList.add('is-ready');
-      });
-
-      // ── Zoom buttons in the toolbar row ──────────────────────────────────────────
-      const controls = root.querySelector<HTMLElement>('[data-live-ops-controls]')!;
-      const zoomIn = controls.querySelector<HTMLButtonElement>('[data-map-zoom-in]')!;
-      const zoomOut = controls.querySelector<HTMLButtonElement>('[data-map-zoom-out]')!;
-      function syncZoomButtons() {
-        zoomIn.disabled = m.getZoom() >= MAX_ZOOM - 0.01;
-        zoomOut.disabled = m.getZoom() <= m.getMinZoom() + 0.01;
-      }
-      // The home view is as far out as it goes, so "Zoom out" is disabled there on every screen size.
-      // The map's size sets that zoom, so it follows resizes (and the wide ↔ tall frame switch).
-      const syncMinZoom = () => m.setMinZoom(homeCamera().zoom);
-      m.once('load', () => {
-        syncMinZoom();
-        syncZoomButtons();
-      });
-      m.on('resize', () => {
-        syncMinZoom();
-        drawDots();
-        syncZoomButtons();
-      });
-      m.on('moveend', syncZoomButtons);
-      zoomIn.addEventListener('click', () => m.zoomIn({ animate: !reduceMotion.matches }));
-      zoomOut.addEventListener('click', () => m.zoomOut({ animate: !reduceMotion.matches }));
-
-      // ── HTML markers from the clustered source ─────────────────────────────────
-      const markers = new Map<string, Marker>();
-      let onScreen = new Map<string, Marker>();
-
-      function markerEl(key: string, label: string, count: number, cluster: boolean) {
-        const el = document.createElement('div');
-        el.className = `live-ops__marker${cluster ? ' live-ops__marker--cluster' : ''}`;
-        el.dataset.key = key;
-        el.setAttribute('aria-hidden', 'true');
-        el.innerHTML = `
-          <span class="live-ops__marker-pulse"></span>
-          ${cluster ? '<span class="live-ops__marker-ring"></span>' : ''}
-          <span class="live-ops__marker-dot">${count}</span>
-          <span class="live-ops__marker-label">${esc(label)}</span>`;
-        return el;
-      }
-
-      refreshMarkers = () => {
-        markers.forEach((mk) => mk.remove());
-        markers.clear();
-        onScreen = new Map();
-        (m.getSource('regions') as GeoJSONSource | undefined)?.setData(featureCollection());
-      };
-
-      function updateMarkers() {
-        const source = m.getSource('regions') as GeoJSONSource | undefined;
-        if (!source || !m.isSourceLoaded('regions')) return;
-        const next = new Map<string, Marker>();
-        const width = canvas!.clientWidth;
-        const placed: { el: HTMLElement; x: number }[] = [];
-        for (const f of m.querySourceFeatures('regions')) {
-          const p = f.properties as Record<string, unknown>;
-          const cluster = Boolean(p.cluster);
-          const key = cluster ? `c${p.cluster_id}` : String(p.id);
-          if (next.has(key)) continue;
-          let mk = markers.get(key);
-          if (!mk) {
-            const count = Number(cluster ? p.assets : p.assets);
-            const el = markerEl(key, cluster ? `${p.point_count} regions` : String(p.name), count, cluster);
-            const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
-            mk = new ml.Marker({ element: el }).setLngLat(coords);
-            if (cluster) {
-              const clusterId = Number(p.cluster_id);
-              source.getClusterLeaves(clusterId, Infinity, 0).then((leaves) => {
-                el.dataset.ids = leaves.map((l) => String(l.properties?.id)).join(' ');
-                paint(el);
-              });
-              el.addEventListener('click', async () => {
-                const zoom = await source.getClusterExpansionZoom(clusterId);
-                m.easeTo({ center: coords, zoom: Math.min(MAX_ZOOM, zoom + 0.5), duration: reduceMotion.matches ? 0 : 700 });
-                say(`Map zoomed in to ${p.point_count} regions`);
-              });
-              el.addEventListener('pointerenter', () => ids(el).forEach((id) => rowFor(id)?.classList.add('is-hover')));
-              el.addEventListener('pointerleave', () => ids(el).forEach((id) => rowFor(id)?.classList.remove('is-hover')));
-            } else {
-              const id = String(p.id);
-              el.addEventListener('click', () => {
-                const t = toggleFor(id);
-                if (!t) return;
-                select(t.getAttribute('aria-expanded') === 'true' ? null : id);
-                t.focus({ preventScroll: true });
-                if (window.matchMedia('(min-width: 900px)').matches)
-                  t.closest('li')!.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
-              });
-              el.addEventListener('pointerenter', () => rowFor(id)?.classList.add('is-hover'));
-              el.addEventListener('pointerleave', () => rowFor(id)?.classList.remove('is-hover'));
-            }
-            markers.set(key, mk);
-          }
-          next.set(key, mk);
-          if (!onScreen.has(key)) mk.addTo(m);
-          placed.push({ el: mk.getElement(), x: m.project(mk.getLngLat()).x });
-          paint(mk.getElement());
-        }
-        // Labels point away from the middle of the visible markers, so neighbours' labels don't cross
-        // each other's markers; near an edge they point inwards
-        const mid = placed.length > 1 ? placed.reduce((sum, p) => sum + p.x, 0) / placed.length : width / 2;
-        placed.forEach(({ el, x }) => {
-          const left = x < 170 ? false : x > width - 170 ? true : x < mid;
-          el.classList.toggle('is-label-left', left);
-        });
-        onScreen.forEach((mk, key) => !next.has(key) && mk.remove());
-        onScreen = next;
-        // Once clusters have split, every region carries its name
-        root.classList.toggle('is-detail', m.getZoom() > CLUSTER_MAX_ZOOM + 0.25);
-      }
-
-      const ids = (el: HTMLElement) => (el.dataset.ids ?? el.dataset.key ?? '').split(' ').filter(Boolean);
-      function paint(el: HTMLElement) {
-        const members = el.classList.contains('live-ops__marker--cluster') ? ids(el) : [el.dataset.key!];
-        el.classList.toggle('is-active', activeId !== null && members.includes(activeId));
-        el.classList.toggle('is-hover', members.some((id) => hoverIds.includes(id)));
-      }
-      paintAll = () => onScreen.forEach((mk) => paint(mk.getElement()));
-
-      m.on('render', updateMarkers);
-
-      // Filters: frame whatever the chip leaves on the map ("All" = the home view). Padding keeps markers
-      // and labels clear of the controls; maxZoom keeps a single region at region level, not a close-up.
-      fitToShown = (all: boolean) => {
-        const shown = points.filter((p) => shownBy[p.id] > 0);
-        const animate = !reduceMotion.matches;
-        if (all || shown.length === 0) {
-          m.easeTo({ ...homeCamera(), animate, duration: 900 });
-          return;
-        }
-        const lons = shown.map((p) => p.lon);
-        const lats = shown.map((p) => p.lat);
-        m.fitBounds(
-          [
-            [Math.min(...lons), Math.min(...lats)],
-            [Math.max(...lons), Math.max(...lats)],
-          ],
-          { padding: { top: 72, bottom: 56, left: 72, right: 96 }, maxZoom: 3.5, animate, duration: 900 },
-        );
-      };
-      flyToRegion = (id: string) => {
-        const pt = pointFor(id);
-        if (!pt) return;
-        // Opening a row always takes the map to that region, at region level (never closer)
-        const options = { center: [pt.lon, pt.lat] as [number, number], zoom: REGION_ZOOM };
-        if (reduceMotion.matches) m.jumpTo(options);
-        else m.flyTo({ ...options, duration: 900 });
-      };
-    }
-
-    let paintAll = () => {};
-    let flyToRegion = (_id: string) => {};
-    let fitToShown = (_all: boolean) => {};
     let currentFilter = 'all';
-
-    if (canvas) {
-      const io = new IntersectionObserver(
-        (entries) => {
-          if (entries.some((e) => e.isIntersecting)) {
-            io.disconnect();
-            loadMap().catch((err) => console.error('Live operations map failed to load', err));
-          }
-        },
-        { rootMargin: '400px' },
-      );
-      io.observe(figure);
-    }
-
+    /** Frame whatever the filter leaves on the map ("All" = the home view). */
+    const fitToShown = (all: boolean) => {
+      const shown = Object.keys(shownBy).filter((id) => shownBy[id] > 0);
+      if (all || shown.length === 0) dotMap.fitHome();
+      else dotMap.fitTo(shown);
+    };
 
     // ── Region selection: one open at a time; list and map stay in sync ────────
     function select(id: string | null, moveMap = true) {
@@ -642,10 +345,10 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
         document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !open;
         t.closest('li')!.classList.toggle('is-open', open);
       });
-      activeId = id;
       root.classList.toggle('has-selection', id !== null);
-      paintAll();
-      if (id && moveMap) flyToRegion(id);
+      dotMap.setActive(id);
+      // Opening a row always takes the map to that region, at region level (never closer)
+      if (id && moveMap) dotMap.flyTo(id);
       // Closing the open row returns to the current filter's view
       else if (!id && moveMap) fitToShown(currentFilter === 'all');
     }
@@ -654,10 +357,7 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
       const id = t.dataset.liveOpsToggle!;
       t.addEventListener('click', () => select(t.getAttribute('aria-expanded') === 'true' ? null : id));
       const li = t.closest<HTMLElement>('li')!;
-      const hover = (on: boolean) => {
-        hoverIds = on ? [id] : [];
-        paintAll();
-      };
+      const hover = (on: boolean) => dotMap.setHover(on ? [id] : []);
       li.addEventListener('pointerenter', () => hover(true));
       li.addEventListener('pointerleave', () => hover(false));
       t.addEventListener('focus', () => hover(true));
@@ -691,7 +391,7 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
           if (shown === 0 && li.classList.contains('is-open')) select(null, false);
           if (shown > 0) visible += 1;
         });
-        refreshMarkers();
+        dotMap.refresh();
         fitToShown(type === 'all');
         const word = visible === 1 ? 'region' : 'regions';
         root.querySelector('[data-live-ops-count]')!.textContent = String(visible);
@@ -786,235 +486,13 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
     min-width: 0;
   }
 
-  /* ── Map ──────────────────────────────────────────────── */
+  /* ── Map (DotMap.astro) ──────────────────────────────── */
   .live-ops__map {
-    /* Map colours from tokens (read by the script); Light surface values here, Navy below */
-    --map-dot: var(--wp--preset--color--navy-300);
     grid-area: map;
-    position: relative;
-    margin: 0;
-    /* Frame aspect: 'wide' in src/lib/dot-map.ts. Keep the two in step. */
-    aspect-ratio: 2 / 1;
-    border-radius: var(--wp--custom--radius--md);
-    overflow: hidden;
-    /* Poster variants switch on the map's own width (WIDE_BREAK in dot-map.ts) */
-    container-type: inline-size;
   }
-  .live-ops.has-surface-navy .live-ops__map {
-    --map-dot: var(--wp--preset--color--navy-600);
-  }
-  /* Poster variants: one per width band, matching the overlay's choice in the script */
-  .live-ops__poster {
-    display: none;
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    transition: opacity 400ms var(--wp--custom--motion--easing);
-  }
-  @container (width >= 680px) {
-    .live-ops__poster--wide-lg {
-      display: block;
-    }
-  }
-  @container (width < 680px) {
-    .live-ops__poster--wide-sm {
-      display: block;
-    }
-  }
-  .live-ops__land {
-    fill: none;
-    stroke: var(--map-dot);
-    stroke-linecap: round;
-  }
-  /* The live dots: a canvas the script draws over the (empty) GL canvas, under the markers */
-  .live-ops__dots {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-  /* Doubled class: MapLibre's CSS (loaded later) sets .maplibregl-map { position: relative } */
-  .live-ops__canvas.live-ops__canvas {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 400ms var(--wp--custom--motion--easing);
-  }
-  .live-ops__map.is-ready .live-ops__canvas {
-    opacity: 1;
-  }
-  .live-ops__map.is-ready .live-ops__poster {
-    opacity: 0;
-  }
-  /* MapLibre chrome, brought onto the tokens */
-  .live-ops .maplibregl-map {
-    font-family: var(--wp--preset--font-family--inter);
-  }
-  .live-ops .maplibregl-canvas:focus-visible {
-    outline: 2px solid var(--wp--custom--color--border--focus);
-    outline-offset: -2px;
-  }
-  .live-ops .maplibregl-ctrl-attrib,
-  .live-ops .maplibregl-ctrl-attrib.maplibregl-compact,
-  .live-ops .maplibregl-ctrl-attrib.maplibregl-compact-show {
-    background-color: transparent;
-    color: var(--wp--custom--color--text--secondary);
-    font-size: var(--wp--preset--font-size--eyebrow);
-  }
-  .live-ops .maplibregl-ctrl-attrib a {
-    color: inherit;
-  }
-  .live-ops.has-surface-navy .maplibregl-ctrl-attrib-button {
-    filter: invert(1);
-  }
-  .live-ops .maplibregl-cooperative-gesture-screen {
-    background: var(--wp--custom--color--bg--overlay);
-    color: var(--wp--custom--color--text--on-overlay);
-    font-size: var(--wp--preset--font-size--body-sm);
-    border-radius: inherit;
-  }
-
-  /* Zoom: one horizontal pill, same height and outline as the filter chips */
+  /* Zoom pill (DotMapZoom.astro) at the end of the toolbar row */
   .live-ops__controls {
-    display: flex;
-    flex: none;
     margin-inline-start: auto;
-    border-radius: var(--wp--custom--radius--full);
-    box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--default);
-    overflow: hidden;
-  }
-  .live-ops__control {
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    color: var(--wp--custom--color--text--primary);
-    transition: background-color 160ms var(--wp--custom--motion--easing);
-  }
-  .live-ops__control + .live-ops__control {
-    box-shadow: inset 1px 0 0 var(--wp--custom--color--border--default);
-  }
-  .live-ops__control:hover:not(:disabled) {
-    background-color: var(--wp--custom--color--alpha--navy-8);
-  }
-  .live-ops.has-surface-navy .live-ops__control:hover:not(:disabled) {
-    background-color: color-mix(in srgb, var(--wp--preset--color--white) 8%, transparent);
-  }
-  .live-ops__control:disabled {
-    color: var(--wp--custom--color--text--disabled);
-    cursor: default;
-  }
-  .live-ops__control:focus-visible {
-    outline: 2px solid var(--wp--custom--color--border--focus);
-    outline-offset: -3px;
-    border-radius: var(--wp--custom--radius--full);
-  }
-
-  /* ── Markers (HTML, positioned by the map) ─────────────── */
-  .live-ops__marker {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 26px;
-    height: 26px;
-    cursor: pointer;
-    font-family: var(--wp--preset--font-family--inter);
-  }
-  .live-ops__marker--cluster {
-    width: 34px;
-    height: 34px;
-    cursor: zoom-in;
-  }
-  .live-ops__marker::before {
-    /* larger hit area */
-    content: '';
-    position: absolute;
-    inset: -8px;
-  }
-  .live-ops__marker-dot {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 100%;
-    height: 100%;
-    border-radius: var(--wp--custom--radius--full);
-    background-color: var(--wp--custom--color--border--accent);
-    color: var(--wp--preset--color--navy-900);
-    font-size: var(--wp--preset--font-size--eyebrow);
-    font-weight: var(--wp--custom--font-weight--bold);
-    font-variant-numeric: tabular-nums;
-    box-shadow: 0 0 0 0 var(--wp--preset--color--navy-900);
-    transition:
-      transform 240ms var(--wp--custom--motion--easing),
-      box-shadow 240ms var(--wp--custom--motion--easing);
-  }
-  .live-ops__marker--cluster .live-ops__marker-dot {
-    font-size: var(--wp--preset--font-size--caption);
-  }
-  .live-ops__marker-pulse {
-    position: absolute;
-    inset: 0;
-    border-radius: var(--wp--custom--radius--full);
-    background-color: var(--wp--custom--color--border--accent);
-    opacity: 0;
-    animation: live-ops-pulse 3.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
-  }
-  .live-ops__marker-ring {
-    position: absolute;
-    inset: -6px;
-    border: 1.5px dashed var(--wp--custom--color--border--accent);
-    border-radius: var(--wp--custom--radius--full);
-    opacity: 0.8;
-    animation: live-ops-spin 18s linear infinite;
-  }
-  .live-ops[data-state='stale'] .live-ops__marker-pulse,
-  .live-ops[data-state='stale'] .live-ops__marker-ring {
-    animation: none;
-  }
-  .live-ops__marker-label {
-    position: absolute;
-    left: calc(100% + 10px);
-    top: 50%;
-    translate: 0 -50%;
-    white-space: nowrap;
-    color: var(--wp--custom--color--text--primary);
-    font-size: var(--wp--preset--font-size--body-sm);
-    font-weight: var(--wp--custom--font-weight--medium);
-    text-shadow:
-      0 0 4px var(--wp--custom--color--bg--default),
-      0 0 2px var(--wp--custom--color--bg--default);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 200ms var(--wp--custom--motion--easing);
-  }
-  .live-ops__marker.is-label-left .live-ops__marker-label {
-    left: auto;
-    right: calc(100% + 10px);
-  }
-  .live-ops__marker--cluster .live-ops__marker-label {
-    left: calc(100% + 14px);
-  }
-  .live-ops__marker--cluster.is-label-left .live-ops__marker-label {
-    right: calc(100% + 14px);
-  }
-  .live-ops__marker:hover .live-ops__marker-dot,
-  .live-ops__marker.is-hover .live-ops__marker-dot {
-    transform: scale(1.15);
-  }
-  .live-ops__marker.is-active .live-ops__marker-dot {
-    transform: scale(1.25);
-    box-shadow: 0 0 0 3px var(--wp--preset--color--navy-900);
-  }
-  .live-ops__marker:hover .live-ops__marker-label,
-  .live-ops__marker.is-hover .live-ops__marker-label,
-  .live-ops__marker.is-active .live-ops__marker-label,
-  .live-ops.is-detail .live-ops__marker:not(.live-ops__marker--cluster) .live-ops__marker-label {
-    opacity: 1;
-  }
-  .live-ops.has-selection .live-ops__marker:not(.is-active):not(:hover):not(.is-hover) {
-    opacity: 0.6;
   }
 
   /* ── Region list ──────────────────────────────────────── */
@@ -1193,17 +671,6 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
     display: none;
   }
 
-  @keyframes live-ops-pulse {
-    0% {
-      opacity: 0.55;
-      transform: scale(1);
-    }
-    70%,
-    100% {
-      opacity: 0;
-      transform: scale(2.8);
-    }
-  }
   @keyframes live-ops-ping {
     0% {
       opacity: 0.7;
@@ -1215,11 +682,6 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
       transform: scale(2.6);
     }
   }
-  @keyframes live-ops-spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
   @keyframes live-ops-rise {
     from {
       opacity: 0;
@@ -1228,15 +690,9 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .live-ops__marker-pulse,
-    .live-ops__marker-ring,
     .live-ops__beacon::after,
     .is-enhanced .live-ops__panel:not([hidden]) .live-ops__op {
       animation: none !important;
-    }
-    .live-ops__marker-pulse {
-      opacity: 0.25;
-      transform: scale(1.6);
     }
   }
 
@@ -1278,20 +734,9 @@ const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-op
       mask-image: linear-gradient(to right, black calc(100% - 32px), transparent);
     }
     .live-ops__map {
-      /* Frame aspect: 'tall' in src/lib/dot-map.ts */
-      aspect-ratio: 5 / 4;
+      /* Edge to edge on phones (the DotMap sets the 5:4 frame) */
       margin-inline: calc(-1 * var(--wp--preset--spacing--16));
       border-radius: 0;
-    }
-    .live-ops__poster--wide-lg,
-    .live-ops__poster--wide-sm {
-      display: none;
-    }
-    .live-ops__poster--tall {
-      display: block;
-    }
-    .live-ops__marker-label {
-      font-size: var(--wp--preset--font-size--caption);
     }
   }
 </style>

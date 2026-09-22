@@ -1,0 +1,56 @@
+---
+// Contact (22 Sep 2026, Q73, Q75): the plain "Contact" link at the end of the nav. Content: client PDF
+// p59 ("27 — Contact": get in touch, offices, key contacts by topic, FAQ) with the dev site's full-width
+// offices map kept as our own dot-matrix map (docs/07 §3), and no form (Q39: topic mailboxes instead).
+// No Page hero (Q75): the page opens with "Get in touch" and the lead as the Offices map block's own
+// header (the page's h1), then the map straight under the site header. Built for someone who needs a
+// mailbox or the nearest office: the map and its cards answer "nearest office" (HQ first) · the six
+// topic mailboxes as pictogram cards · the three FAQs. No CTA band: the PDF has none, and the footer
+// already carries phone, email and socials. Data: src/data/contact.ts (every value sourced); counts
+// from key-figures.ts. Redirects: /contact/ (dev) keeps its URL.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import OfficesMap from '../../blocks/OfficesMap.astro';
+import CardGrid from '../../blocks/CardGrid.astro';
+import Accordion from '../../blocks/Accordion.astro';
+import { contactIntro, offices, mailboxes, contactFaqs } from '../../data/contact';
+import type { CardField } from '../../lib/types';
+
+const mailboxCards: CardField[] = mailboxes.map((m) => ({
+  media: 'icon',
+  pictogram: m.pictogram,
+  title: m.topic,
+  meta: [{ icon: 'mail', text: m.email.label, href: m.email.href }],
+}));
+---
+
+<BaseLayout title="Contact · Reach Subsea" motion>
+  <Header current="contact" />
+  <main id="main">
+    <OfficesMap first headingLevel="h1" sectionHeader={{ title: contactIntro.title, intro: contactIntro.lead }} offices={offices} />
+
+    <CardGrid
+      anchor="topics"
+      background="tint"
+      layout="3-columns"
+      media="icon"
+      surface="white"
+      sectionHeader={{ title: 'Key contacts by topic' }}
+      cards={mailboxCards}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about reaching our offices and teams.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="contact"
+      items={contactFaqs}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

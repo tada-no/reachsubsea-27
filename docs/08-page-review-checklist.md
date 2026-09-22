@@ -51,6 +51,7 @@ If a card fails, change the row's shape at that width (fewer columns, or the car
 - Every card in a row has the same structure and one left edge: media or tile, kicker, title, meta, actions.
 - Actions line up across the row. No card's actions float higher or lower than its neighbours'.
 - No hairlines inside a card. One piece of meta, on one line (short dates: "18 Aug 2026").
+- An icon beside text aligns to the first line of that text, never the middle of a wrapped block (`MetaItem`: `align-items: flex-start`, icon box one line tall). Same for any icon + multi-line text pair (Ross, 22 Sep 2026).
 - Card text columns stay at 260px or more wherever the card carries a description or list (the sweep above). Card rows go to one column below 768; wide pictogram cards (Services' four lines) below 900; the editorial feed's lead-plus-stack starts at 1000; four-across rows start at 1320.
 - Measure the actions. If 2–3 links won't fit on one line at a width, change the row's shape (container query) rather than letting them wrap.
 - No half-empty cards. A single column of wide cards with the content bunched on the left means the layout should change at that width.

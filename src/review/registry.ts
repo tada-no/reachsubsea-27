@@ -30,6 +30,8 @@ export const blocks: BlockEntry[] = [
   { slug: 'gallery', name: 'Media gallery', component: 'MediaGallery', spec: '§2.12', figma: '192:3618', variants: 'Type Photos · Videos' },
   { slug: 'embed', name: 'Embed', component: 'Embed', spec: '§2.13', figma: '203:4644', variants: 'Type 3D World · Iframe · Map × State Poster/Consent · Loaded' },
   { slug: 'subnav', name: 'Section subnav', component: 'SectionSubnav', spec: '§2.14', figma: '207:4710', variants: 'Source Section pages · In-page' },
+  // Contact (22 Sep 2026, Q73). Live operations (§2.15) has its own review page instead of a demo.
+  { slug: 'offices-map', name: 'Offices map', component: 'OfficesMap', spec: '§2.16', figma: '', variants: 'Background White · Tint · Navy; Heading level h1 (page opener) · h2' },
 ];
 
 export const FIGMA_FILE = 'HAvCQCXzWNFOKQ1AZxqNTX';

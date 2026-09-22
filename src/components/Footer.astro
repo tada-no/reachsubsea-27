@@ -1,6 +1,7 @@
 ---
 // Footer (docs/04 §17). Navy mode always, regardless of the page it sits on. Top row on the 12-col
-// grid: brand (4 cols: logo, tagline) + 4 link columns. LinkedIn/Facebook are text links under Get in touch (dev site).
+// grid: brand (4 cols: logo, tagline) + 4 link columns. Contact, LinkedIn and Facebook are text links under Get in touch
+// (Contact moved there from Company on 22 Sep 2026, Q75).
 // (2 cols each). Divider, then a legal row (copyright + Transparency Act + Privacy & Cookie Policy).
 // Mobile: everything stacks (brand, then the 4 link columns, then the legal row).
 import fs from 'node:fs';
@@ -39,7 +40,6 @@ const columns: FooterColumn[] = [
       { label: 'Leadership & Board', href: '/company/leadership-board/' },
       { label: 'HSEQ', href: '/company/hseq/' },
       { label: 'Sustainability', href: '/company/sustainability/' },
-      { label: 'Contact', href: '/contact/' },
     ],
   },
   {
@@ -95,6 +95,7 @@ const logoInner = logoSvg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*
       <div class="site-footer__column">
         <Eyebrow text="Get in touch" as="p" />
         <ul class="site-footer__list">
+          <li><a class="text-small site-footer__link" href="/contact/">Contact</a></li>
           <li><a class="text-small site-footer__link" href="mailto:post@reachsubsea.com">post@reachsubsea.com</a></li>
           {
             socialLinks.map((social) => (

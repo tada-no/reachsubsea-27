@@ -1,0 +1,17 @@
+---
+import OfficesMap from '../blocks/OfficesMap.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+import { offices, contactIntro } from '../data/contact';
+---
+
+<VariantLabel name="Default (white): full-width map, office cards under it" props='background="white"' />
+<OfficesMap offices={offices} />
+
+<VariantLabel name="Example · page opener (Contact): h1 title, no Page hero" props='headingLevel="h1" sectionHeader={{ title, intro }}' />
+<OfficesMap offices={offices} headingLevel="h1" sectionHeader={{ title: contactIntro.title, intro: contactIntro.lead }} anchor="offices-opener" />
+
+<VariantLabel name="Example · on Tint" props='background="tint"' />
+<OfficesMap offices={offices} background="tint" anchor="offices-tint" />
+
+<VariantLabel name="Example · on Navy" props='background="navy"' />
+<OfficesMap offices={offices} background="navy" anchor="offices-navy" />

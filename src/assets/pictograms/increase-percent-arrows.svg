@@ -1,0 +1,12 @@
+<svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Traced from Figma Pictogram/increase-percent-arrows (36:99): stroke 2.5 on the outline's centreline -->
+<g stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<path class="pg-arrow pg-arrow--b" pathLength="100" d="M31.32 59.4V48.05H24.2C23 48.05 21.9 46 22.4 45.2L37.9 29.7C38.6 29 40.1 29 40.8 29.7L56.3 45.2C56.8 46 55.7 48.05 54.5 48.05H46.82V55.75"/>
+<path class="pg-arrow pg-arrow--a pg-lead" pathLength="100" d="M51.71 33.4V25.4H46.1C45.3 25.4 44.5 24.1 44.95 23.2L56.9 11.27C57.3 10.8 58.1 10.8 58.5 11.27L70.4 23.2C70.9 24.1 70.1 25.4 69.3 25.4H63.24V34.6"/>
+<path pathLength="100" class="pg-trail pg-trail--1" d="M31.32 64.19V67.05"/>
+<path pathLength="100" class="pg-trail pg-trail--2" d="M39.35 53.4V66.3M39.35 71.27V77.7M39.35 82.67V84.71"/>
+<path pathLength="100" class="pg-trail pg-trail--3" d="M46.82 60.35V65.04M46.82 70V72.62"/>
+<path pathLength="100" class="pg-trail pg-trail--4" d="M63.24 39.62V43.46"/>
+<g class="pg-percent"><path d="M56.1 74.42L69.9 54.41"/><circle cx="56.28" cy="57.17" r="3.87"/><circle cx="69.72" cy="71.67" r="3.87"/></g>
+</g>
+</svg>
