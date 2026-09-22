@@ -22,6 +22,10 @@ const { title, bodyClass, motion = false } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <title>{title}</title>
+    {/* Brand icon (scripts/favicon.mjs from Reach-icon-600x600.svg): SVG follows the tab's colour scheme, ICO for old browsers, navy tile for iOS */}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     {/* Reveal styles only apply once JS is known to run, so content is never hidden without it. */}
     {motion && <script is:inline>document.documentElement.classList.add('js');</script>}
   </head>
