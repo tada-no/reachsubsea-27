@@ -164,8 +164,13 @@ const posterClass = (p: (typeof posterSet)[number]) =>
   }
 
   /* ── Markers (HTML, positioned by the map) ─────────────── */
+  /* Same position as MapLibre's .maplibregl-marker rule, so stylesheet order can't undo it: in a
+     production build MapLibre's CSS is hoisted above this one, and `position: relative` here left
+     the markers in flow, each one a marker height below its place (found 22 Sep 2026 on the deploy). */
   .dot-map__marker {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     display: grid;
     place-items: center;
     width: 26px;

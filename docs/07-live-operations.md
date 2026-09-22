@@ -130,6 +130,7 @@ This replaces the SVG recommendation above. Contact on dev runs **Mapbox GL JS v
 - **Controls:** + / − / "show all regions", as design-system buttons inside the top-right corner of the map.
 - **Gestures:** drag to pan. Scroll-zoom needs Ctrl or ⌘ (two fingers on touch), so the page still scrolls normally.
 - **Limits:** zoom is capped at level 5, which is region level. Rotation and pitch are off.
+- **Stylesheet order:** a production build hoists MapLibre's CSS above the component's, the reverse of dev, where it arrives with the dynamic import. Any rule of ours on a MapLibre-classed element must therefore give the same answer whichever loads last: `.dot-map__canvas` is doubled to win, and `.dot-map__marker` repeats MapLibre's `position: absolute; top: 0; left: 0` (a `position: relative` there left every marker one marker-height below the previous one on the deploy, 22 Sep 2026). Check the map on `astro preview`, not only dev.
 - **Loading:** the static dot map shows first. MapLibre (about 230 KB gzipped of JS, loaded with its CSS) and the 23 KB land mask only load when the block comes within 400 px of the viewport, then the live map fades in over the poster. Because both are the same picture, the fade is invisible.
 
 ### Dots and poster (22 Sep 2026)
