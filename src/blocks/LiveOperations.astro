@@ -11,11 +11,18 @@
 //
 // Map (17 Sep 2026, user decision): an interactive GL map like the dev site's Contact map — zoom
 // controls inside the map, drag to pan, clusters that split as you zoom. Prototype runs MapLibre GL
-// (open-source fork of Mapbox GL, same API, no access token) on a local Natural Earth style: land as
-// the brand dot matrix, coloured from the tokens (a solid 'like Contact' style was reviewed and dropped); production can swap to mapbox-gl + the dev site's style (docs/07 §3). Markers are
-// HTML, so the pulse and the dashed cluster ring are plain CSS. Zoom is capped at region level.
-// Performance: a static dot-matrix map renders first; MapLibre (JS + CSS + ~45 KB GeoJSON) only loads
-// when the block nears the viewport, then fades in over the poster.
+// (open-source fork of Mapbox GL, same API, no access token) with no tiles at all: MapLibre handles
+// the camera, gestures and clustering, and the land is the brand dot matrix drawn on a canvas overlay
+// (a solid 'like Contact' style was reviewed and dropped); production can swap to mapbox-gl + the dev
+// site's style (docs/07 §3). Markers are HTML, so the pulse and the dashed cluster ring are plain CSS.
+// Zoom is capped at region level.
+// Dots (22 Sep 2026): a screen-fixed hex grid; a dot is drawn where its centre falls on land in a
+// Mercator land mask (/data/land-mask.png, 23 KB), so nothing is ever cut at a coastline. The static
+// poster is the same grid, tested against the same mask at build time, in the same framing
+// (src/lib/dot-map.ts), so the fade from poster to live map shows no jump. `dots` picks the density
+// (Regular, chosen 22 Sep 2026 over Fine and Finer, Q72).
+// Performance: the poster renders first; MapLibre (JS + CSS) and the mask only load when the block
+// nears the viewport, then the live map fades in over the poster.
 //
 // States: live · stale (feed older than STALE_AFTER_HOURS) · unavailable (no feed: static map only).
 // The script re-checks staleness in the browser, because a cached WordPress page can outlive its data.
@@ -25,7 +32,8 @@ import Icon from '../components/Icon.astro';
 import Badge from '../components/Badge.astro';
 import Link from '../components/Link.astro';
 import { makeId } from '../lib/ids';
-import { WORLD_BOX, worldDotsPath } from '../lib/world-dots';
+import { posters } from '../lib/world-dots';
+import type { DotPreset } from '../lib/dot-map';
 import { assetTypes, STALE_AFTER_HOURS, type LiveOperationsFeed } from '../data/live-operations';
 import type { BlockFields, LinkField } from '../lib/types';
 
@@ -43,6 +51,8 @@ interface Props extends BlockFields {
   action?: LinkField;
   /** Show the "Sample data" badge (prototype only). */
   sample?: boolean;
+  /** Dot density of the land (src/lib/dot-map.ts DOT_PRESETS). */
+  dots?: DotPreset;
 }
 
 const {
@@ -55,6 +65,7 @@ const {
   fallbackFigure = { value: '9', label: 'countries' },
   action = { label: 'See our assets', url: '/assets/' },
   sample = false,
+  dots = 'regular',
   background = 'navy',
   spacing = 'lg',
   anchor = 'live-operations',
@@ -93,7 +104,9 @@ const mapSummary =
     ? 'World map.'
     : `Map of ${n} active ${regionWord(n)}: ${regions.map((r) => r.name).join(', ')}. Details in the list.`;
 const typeOf = (type: string) => assetTypes.find((t) => t.key === type)!;
-const wb = WORLD_BOX;
+// Poster variants: one per width band (wide frame) plus the phone (tall) frame; CSS shows one
+const posterSet = await posters(dots);
+const posterClass = (p: (typeof posterSet)[number]) => `live-ops__poster live-ops__poster--${p.frame}${p.frame === 'wide' ? (p.min > 0 ? '-lg' : '-sm') : ''}`;
 ---
 
 <BlockSection
@@ -108,6 +121,7 @@ const wb = WORLD_BOX;
   data-state-forced={forcedState ? '' : undefined}
   data-updated={feed?.updatedAt}
   data-stale-hours={STALE_AFTER_HOURS}
+  data-dots={dots}
 >
   <div class="live-ops__layout">
     <header class="live-ops__head">
@@ -171,10 +185,13 @@ const wb = WORLD_BOX;
     }
 
     <figure class="live-ops__map" data-live-ops-map>
-      {/* Poster: static dot map, shown until the GL map is ready (and the whole map without JS) */}
-      <svg class="live-ops__poster" viewBox={`${wb.x} ${wb.y} ${wb.w} ${wb.h}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <path class="live-ops__land" d={worldDotsPath()} />
-      </svg>
+      {/* Poster: static dot map, shown until the GL map is ready (and the whole map without JS).
+          Same framing, grid and land mask as the live map, so the fade shows no jump. */}
+      {posterSet.map((p) => (
+        <svg class={posterClass(p)} viewBox={`${p.box.x} ${p.box.y} ${p.box.w} ${p.box.h}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <path class="live-ops__land" d={p.d} stroke-width={p.dot} />
+        </svg>
+      ))}
       {
         state !== 'unavailable' && (
           <Fragment>
@@ -257,20 +274,36 @@ const wb = WORLD_BOX;
   // MapLibre loads its tile worker from a URL next to the library, which breaks once Vite pre-bundles it.
   // Bundle the worker (with its shared chunk) ourselves and hand MapLibre the URL.
   import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+  import { DOT_PRESETS, FRAMES, MASK_H, MASK_W, cameraFor, colsFor, frameBox, frameFor, gridPoints, maskIndex, mercX, mercY, type DotPreset } from '../lib/dot-map';
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const COUNTRIES_URL = `${import.meta.env.BASE_URL}data/world-countries.json`;
+  const MASK_URL = `${import.meta.env.BASE_URL}data/land-mask.png`;
   /** Region level: never close enough to read as a position. */
   const MAX_ZOOM = 5;
   /** Zoom when a region is opened from the list or a marker: its sea area with context around it. */
   const REGION_ZOOM = 3.5;
   /** Clusters split from this zoom up. */
   const CLUSTER_MAX_ZOOM = 2;
-  /** The world view: every continent Reach could work off, without the polar stretch of Mercator. */
-  const HOME: [[number, number], [number, number]] = [
-    [-130, -50],
-    [160, 70],
-  ];
+
+  /** The land mask, one byte per pixel, shared by every block on the page. */
+  let maskPromise: Promise<Uint8Array> | undefined;
+  function loadMask() {
+    maskPromise ??= (async () => {
+      const img = new Image();
+      img.src = MASK_URL;
+      await img.decode();
+      const c = document.createElement('canvas');
+      c.width = MASK_W;
+      c.height = MASK_H;
+      const ctx = c.getContext('2d', { willReadFrequently: true })!;
+      ctx.drawImage(img, 0, 0, MASK_W, MASK_H);
+      const { data } = ctx.getImageData(0, 0, MASK_W, MASK_H);
+      const bits = new Uint8Array(MASK_W * MASK_H);
+      for (let i = 0; i < bits.length; i++) bits[i] = data[i * 4] > 127 ? 1 : 0;
+      return bits;
+    })();
+    return maskPromise;
+  }
 
   interface Point {
     id: string;
@@ -337,9 +370,12 @@ const wb = WORLD_BOX;
         })),
     });
 
+    /** The home view for the map's current size: the frame box as a MapLibre camera. */
+    const homeCamera = () => cameraFor(frameBox(FRAMES[frameFor(figure.clientWidth, figure.clientHeight)]), figure.clientWidth);
+
     async function loadMap() {
       if (!canvas || map) return;
-      const [ml] = await Promise.all([import('maplibre-gl'), import('maplibre-gl/dist/maplibre-gl.css')]);
+      const [ml, bits] = await Promise.all([import('maplibre-gl'), loadMask(), import('maplibre-gl/dist/maplibre-gl.css')]);
       ml.setWorkerUrl(workerUrl);
       const css = getComputedStyle(figure);
       const token = (name: string) => css.getPropertyValue(name).trim();
@@ -349,8 +385,6 @@ const wb = WORLD_BOX;
         style: {
           version: 8,
           sources: {
-            // Natural Earth is public domain: no on-map credit required (Mapbox in production must show its own)
-            countries: { type: 'geojson', data: COUNTRIES_URL },
             regions: {
               type: 'geojson',
               data: featureCollection(),
@@ -365,8 +399,7 @@ const wb = WORLD_BOX;
             { id: 'regions-query', type: 'circle', source: 'regions', paint: { 'circle-radius': 1, 'circle-opacity': 0 } },
           ],
         },
-        bounds: HOME,
-        fitBoundsOptions: { padding: 24 },
+        ...homeCamera(),
         maxZoom: MAX_ZOOM,
         renderWorldCopies: false,
         dragRotate: false,
@@ -382,30 +415,53 @@ const wb = WORLD_BOX;
       // Debug handle for review tooling (harmless in production)
       (root as HTMLElement & { liveOpsMap?: GLMap }).liveOpsMap = m;
 
-      // Dot-matrix land: a tiny tiled image, fixed in screen px, so the dots stay crisp at every zoom
-      function dotsImage() {
-        const dpr = Math.max(1, Math.round(window.devicePixelRatio || 1));
-        const size = 14 * dpr;
-        const c = document.createElement('canvas');
-        c.width = size;
-        c.height = size;
-        const ctx = c.getContext('2d')!;
-        ctx.fillStyle = token('--map-dot');
-        for (const [x, y] of [
-          [3.5, 3.5],
-          [10.5, 10.5],
-        ]) {
-          ctx.beginPath();
-          ctx.arc(x * dpr, y * dpr, 1.7 * dpr, 0, Math.PI * 2);
-          ctx.fill();
+      // ── Dot-matrix land: a canvas overlay, redrawn every frame ─────────────────
+      // A hex grid fixed to the screen (the land moves under it). Each grid point is unprojected to
+      // Mercator and looked up in the land mask: a whole dot on land, nothing at sea. Same grid and
+      // mask as the poster, so the fade-in shows no change.
+      const overlay = document.createElement('canvas');
+      overlay.className = 'live-ops__dots';
+      overlay.setAttribute('aria-hidden', 'true');
+      m.getCanvasContainer().appendChild(overlay);
+      const ctx = overlay.getContext('2d')!;
+      const preset: DotPreset = (root.dataset.dots as DotPreset) in DOT_PRESETS ? (root.dataset.dots as DotPreset) : 'regular';
+
+      function drawDots() {
+        const w = figure.clientWidth;
+        const h = figure.clientHeight;
+        if (!w || !h) return;
+        const dpr = Math.min(3, window.devicePixelRatio || 1);
+        if (overlay.width !== Math.round(w * dpr) || overlay.height !== Math.round(h * dpr)) {
+          overlay.width = Math.round(w * dpr);
+          overlay.height = Math.round(h * dpr);
         }
-        return { img: ctx.getImageData(0, 0, size, size), dpr };
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+        // No rotation or pitch, so screen → Mercator is linear: two corners are enough
+        const tl = m.unproject([0, 0]);
+        const br = m.unproject([w, h]);
+        const x0 = mercX(tl.lng);
+        const y0 = mercY(tl.lat);
+        const sx = (mercX(br.lng) - x0) / w;
+        const sy = (mercY(br.lat) - y0) / h;
+        const spec = DOT_PRESETS[preset];
+        const cols = colsFor(spec, frameFor(w, h), w);
+        const r = ((w / cols) * spec.dot) / 2;
+        ctx.fillStyle = token('--map-dot');
+        ctx.beginPath();
+        for (const [gx, gy] of gridPoints(w, h, cols)) {
+          const i = maskIndex(x0 + gx * sx, y0 + gy * sy);
+          if (i >= 0 && bits[i]) {
+            ctx.moveTo(gx + r, gy);
+            ctx.arc(gx, gy, r, 0, Math.PI * 2);
+          }
+        }
+        ctx.fill();
       }
+      m.on('render', drawDots);
 
       m.on('load', () => {
-        const { img, dpr } = dotsImage();
-        m.addImage('live-ops-dots', img, { pixelRatio: dpr });
-        m.addLayer({ id: 'land-dots', type: 'fill', source: 'countries', paint: { 'fill-pattern': 'live-ops-dots' } }, 'regions-query');
+        drawDots();
         figure.classList.add('is-ready');
       });
 
@@ -413,15 +469,20 @@ const wb = WORLD_BOX;
       const controls = root.querySelector<HTMLElement>('[data-live-ops-controls]')!;
       const zoomIn = controls.querySelector<HTMLButtonElement>('[data-map-zoom-in]')!;
       const zoomOut = controls.querySelector<HTMLButtonElement>('[data-map-zoom-out]')!;
-      let minZoom = 0;
       function syncZoomButtons() {
         zoomIn.disabled = m.getZoom() >= MAX_ZOOM - 0.01;
-        zoomOut.disabled = m.getZoom() <= minZoom + 0.01;
+        zoomOut.disabled = m.getZoom() <= m.getMinZoom() + 0.01;
       }
+      // The home view is as far out as it goes, so "Zoom out" is disabled there on every screen size.
+      // The map's size sets that zoom, so it follows resizes (and the wide ↔ tall frame switch).
+      const syncMinZoom = () => m.setMinZoom(homeCamera().zoom);
       m.once('load', () => {
-        // The home view is as far out as it goes, so "Zoom out" is disabled there on every screen size
-        minZoom = m.getZoom();
-        m.setMinZoom(minZoom);
+        syncMinZoom();
+        syncZoomButtons();
+      });
+      m.on('resize', () => {
+        syncMinZoom();
+        drawDots();
         syncZoomButtons();
       });
       m.on('moveend', syncZoomButtons);
@@ -531,7 +592,7 @@ const wb = WORLD_BOX;
         const shown = points.filter((p) => shownBy[p.id] > 0);
         const animate = !reduceMotion.matches;
         if (all || shown.length === 0) {
-          m.fitBounds(HOME, { padding: 24, animate, duration: 900 });
+          m.easeTo({ ...homeCamera(), animate, duration: 900 });
           return;
         }
         const lons = shown.map((p) => p.lon);
@@ -732,25 +793,47 @@ const wb = WORLD_BOX;
     grid-area: map;
     position: relative;
     margin: 0;
+    /* Frame aspect: 'wide' in src/lib/dot-map.ts. Keep the two in step. */
     aspect-ratio: 2 / 1;
     border-radius: var(--wp--custom--radius--md);
     overflow: hidden;
+    /* Poster variants switch on the map's own width (WIDE_BREAK in dot-map.ts) */
+    container-type: inline-size;
   }
   .live-ops.has-surface-navy .live-ops__map {
     --map-dot: var(--wp--preset--color--navy-600);
   }
+  /* Poster variants: one per width band, matching the overlay's choice in the script */
   .live-ops__poster {
+    display: none;
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     transition: opacity 400ms var(--wp--custom--motion--easing);
   }
+  @container (width >= 680px) {
+    .live-ops__poster--wide-lg {
+      display: block;
+    }
+  }
+  @container (width < 680px) {
+    .live-ops__poster--wide-sm {
+      display: block;
+    }
+  }
   .live-ops__land {
     fill: none;
     stroke: var(--map-dot);
-    stroke-width: 3.4;
     stroke-linecap: round;
+  }
+  /* The live dots: a canvas the script draws over the (empty) GL canvas, under the markers */
+  .live-ops__dots {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
   }
   /* Doubled class: MapLibre's CSS (loaded later) sets .maplibregl-map { position: relative } */
   .live-ops__canvas.live-ops__canvas {
@@ -1195,9 +1278,17 @@ const wb = WORLD_BOX;
       mask-image: linear-gradient(to right, black calc(100% - 32px), transparent);
     }
     .live-ops__map {
+      /* Frame aspect: 'tall' in src/lib/dot-map.ts */
       aspect-ratio: 5 / 4;
       margin-inline: calc(-1 * var(--wp--preset--spacing--16));
       border-radius: 0;
+    }
+    .live-ops__poster--wide-lg,
+    .live-ops__poster--wide-sm {
+      display: none;
+    }
+    .live-ops__poster--tall {
+      display: block;
     }
     .live-ops__marker-label {
       font-size: var(--wp--preset--font-size--caption);

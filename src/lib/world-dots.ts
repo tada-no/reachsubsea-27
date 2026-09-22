@@ -1,104 +1,115 @@
-// Dot-matrix world map for the Live operations block, computed at build time (no client JS, no tiles).
-// Natural Earth land (world-atlas) → Equal Earth projection → a grid of dots on land, emitted as ONE
-// <path> of zero-length segments drawn with round caps, so thousands of dots cost one DOM node.
-// World view uses 1:110m; a zoomed cluster gets its own finer grid from 1:50m for just that area.
-// For WordPress, export the results once as static SVG in the theme (docs/07 §3).
-import { geoContains, geoEqualEarth } from 'd3-geo';
+// Dot-matrix world map for the Live operations block, computed at build time. Server only (sharp,
+// world-atlas): the maths it shares with the browser overlay lives in dot-map.ts.
+//
+// Land mask: Natural Earth 1:50m land (world-atlas) → Web Mercator → rasterised once with sharp to a
+// MASK_W × MASK_H bitmap of the LAT_MIN..LAT_MAX band. The poster tests its grid points against this
+// mask, and the same bitmap is served as /data/land-mask.png for the overlay MapLibre draws, so a dot
+// is either whole or absent in both: nothing is clipped at a coastline (22 Sep 2026, replaces the
+// fill-pattern land that cut dots into segments).
+//
+// Poster: ONE <path> of zero-length segments drawn with round caps, so thousands of dots cost one DOM
+// node. For WordPress, export the paths once as static SVG in the theme (docs/07 §3).
+import sharp from 'sharp';
+import { geoMercator, geoPath } from 'd3-geo';
 import { feature } from 'topojson-client';
-import land110 from 'world-atlas/land-110m.json';
 import land50 from 'world-atlas/land-50m.json';
+import {
+  BAND,
+  DOT_PRESETS,
+  FRAMES,
+  HIDDEN,
+  MASK_H,
+  MASK_W,
+  WORLD,
+  colsFor,
+  frameBox,
+  gridPoints,
+  maskIndex,
+  mercX,
+  mercY,
+  type Box,
+  type DotPreset,
+  type FrameKey,
+} from './dot-map';
 
-export const MAP_WIDTH = 1000;
-/** Antarctica and the far Arctic are cropped: nobody works there and they eat vertical space. */
-const LAT_MIN = -56;
-const LAT_MAX = 78;
-/** World grid pitch in map units. */
-export const DOT_STEP = 7;
+export { frameBox, FRAMES, WORLD } from './dot-map';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const landCoarse = feature(land110 as any, (land110 as any).objects.land) as any;
-const landFine = feature(land50 as any, (land50 as any).objects.land) as any;
+const land = feature(land50 as any, (land50 as any).objects.land) as any;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-/**
- * Centred on 10°E, so the edge falls in the Bering Strait and no continent is split across the edges.
- * (Was 65°E while the region list floated over the Pacific; it now has its own column, 17 Sep 2026.)
- */
-export const MAP_CENTER_LON = 10;
-const projection = geoEqualEarth().rotate([-MAP_CENTER_LON, 0]).fitWidth(MAP_WIDTH, { type: 'Sphere' });
-const top = projection([MAP_CENTER_LON, LAT_MAX])![1];
-const bottom = projection([MAP_CENTER_LON, LAT_MIN])![1];
-projection.translate([projection.translate()[0], projection.translate()[1] - top]);
+/** Map units → mask px. */
+const px = (v: number) => (v / WORLD) * MASK_W;
 
-export const MAP_HEIGHT = Math.round(bottom - top);
-
-/** Projects lon/lat to map units (viewBox 0 0 MAP_WIDTH MAP_HEIGHT). */
-export function project(lon: number, lat: number): [number, number] {
-  const [x, y] = projection([lon, lat])!;
-  return [Math.round(x * 10) / 10, Math.round(y * 10) / 10];
+function landSvg() {
+  // d3's Mercator: y = -ln(tan(π/4 + φ/2)) · k + ty. Match mercY() with k = MASK_W / 2π.
+  const k = MASK_W / (2 * Math.PI);
+  const projection = geoMercator()
+    .scale(k)
+    .translate([MASK_W / 2, MASK_W / 2 - px(BAND.y0)]);
+  const d = geoPath(projection).digits(1)(land);
+  const hidden = HIDDEN.map((h) => {
+    const x0 = px(mercX(h.lon[0]));
+    const x1 = px(mercX(h.lon[1]));
+    const y0 = Math.max(0, px(mercY(h.lat[1]) - BAND.y0));
+    const y1 = Math.min(MASK_H, px(mercY(h.lat[0]) - BAND.y0));
+    return `<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" fill="black"/>`;
+  }).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${MASK_W}" height="${MASK_H}"><rect width="${MASK_W}" height="${MASK_H}" fill="black"/><path d="${d}" fill="white"/>${hidden}</svg>`;
 }
 
-export interface Box {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+let maskPromise: Promise<{ bits: Uint8Array; png: Buffer }> | undefined;
+
+/** The land mask: one byte per pixel (1 = land) for the poster, and the PNG served to the browser. */
+export function landMask() {
+  maskPromise ??= (async () => {
+    const image = sharp(Buffer.from(landSvg()), { density: 72 });
+    const [raw, png] = await Promise.all([
+      image.clone().greyscale().raw().toBuffer({ resolveWithObject: true }),
+      image.clone().greyscale().png({ palette: true, colours: 2, compressionLevel: 9 }).toBuffer(),
+    ]);
+    const bits = new Uint8Array(raw.info.width * raw.info.height);
+    for (let i = 0; i < bits.length; i++) bits[i] = raw.data[i] > 127 ? 1 : 0;
+    return { bits, png };
+  })();
+  return maskPromise;
 }
 
-/**
- * Artistic licence (user, 17 Sep 2026): drop the far ends that float at the map edges and say nothing
- * about Reach's work — Alaska and the North Pacific islands on the left, Russia's far east
- * (Kamchatka, Chukotka) on the right. New Zealand and Oceania south of 45°N stay.
- */
-function hidden(lon: number, lat: number) {
-  return lon < -140 || (lon > 145 && lat > 45);
+export interface Poster {
+  frame: FrameKey;
+  /** Width band this variant is for (px of map width, `wide` frames only). */
+  min: number;
+  box: Box;
+  cols: number;
+  /** Stroke width in map units (the dot diameter). */
+  dot: number;
+  d: string;
 }
 
-/**
- * Grid points outside the Equal Earth outline (the map's rounded corners) still invert to a lon/lat,
- * which can land on real land and print phantom dots in the corners. Keep a point only if projecting
- * its lon/lat again lands back on it.
- */
-function onGlobe([x, y]: [number, number], lonLat: [number, number]) {
-  const back = projection(lonLat);
-  return !!back && Math.abs(back[0] - x) < 0.5 && Math.abs(back[1] - y) < 0.5;
-}
-
-const cache = new Map<string, string>();
+const cache = new Map<string, Poster>();
 
 /**
- * `d` for a dot path over `box` (default: the whole map) at grid pitch `step`. The grid is anchored to
- * the map origin, so a zoomed grid lines up with the world grid at the same density on screen.
+ * Poster variants for a density preset: one per `wide` width band plus one `tall`. The block shows
+ * one of them through container and media queries; the overlay picks the same one from the map size.
  */
-export function worldDotsPath(step = DOT_STEP, box: Box = { x: 0, y: 0, w: MAP_WIDTH, h: MAP_HEIGHT }): string {
-  const key = `${step}|${box.x}|${box.y}|${box.w}|${box.h}`;
-  const hit = cache.get(key);
-  if (hit) return hit;
-  const land = box.w < MAP_WIDTH ? landFine : landCoarse;
-  const decimals = step < 3 ? 2 : 1;
-  const parts: string[] = [];
-  const row0 = Math.max(0, Math.floor(box.y / step));
-  for (let row = row0; row * step + step / 2 < Math.min(MAP_HEIGHT, box.y + box.h); row++) {
-    const y = row * step + step / 2;
-    // Offset alternate rows by half a step: a hex-ish grid reads less like graph paper
-    const offset = row % 2 ? step / 2 : 0;
-    const col0 = Math.max(0, Math.floor((box.x - offset) / step));
-    for (let col = col0; col * step + step / 2 + offset < Math.min(MAP_WIDTH, box.x + box.w); col++) {
-      const x = col * step + step / 2 + offset;
-      const lonLat = projection.invert!([x, y]);
-      if (lonLat && onGlobe([x, y], lonLat) && !hidden(lonLat[0], lonLat[1]) && geoContains(land, lonLat)) parts.push(`M${x.toFixed(decimals)} ${y.toFixed(decimals)}h0`);
+export async function posters(preset: DotPreset): Promise<Poster[]> {
+  const spec = DOT_PRESETS[preset];
+  const { bits } = await landMask();
+  const variants: { frame: FrameKey; min: number }[] = [...spec.wide.map((b) => ({ frame: 'wide' as const, min: b.min })), { frame: 'tall', min: 0 }];
+  return variants.map(({ frame, min }) => {
+    const key = `${preset}|${frame}|${min}`;
+    const hit = cache.get(key);
+    if (hit) return hit;
+    const box = frameBox(FRAMES[frame]);
+    const cols = colsFor(spec, frame, min);
+    const pitch = box.w / cols;
+    const parts: string[] = [];
+    for (const [gx, gy] of gridPoints(box.w, box.h, cols)) {
+      const i = maskIndex(box.x + gx, box.y + gy);
+      if (i >= 0 && bits[i]) parts.push(`M${(box.x + gx).toFixed(1)} ${(box.y + gy).toFixed(1)}h0`);
     }
-  }
-  const d = parts.join('');
-  cache.set(key, d);
-  return d;
+    const poster: Poster = { frame, min, box, cols, dot: Math.round(pitch * spec.dot * 100) / 100, d: parts.join('') };
+    cache.set(key, poster);
+    return poster;
+  });
 }
-
-/** The world view: the extent of the visible land dots plus a margin, so trimmed edges don't leave empty bands. */
-export const WORLD_BOX: Box = (() => {
-  const xs = [...worldDotsPath().matchAll(/M([\d.]+) /g)].map((m) => Number(m[1]));
-  const margin = DOT_STEP * 2;
-  const x = Math.max(0, Math.min(...xs) - margin);
-  const w = Math.min(MAP_WIDTH, Math.max(...xs) + margin) - x;
-  return { x: Math.round(x), y: 0, w: Math.round(w), h: MAP_HEIGHT };
-})();

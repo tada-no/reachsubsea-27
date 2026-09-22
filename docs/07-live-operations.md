@@ -3,7 +3,7 @@
 17 Sep 2026 · Status: **on the homepage** after the Stats band (Live state, dotted map, SAMPLE DATA badge). The review page shows the automatic Stale and Unavailable states.
 Review page: `http://localhost:4321/live-operations-review/`
 
-Files: [src/blocks/LiveOperations.astro](../src/blocks/LiveOperations.astro) · [src/data/live-operations.ts](../src/data/live-operations.ts) · [src/lib/world-dots.ts](../src/lib/world-dots.ts) · [src/pages/live-operations-review.astro](../src/pages/live-operations-review.astro). Build-only dev dependencies added: `world-atlas`, `topojson-client`, `d3-geo` (nothing ships to the browser). Backup: `backups/package.json.2026-09-17-pre-liveops`.
+Files: [src/blocks/LiveOperations.astro](../src/blocks/LiveOperations.astro) · [src/data/live-operations.ts](../src/data/live-operations.ts) · [src/lib/world-dots.ts](../src/lib/world-dots.ts) · [src/pages/live-operations-review.astro](../src/pages/live-operations-review.astro). Build-only dev dependencies: `world-atlas`, `topojson-client`, `d3-geo` and `sharp` (nothing ships to the browser). Shared maths in [src/lib/dot-map.ts](../src/lib/dot-map.ts). Backup: `backups/package.json.2026-09-17-pre-liveops`.
 
 **Keep these two ideas apart.** The **3D World** (`/3d-world/`, `src/data/world.ts`) shows *illustrative zones*: Subsea Infrastructure, Oil Field Operations, and so on. The **live operations map** shows *where assets are actually working*. The block therefore says **"regions"** and never "zones".
 
@@ -89,7 +89,7 @@ The user chose to launch with the hybrid. Claude had recommended starting with A
 **Recommendation: the stylised SVG.** MapLibre only makes sense if the client later wants a zoomable fleet tracker, which would be a separate product decision.
 
 How the prototype works:
-- **Geometry:** Natural Earth 1:110m land (`world-atlas`) with an Equal Earth projection, centred on 10°E so the seam falls in the Bering Strait and no continent is split across the edges. Grid points outside the map's rounded outline are dropped (they used to print phantom land in the corners). Artistic licence: Alaska and the North Pacific islands (west of 140°W) and Russia's far east (east of 145°E, north of 45°N) are hidden, and the world view is cropped to the remaining land. The land is a hex dot grid drawn as a single path (zero-length segments with round caps). Everything is computed at build time. In WordPress, ship the SVG as a theme file and place pins using precomputed x/y per region, or the same projection maths in PHP.
+- **Geometry (superseded 22 Sep 2026, see "Dots and poster" below):** was Natural Earth 1:110m land with an Equal Earth projection. Now Web Mercator, so the poster and the GL map are the same picture. Artistic licence stays: Alaska and the North Pacific islands (west of 140°W) and Russia's far east (east of 145°E, north of 45°N) are hidden. The land is a hex dot grid drawn as a single path (zero-length segments with round caps), computed at build time. In WordPress, ship the SVG as a theme file and place pins using precomputed x/y per region, or the same projection maths in PHP.
 - **Layout:**
   - Headline, status and filters sit above a full-width map.
   - On desktop the region list has its own column beside the map.
@@ -124,17 +124,23 @@ This replaces the SVG recommendation above. Contact on dev runs **Mapbox GL JS v
 
 **Prototype setup:**
 - **Engine:** **MapLibre GL 6**, the open-source fork of Mapbox GL with the same API. It needs no access token, and I didn't copy the dev site's token.
-- **Map data:** local Natural Earth 1:110m countries, served as `/data/world-countries.json` (about 45 KB gzipped).
-- **Two land styles**, switchable on the review page:
-  - *Dots*: the brand dot matrix as a screen-pixel pattern, so the dots stay crisp at every zoom.
-  - *Solid*: filled countries with thin borders, like Contact.
+- **Map data:** none. MapLibre runs with no tiles and no land layer: it provides the camera, gestures and clustering only. The land is drawn by the block (below). The 1:110m countries GeoJSON and the *Solid* land style are gone (22 Sep 2026).
 - **Markers:** HTML elements, so the pulse and the turning dashed cluster ring are plain CSS.
 - **Clusters:** built into MapLibre, by distance, and split from zoom 3. Clicking a cluster zooms to where it splits. Opening a row in the list flies to that region.
 - **Controls:** + / − / "show all regions", as design-system buttons inside the top-right corner of the map.
 - **Gestures:** drag to pan. Scroll-zoom needs Ctrl or ⌘ (two fingers on touch), so the page still scrolls normally.
 - **Limits:** zoom is capped at level 5, which is region level. Rotation and pitch are off.
-- **Loading:** the static dot map shows first. MapLibre (about 230 KB gzipped of JS, loaded with its CSS) only loads when the block comes within 400 px of the viewport, then fades in over it.
-- **Data fixes:** Natural Earth rings are re-wound to the GeoJSON standard, and the rings for Russia and Fiji are unwrapped across 180°. Without both fixes, blocks of false land fill whole map tiles.
+- **Loading:** the static dot map shows first. MapLibre (about 230 KB gzipped of JS, loaded with its CSS) and the 23 KB land mask only load when the block comes within 400 px of the viewport, then the live map fades in over the poster. Because both are the same picture, the fade is invisible.
+
+### Dots and poster (22 Sep 2026)
+Two problems in review: the map appeared to zoom when it loaded (the poster was an Equal Earth world, the GL map a cropped Mercator one), and dots were cut into segments at every coastline (the land was a tiled dot image clipped to the country polygons). Fix: one picture, drawn the same way twice.
+- **Land mask:** Natural Earth 1:50m land → Web Mercator, latitude −56° to 78°, rasterised once at build time with sharp to a 2048 px-wide two-colour PNG with the hidden far ends painted out (`src/lib/world-dots.ts`, served as `/data/land-mask.png`, 23 KB). One mask pixel is about 8 screen px at the zoom cap of 5.
+- **Grid:** an equilateral hex lattice **fixed to the screen** (user decision): the land moves under the grid as you pan and zoom. Each grid point is unprojected to Mercator and looked up in the mask; a dot is drawn whole or not at all, so nothing is ever clipped.
+- **Live map:** a `<canvas>` overlay inside MapLibre's canvas container (under the markers), redrawn on every `render` and `resize` event. Screen → Mercator is linear because rotation and pitch are off, so two `unproject` calls per frame are enough; a world view is about 1,500 dots.
+- **Poster:** the same grid, tested against the same mask at build time, emitted as one `<path>`. Its `viewBox` is the framing box, and the MapLibre camera is computed from the same box (`cameraFor`), replacing `fitBounds`, so the poster and the live view are pixel-aligned (99% or more of poster dots sit under a live dot at 1440, 1100, 800 and 375).
+- **Framing:** `FRAMES` in `src/lib/dot-map.ts`: `wide` (2:1, lon −125°..165°, lat −50°..70°) for desktop and tablet, `tall` (5:4, the Brazil–Asia band) for phones. Each is grown to the figure's CSS aspect ratio with a 4% margin, so keep the CSS `aspect-ratio` and the frame aspects in step. Home view = minimum zoom, recomputed on resize.
+- **Density:** columns are fixed per width band (`DOT_PRESETS`: `regular`, `fine`, `finer`, with `wide` bands switching at 680 px of map width and one `tall` count), so the pitch scales with the map and the poster (an SVG that scales) and the overlay (drawn in px) always agree. The block has one poster per band, shown by container and media queries. The `dots` prop picks the preset: **Regular** (Q72, chosen over Fine and Finer with a live compare on the review page, toggle since removed).
+- **WordPress:** the theme ships `land-mask.png` and the poster SVGs (one per band and density) as static files, and the overlay script as is. The mask can be regenerated with the same Node script if the crop or hidden areas change.
 - **Prototype-only settings:** the MapLibre worker is bundled with `?worker&url`, because Vite's dependency pre-bundling breaks MapLibre's own worker path.
 
 **Swapping to Mapbox in production** (for the same style as Contact):

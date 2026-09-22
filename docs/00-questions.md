@@ -10,6 +10,24 @@ _No open questions right now._
 
 ## Answered log
 
+### Q72. Live operations map: dot density (22 Sep 2026, Live operations)
+Context: with the dots no longer cut at coastlines (Q71), the density was a free choice. Compared live on the review page with a temporary Dot density toggle (Regular · Fine · Finer) and a stacked comparison image at 1440.
+- [x] Regular: about the size of the old map's dots (3.4px on a 13px pitch at 1440)
+- [ ] Fine: the smaller dots from the review screenshot
+- [ ] Finer: reads as a texture
+
+**Answer:** Regular. It is the block's default (`dots="regular"`); the toggle was removed after the choice. The presets stay in `src/lib/dot-map.ts` so Contact or a future page can pick a finer grid if it ever suits.
+
+### Q71. Live operations map: jump on load, and dots cut at coastlines (22 Sep 2026, Live operations)
+Context: the static poster (an Equal Earth world) and the MapLibre map (Web Mercator, cropped) were two different pictures, so the map appeared to zoom when it faded in. And the live map drew land by clipping a tiled dot image to the country polygons, so any dot on a coastline was sliced; smaller dots only made it rarer.
+- [x] Dots fixed to the screen while panning and zooming: the land moves under the grid (as before, and the usual dot-matrix look)
+- [ ] Dots stuck to the land, re-gridding at each zoom step
+- [x] Poster becomes the same Mercator view, framing, grid and land mask as the live map
+- [ ] Keep the Equal Earth poster
+- [x] Dot size: smaller than before, but compare first (Q72)
+
+**Answer:** Fixed. The live map no longer draws land with MapLibre at all: a canvas overlay lays a hex grid over the map every frame and draws a whole dot wherever the grid point falls on land in a Mercator land mask (`/data/land-mask.png`, 23 KB, Natural Earth 1:50m rasterised at build time with sharp). The poster is the same grid, tested against the same mask, in the same framing box (`src/lib/dot-map.ts` holds the framing, presets and maths for both), so the fade-in is invisible: 99% or more of poster dots sit under a live dot at 1440, 1100, 800 and 375. Columns are fixed per width band so the pitch scales with the map and the poster and overlay stay aligned. The 45 KB countries GeoJSON is gone. Docs/07 §3.
+
 ### Q70. Web standards and accessibility audit (21 Sep 2026, WordPress handoff)
 Context: HTML validator (html-validate) and axe-core (WCAG 2.2 AA + best practice) on the 8 built pages, plus manual checks of motion, focus, keyboard and contrast over photos. Nothing seriously wrong. Two WCAG failures: the 3D World poster loop had no pause control (2.2.2) and the Investors Timeline track couldn't be scrolled by keyboard (2.1.1).
 - [x] Fix the failures and the minor validity items, and log the WordPress handover points
