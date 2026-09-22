@@ -782,6 +782,9 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
   }
   .data-list__facet-chips {
     padding-block: 0;
+    /* Scrolls inside the facet instead of widening it (a flex item's min-width is its content) */
+    flex: 1 1 auto;
+    min-width: 0;
   }
   /* Figma: count, then the divider that opens the list (each row carries a top rule) */
   .data-list__count {
@@ -834,6 +837,9 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
       flex-direction: column;
       align-items: flex-start;
       gap: var(--wp--preset--spacing--8);
+    }
+    .data-list__facet-chips {
+      align-self: stretch;
     }
     .data-list__facet-label {
       width: auto;

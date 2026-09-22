@@ -35,7 +35,7 @@ const { slug } = Astro.params;
   </head>
   <body>
     <iframe id="frame" title={`${slug}, Mobile 375`} width="375"></iframe>
-    <script is:inline define:vars={{ slug }}>
+    <script is:inline define:vars={{ slug, base: import.meta.env.BASE_URL }}>
       const frame = document.getElementById('frame');
       frame.addEventListener('load', () => {
         const body = frame.contentDocument.body;
@@ -45,7 +45,7 @@ const { slug } = Astro.params;
         fit();
         new ResizeObserver(fit).observe(body);
       });
-      frame.src = `/blocks/frame/${slug}/${location.search}`;
+      frame.src = `${base}blocks/frame/${slug}/${location.search}`; // base: the GitHub Pages build lives under /reachsubsea-27/
     </script>
   </body>
 </html>
