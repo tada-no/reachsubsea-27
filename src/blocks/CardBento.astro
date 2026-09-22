@@ -4,7 +4,7 @@
 // `pattern` (src/data/bento-patterns.ts) and fills its cells in order; a card carries no span of its own.
 // Each card keeps its own Media / Surface. Give exactly as many cards as the pattern has cells: extra
 // cards are dropped, and a warning is logged at build time for a short list.
-// Tablet (600–1199): 6 columns (wide cards full width, the rest halves); mobile: one column.
+// Tablet (768–1319): 6 columns (wide cards full width, the rest halves); mobile: one column.
 // No cards → render nothing (docs/05 §0).
 import BlockSection from '../components/BlockSection.astro';
 import SectionHeader from '../components/SectionHeader.astro';
@@ -123,15 +123,17 @@ for (let i = cards.length - 1; i >= 0 && area() % 6 !== 0; i--) {
   /* Short image cards (one row, 17 Sep 2026): read like their text neighbours. Eyebrow at the top on
      the shared padding line, action pinned to the bottom, and a left-to-right scrim so the right of
      the photo stays clear. Tall image cards keep the bottom-up ramp and bottom-anchored text. */
-  .card-bento__item--short .card--media-image-bg .card__content {
-    flex: 1 1 auto;
-    margin-top: 0;
+  @media (min-width: 600px) {
+    .card-bento__item--short .card--media-image-bg .card__content {
+      flex: 1 1 auto;
+      margin-top: 0;
+    }
+    .card-bento__item--short .card__overlay {
+      background: var(--wp--custom--scrim--card-across);
+    }
   }
-  .card-bento__item--short .card__overlay {
-    background: var(--wp--custom--scrim--card-across);
-  }
-  @media (max-width: 1199px) {
-    /* Tablet: every half-width card is one row tall, so all of them take the short treatment */
+  /* Tablet: every half-width card is one row tall, so all of them take the short treatment */
+  @media (min-width: 600px) and (max-width: 1319px) {
     .card-bento__item:not(.card-bento__item--wide) .card--media-image-bg .card__content {
       flex: 1 1 auto;
       margin-top: 0;
@@ -139,6 +141,10 @@ for (let i = cards.length - 1; i >= 0 && area() % 6 !== 0; i--) {
     .card-bento__item:not(.card-bento__item--wide) .card__overlay {
       background: var(--wp--custom--scrim--card-across);
     }
+  }
+  /* The 12-column bento (four across) only from 1320 (22 Sep 2026, Q74): at 1200–1319 its quarter
+     cards left ~190px of text */
+  @media (max-width: 1319px) {
     .card-bento__list {
       grid-template-columns: repeat(6, minmax(0, 1fr));
     }
@@ -151,7 +157,13 @@ for (let i = cards.length - 1; i >= 0 && area() % 6 !== 0; i--) {
       grid-row: span var(--span-rows, 1);
     }
   }
-  @media (max-width: 599px) {
+  /* One column up to 767 (22 Sep 2026): two cards at 600–767 left ~190px of text */
+  @media (min-width: 600px) and (max-width: 767px) {
+    .card-bento .card--media-image-bg {
+      min-height: 360px;
+    }
+  }
+  @media (max-width: 767px) {
     .card-bento__list {
       grid-template-columns: 1fr;
       grid-auto-rows: auto;
@@ -161,16 +173,6 @@ for (let i = cards.length - 1; i >= 0 && area() % 6 !== 0; i--) {
       grid-column: span 1;
       grid-row: auto;
     }
-    .card-bento .card--media-image-bg {
-      min-height: 360px;
-    }
-    /* Phones: stacked full width, so every image card goes back to bottom-anchored text */
-    .card-bento__list .card-bento__item .card--media-image-bg .card__content {
-      flex: 0 0 auto;
-      margin-top: auto;
-    }
-    .card-bento__list .card-bento__item .card__overlay {
-      background: var(--wp--custom--scrim--card-up);
-    }
+    /* Phones: image cards take Card's own photo-over-navy-panel layout (22 Sep 2026) */
   }
 </style>

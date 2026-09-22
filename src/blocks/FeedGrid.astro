@@ -214,8 +214,9 @@ const instanceId = makeId('feed-grid');
     width: 100%;
   }
 
-  /* Editorial: lead + stack */
-  @media (min-width: 900px) {
+  /* Editorial: lead + stack. From 1000, not 900 (22 Sep 2026): at 900 the 5-column stack left ~260px
+     of text and news titles ran to four lines */
+  @media (min-width: 1000px) {
     .feed-grid__list--editorial {
       grid-template-columns: repeat(12, minmax(0, 1fr));
     }
@@ -231,9 +232,9 @@ const instanceId = makeId('feed-grid');
     }
   }
 
-  /* Four across only from 1200: below it the cards' kickers and meta wrap, so they go 2 × 2
-     (19 Sep 2026, Subsea projects) */
-  @media (max-width: 1199px) {
+  /* Four across only from 1320 (1200 until 22 Sep 2026, Q74): below it the cards' kickers and meta
+     wrap and titles run long, so they go 2 × 2 (19 Sep 2026, Subsea projects) */
+  @media (max-width: 1319px) {
     .feed-grid__list--cols-4 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -263,6 +264,11 @@ const instanceId = makeId('feed-grid');
       flex-wrap: nowrap;
       align-items: flex-start;
     }
+  }
+  @media (max-width: 999px) {
+    .feed-grid__list--editorial {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
     .feed-grid__list--editorial .feed-grid__item:first-child {
       grid-column: 1 / -1;
     }
@@ -273,10 +279,16 @@ const instanceId = makeId('feed-grid');
     }
   }
 
-  @media (max-width: 599px) {
+  /* One column up to 767 (22 Sep 2026): two cards at 600–767 left ~190px of text */
+  @media (max-width: 767px) {
     .feed-grid__list {
       grid-template-columns: 1fr;
     }
+    .feed-grid__list .feed-grid__item {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 599px) {
     .feed-grid__facet {
       flex-direction: column;
       align-items: flex-start;

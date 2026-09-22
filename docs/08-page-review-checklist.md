@@ -21,11 +21,37 @@ Headless command (from the project root):
 
 Headless can catch scroll reveals halfway through, and it leaves the OMS iframe unloaded. Recheck anything odd in the browser pane before calling it a bug.
 
+### Between the widths: the card sweep
+
+The four widths miss the ranges just above each breakpoint, where rows are squeezed hardest (600–767, 900, 1200). Before any handover, sweep every page from 600 to 1399. Open the browser pane at 1400 wide (`resize_window` 1400×900, since test frames can't be wider than the pane), then run this with `javascript_tool`. It loads each page in test frames at each width and lists any card whose text column is under 260px **and** carries running text (description over 3 lines, a list item that wraps, or a title over 3 lines), plus any sideways scroll. It should print `clean`, apart from two exemptions: phone-width cards (375), and four-across rows from 1320, which sit at 214–246px as designed (Q74).
+
+```js
+const pages=['/','/services/','/services/subsea/','/company/','/careers/','/investors/','/investors/why-invest/','/contact/'];
+const widths=[600,680,767,768,820,899,900,999,1000,1100,1199,1200,1300,1399];
+const L=(el,d)=>el?Math.round(el.getBoundingClientRect().height/(parseFloat(d.defaultView.getComputedStyle(el).lineHeight)||20)):0;
+const bad=[];
+for (const p of pages) for (const w of widths) {
+  const f=document.createElement('iframe'); f.style.cssText=`position:fixed;inset:0 auto auto 0;width:${w}px;height:900px;border:0;opacity:0`;
+  f.src=p+'?v='+Date.now(); document.body.appendChild(f); await new Promise(r=>f.onload=r); await new Promise(r=>setTimeout(r,250));
+  const d=f.contentDocument;
+  if (d.documentElement.scrollWidth>w) bad.push(`${p} @${w} sideways scroll`);
+  d.querySelectorAll('.card').forEach(c=>{ const t=c.querySelector('.card__heading'); if(!c.offsetWidth||!t) return;
+    const tw=Math.round(t.getBoundingClientRect().width), ti=L(c.querySelector('.card__title'),d), de=L(c.querySelector('.card__description'),d);
+    const wr=[...c.querySelectorAll('.card__sublink span')].filter(s=>L(s,d)>1).length;
+    if (tw<260 && (de>3||wr||ti>3)) bad.push(`${p} #${c.closest('[id]')?.id} @${w}: text ${tw}px, title ${ti}L, desc ${de}L, wrapped ${wr}`); });
+  f.remove();
+}
+bad.join('\n')||'clean'
+```
+
+If a card fails, change the row's shape at that width (fewer columns, or the card's own container-query layout). Don't shrink the type.
+
 ## 2. Cards and rows
 
 - Every card in a row has the same structure and one left edge: media or tile, kicker, title, meta, actions.
 - Actions line up across the row. No card's actions float higher or lower than its neighbours'.
 - No hairlines inside a card. One piece of meta, on one line (short dates: "18 Aug 2026").
+- Card text columns stay at 260px or more wherever the card carries a description or list (the sweep above). Card rows go to one column below 768; wide pictogram cards (Services' four lines) below 900; the editorial feed's lead-plus-stack starts at 1000; four-across rows start at 1320.
 - Measure the actions. If 2–3 links won't fit on one line at a width, change the row's shape (container query) rather than letting them wrap.
 - No half-empty cards. A single column of wide cards with the content bunched on the left means the layout should change at that width.
 - The card surface contrasts with the section ground: never a tint card on a tint section.

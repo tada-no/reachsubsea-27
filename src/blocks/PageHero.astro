@@ -265,6 +265,11 @@ const objectPosition = image?.focalPoint
     min-height: 640px;
     color: var(--wp--custom--color--text--primary);
   }
+  /* 22 Sep 2026 (ref/squashed.jpg): a fixed 640 read flatter the wider the screen. It grows with the
+     width, 680 at 1440 to 800 from ~1700; 800 stays inside the photo's native 820, so no enlarging */
+  .page-hero--photo:not(.page-hero--video) .page-hero__frame {
+    min-height: clamp(640px, 47.2vw, 800px);
+  }
   .page-hero__container {
     position: relative;
   }
@@ -364,18 +369,96 @@ const objectPosition = image?.focalPoint
   }
   .page-hero--photo:not(.page-hero--video) .page-hero__scrim {
     background:
-      linear-gradient(to right, var(--wp--preset--color--navy-900) 0%, transparent 30%),
-      linear-gradient(to left, var(--wp--preset--color--navy-900) 0%, transparent 22%),
+      linear-gradient(to right, var(--wp--preset--color--navy-900) 0%, transparent var(--hero-fade-left, 30%)),
+      /* 22 Sep 2026: the right fade only hides the photo's edge where it meets the solid navy, so up to
+         1240, where the photo spans the screen and has no edge, it is off (ref/side scrim.jpg) */
+      linear-gradient(to left, var(--wp--preset--color--navy-900) 0%, transparent var(--hero-fade-right, 30%)),
       /* Heavy under the copy only: an ellipse from the bottom-left corner carries the lead, so the
          subject at the bottom right stays lit. A short full-width ramp joins the subnav */
-      radial-gradient(ellipse 85% 75% at 0% 100%, color-mix(in srgb, var(--wp--preset--color--navy-900) 90%, transparent) 0%, color-mix(in srgb, var(--wp--preset--color--navy-900) 60%, transparent) 45%, transparent 100%),
+      radial-gradient(ellipse var(--hero-ellipse-w, 85%) 75% at 0% 100%, color-mix(in srgb, var(--wp--preset--color--navy-900) 90%, transparent) 0%, color-mix(in srgb, var(--wp--preset--color--navy-900) 60%, transparent) 45%, transparent 100%),
       linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, transparent 24%),
       color-mix(in srgb, var(--wp--preset--color--navy-900) 45%, transparent);
   }
+  @media (max-width: 1240px) {
+    .page-hero--photo:not(.page-hero--video) {
+      --hero-fade-right: 0%;
+    }
+  }
+
+  /* Wide screens (22 Sep 2026, ref/scrim.jpg; Ross's C + D): the photo keeps its left edge where a
+     centred 1240 photo would start (so the title side is unchanged) and grows to the right, up to the
+     screen edge, capped at 1600 (≤1.29× its native width; ~1.08× at 1440, ~1.25× at 1870). Its right
+     30% fades into navy, so the fade ends at or near the screen edge instead of stopping short. The
+     left fade and the ellipse under the copy keep their 1240-based sizes, so the copy's ground doesn't
+     darken as the photo widens. */
+  @media (min-width: 1241px) {
+    .page-hero--photo:not(.page-hero--video) {
+      --hero-fade-left: calc(1240px * 0.3);
+      --hero-ellipse-w: calc(1240px * 0.85);
+    }
+    .page-hero--photo:not(.page-hero--video) .page-hero__media {
+      max-width: 1600px;
+      margin-left: calc((100% - 1240px) / 2);
+      margin-right: 0;
+    }
+  }
+
+  /* Below 900 (22 Sep 2026, ref/mobile hero.jpg): the photo no longer fills the frame behind the copy.
+     It is a band across the top, sized to the screen (near square on phones, so far more of the wide
+     image shows than a tall cover crop did), fading into a solid navy panel that carries the text.
+     The title starts 70 % of the way down the band, over the solid end of the fade; the breadcrumb
+     stays pinned under the header. */
   @media (max-width: 899px) {
+    .page-hero--photo:not(.page-hero--video) {
+      --hero-media-h: min(90vw, 560px);
+    }
+    .page-hero--photo:not(.page-hero--video) .page-hero__frame,
+    .site-header--overlay ~ main > .page-hero--photo:not(.page-hero--video):first-child .page-hero__frame {
+      min-height: 0;
+      padding-top: calc(var(--hero-media-h) * 0.7);
+    }
+    .page-hero--photo:not(.page-hero--video) .page-hero__media,
+    .page-hero--motion:not(.page-hero--video) .page-hero__media {
+      top: 0;
+      bottom: auto;
+      height: var(--hero-media-h);
+      max-width: none;
+    }
+    /* The container stops being the positioning box so the breadcrumb can pin to the frame's top */
+    .page-hero--photo:not(.page-hero--video) .page-hero__container {
+      position: static;
+    }
+    .page-hero--photo:not(.page-hero--video) .page-hero__breadcrumb {
+      position: absolute;
+      top: var(--wp--preset--spacing--24);
+      left: var(--wp--style--root--padding-left);
+      right: var(--wp--style--root--padding-right);
+      margin: 0;
+      padding: 0;
+    }
+    .site-header--overlay ~ main > .page-hero--photo:not(.page-hero--video):first-child .page-hero__breadcrumb {
+      top: calc(72px + var(--wp--preset--spacing--24));
+    }
+    .page-hero--photo:not(.page-hero--video) .page-hero__credit {
+      position: static;
+      order: 1;
+      margin-top: var(--wp--custom--stack--md);
+    }
+    /* Solid for the bottom eighth, so the title's first line always sits on navy; a short top ramp
+       under the header; a light even tint in between keeps the photo a photo */
     .page-hero--photo:not(.page-hero--video) .page-hero__scrim {
       background:
-        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, var(--wp--preset--color--navy-900) 34%, color-mix(in srgb, var(--wp--preset--color--navy-900) 60%, transparent) 70%, color-mix(in srgb, var(--wp--preset--color--navy-900) 45%, transparent) 100%);
+        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, var(--wp--preset--color--navy-900) 12%, color-mix(in srgb, var(--wp--preset--color--navy-900) 82%, transparent) 32%, transparent 70%),
+        linear-gradient(to bottom, color-mix(in srgb, var(--wp--preset--color--navy-900) 60%, transparent) 0%, transparent 30%),
+        color-mix(in srgb, var(--wp--preset--color--navy-900) 30%, transparent);
+    }
+  }
+  /* Phones: the lead steps down to Body so it takes three or four lines, not five. The title keeps H1:
+     H2 is 32 on phones, the same as the section headings below, and the page would lose its top level. */
+  @media (max-width: 599px) {
+    .page-hero--photo .page-hero__lead.text-lead {
+      font-size: var(--wp--preset--font-size--body);
+      line-height: var(--wp--custom--line-height--body);
     }
   }
 

@@ -230,6 +230,32 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     margin-top: auto;
   }
 
+  /* Phones (22 Sep 2026): an image card no longer runs its photo behind the text. The photo takes the
+     top of the card (4:3) and fades into a solid navy panel that holds the text, like the photo hero.
+     The card's surface matches the fade's end (navy/900) so there is no seam. */
+  @media (max-width: 599px) {
+    .card.card--media-image-bg {
+      --pg-bg: var(--wp--custom--color--scrim--solid);
+      min-height: 0;
+    }
+    .card--media-image-bg .card__bg {
+      position: relative;
+      inset: auto;
+      z-index: auto;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+    }
+    .card.card--media-image-bg .card__overlay {
+      background: linear-gradient(to top, var(--wp--custom--color--scrim--solid) 0%, var(--wp--custom--color--scrim--solid) 16%, transparent 64%);
+    }
+    .card.card--media-image-bg .card__content {
+      position: relative;
+      flex: 1 1 auto;
+      margin-top: calc(-1 * var(--wp--preset--spacing--32));
+      padding-top: 0;
+    }
+  }
+
   .card__text {
     display: flex;
     flex-direction: column;

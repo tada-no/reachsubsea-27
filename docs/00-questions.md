@@ -10,6 +10,21 @@ _No open questions right now._
 
 ## Answered log
 
+### Q74. Site-wide mobile and scrim notes (22 Sep 2026, all pages)
+Context: Ross's notes with ref/side scrim.jpg, ref/mobile hero.jpg and ref/service cards mobile.jpg. On phones the photo heroes and image cards ran the photo behind all the text, so both read as busy; the tint service cards inside the page gutter left the text about 260 wide.
+- [x] Photo hero, right fade: 22% → 10% of the photo, and only above 1240, where the photo has an edge to hide
+- [x] Photo hero below 900: the photo becomes a band across the top (90vw tall, max 560; near square on phones, so ~75% of a 3:2 image shows instead of ~30%), fading into a solid navy panel that holds the text. The title starts 70% of the way down the band; breadcrumb stays pinned under the header
+- [x] Hero type on phones: the lead steps down to Body (16/24). The title keeps H1 (40): H2 is 32 on phones, the same as the section headings, so a smaller title would flatten the page's top level
+- [x] Pictogram card grids (Media icon or pictogram panel) below 600: no container; open rows across the full column with a hairline between rows, pictogram 96. Light grounds only
+- [x] Image bg cards below 600: the photo takes the top of the card (4:3, about 55% of a typical card) and fades into a solid navy/900 panel for the text
+
+- [x] Follow-up (Ross: cards too narrow at ~620): card rows (Card grid, Card bento, Feed grid) go to one column below 768, not 600; wide pictogram cards (Services' four lines) stay one column below 900, where the card puts its pictogram beside the text; the editorial feed's lead + stack starts at 1000, not 900. A card sweep (600–1399, every page) is now in docs/08 §1
+- [x] Photo hero height (ref/squashed.jpg): min-height grows with the width, `clamp(640px, 47.2vw, 800px)`: 640 to ~1360, 680 at 1440, 800 from ~1700 (inside the photo's native 820, so no enlarging). Phones and tablets unchanged
+- [x] Photo hero right edge on wide screens (ref/scrim.jpg): first built as A (a blurred copy of the photo filling the frame); Ross tried it and it didn't work. **Final: C + D**: above 1240 the photo keeps a centred 1240 photo's left edge and grows right to the screen edge, capped at 1600 (≤1.29×, ~1.25× at 1870), with a 30% right fade into navy. The left fade and the ellipse under the copy stay 1240-based. Not chosen: B the 10% fade to flat navy
+- [x] Four-across rows (Card grid 4 columns, Card bento, Feed grid 4 columns) start at 1320, not 1200 (Ross picked this over leaving them or tightening padding)
+
+**Answer:** as ticked (Ross's proposals; details decided by Claude, open to change). ref/image cards.jpg arrived later; it shows the before state (text over the photo) that the image card change fixes.
+
 ### Q72. Live operations map: dot density (22 Sep 2026, Live operations)
 Context: with the dots no longer cut at coastlines (Q71), the density was a free choice. Compared live on the review page with a temporary Dot density toggle (Regular · Fine · Finer) and a stacked comparison image at 1440.
 - [x] Regular: about the size of the old map's dots (3.4px on a 13px pitch at 1440)

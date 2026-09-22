@@ -6,7 +6,7 @@
 // Pictogram panel: wide (Featured) cards never share a row with narrow ones. 2 columns and Featured first
 // both render as 2 columns of wide cards; 3 and 4 columns keep narrow cards.
 // Cards in a row are equal height with the action pinned to the bottom (Card already does this).
-// Mobile (<600): 1 column, Featured renders as Default (Card's own CSS already falls back). Tablet (600–1199): 2 columns.
+// Mobile (<600): 1 column, Featured renders as Default (Card's own CSS already falls back). Tablet (768–1199): 2 columns (4 columns: up to 1319). 1 column below 768.
 // Strip (19 Sep 2026, Subsea single: the PDF's "Industries we serve"; Ross's "Where it's used"
 // reference): one row of light tiles, each a looping line pictogram beside a short label, on
 // bg/accent-subtle. Eyebrow above; no section header, no actions. 2×2 below 1200; one compact
@@ -56,6 +56,8 @@ const featuredFirst = resolvedLayout === 'featured-first';
 const strip = resolvedLayout === 'strip';
 const titleId = sectionHeader?.title ? makeId('card-grid', sectionHeader.title) : undefined;
 const pad = (n: number) => String(n).padStart(2, '0');
+// Pictogram cards open up into hairline-separated rows on phones (see the CSS below)
+const openRows = media === 'icon' || media === 'pictogram-panel';
 
 ---
 
@@ -86,7 +88,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
       ) : (
       <div class="block__body">
         {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
-        <ul class:list={['card-grid__list', `card-grid__list--${resolvedLayout}`]}>
+        <ul class:list={['card-grid__list', `card-grid__list--${resolvedLayout}`, openRows && 'card-grid__list--open', widePanels && 'card-grid__list--wide']}>
           {cards.map((card, i) => (
             <li class="card-grid__item">
               <Card
@@ -150,11 +152,19 @@ const pad = (n: number) => String(n).padStart(2, '0');
      (docs/05 §2.2, tablet 600–1199 = 2 columns): at ~1100 three text cards wrap their titles to three
      lines and their lists fall out of line (19 Sep 2026, Subsea) */
   @media (max-width: 1199px) {
-    .card-grid__list--3-columns,
+    .card-grid__list--3-columns {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .card-grid__list--3-columns .card-grid__item {
+      grid-column: span 1;
+    }
+  }
+  /* Four across only from 1320 (22 Sep 2026, Q74): at 1200–1319 four cards left ~190px of text and
+     titles ran to four lines */
+  @media (max-width: 1319px) {
     .card-grid__list--4-columns {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .card-grid__list--3-columns .card-grid__item,
     .card-grid__list--4-columns .card-grid__item {
       grid-column: span 1;
     }
@@ -176,8 +186,10 @@ const pad = (n: number) => String(n).padStart(2, '0');
     }
   }
 
-  /* Same specificity as the 899 rule above, so phones really get one column */
-  @media (max-width: 599px) {
+  /* Same specificity as the 899 rule above, so phones really get one column.
+     767, not 599 (22 Sep 2026): at 600–767 two cards left ~190px of text, so long descriptions ran to
+     six lines and list items wrapped. One column until two cards clear ~280px of text. */
+  @media (max-width: 767px) {
     .card-grid .card-grid__list {
       grid-template-columns: 1fr;
     }
@@ -188,6 +200,54 @@ const pad = (n: number) => String(n).padStart(2, '0');
     .card-grid__list--featured-first .card-grid__item,
     .card-grid__list--featured-first .card-grid__item:first-child {
       grid-column: span 1;
+    }
+  }
+  /* Wide pictogram cards (Services' four lines) need more: one column until 900, where Card switches
+     them to the pictogram beside the text once the card is 600 wide */
+  @media (max-width: 899px) {
+    .card-grid .card-grid__list--wide {
+      grid-template-columns: 1fr;
+    }
+    .card-grid .card-grid__list--wide .card-grid__item {
+      grid-column: span 1;
+    }
+  }
+
+  /* Phones (22 Sep 2026, ref/service cards mobile.jpg): pictogram cards drop their container. A tint
+     panel inside the page gutter left the text ~260 wide; as open rows they take the full column and
+     a hairline between them does the separating. Light grounds only: on navy the cards keep their panels.
+     Up to 767, wherever the row is one column. */
+  @media (max-width: 767px) {
+    .card-grid:not(.has-surface-navy) .card-grid__list--open {
+      gap: 0;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open .card-grid__item + .card-grid__item {
+      border-top: 1px solid var(--wp--custom--color--border--subtle);
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open .card {
+      --pg-bg: var(--wp--custom--color--bg--default);
+      border-radius: 0;
+      box-shadow: none;
+      transform: none;
+    }
+    .card-grid.has-surface-tint .card-grid__list--open .card {
+      --pg-bg: var(--wp--custom--color--bg--tint);
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open .card::after {
+      content: none;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open .card__content {
+      padding-inline: 0;
+    }
+    /* A row's pictogram matches the icon cards' 96, not the stacked wide card's 128 */
+    .card-grid:not(.has-surface-navy) .card-grid__list--open .card__pictogram-panel {
+      width: 96px;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open .card-grid__item:first-child .card__content {
+      padding-top: 0;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open .card-grid__item:last-child .card__content {
+      padding-bottom: 0;
     }
   }
 
