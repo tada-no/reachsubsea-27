@@ -80,6 +80,14 @@ The website's zone cards list each zone's clickable assets. Two pins still have 
   - no `X-Frame-Options: DENY` or `SAMEORIGIN`.
 - **Self-host three.js, the Draco decoder and Inter** (today they come from jsDelivr and Google Fonts). That removes the third-party requests and the cookie-consent question.
 
+### 8. Two clean screenshots for the landing page
+
+The landing page's How it works (`/services/3d-world/`) is three cards, each with a screenshot that shows the step (3:2). Take the controls uses Ross's own Pilot mode screenshot. The other two are crops of `review/shots/careers_8_v42_desktop.jpg`, only 846 px wide. Clean ones would be better: 1800 × 1200 (3:2), desktop UI at 1440 scale, no cursor, the UI large enough to read at about 400 px wide.
+- **Fly between four zones:** a zone overview with the zone switcher (arrows and the zone name) and a few pins in the shot, ideally with the welcome panel listing the zones. Replaces `public/images/world-step-zones.jpg`.
+- **Click any vessel or ROV:** a pin clicked and its ordinary info panel open beside the asset (not the careers-route panel, which today's crop shows). Replaces `world-step-panel.jpg`.
+
+Hand them to the website chat.
+
 ## Tell the website chat if any of these change
 
 - **Zone names, order or numbers.** The website's landing page cards and the embed zone links use them (`src/data/world.ts`, later the WordPress zone posts).

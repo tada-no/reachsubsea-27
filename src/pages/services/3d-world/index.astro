@@ -2,17 +2,17 @@
 // Services › Explore 3D World (6 Oct 2026): the landing page for the interactive 3D World, from the client screens
 // PDF p28–29 ("11 — Services — Explore 3D World") and the Design Reference p13 ("landing page introducing the real
 // interactive 3D exploration tool"). The scene itself is a separate app with its content from WordPress (Q94); this
-// page explains it, and its Launch button and zone cards open it on the in-site /3d-world/ page, under the header (Q96). Kept from the PDF: hero with Launch, How it works,
-// the four zones, FAQ, CTA. Changed: the three cards over the hero's edge (no overlaps, docs/06 §2) become How it
-// works below it; "Best viewed on" becomes the hero's meta row. Cut: the 500+ / 9 / 2 modes stats band (repeats
-// Home and Services) and Related services (the How it works copy links the three lines). Zone names, order and
-// assets follow the world build, not the PDF's draft (src/data/world.ts).
+// page explains it, and its Launch button and zone cards open it on the in-site /3d-world/ page, under the header
+// (Q96). Kept from the PDF: hero with Launch, How it works, the four zones, FAQ, CTA. Changed: the three cards over
+// the hero's edge (no overlaps, docs/06 §2) become How it works below it, with "Best viewed on" under its intro and
+// the steps as three cards, each with a screenshot that shows it (Q98–Q102). Cut: the 500+ / 9 / 2 modes stats band
+// (repeats Home and Services) and Related services (the Services subnav links the three lines). Zone names, order
+// and assets follow the world build, not the PDF's draft (src/data/world.ts).
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/header/Header.astro';
 import Footer from '../../../components/Footer.astro';
 import PageHero from '../../../blocks/PageHero.astro';
 import SectionSubnav from '../../../blocks/SectionSubnav.astro';
-import SplitMedia from '../../../blocks/SplitMedia.astro';
 import CardGrid from '../../../blocks/CardGrid.astro';
 import Accordion from '../../../blocks/Accordion.astro';
 import CtaBand from '../../../blocks/CtaBand.astro';
@@ -27,6 +27,32 @@ const services = navSections.find((s) => s.id === 'services')!;
 const subnavItems = [
   { label: 'Overview', href: services.href },
   ...services.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+// How it works (Q102): one card per thing you do, each image showing it in the world (screenshots from reach-world
+// review/shots and Ross, 6 Oct 2026; clean renders asked of the 3D World chat, docs/prompts/3d-world-embed.md §8)
+const howItWorks: CardField[] = [
+  {
+    media: 'image-top',
+    surface: 'white',
+    title: 'Fly between four zones',
+    description: 'Use the arrows to step between subsea infrastructure, an oil field, offshore wind and production monitoring, and drag to look around. Or jump straight to a zone from the cards below.',
+    image: { src: `${base}images/world-step-zones.jpg`, alt: 'The 3D World at Subsea Infrastructure: the zone name between two arrows, pins on the vessel and ROVs, and the welcome panel listing the zones' },
+  },
+  {
+    media: 'image-top',
+    surface: 'white',
+    title: 'Click any vessel or ROV',
+    description: 'Pins mark the vessels, ROVs and structures at work. Click one to open a panel on what it is and the job it’s doing, or watch a ZeeROV launch from an uncrewed vessel.',
+    image: { src: `${base}images/world-step-panel.jpg`, alt: 'Reach Remote 1 selected in the 3D World, with its panel open beside it' },
+  },
+  {
+    media: 'image-top',
+    surface: 'white',
+    title: 'Take the controls',
+    description: 'Press Pilot to fly an ROV yourself with the keyboard, with live depth, heading and speed. Then try a survey line: steer through the hoops along the pipeline.',
+    image: { src: `${base}images/world-step-pilot.jpg`, alt: 'Pilot mode in the 3D World: an ROV over the seabed, the keyboard controls top left and its depth, heading and speed above' },
+  },
 ];
 
 const zoneCards: CardField[] = worldZones.map((z) => ({
@@ -71,30 +97,31 @@ const faqItems = [
       style="photo"
       animate
       breadcrumb={[{ label: 'Home', href: base }, { label: 'Services', href: services.href }, { label: 'Explore 3D World' }]}
-      title="Explore our operations in 3D"
+      title="Explore Reach in 3D"
       lead="Fly between four working zones and click any vessel, ROV or structure to see what it does."
       image={{ src: `${base}images/world-hero.jpg`, alt: '', focalPoint: { x: 0.6, y: 0.5 } }}
-      meta={[
-        { icon: 'device-desktop', text: 'Best on a computer or tablet' },
-        { icon: 'browser', text: 'Runs in your browser' },
-      ]}
       actions={[{ label: 'Launch 3D World', url: worldPath }]}
     />
 
     <SectionSubnav source="section-pages" label="Services" items={subnavItems} current={worldPagePath} />
 
-    {/* PDF "How it works" card, as steps: the third is the PDF's own closing sentence */}
-    <SplitMedia
+    {/* PDF "How it works" and "Best viewed on" cards: the section header carries the intro and the two notes,
+        then the three things you do in the world as cards, each with a screenshot that shows it (Q102) */}
+    <CardGrid
       anchor="how-it-works"
       background="white"
-      media="numbered-list"
-      title="How it works"
-      body={`<p>The 3D World places you above four working sites. Each is set against a different piece of offshore infrastructure, and shows a different operation carried out by a different mix of vessels and ROVs: our <a href="/services/subsea/">subsea</a>, <a href="/services/survey/">survey</a> and <a href="/services/monitoring/">monitoring</a> work in one place.</p>`}
-      items={[
-        { title: 'Fly between zones', text: 'Use the fly control to move from one zone to the next, or open a zone straight from the cards below.' },
-        { title: 'Click any asset', text: 'Each vessel, ROV and structure opens an info panel with its name and what it does.' },
-        { title: 'See the range we work with', text: 'From crewed DP vessels to uncrewed surface vessels, all carrying ROV and survey spreads.' },
-      ]}
+      sectionHeader={{
+        title: 'How it works',
+        intro: 'Four working sites, each a different operation carried out by a different mix of vessels and ROVs: our subsea, survey and monitoring work in one place.',
+        meta: [
+          { icon: 'device-desktop', text: 'Best on a computer or tablet' },
+          { icon: 'browser', text: 'Runs in your browser' },
+        ],
+      }}
+      layout="3-columns"
+      media="image-top"
+      surface="white"
+      cards={howItWorks}
     />
 
     <CardGrid

@@ -66,6 +66,9 @@ export interface SectionHeaderField {
   eyebrow?: string;
   title: string;
   intro?: string;
+  /** 1–3 short facts as Meta items under the intro (6 Oct 2026, Q102, Explore 3D World › How it works:
+   * "Best on a computer or tablet"). */
+  meta?: MetaField[];
   action?: LinkField;
   align?: 'start' | 'center';
 }

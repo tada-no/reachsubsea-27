@@ -10,6 +10,55 @@ _No open questions right now._
 
 ## Answered log
 
+### Q102. How it works: the steps become a 3-column card row with explaining screenshots (6 Oct 2026)
+Context: Ross: choosing a step wasn't intuitive. The steps should be their own 3-column block, with images that explain each one; Take the controls should at least show the ROV and the controls (Ross supplied a Pilot mode screenshot).
+- [x] How it works is a Card grid: 3 columns, `image-top`, white cards on white. The section header carries the intro and the two notes (Section header gains an optional `meta` row)
+- [x] Images: Fly between four zones = the zone switcher with pins and the welcome panel listing the zones; Click any vessel or ROV = Reach Remote 1 selected with its panel open; Take the controls = Ross's Pilot mode screenshot (ROV, keyboard controls, depth/heading/speed). The first two are crops of reach-world `review/shots/careers_8_v42_desktop.jpg` (846 px wide, and the panel is the careers-route version); clean renders asked of the 3D World chat
+- [x] The intro loses its links to Subsea, Survey and Monitoring (a section header intro is plain text); the Services subnav right under the hero links them
+- [x] Removed as unused: Split media's Steps layout and `meta` field (Q98–Q101), and the earlier step stills
+
+**Answer:** as ticked. Supersedes Q99–Q101.
+
+### Q101. How it works: steps you choose, not scroll-driven (6 Oct 2026)
+Context: Ross: the section felt very sensitive, with a lot of text visible before the next image arrived. Claude: the scroll trigger was the wrong build. Three short steps fit on one screen on a tall monitor, so they were all readable while the still lagged behind, and the swap fired on small scrolls through a narrow band in the middle of the viewport. Making each step a full screen tall would only add empty space.
+- [x] Each step's heading is a button; choosing it swaps the still with the same wipe and moves the accent marker. Step 1 is chosen on load
+- [x] No sticky stage: the still sits beside the list, centred on the text column, so nothing moves while you read
+- [x] Below 900: one still between the meta and the steps (replacing a still per step), so the still is next to what changes it
+- [x] Measured: no element moves when a step is chosen, at 1440, 1100, 800 and 375
+
+**Answer:** Claude's call after Ross asked whether this was the best build; easy to revert to the scroll version. Supersedes Q99's scroll trigger and sticky stage.
+
+### Q100. How it works: stills, no numbers, steps that say what you can do (6 Oct 2026)
+Context: Ross: the block felt laggy, the step text small and unhelpful, and asked whether the numbers 1–3 help. Claude: three films swapping on a sticky stage (each screen-blended over the tint, decoding as it wipes) is the lag, and the steps aren't a sequence, so the numbers only add noise.
+- [x] Stills, no films: the sticky stage swaps stills with the same wipe. The Media frame film loop (Q98–Q99) and its three clips are removed
+- [x] No numbers: each step is an H3 (`Heading/H4`) and `Body/Body` copy on a 1px `border/subtle` rail; the step that owns the media gets a `space/4` `border/accent` marker that grows down the rail, the others' headings drop to `text/secondary`
+- [x] Steps rewritten around what you do in the world: Fly between four zones · Click any vessel or ROV (with Watch the launch) · Take the controls (Pilot mode and the survey line). "See the range we work with" is dropped: the zone cards list each zone's assets
+- [x] New still for Take the controls: a Pilot mode survey-line screenshot from reach-world `review/shots` (1056 px wide; a clean 1600 × 1200 still is asked of the 3D World chat)
+
+**Answer:** as ticked. Supersedes Q99's films, numbers and pause control; the sticky stage and wipe stay.
+
+### Q99. How it works: notes under the intro, steps swap the media on scroll (6 Oct 2026)
+Context: Ross: the two notes are best under the intro text, then steps 1, 2, 3 change the media on the right as you scroll. Claude agreed, reusing the Figures Sticky swap so the site has one scroll behaviour, with one clip per step from the world's films. Ross chose to build now with the existing films.
+- [x] Meta row under the body copy, before the steps (Split media `meta` now always sits there)
+- [x] New Split media layout **Steps**: sticky 4:3 stage held in the middle of the viewport, swapping on the Figures wipe; active step number accent, others secondary; one pause control; only the showing film plays and loads
+- [x] Clips (from reach-world `film/out`, 17 Sep renders): 01 the dive from the hull down the jacket (`world-dive-loop.mp4`, 16 s, 2.1 MB), 02 the Surveyor with its pin (1.4 MB), 03 Viking Vigor → Reach Remote 1 → ZeeROV gWatch with cross-dissolves (`world-range-loop.mp4`, 12.6 s, 2.0 MB); soft fades through the tint at the loop point
+- [x] Below 900: each step's media above its text, no sticky. Reduced motion: stills, instant swap
+- [x] Fixed on the way: a playing loop no longer shows its still through it (both screen-blend over the tint)
+- [x] Asked of the 3D World chat: a pin being clicked with its panel opening (step 2), and a zone-to-zone flight (step 1), to swap in (docs/prompts/3d-world-embed.md)
+
+**Answer:** as ticked. Resolves the Q98 tablet imbalance: the media now holds the middle of the viewport at every width from 900.
+
+### Q98. Explore 3D World: hero meta moves into How it works, redesigned (6 Oct 2026)
+Context: Ross: the hero heading ran into the vessel, and the two hero notes ("Best on a computer or tablet", "Runs in your browser") belong in the first block under the pills, which could be designed better. It was a plain list beside a heading.
+- [x] Hero heading "Explore Reach in 3D" (was "Explore our operations in 3D"): one line from 800 up, clear of the vessel; matches the menu's "Explore Reach in interactive 3D"
+- [x] How it works = Split media Image with the text column as one piece: heading, short intro, three tighter steps, then the two notes as a Meta row
+- [x] Media: the world's own film of the Surveyor with its pin (`video/world-surveyor-loop.mp4`, 1.4 MB, 16 s, fades in and out of blue so it loops softly), so "click any asset" is shown. Loads and plays only in view, never under reduced motion or Save-Data, pause control
+- [x] New, reusable: Media frame `loop`; Split media `loop` (Image) and `meta` (docs/05 §1, §2.4)
+- [x] Zone 1 card now shows the Viking Vigor, so the Surveyor isn't shown twice
+- [x] Superseded by Q99 (Steps layout): the 900–1199 imbalance is gone
+
+**Answer:** as ticked.
+
 ### Q97. Year bars: review demo, short runs (6 Oct 2026)
 Context: Ross asked whether the bar chart was on the blocks review (/blocks/stats/). It wasn't anywhere in /blocks; it now has its own entry, /blocks/year-bars/ (White, Tint with eyebrow, Navy with a five-year run). The five-year run showed two edge cases the Research page (14 years) never hits.
 - [x] Bar width capped at 48 (`space/48`), centred in the column: five years had stretched to 100px blocks at 1440 (61 at 375). Fourteen years stay about 34, so the Research page doesn't change
