@@ -8,7 +8,8 @@
 // the share-graph embed is Split embed (src/blocks/SplitEmbed.astro), and the Card media (unused on any page)
 // was dropped: a Card in a section is Card grid / Card bento. This block is now Image · Video · Spec table ·
 // Numbered list, so every field applies to what the editor picked.
-// Any media except Numbered list can also carry `items` as a numbered list under the body copy.
+// Any media except Numbered list can also carry `items` as a numbered list under the body copy, or `tiles`
+// (4 Oct 2026): 2–3 pictogram tiles, one per row, for a few short items that are too few for a card row.
 // Layout Wide (19 Sep 2026, About › Our story): for long copy. Heading on top, the body in
 // two columns (one paragraph each), then the image as a full-width 21:9 banner (16:9 tablet, 4:3 phone).
 // Below 900 the columns stack. The image is optional: Careers › Who thrives (20 Sep 2026) is the same
@@ -21,6 +22,7 @@ import Link from '../components/Link.astro';
 import MediaFrame from '../components/MediaFrame.astro';
 import SpecRow from '../components/SpecRow.astro';
 import NumberedItem from '../components/NumberedItem.astro';
+import PictogramTile from '../components/PictogramTile.astro';
 import Pictogram from '../components/Pictogram.astro';
 import { makeId } from '../lib/ids';
 import type { BlockFields, ImageField, LinkField } from '../lib/types';
@@ -40,6 +42,13 @@ interface SpecItem {
 interface NumberedListItem {
   title: string;
   text: string;
+}
+
+interface TileItem {
+  pictogram: string;
+  title: string;
+  text: string;
+  link?: LinkField;
 }
 
 interface Props extends BlockFields {
@@ -64,6 +73,9 @@ interface Props extends BlockFields {
   specFile?: LinkField;
   /** 3–6 numbered items (Reach Remote oversight levels, HOP). */
   items?: NumberedListItem[];
+  /** 2–3 pictogram tiles under the body copy, one per row in the text column (4 Oct 2026, Assets overview:
+   * the survey suite and the monitoring technology). Library pictograms only. */
+  tiles?: TileItem[];
   /** A quote in place of the visible heading (19 Sep 2026, Investors overview CEO letter). `title` stays the
    * section's accessible name (a visually hidden H2); the quote reads as H3, then the attribution. */
   quote?: { text: string; name: string; role?: string };
@@ -89,6 +101,7 @@ const {
   specs = [],
   specFile,
   items = [],
+  tiles = [],
   quote,
   pictogram,
   background,
@@ -177,6 +190,15 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
               <NumberedItem title={item.title} text={item.text} />
             ))}
           </ol>
+        )
+      }
+      {
+        tiles.length > 0 && (
+          <ul class="split-media__tiles">
+            {tiles.map((tile) => (
+              <PictogramTile pictogram={tile.pictogram} title={tile.title} text={tile.text} link={tile.link} />
+            ))}
+          </ul>
         )
       }
       {
@@ -361,6 +383,12 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
 
 
   .split-media__list--text {
+    margin-top: var(--wp--preset--spacing--8);
+  }
+  /* Pictogram tiles: one per row under the body copy */
+  .split-media__tiles {
+    display: flex;
+    flex-direction: column;
     margin-top: var(--wp--preset--spacing--8);
   }
   .split-media__list--text .numbered-item {

@@ -1,0 +1,248 @@
+---
+// Fleet register · reach/fleet-register (3 Oct 2026, Assets overview, Q77; a custom data visual outside
+// the block budget, like Lifecycle and Live operations). The fleet at a glance: one group per asset type,
+// each with its big figure and one marker per unit, so the size and make-up of the fleet reads in a
+// glance. Filled markers are units in service, rings are units joining the fleet; nothing is typed
+// twice, the figures and the markers are both derived from `src/data/assets.ts` (and the ROV total
+// from the Key figures options page). One highlight channel: hovering a group turns its markers
+// accent. Motion: figures count up and the markers land one by one as the block scrolls in (scale,
+// no fades). Groups sit four across from 1200, 2 × 2 from 600, one column below, with rules between.
+// A visually hidden sentence per group names its units for screen readers; the markers are decorative.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+
+export interface FleetUnit {
+  name: string;
+  status: 'in-service' | 'joining';
+}
+
+export interface FleetGroup {
+  key: string;
+  /** The big figure (units in service). */
+  value: string;
+  label: string;
+  /** Second line, e.g. "2 joining 3Q 2026 and 2027". */
+  note?: string;
+  units: FleetUnit[];
+}
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  groups: FleetGroup[];
+  /** Figures count up and markers land as the block scrolls in. */
+  animate?: boolean;
+}
+
+const { sectionHeader, groups = [], animate = true, background = 'white', spacing, anchor } = Astro.props;
+const titleId = sectionHeader?.title ? makeId('fleet-register', sectionHeader.title) : undefined;
+const STAGGER = 160;
+
+const summary = (group: FleetGroup) => {
+  const active = group.units.filter((u) => u.status === 'in-service').map((u) => u.name);
+  const joining = group.units.filter((u) => u.status === 'joining').map((u) => u.name);
+  const parts = [`${group.value} ${group.label}`];
+  if (active.length && active.some((n) => n !== group.label)) parts.push(`in service: ${active.join(', ')}`);
+  if (joining.length) parts.push(`joining: ${joining.join(', ')}`);
+  return parts.join('; ') + '.';
+};
+---
+
+{
+  groups.length > 0 && (
+    <BlockSection
+      slug="fleet-register"
+      root="fleet-register"
+      class={animate ? 'fleet-register--animate' : undefined}
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : 'Fleet at a glance'}
+    >
+      <div class="fleet-register__body">
+        {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+        <ul class="fleet-register__groups" data-fleet-register>
+          {groups.map((group, g) => (
+            <li class="fleet-register__group" style={`--group-i: ${g}`}>
+              <p class="fleet-register__value">
+                {animate ? <span data-count-up data-count-up-delay={150 + g * STAGGER}>{group.value}</span> : group.value}
+              </p>
+              <p class="fleet-register__label text-body">{group.label}</p>
+              {group.note && <p class="fleet-register__note text-small">{group.note}</p>}
+              <p class="visually-hidden">{summary(group)}</p>
+              <ul class="fleet-register__units" aria-hidden="true" style={`--fr-cols: ${group.units.length > 12 ? 8 : group.units.length}`}>
+                {group.units.map((unit, i) => (
+                  <li
+                    class:list={['fleet-register__unit', unit.status === 'joining' && 'fleet-register__unit--joining']}
+                    style={`--unit-i: ${i}`}
+                    title={unit.status === 'joining' ? `${unit.name} (joining)` : unit.name}
+                  />
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+        <p class="fleet-register__legend text-caption" aria-hidden="true">
+          <span class="fleet-register__legend-item"><span class="fleet-register__unit" /> In service</span>
+          <span class="fleet-register__legend-item"><span class="fleet-register__unit fleet-register__unit--joining" /> Joining the fleet</span>
+        </p>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .fleet-register__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
+  }
+  .fleet-register__groups {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--wp--preset--spacing--48);
+    row-gap: var(--wp--preset--spacing--48);
+  }
+  .fleet-register__group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    min-width: 0;
+  }
+  /* A rule between neighbours, centred in the column gap */
+  .fleet-register__group + .fleet-register__group::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--wp--preset--spacing--48) / -2);
+    width: 1px;
+    background-color: var(--wp--custom--color--border--subtle);
+  }
+  .fleet-register__value {
+    color: var(--wp--custom--color--text--accent-display);
+    font-size: var(--wp--preset--font-size--display);
+    line-height: var(--wp--custom--line-height--figure);
+    letter-spacing: var(--wp--custom--letter-spacing--display);
+    font-weight: var(--wp--custom--font-weight--bold);
+    font-variant-numeric: tabular-nums lining-nums;
+    /* Optical: pull the digits back onto the label's left edge */
+    margin-left: -0.05em;
+  }
+  .fleet-register__label {
+    color: var(--wp--custom--color--text--primary);
+    font-weight: var(--wp--custom--font-weight--medium);
+  }
+  .fleet-register__note {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* A group with more than 12 units stacks its markers in rows of 8 (8 + 7 reads as a block, a stray
+     marker on a second row does not); the list is capped at that width so the rows break evenly. */
+  .fleet-register__units {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--8);
+    max-width: calc(var(--fr-cols, 8) * 16px + (var(--fr-cols, 8) - 1) * var(--wp--preset--spacing--8));
+    margin-top: var(--wp--preset--spacing--16);
+  }
+  .fleet-register__unit {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 16px;
+    height: 16px;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--text--primary);
+    transition: background-color var(--wp--custom--motion--duration-fast) var(--wp--custom--motion--easing),
+      border-color var(--wp--custom--motion--duration-fast) var(--wp--custom--motion--easing);
+  }
+  .fleet-register__unit--joining {
+    background-color: transparent;
+    border: 2px solid var(--wp--custom--color--text--primary);
+  }
+  /* One highlight channel: a hovered or focused group lights its own markers */
+  .fleet-register__group:hover .fleet-register__unit,
+  .fleet-register__group:focus-within .fleet-register__unit {
+    background-color: var(--wp--custom--color--icon--accent);
+  }
+  .fleet-register__group:hover .fleet-register__unit--joining,
+  .fleet-register__group:focus-within .fleet-register__unit--joining {
+    background-color: transparent;
+    border-color: var(--wp--custom--color--icon--accent);
+  }
+  .fleet-register__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--24);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .fleet-register__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .fleet-register__legend .fleet-register__unit {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Motion: markers land one by one once the block is in view (scale only, no fades) */
+  html.js .fleet-register--animate .fleet-register__unit {
+    transform: scale(0);
+    transition: transform var(--wp--custom--motion--duration) var(--wp--custom--motion--ease-out);
+    transition-delay: calc(0.3s + var(--group-i, 0) * 0.16s + var(--unit-i, 0) * 0.05s);
+  }
+  html.js .fleet-register--animate .fleet-register__legend .fleet-register__unit,
+  html.js .fleet-register--animate .is-drawn .fleet-register__unit {
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .fleet-register--animate .fleet-register__unit {
+      transform: none;
+      transition: none;
+    }
+  }
+
+  @media (max-width: 1199px) {
+    .fleet-register__groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    /* Rules only between the two columns, not under the row break */
+    .fleet-register__group:nth-child(odd)::before {
+      display: none;
+    }
+  }
+  @media (max-width: 599px) {
+    .fleet-register__groups {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--wp--preset--spacing--24);
+    }
+    .fleet-register__group + .fleet-register__group::before {
+      display: block;
+      top: calc(var(--wp--preset--spacing--24) / -2);
+      bottom: auto;
+      left: 0;
+      width: 100%;
+      height: 1px;
+    }
+  }
+</style>
+
+<script>
+  // Land the markers on first view (the figures count up through motion.ts). Content is complete without JS.
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-fleet-register]')];
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-drawn');
+          io.unobserve(entry.target);
+        }),
+      { threshold: 0.3 },
+    );
+    panels.forEach((panel) => io.observe(panel));
+  } else panels.forEach((panel) => panel.classList.add('is-drawn'));
+</script>

@@ -1,0 +1,223 @@
+---
+// Services › Technology & Innovation (6 Oct 2026): the technology the three service lines draw on (Q79), on the
+// service-single template. Content: client PDF p15–16 ("06 — Services — Technology & Innovation"), drawn from the
+// Reach Subsea 2Q 2026 Report. Built for an operator or investor asking what Reach is building itself: the four
+// in-house products (the page's focus) · the figures that prove them · Reach Remote as the product in service ·
+// the established monitoring and research heritage (a cross-link, not a second full section: Jorunn's feedback,
+// PDF p8) · FAQ · contact. Left out: the PDF's two illustrative video cards (no real footage yet) and its
+// "REAL" badges (a review annotation). PDF p31: no third-party brand names in our own copy, so the AROS notation
+// is named without its class society.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import CardGrid from '../../../blocks/CardGrid.astro';
+import StatsBand from '../../../blocks/StatsBand.astro';
+import SplitMedia from '../../../blocks/SplitMedia.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import Dialog from '../../../components/Dialog.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { pickFigures } from '../../../data/key-figures';
+import { navSections } from '../../../data/navigation';
+import { serviceLines } from '../../../data/services';
+import { publications } from '../../../data/documents';
+import type { CardField } from '../../../lib/types';
+
+const base = import.meta.env.BASE_URL;
+const line = serviceLines.find((l) => l.id === 'technology')!;
+// The Monitoring card carries the Monitoring line's own pictogram: same meaning, so not a reuse (Ross, 6 Oct 2026)
+const monitoring = serviceLines.find((l) => l.id === 'monitoring')!;
+const services = navSections.find((s) => s.id === 'services')!;
+
+// The four in-house products, the PDF's wording. Relay is the data backbone under the other three.
+const productCards: CardField[] = [
+  {
+    media: 'pictogram-panel',
+    pictogram: 'needed-reach-pilot',
+    title: 'Reach Pilot',
+    description:
+      'A suite of perception and robotics applications giving ROV operators real-time situational awareness: a heads-up display, obstacle detection, pipeline tracking and computer-vision tools. It lays the foundations for autonomous ROV capability. In development since 2025, expanded through 2026.',
+  },
+  {
+    media: 'pictogram-panel',
+    pictogram: 'reach-remote',
+    title: 'Reach Remote',
+    description:
+      'Uncrewed vessels operated remotely from shore, holding the world-first AROS notation for autonomous and remotely operated ships. Reach Remote 1 has operated in the UK sector while controlled from Norway.',
+  },
+  {
+    media: 'pictogram-panel',
+    pictogram: 'needed-reach-horizon',
+    title: 'Reach Horizon',
+    description:
+      'Our in-house software platform, built for uncrewed operations and now adapted to support crewed vessels too, giving operators, surveyors and clients seamless access to data, operations and expertise from shore. No longer just a Reach Remote management tool, it is becoming a standalone product in its own right.',
+  },
+  {
+    media: 'pictogram-panel',
+    pictogram: 'needed-reach-relay',
+    title: 'Reach Relay',
+    description:
+      'A secure, in-house data tunnel that prioritises critical data for reliable transmission from offshore in harsh conditions. The data backbone behind Reach Pilot, Reach Horizon and remote operations generally.',
+  },
+];
+
+const heritageCards: CardField[] = [
+  {
+    media: 'icon',
+    pictogram: monitoring.pictogram,
+    title: 'Monitoring technology',
+    description: 'gWatch, DepthWatch, Wellwatch and Drillwatch, developed in-house and already in production use on client fields.',
+    action: { label: 'See Monitoring services', url: '/services/monitoring/', action: 'page' },
+  },
+  {
+    media: 'icon',
+    pictogram: 'book',
+    title: 'Research partnerships',
+    description:
+      `DIGIMON (CCS monitoring) and ASUMO (seafloor and earthquake monitoring), delivered with research institutes, universities and industry partners. ${publications.length} conference papers and journal articles since 2013.`,
+    action: { label: 'Browse the research library', url: '/services/technology-innovation/research-publications/', action: 'page' },
+  },
+];
+
+// See it in action: the PDF's two video cards, both placeholders until real footage exists (PDF p15; no badge on the card, Ross 6 Oct 2026). They point at the
+// promo film so the dialog works; swap each card's url and image for its own film.
+const videoCards: CardField[] = [
+  {
+    media: 'image-bg',
+    image: { src: `${base}images/reach-remote-side.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel under way', focalPoint: { x: 0.5, y: 0.5 } },
+    eyebrow: 'Film',
+    title: 'Reach Remote: the onshore ROC in action',
+    action: { label: 'Watch the film', url: `${base}video/promo.mp4`, action: 'video' },
+  },
+  {
+    media: 'image-bg',
+    image: { src: `${base}images/rov-zeerov-seabed.jpg`, alt: 'A Reach Subsea ROV working on the seabed', focalPoint: { x: 0.5, y: 0.5 } },
+    eyebrow: 'Film',
+    title: 'Reach Pilot: computer vision in action',
+    action: { label: 'Watch the film', url: `${base}video/promo.mp4`, action: 'video' },
+  },
+];
+
+// The PDF's three FAQs (p16), FAQ post type, topic Technology & Innovation
+const faqItems = [
+  {
+    slug: 'research-development-investment',
+    question: 'What research and development does Reach Subsea invest in?',
+    answer:
+      'Several active programmes: AI-enabled perception and autonomy for our ROV fleet (Reach Pilot), autonomous and remote vessel operations (Reach Remote), in-house data infrastructure (Reach Relay) and geophysical monitoring technology developed with research partners including ASUMO and DIGIMON.',
+    open: true,
+  },
+  {
+    slug: 'what-is-reach-pilot',
+    question: 'What is Reach Pilot?',
+    answer:
+      'A suite of perception and robotics applications developed in-house, giving ROV operators real-time situational awareness (obstacle detection, pipeline tracking and computer-vision tools) and laying the groundwork for autonomous ROV capability.',
+  },
+  {
+    slug: 'published-research',
+    question: 'Where can I read Reach Subsea’s published research?',
+    answer:
+      `Our Research & Publications library lists ${publications.length} conference papers and journal articles from 2013 to 2026, co-authored by our geophysics and monitoring teams.`,
+  },
+];
+const subnavItems = [
+  { label: 'Overview', href: services.href },
+  ...services.links.map((l) => ({ label: l.label, href: l.href })),
+];
+---
+
+<BaseLayout title={`${line.title} · Reach Subsea`} motion>
+  <Header current="services" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Services', href: services.href }, { label: line.short }]}
+      title="Investing in R&D to reach further, more safely"
+      lead="AI-enabled perception, autonomous and remote operations, and the in-house data infrastructure behind them."
+      image={{ src: `${base}images/hero-tech.jpg`, alt: '', focalPoint: { x: 1, y: 0.5 } }}
+      actions={[
+        { label: 'Talk to our team', url: '#contact', action: 'anchor' },
+        { label: 'Meet Reach Remote', url: '/assets/reach-remote/', action: 'page', type: 'link' },
+      ]}
+    />
+
+    <SectionSubnav source="section-pages" label="Services" items={subnavItems} current={line.href} />
+
+    <CardGrid
+      anchor="investing"
+      background="white"
+      sectionHeader={{
+        eyebrow: 'Where we are investing now',
+        title: 'AI-enabled perception, autonomy and remote operations',
+        intro: 'Technology is one of the core drivers behind Reach Subsea. Per our 2Q 2026 report, this is where the newest development is happening, alongside the geophysical monitoring methods already at work on producing fields.',
+      }}
+      layout="2-columns"
+      media="pictogram-panel"
+      surface="tint"
+      cards={productCards}
+    />
+
+    <StatsBand
+      anchor="proof"
+      style="feature"
+      featureKey="uncrewed-days"
+      background="tint"
+      animate
+      stats={pickFigures(['uncrewed-days', 'fuel-saving', 'relay-speed'])}
+    />
+
+    <SplitMedia
+      anchor="reach-remote"
+      background="white"
+      title="Reach Remote, operated from shore"
+      body={`<p>Reach Remote's uncrewed vessels are run from shore. Reach Remote 1 has operated in the UK sector while controlled from Norway.</p>`}
+      actions={[{ label: 'Reach Remote’s concept, technology and capabilities', url: '/assets/reach-remote/', action: 'page' }]}
+      image={{ src: `${base}images/reach-remote-side.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel under way', focalPoint: { x: 0.5, y: 0.6 } }}
+    />
+
+    <CardGrid
+      anchor="heritage"
+      background="tint"
+      sectionHeader={{ eyebrow: 'Also from Reach Subsea', title: 'Established technology and research heritage' }}
+      layout="2-columns"
+      media="icon"
+      surface="white"
+      cards={heritageCards}
+    />
+
+    <CardGrid
+      anchor="in-action"
+      background="white"
+      sectionHeader={{ eyebrow: 'See it in action', title: 'Technology videos' }}
+      layout="2-columns"
+      media="image-bg"
+      cards={videoCards}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'About our R&D programme and the technology behind our services.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="technology-innovation"
+      background="tint"
+      items={faqItems}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="white"
+      title="Interested in partnering on R&D?"
+      text="We work with research institutes, universities and industry partners across our technology programmes."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+    />
+  </main>
+  <Dialog type="video" />
+  <Footer />
+</BaseLayout>

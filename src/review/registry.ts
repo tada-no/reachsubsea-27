@@ -34,6 +34,10 @@ export const blocks: BlockEntry[] = [
   { slug: 'subnav', name: 'Section subnav', component: 'SectionSubnav', spec: '§2.14', figma: '207:4710', variants: 'Source Section pages · In-page' },
   // Contact (22 Sep 2026, Q73). Live operations (§2.15) has its own review page instead of a demo.
   { slug: 'offices-map', name: 'Offices map', component: 'OfficesMap', spec: '§2.16', figma: '', variants: 'Background White · Tint · Navy; Heading level h1 (page opener) · h2' },
+  // Assets overview (3 Oct 2026, Q77)
+  { slug: 'fleet-register', name: 'Fleet register', component: 'FleetRegister', spec: '§2.17', figma: '', variants: 'Groups 2–4; Background White · Tint · Navy' },
+  // Leadership & Board (6 Oct 2026, Q103)
+  { slug: 'profiles', name: 'Profiles', component: 'Profiles', spec: '§2.18', figma: '', variants: 'Layout Grid (square portrait tiles) · Rows (bios open); Background White · Tint · Navy' },
 ];
 
 export const FIGMA_FILE = 'HAvCQCXzWNFOKQ1AZxqNTX';

@@ -95,6 +95,12 @@ export interface CardField {
   /** 3 short scope items as a quiet list under the text (19 Sep 2026, service singles).
    * Not links. */
   scope?: string[];
+  /** Label · value rows under the text (3 Oct 2026, Assets overview: the Q2 report's vessel and ROV
+   * cards, "Charter period: April 2023 – April 2029"). The card is the whole record: no single page. */
+  specs?: { label: string; value: string }[];
+  /** Short values (ROVs, DriX) can pair up two rows across once the card is 560 wide (5 Oct 2026, Ross: a
+   * wide ROV card left its rows in a narrow column with empty space beside them). Default 1. */
+  specColumns?: 1 | 2;
   action?: LinkField;
 }
 

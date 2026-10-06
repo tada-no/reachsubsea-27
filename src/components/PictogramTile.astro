@@ -1,0 +1,64 @@
+---
+// Pictogram tile (4 Oct 2026, Assets overview › Survey and monitoring equipment). The line pictogram (64, 48 on
+// phones) beside a title, one line of text and optionally the item's own link. Used by Split media's `tiles`
+// under the body copy, one per row in the text column, where two or three short items would be too few for a
+// card row. 6 Oct 2026 (Ross: the right column felt clunky, boxes and a separate link row): open rows divided
+// by a hairline, no tinted box, and the link sits in the row it belongs to.
+import Pictogram from './Pictogram.astro';
+import Link from './Link.astro';
+import type { LinkField } from '../lib/types';
+
+interface Props {
+  pictogram: string;
+  title: string;
+  text: string;
+  link?: LinkField;
+  /** Visual style is independent of level (docs/05 §0); default h3 matches other item titles. */
+  headingLevel?: 'h3' | 'h4';
+  class?: string;
+}
+
+const { pictogram, title, text, link, headingLevel: Heading = 'h3', class: className } = Astro.props;
+---
+
+<li class:list={['pictogram-tile', className]}>
+  <Pictogram name={pictogram} size={64} />
+  <div class="pictogram-tile__body">
+    <Heading class="pictogram-tile__title text-h5">{title}</Heading>
+    <p class="pictogram-tile__text text-small">{text}</p>
+    {link && <Link label={link.label} href={link.url} action={link.action ?? 'page'} context={link.context} />}
+  </div>
+</li>
+
+<style is:global>
+  .pictogram-tile {
+    --pg-bg: var(--wp--custom--color--bg--default);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--24);
+    padding-block: var(--wp--preset--spacing--24);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .pictogram-tile__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xs);
+    min-width: 0;
+  }
+  .pictogram-tile__title {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .pictogram-tile__text {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  @media (max-width: 599px) {
+    .pictogram-tile {
+      gap: var(--wp--preset--spacing--16);
+      padding-block: var(--wp--preset--spacing--16);
+    }
+    .pictogram-tile .pictogram {
+      width: 48px;
+      height: 48px;
+    }
+  }
+</style>

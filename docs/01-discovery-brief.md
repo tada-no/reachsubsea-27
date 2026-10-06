@@ -34,8 +34,8 @@ Top nav: **Services · Assets · Projects · Company · Investors · Careers · 
 
 | Section | Pages |
 |---|---|
-| Home | Includes a **large Explore 3D World feature**, based on the ocean-realism build in `~/Desktop/reach-world`. It shows a poster (still or short loop) with a "Launch 3D World" button that loads the live scene in place on click, using `?embed=1&zone=n` once built. Phones get the poster and a full-screen link. Local: `http://localhost:8765/reach-ocean-realism.html`; public demo: `https://tada-no.github.io/reach-world/`. |
-| Services | Overview · Subsea · Survey · Monitoring · Technology & Innovation → Research & Publications · Explore 3D World |
+| Home | **5 Oct 2026 (Q79): the 3D World stage was removed from Home** (the client: enough entries already; it stays on Services overview and Careers, the Services menu, the footer and the Assets hero). Earlier brief: Includes a **large Explore 3D World feature**, based on the ocean-realism build in `~/Desktop/reach-world`. It shows a poster (still or short loop) with a "Launch 3D World" button that loads the live scene in place on click, using `?embed=1&zone=n` once built. Phones get the poster and a full-screen link. Local: `http://localhost:8765/reach-ocean-realism.html`; public demo: `https://tada-no.github.io/reach-world/`. |
+| Services | Overview · Subsea · Survey · Monitoring · Technology & Innovation → Research & Publications · Explore 3D World. **5 Oct 2026 (Q79):** the client counts three services; Technology & Innovation stays in the section as the technology the three draw on, not a fourth line |
 | Assets | Fleet overview · Vessels (archive/single) · Reach Remote (USV + ROC + Horizon) → Reach Remote 3 & 4 · ROVs · Survey & monitoring equipment |
 | Projects | Archive (filter: service, asset, region, year) · Project single |
 | Company | About · Leadership & Board · HSEQ · Sustainability |

@@ -30,6 +30,8 @@ const {
   meta = [],
   links = [],
   scope = [],
+  specs = [],
+  specColumns = 1,
   action,
   headingLevel: Heading = 'h3',
   class: className,
@@ -54,6 +56,7 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     // The surface sets the card's own colour mode: a White or Tint card stays light inside a Navy section
     navy ? 'has-surface-navy' : 'has-surface-light',
     linked && 'card--linked',
+    specColumns === 2 && 'card--specs-2',
     className,
   ]}
 >
@@ -115,6 +118,18 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
       )
     }
     {
+      specs.length > 0 && (
+        <dl class="card__specs text-small">
+          {specs.map((row) => (
+            <div class="card__spec">
+              <dt>{row.label}</dt>
+              <dd>{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )
+    }
+    {
       links.length > 0 && (
         <ul class="card__links">
           {links.map((link) => (
@@ -173,6 +188,12 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     border: 1px solid var(--wp--custom--color--border--subtle);
     border-radius: inherit;
     pointer-events: none;
+  }
+  /* The stroke shows only on a white ground. On tint or navy the ground itself draws the card's edge, and the
+     light hairline read as a grey rim inside the white card (Ross, 4–5 Oct 2026, Assets ROV and vessel grids). */
+  .has-surface-navy .card--white::after,
+  .has-surface-tint .card--white::after {
+    display: none;
   }
   .card--tint {
     --pg-bg: var(--wp--custom--color--bg--tint);
@@ -274,6 +295,12 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
   /* Text, meta and action: part of the content stack, except beside a Featured pictogram panel */
   .card__body {
     display: contents;
+  }
+  /* Default pictogram panel: capped at 200 (the wide card's beside-the-text size), not the card width. At
+     416 in a 3-column row the pictogram ran to 350 and read as a poster (Ross, 5 Oct 2026, Services overview). */
+  .card__pictogram-panel {
+    width: 200px;
+    max-width: 100%;
   }
   /* Stacked wide card (card under 600): the panel above the text is capped at 128, so a 2-column
      row at 600–1199 doesn't blow the pictogram up to the card width (19 Sep 2026, Services overview) */
@@ -386,13 +413,51 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     align-items: baseline;
     gap: var(--wp--preset--spacing--12);
   }
+  /* A 6px accent dot (Ross, 5 Oct 2026: a bullet over the 19 Sep dash, nearer the discs in rich-text prose) */
   .card__scope li::before {
     content: '';
     flex: none;
-    width: 12px;
-    height: 2px;
-    align-self: center;
+    width: 6px;
+    height: 6px;
+    /* On the first line's centre, not the item's, so a wrapped item keeps its dot at the top (Ross, 5 Oct 2026) */
+    align-self: flex-start;
+    margin-top: calc((1lh - 6px) / 2);
+    border-radius: var(--wp--custom--radius--full);
     background-color: var(--wp--custom--color--icon--accent);
+  }
+
+  /* Spec rows (3 Oct 2026, Assets overview): label · value pairs like the Q2 report's vessel cards. The
+     labels share one column per card so the values line up; no rules between rows (card rule, docs/08 §2).
+     The rows follow the title (not pinned to the foot): a kicker that wraps on one card would otherwise
+     open an uneven gap under the titles across the row. */
+  .card__specs {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--16);
+  }
+  .card__spec {
+    display: contents;
+  }
+  .card__specs dt {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .card__specs dd {
+    color: var(--wp--custom--color--text--primary);
+    font-weight: var(--wp--custom--font-weight--medium);
+    overflow-wrap: anywhere;
+  }
+  /* Two pairs across once the card is 560 wide (short values only: ROVs, DriX). Keyed to the card's own
+     width; the second pair's label gets space/16 more so the pairs read apart (Ross, 5 Oct 2026). */
+  .card--specs-2 {
+    container-type: inline-size;
+  }
+  @container (min-width: 560px) {
+    .card--specs-2 .card__specs {
+      grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr);
+    }
+    .card--specs-2 .card__spec:nth-child(even) dt {
+      padding-left: var(--wp--preset--spacing--16);
+    }
   }
 
   /* Sub-page links: a quiet list under the text, 44px rows on touch via padding, no rules */

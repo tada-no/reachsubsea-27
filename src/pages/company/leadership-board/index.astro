@@ -1,0 +1,108 @@
+---
+// Company › Leadership & Board (6 Oct 2026, Q103). Client PDF p32–33 ("13 — Company — Leadership & Board"), its
+// own wording, with the people from people.ts (the People post type): the management team as Profiles grid
+// tiles, square portraits with direct phone and email, five across (Q104, after the Q2 2026 report p7), then the
+// Board of Directors as Profiles rows with their bios open, the PDF's FAQs and a way in. Real black-and-white portraits replace the PDF's initials avatars. This is
+// the one page that names Haugesund as the headquarters (PDF note). The PDF's long hero lead is cut to two
+// lines; the listing it mentioned is already the board's intro.
+// Redirects: /company/who-we-are/leadership-board/ (dev, empty) and /investors/key-information/board-of-directors/
+// (dev, out-of-date board) → this page until Investors › Governance & meetings is built.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import Profiles from '../../../blocks/Profiles.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { navSections } from '../../../data/navigation';
+import { management, board, personMeta, leadershipFaqs } from '../../../data/people';
+
+const base = import.meta.env.BASE_URL;
+const company = navSections.find((s) => s.id === 'company')!;
+const page = company.links.find((l) => l.label === 'Leadership & Board')!;
+const subnavItems = [
+  { label: 'About', href: company.href },
+  ...company.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+const managementProfiles = management.map((p) => ({
+  name: p.name,
+  role: p.role,
+  portrait: { src: p.portrait.src, alt: '' },
+  contacts: [
+    ...(p.phone ? [{ icon: 'phone', text: p.phone.label, href: p.phone.href }] : []),
+    ...(p.email ? [{ icon: 'mail', text: p.email.label, href: p.email.href }] : []),
+  ],
+}));
+
+const boardProfiles = board.map((p) => ({
+  name: p.name,
+  role: p.role,
+  roleTone: p.chair ? ('accent' as const) : ('neutral' as const),
+  portrait: { src: p.portrait.src, alt: '', focalPoint: p.portrait.focalPoint },
+  meta: personMeta(p),
+  bio: p.bio,
+}));
+---
+
+<BaseLayout title="Leadership & Board" motion>
+  <Header current="company" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Company', href: company.href }, { label: 'Leadership & Board' }]}
+      title="Our management team and Board of Directors"
+      lead="Deep offshore, engineering and capital-markets experience, guiding Reach Subsea from our headquarters in Haugesund, Norway."
+      image={{ src: `${base}images/hero-leadership.jpg`, alt: '', focalPoint: { x: 1, y: 0.5 } }}
+    />
+
+    <SectionSubnav source="section-pages" label="Company" items={subnavItems} current={page.href} />
+
+    <Profiles
+      anchor="management"
+      layout="grid"
+      background="white"
+      sectionHeader={{ title: 'Meet our management team' }}
+      people={managementProfiles}
+    />
+
+    <Profiles
+      anchor="board"
+      layout="rows"
+      background="tint"
+      sectionHeader={{
+        eyebrow: 'Corporate governance',
+        title: 'Board of Directors',
+        intro: 'Reach Subsea ASA is listed on the Oslo Stock Exchange (Euronext) and follows the Norwegian recommendation for ownership and company management.',
+        action: { label: 'Governance & meetings', url: '/investors/governance-meetings/' },
+      }}
+      people={boardProfiles}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about our management team and Board of Directors.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="leadership"
+      background="white"
+      items={leadershipFaqs}
+    />
+
+    <CtaBand
+      anchor="contact"
+      title="Talk to us"
+      text="Questions for our leadership, or about investing in Reach? We will put you in touch."
+      actions={[
+        { label: 'Contact us', url: '/contact/', action: 'page' },
+        { label: 'Investor relations', url: '/investors/', action: 'page' },
+      ]}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

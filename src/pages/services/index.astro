@@ -1,15 +1,18 @@
 ---
 // Services › Overview (19 Sep 2026). Content: client PDF p5–7 ("02 — Services — Overview"), the dev site's
 // service child pages, and the Home/Investors patterns (Q63 in docs/00-questions.md).
-// The hub between Home and the service singles. It answers "which service do I need?": four service
-// lines with their sub-services · the asset lifecycle (which service works at which stage) · how we
-// deliver (crewed, uncrewed, Reach Horizon, the fleet) · project references · 3D World · FAQ · CTA.
+// The hub between Home and the service singles. It answers "which service do I need?": three service
+// lines with their sub-services · the asset lifecycle (which service works at which stage) · the technology
+// under every line (Technology & Innovation, 5 Oct 2026, Q79: the client counts three services, with
+// Technology & Innovation as what the three draw on, client PDF p15) · how we deliver (crewed, uncrewed,
+// Reach Horizon, the fleet) · project references · 3D World · FAQ · CTA.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/header/Header.astro';
 import Footer from '../../components/Footer.astro';
 import PageHero from '../../blocks/PageHero.astro';
 import SectionSubnav from '../../blocks/SectionSubnav.astro';
 import CardGrid from '../../blocks/CardGrid.astro';
+import SplitMedia from '../../blocks/SplitMedia.astro';
 import CardBento from '../../blocks/CardBento.astro';
 import Lifecycle from '../../blocks/Lifecycle.astro';
 import FeedGrid from '../../blocks/FeedGrid.astro';
@@ -31,13 +34,14 @@ const subnavItems = [
   ...services.links.map((l) => ({ label: l.label, href: l.href })),
 ];
 
-const serviceCards = serviceLines.map((line) =>
+const technology = serviceLines.find((l) => l.id === 'technology')!;
+const serviceCards = serviceLines.filter((line) => line.id !== 'technology').map((line) =>
   cardPresets.service({
     pictogram: line.pictogram,
     eyebrow: undefined,
     title: line.title,
     description: line.summary,
-    links: line.subServices,
+    scope: line.scope,
     action: { label: `Explore ${line.short.toLowerCase()}`, url: line.href, action: 'page' },
   }),
 );
@@ -132,7 +136,7 @@ const faqItems = [
     slug: 'which-service-lines',
     question: 'What service lines does Reach Subsea offer?',
     answer:
-      'Four: Subsea (inspection, maintenance, repair and construction support), Survey (seabed, cable and positioning data), Monitoring (gWatch, DepthWatch, Wellwatch and Drillwatch) and Technology & Innovation, the in-house technology under all three: Reach Pilot, Reach Remote, Reach Horizon and Reach Relay. All are delivered from crewed or uncrewed vessels.',
+      'Three: Subsea (inspection, maintenance, repair and construction support), Survey (seabed, cable and positioning data) and Monitoring (gWatch, DepthWatch, Wellwatch and Drillwatch). Under all three sits our in-house technology, Reach Pilot, Reach Remote, Reach Horizon and Reach Relay. All are delivered from crewed or uncrewed vessels.',
     open: true,
   },
   {
@@ -157,9 +161,9 @@ const faqItems = [
       style="photo"
       animate
       breadcrumb={[{ label: 'Home', href: base }, { label: 'Services' }]}
-      title="Services built for the full offshore asset lifecycle"
-      lead="From inspection and repair to survey and long-term monitoring, delivered through crewed and uncrewed vessels, both equipped with ROV and survey capability."
-      image={{ src: `${base}images/usv-drix-wind.jpg`, alt: '', focalPoint: { x: 0.6, y: 0.55 } }}
+      title="Services for the full offshore asset lifecycle"
+      lead="From inspection and repair to survey and monitoring, delivered by crewed and uncrewed vessels."
+      image={{ src: `${base}images/hero-services.jpg`, alt: '', focalPoint: { x: 1, y: 0.55 } }}
       actions={[
         { label: 'Talk to our team', url: '/contact/', action: 'page' },
         { label: 'Explore the 3D World', url: worldPagePath, action: 'page', type: 'link' },
@@ -171,8 +175,8 @@ const faqItems = [
     <CardGrid
       anchor="service-lines"
       background="white"
-      sectionHeader={{ title: 'Our four service lines' }}
-      layout="2-columns"
+      sectionHeader={{ title: 'Our three service lines' }}
+      layout="3-columns"
       media="pictogram-panel"
       surface="tint"
       cards={serviceCards}
@@ -190,6 +194,24 @@ const faqItems = [
       rows={lifecycleRows}
       foundation={lifecycleFoundation}
       services={serviceLines}
+    />
+
+    {/* Technology & Innovation (5 Oct 2026, Q79): not a fourth line but the technology the three draw on, so
+        it follows the lifecycle's foundation row as its own block. Wording drafted from the line's summary
+        and the PDF p15 product names; Reach to confirm. */}
+    <SplitMedia
+      anchor="technology"
+      media="image"
+      position="end"
+      background="white"
+      pictogram={technology.pictogram}
+      title="The technology under every service"
+      body="<p>Reach Pilot, Reach Remote, Reach Horizon and Reach Relay are developed in-house and used across our subsea, survey and monitoring work, from ROV piloting to uncrewed vessels run from shore.</p>"
+      image={{ src: `${base}images/reach-remote-side.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel under way', focalPoint: { x: 0.5, y: 0.5 } }}
+      actions={[
+        { label: 'Technology & Innovation', url: technology.href, action: 'page' },
+        { label: 'Research & Publications', url: '/services/technology-innovation/research-publications/', action: 'page' },
+      ]}
     />
 
     <CardBento

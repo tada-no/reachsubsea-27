@@ -1,0 +1,32 @@
+---
+import FleetRegister from '../blocks/FleetRegister.astro';
+import type { FleetGroup } from '../blocks/FleetRegister.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+import { pickFigures } from '../data/key-figures';
+import { assets, assetsOf, fleetCounts, unitsOf } from '../data/assets';
+
+const [rovSystems] = pickFigures(['rov-systems']);
+const units = (type: 'vessel' | 'usv') =>
+  assetsOf(type).flatMap((a) =>
+    (a.unitNames ?? Array.from({ length: a.units ?? 1 }, () => a.name)).map((name) => ({
+      name,
+      status: a.status === 'newbuild' ? ('joining' as const) : ('in-service' as const),
+    })),
+  );
+const reachRemote = assets.filter((a) => a.slug.startsWith('reach-remote'));
+const groups: FleetGroup[] = [
+  { key: 'vessels', value: String(fleetCounts.vessels.inService), label: 'Chartered vessels', note: `${fleetCounts.vessels.joining} joining 3Q 2026 and 2027`, units: units('vessel') },
+  { key: 'usvs', value: String(unitsOf(reachRemote.filter((a) => a.status !== 'newbuild'))), label: 'Reach Remote USVs', note: '2 in build, due 2H 2027', units: units('usv').filter((u) => u.name.startsWith('Reach')) },
+  { key: 'drix', value: '2', label: 'DriX survey USVs', note: 'Shallow-water hydrographic survey', units: units('usv').filter((u) => u.name.startsWith('DriX')) },
+  { key: 'rovs', value: rovSystems.value, label: rovSystems.label, note: '13 work-class and 2 Surveyor Interceptor', units: Array.from({ length: Number(rovSystems.value) }, (_, i) => ({ name: `ROV system ${i + 1}`, status: 'in-service' as const })) },
+];
+---
+
+<VariantLabel name="Four groups · White" props='groups={4} background="white"' />
+<FleetRegister sectionHeader={{ title: 'The fleet at a glance' }} groups={groups} />
+
+<VariantLabel name="Two groups · Tint" props='groups={2} background="tint"' />
+<FleetRegister background="tint" sectionHeader={{ title: 'Vessels and uncrewed vessels' }} groups={groups.slice(0, 2)} />
+
+<VariantLabel name="Four groups · Navy" props='groups={4} background="navy"' />
+<FleetRegister background="navy" sectionHeader={{ title: 'The fleet at a glance' }} groups={groups} />

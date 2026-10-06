@@ -59,10 +59,22 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     flex: none;
     color: var(--wp--custom--color--icon--accent);
   }
+  /* A pictogram that does not exist yet (6 Oct 2026, Ross: never reuse an icon for a new meaning): a dashed
+     accent box that says so, so it cannot pass for finished art. Name it `needed-<what-it-stands-for>`. */
   .pictogram--missing {
-    display: block;
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    border: 2px dashed var(--wp--custom--color--border--accent);
     border-radius: var(--wp--custom--radius--sm);
-    background-color: var(--wp--custom--color--bg--disabled);
+    background-color: var(--wp--custom--color--bg--tint);
+    color: var(--wp--custom--color--text--secondary);
+    text-align: center;
+  }
+  .pictogram--missing::after {
+    content: 'Icon needed';
+    font-size: var(--wp--preset--font-size--caption);
+    line-height: var(--wp--custom--line-height--caption);
   }
 
   /* ── Micro loops (18 Sep 2026) ─────────────────────────────────
@@ -188,6 +200,112 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     44%, 60% { stroke-dasharray: 0 84 16 0; }
   }
 
+  /* Book (6 Oct 2026, Research partnerships; reworked from Ross's Icons8 "literature" Lottie): the right-hand
+     page lifts and turns over the spine onto the left page, then the whole book dips 1px as it lands, as in
+     the reference. The turning page is a copy drawn over the still right page, so once it has landed it can
+     jump back to the right unseen (the real page is already there, at 54%) and every cycle is a one-way turn. The
+     lift (-4) and the shrinking width follow the reference's page-bend keyframes. Solid, transform only;
+     the page's origin is the spine, the left edge of its own box. */
+  .pictogram--book {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--book .pg-page {
+    fill: var(--pg-bg, var(--wp--custom--color--bg--default));
+    transform-box: fill-box;
+    transform-origin: left center;
+  }
+  .pictogram--book.is-playing .pg-page {
+    animation-name: pg-page-turn, pg-page-lift;
+  }
+  .pictogram--book.is-playing .pg-book {
+    animation-name: pg-book-dip;
+  }
+  /* The bookmark is filled with the surface behind the icon so the left page's top edge runs unbroken beneath it.
+     It shrinks away as the page lifts and pops back in once the page has landed (solid: scale only). */
+  .pictogram--book .pg-mark {
+    fill: var(--pg-bg, var(--wp--custom--color--bg--default));
+    transform-box: fill-box;
+    transform-origin: center top;
+  }
+  .pictogram--book.is-playing .pg-mark {
+    animation-name: pg-mark-pop;
+  }
+  @keyframes pg-mark-pop {
+    0%, 4% { scale: 1 1; animation-timing-function: var(--wp--custom--motion--ease-in-out); }
+    20%, 58% { scale: 0 0; animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
+    74%, 100% { scale: 1 1; }
+  }
+  /* One long ease across the whole turn (scale), with the lift riding it on its own curve (translate), so there are no stops mid-turn */
+  @keyframes pg-page-turn {
+    0%, 6% { scale: 1 1; animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1); }
+    50%, 62% { scale: -1 1; }
+    62.1%, 100% { scale: 1 1; }
+  }
+  @keyframes pg-page-lift {
+    0%, 6% { translate: 0 0; animation-timing-function: cubic-bezier(0.3, 0, 0.5, 1); }
+    28% { translate: 0 -4.3px; animation-timing-function: cubic-bezier(0.5, 0, 0.7, 1); }
+    50%, 100% { translate: 0 0; }
+  }
+  @keyframes pg-book-dip {
+    0%, 40% { transform: translateY(0); }
+    52% { transform: translateY(1px); }
+    66%, 100% { transform: translateY(0); }
+  }
+
+  /* Reach Remote (6 Oct 2026): the clouds ease across the icon on a loop while the sea flows exactly as in
+     the other icons (Ross: the sea animates the same everywhere; no lines appearing on the antenna). The
+     cloud set is drawn twice, one sky-width (76) apart, inside a fixed clip: both slide right by 76 at a
+     constant speed, so as one leaves the window its twin enters and the loop is seamless. Solid
+     throughout: transform only; every part rests as drawn at 0% and 100%. */
+  .pictogram--reach-remote {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--reach-remote .pg-sea {
+    clip-path: inset(0 10.4px 0 10.4px) view-box;
+  }
+  .pictogram--reach-remote .pg-sky {
+    clip-path: inset(0 10px 0 10px) view-box;
+  }
+  .pictogram--reach-remote .pg-wave,
+  .pictogram--reach-remote .pg-cloudset {
+    animation-timing-function: linear;
+  }
+  .pictogram--reach-remote .pg-cloudset--b {
+    transform: translateX(-76px);
+  }
+  .pictogram--reach-remote.is-playing .pg-wave {
+    animation-name: pg-flow-wide;
+  }
+  .pictogram--reach-remote.is-playing .pg-cloudset--a {
+    animation-name: pg-sky-a;
+  }
+  .pictogram--reach-remote.is-playing .pg-cloudset--b {
+    animation-name: pg-sky-b;
+  }
+  @keyframes pg-sky-a {
+    to { transform: translateX(76px); }
+  }
+  @keyframes pg-sky-b {
+    from { transform: translateX(-76px); }
+    to { transform: translateX(0); }
+  }
+
+  /* Sea on its own (6 Oct 2026, Ross: the sea animates the same in every icon): Marine, Seabed repair and
+     Survey ROV had a flattened, static wave. Each now carries the shared stroked sea (two extra periods
+     outside a fixed clip, so the loop is seamless) and nothing else moves. */
+  :is(.pictogram--marine, .pictogram--seabed-repair, .pictogram--survey-rov) {
+    --pg-cycle: 3.2s;
+  }
+  :is(.pictogram--marine, .pictogram--seabed-repair, .pictogram--survey-rov) .pg-sea {
+    clip-path: inset(0 12.7px 0 13px) view-box;
+  }
+  :is(.pictogram--marine, .pictogram--seabed-repair, .pictogram--survey-rov) .pg-wave {
+    animation-timing-function: linear;
+  }
+  :is(.pictogram--marine, .pictogram--seabed-repair, .pictogram--survey-rov).is-playing .pg-wave {
+    animation-name: pg-flow;
+  }
+
   /* Global monitoring: the two sonar arcs wipe and redraw top-down, then a gap opens in the outer
      ring, sweeps once around clockwise and closes (pattern "D G": the gap's head tracks the offset). */
   .pictogram--global-monitoring {
@@ -307,6 +425,206 @@ const live = Boolean(inner && inner.includes('class="pg-'));
   }
   @keyframes pg-flow {
     to { transform: translate3d(27.2px, 0, 0); }
+  }
+
+  /* Subsea telemetry (6 Oct 2026, the Seismic risk monitoring tile): the same swell as Subsea
+     infrastructure, then the signal chain acts itself out on one 3.2s cycle: the seabed sensors ping
+     (each arc shrinks back to its start and regrows, inner then outer), then the box, a gap runs up the
+     cable from the box to the surface unit, and the antenna pings. Seabed sediment is stirred as in
+     Subsea infrastructure. Arcs are real strokes (pathLength 100): every ping is a monotone 0 → 110 → 0
+     offset, so nothing jumps mid-loop. Phases live in the keyframes. */
+  .pictogram--subsea-telemetry {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--subsea-telemetry .pg-sea {
+    clip-path: inset(0 12.7px 0 13px) view-box;
+  }
+  .pictogram--subsea-telemetry .pg-wave {
+    animation-timing-function: linear;
+  }
+  .pictogram--subsea-telemetry .pg-cable {
+    stroke-dasharray: 100 12 300 0;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-wave {
+    animation-name: pg-flow;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-arc--sl1 {
+    animation-name: pg-ping-1;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-arc--sr1 {
+    animation-name: pg-ping-2;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-arc--sl2 {
+    animation-name: pg-ping-3;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-arc--sr2 {
+    animation-name: pg-ping-4;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-arc--box1 {
+    animation-name: pg-ping-5;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-arc--box2 {
+    animation-name: pg-ping-6;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-cable {
+    animation-name: pg-cable-pulse;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-arc--ant1 {
+    animation-name: pg-ping-7;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-arc--ant2 {
+    animation-name: pg-ping-8;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-dot--a {
+    animation-name: pg-stir-a;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-dot--b {
+    animation-name: pg-stir-b;
+  }
+  .pictogram--subsea-telemetry.is-playing .pg-dot--c {
+    animation-name: pg-stir-c;
+  }
+  @keyframes pg-ping-1 {
+    0%, 2%, 24%, 100% { stroke-dashoffset: 0; }
+    11%, 13% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-ping-2 {
+    0%, 4%, 26%, 100% { stroke-dashoffset: 0; }
+    13%, 15% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-ping-3 {
+    0%, 7%, 29%, 100% { stroke-dashoffset: 0; }
+    16%, 18% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-ping-4 {
+    0%, 9%, 31%, 100% { stroke-dashoffset: 0; }
+    18%, 20% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-ping-5 {
+    0%, 32%, 54%, 100% { stroke-dashoffset: 0; }
+    41%, 43% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-ping-6 {
+    0%, 36%, 58%, 100% { stroke-dashoffset: 0; }
+    45%, 47% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-cable-pulse {
+    0%, 52% { stroke-dashoffset: 112; }
+    74%, 100% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-ping-7 {
+    0%, 70%, 92%, 100% { stroke-dashoffset: 0; }
+    79%, 81% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-ping-8 {
+    0%, 74%, 96%, 100% { stroke-dashoffset: 0; }
+    83%, 85% { stroke-dashoffset: 110; }
+  }
+
+  /* Geothermal (6 Oct 2026, industry tile): the same swell on top; heat rises through the strata as a gap
+     running up each arrow's shaft (pattern "D G rest": the gap's head tracks the offset, same language
+     as the cable in Subsea telemetry), left to right, and each arrowhead lifts as the gap arrives. */
+  .pictogram--geothermal {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--geothermal .pg-sea {
+    clip-path: inset(0 12.7px 0 13px) view-box;
+  }
+  .pictogram--geothermal .pg-wave {
+    animation-timing-function: linear;
+  }
+  .pictogram--geothermal .pg-shaft {
+    stroke-dasharray: 100 12 300 0;
+  }
+  .pictogram--geothermal.is-playing .pg-wave {
+    animation-name: pg-flow;
+  }
+  .pictogram--geothermal.is-playing .pg-shaft--a {
+    animation-name: pg-geo-rise-a;
+  }
+  .pictogram--geothermal.is-playing .pg-shaft--b {
+    animation-name: pg-geo-rise-b;
+  }
+  .pictogram--geothermal.is-playing .pg-shaft--c {
+    animation-name: pg-geo-rise-c;
+  }
+  .pictogram--geothermal.is-playing .pg-head--a {
+    animation-name: pg-geo-head-a;
+  }
+  .pictogram--geothermal.is-playing .pg-head--b {
+    animation-name: pg-geo-head-b;
+  }
+  .pictogram--geothermal.is-playing .pg-head--c {
+    animation-name: pg-geo-head-c;
+  }
+  @keyframes pg-geo-rise-a {
+    0%, 4% { stroke-dashoffset: 112; }
+    40%, 100% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-geo-rise-b {
+    0%, 16% { stroke-dashoffset: 112; }
+    52%, 100% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-geo-rise-c {
+    0%, 28% { stroke-dashoffset: 112; }
+    64%, 100% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-geo-head-a {
+    0%, 36%, 48%, 100% { transform: translate3d(0, 0, 0); }
+    42% { transform: translate3d(0, -1.5px, 0); }
+  }
+  @keyframes pg-geo-head-b {
+    0%, 48%, 60%, 100% { transform: translate3d(0, 0, 0); }
+    54% { transform: translate3d(0, -1.5px, 0); }
+  }
+  @keyframes pg-geo-head-c {
+    0%, 60%, 72%, 100% { transform: translate3d(0, 0, 0); }
+    66% { transform: translate3d(0, -1.5px, 0); }
+  }
+
+  /* Carbon storage (6 Oct 2026, industry tile): the CO2 is picked out first (C, O, ₂ hop in turn), then it
+     goes down: a gap runs round each arrow's outline, left arrow then right (the outline starts at the
+     stem's top, so the gap travels down one side, round the head and up the other). */
+  .pictogram--carbon-storage {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--carbon-storage .pg-arrow {
+    stroke-dasharray: 100 12 300 0;
+  }
+  .pictogram--carbon-storage.is-playing .pg-letter--c {
+    animation-name: pg-co2-hop-c;
+  }
+  .pictogram--carbon-storage.is-playing .pg-letter--o {
+    animation-name: pg-co2-hop-o;
+  }
+  .pictogram--carbon-storage.is-playing .pg-letter--s {
+    animation-name: pg-co2-hop-s;
+  }
+  .pictogram--carbon-storage.is-playing .pg-arrow--l {
+    animation-name: pg-co2-down-l;
+  }
+  .pictogram--carbon-storage.is-playing .pg-arrow--r {
+    animation-name: pg-co2-down-r;
+  }
+  @keyframes pg-co2-hop-c {
+    0%, 2%, 12%, 100% { transform: translate3d(0, 0, 0); }
+    7% { transform: translate3d(0, -1.5px, 0); }
+  }
+  @keyframes pg-co2-hop-o {
+    0%, 8%, 18%, 100% { transform: translate3d(0, 0, 0); }
+    13% { transform: translate3d(0, -1.5px, 0); }
+  }
+  @keyframes pg-co2-hop-s {
+    0%, 14%, 24%, 100% { transform: translate3d(0, 0, 0); }
+    19% { transform: translate3d(0, -1.5px, 0); }
+  }
+  @keyframes pg-co2-down-l {
+    0%, 28% { stroke-dashoffset: 112; }
+    62%, 100% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-co2-down-r {
+    0%, 40% { stroke-dashoffset: 112; }
+    74%, 100% { stroke-dashoffset: 0; }
   }
 
   /* Oil & gas, Offshore wind (19 Sep 2026, industry tiles): the same swell as Subsea infrastructure

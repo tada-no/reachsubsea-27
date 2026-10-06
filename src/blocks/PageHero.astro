@@ -244,6 +244,12 @@ const objectPosition = image?.focalPoint
     max-width: 880px;
     color: var(--wp--custom--color--text--secondary);
   }
+  /* 6 Oct 2026 (Ross: the lead's lines were unbalanced, a short second line): the Photo lead is two short lines,
+     so it gets the Video lead's 760 measure and balanced wrapping */
+  .page-hero--photo .page-hero__lead {
+    max-width: 760px;
+    text-wrap: balance;
+  }
   .page-hero__meta {
     display: flex;
     flex-wrap: wrap;

@@ -274,6 +274,13 @@ a {
   border: 0;
 }
 
+/* Anchor jumps (4 Oct 2026, Assets: Vessels and ROVs are anchors into the overview). A jump scrolls down,
+   which hides the header, so what stays over the target is the docked Section subnav (72px): keep that
+   much plus one gap clear above any anchored block, FAQ item or contact panel. */
+main [id] {
+  scroll-margin-top: calc(72px + var(--wp--preset--spacing--24));
+}
+
 /* Sideways-scrolling row (chips, tabs on mobile) */
 .scroll-row {
   display: flex;
@@ -346,11 +353,11 @@ html.js [data-reveal].is-settled {
    placeholders on their grey and out-ranks the components' own wrapper background. Photos only: logos, SVGs
    and the 3D World poster (a render, and Embed has its own stage reveal) stay untouched. In
    WordPress this is the same rule on the core Image / Cover / Media & Text wrappers. */
-:is(.page-hero__media, .card__media, .card__bg, .media-frame__frame, .social-feed__media, .statement__photo):has(> :is(img, video)) {
+:is(.page-hero__media, .card__media, .card__bg, .media-frame__frame, .social-feed__media, .statement__photo, .profile__portrait):has(> :is(img, video)) {
   background-color: var(--wp--custom--color--image-tint);
   isolation: isolate;
 }
-:is(.page-hero__media, .card__media, .card__bg, .media-frame__frame, .social-feed__media, .statement__photo)
+:is(.page-hero__media, .card__media, .card__bg, .media-frame__frame, .social-feed__media, .statement__photo, .profile__portrait)
   > :is(img, video) {
   mix-blend-mode: screen;
 }

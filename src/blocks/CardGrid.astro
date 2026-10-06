@@ -58,6 +58,13 @@ const titleId = sectionHeader?.title ? makeId('card-grid', sectionHeader.title) 
 const pad = (n: number) => String(n).padStart(2, '0');
 // Pictogram cards open up into hairline-separated rows on phones (see the CSS below)
 const openRows = media === 'icon' || media === 'pictogram-panel';
+// Three pictogram-panel cards with lists (Services overview): at 768–1199 one column of side-by-side cards
+// (panel beside the text), where three narrow columns squashed the lists (Ross, 5 Oct 2026)
+const trioPanels = media === 'pictogram-panel' && cards.length === 3;
+// Three text cards with lists (Monitoring's Environmental group, 6 Oct 2026): three across at 900–1199 left
+// ~190–250px of text, one column of wide cards at 768–899 left them half empty, so 768–1199 is two columns with
+// the third spanning both (no hole).
+const trioText = media === 'none' && cards.length === 3;
 
 ---
 
@@ -88,7 +95,7 @@ const openRows = media === 'icon' || media === 'pictogram-panel';
       ) : (
       <div class="block__body">
         {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
-        <ul class:list={['card-grid__list', `card-grid__list--${resolvedLayout}`, openRows && 'card-grid__list--open', widePanels && 'card-grid__list--wide']}>
+        <ul class:list={['card-grid__list', `card-grid__list--${resolvedLayout}`, openRows && 'card-grid__list--open', widePanels && 'card-grid__list--wide', trioPanels && 'card-grid__list--trio-panels', trioText && 'card-grid__list--trio-text']}>
           {cards.map((card, i) => (
             <li class="card-grid__item">
               <Card
@@ -159,6 +166,41 @@ const openRows = media === 'icon' || media === 'pictogram-panel';
       grid-column: span 1;
     }
   }
+  /* A grid of exactly three cards (5 Oct 2026, Q79: Home's three services) never drops to 2 + 1 with a
+     hole: short icon cards keep three columns down to 900, then go to one column of open rows at 768–899,
+     as on phones. */
+  @media (min-width: 900px) and (max-width: 1199px) {
+    .card-grid__list--3-columns:has(> :nth-child(3):last-child) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  /* Three pictogram-panel cards with six-item lists (Services overview, Ross 5 Oct 2026): three columns at
+     900–1199 squashed every list item onto two lines, so from 768 to 1199 they are one column of
+     side-by-side cards, the panel (160) beside a text column that holds the list on single lines. */
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .card-grid .card-grid__list--3-columns.card-grid__list--trio-panels {
+      grid-template-columns: 1fr;
+    }
+    .card-grid .card-grid__list--trio-panels .card-grid__item {
+      grid-column: span 1;
+    }
+    .card-grid__list--trio-panels .card__content {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--wp--preset--spacing--32);
+    }
+    .card-grid__list--trio-panels .card__pictogram-panel {
+      flex: none;
+      width: 160px;
+    }
+    .card-grid__list--trio-panels .card__body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      gap: var(--wp--custom--stack--md);
+    }
+  }
   /* Four across only from 1320 (22 Sep 2026, Q74): at 1200–1319 four cards left ~190px of text and
      titles ran to four lines */
   @media (max-width: 1319px) {
@@ -217,6 +259,49 @@ const openRows = media === 'icon' || media === 'pictogram-panel';
      panel inside the page gutter left the text ~260 wide; as open rows they take the full column and
      a hairline between them does the separating. Light grounds only: on navy the cards keep their panels.
      Up to 767, wherever the row is one column. */
+  @media (min-width: 768px) and (max-width: 899px) {
+    .card-grid .card-grid__list--3-columns:has(> :nth-child(3):last-child) {
+      grid-template-columns: 1fr;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open:has(> :nth-child(3):last-child) {
+      gap: 0;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open:has(> :nth-child(3):last-child) .card-grid__item + .card-grid__item {
+      border-top: 1px solid var(--wp--custom--color--border--subtle);
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open:has(> :nth-child(3):last-child) .card {
+      --pg-bg: var(--wp--custom--color--bg--default);
+      border-radius: 0;
+      box-shadow: none;
+      transform: none;
+    }
+    .card-grid.has-surface-tint .card-grid__list--open:has(> :nth-child(3):last-child) .card {
+      --pg-bg: var(--wp--custom--color--bg--tint);
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open:has(> :nth-child(3):last-child) .card::after {
+      content: none;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open:has(> :nth-child(3):last-child) .card__content {
+      padding-inline: 0;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open:has(> :nth-child(3):last-child) .card__pictogram-panel {
+      width: 96px;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open:has(> :nth-child(3):last-child) .card-grid__item:first-child .card__content {
+      padding-top: 0;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open:has(> :nth-child(3):last-child) .card-grid__item:last-child .card__content {
+      padding-bottom: 0;
+    }
+  }
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .card-grid .card-grid__list--3-columns.card-grid__list--trio-text {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .card-grid .card-grid__list--trio-text .card-grid__item:last-child {
+      grid-column: 1 / -1;
+    }
+  }
   @media (max-width: 767px) {
     .card-grid:not(.has-surface-navy) .card-grid__list--open {
       gap: 0;

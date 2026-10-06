@@ -1,0 +1,191 @@
+---
+// Services › Monitoring (6 Oct 2026): the second service single, on the Subsea template. Content: client PDF
+// p12–14 ("05 — Services — Monitoring Services"), the dev site's Monitoring page and its monitoring projects;
+// name, capabilities, industries, lifecycle row and projects all come from src/data. Built for an operator
+// weighing long-term reservoir or storage-site monitoring: what we do (how we deliver, who for) · when in the
+// asset's life · the nine capabilities, geophysical then environmental (PDF p12 groups) · proof · FAQ · contact.
+// PDF p31: no third-party brand names in our own copy; video / spec-sheet links only when a real file exists.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import SplitMedia from '../../../blocks/SplitMedia.astro';
+import CardGrid from '../../../blocks/CardGrid.astro';
+import Lifecycle from '../../../blocks/Lifecycle.astro';
+import FeedGrid from '../../../blocks/FeedGrid.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { worldPath } from '../../../data/world';
+import { projectsFor } from '../../../data/projects';
+import { cardPresets } from '../../../data/card-presets';
+import { navSections } from '../../../data/navigation';
+import { serviceLines, lifecyclePhases, lifecycleRows, lifecycleTasks } from '../../../data/services';
+import type { CardField } from '../../../lib/types';
+
+const base = import.meta.env.BASE_URL;
+const line = serviceLines.find((l) => l.id === 'monitoring')!;
+const services = navSections.find((s) => s.id === 'services')!;
+
+const industryCards: CardField[] = (line.industries ?? []).map((ind) => ({
+  media: 'icon',
+  title: ind.label,
+  pictogram: ind.pictogram,
+}));
+const capabilityCards = (group: 'geophysical' | 'environmental'): CardField[] =>
+  (line.capabilities ?? [])
+    .filter((cap) => cap.group === group)
+    .map((cap) => ({
+      media: 'none',
+      title: cap.title,
+      description: cap.summary,
+      scope: cap.scope,
+      action: cap.link && { ...cap.link, action: 'page', context: cap.title },
+    }));
+
+const projectItems: CardField[] = projectsFor(line.id, 4).map((p) =>
+  cardPresets.project({
+    media: 'image-top',
+    surface: 'white',
+    image: p.image,
+    eyebrow: `${p.work} · ${p.year}`,
+    title: p.title,
+    description: undefined,
+    meta: [{ icon: 'map-pin', text: p.field }],
+    action: { label: 'Read project', url: p.url, context: p.title },
+  }),
+);
+// The PDF's three FAQs (p13), FAQ post type, topic Monitoring
+const faqItems = [
+  {
+    slug: 'monitoring-technology-operated',
+    question: 'What monitoring technology does Reach Subsea operate?',
+    answer:
+      'Our own proprietary systems: gWatch for 4D gravity monitoring, DepthWatch for seafloor subsidence, Wellwatch for injection integrity and Drillwatch for well drilling control, alongside environmental monitoring covering seismic, CO2 storage and geothermal sites.',
+    open: true,
+  },
+  {
+    slug: 'gwatch-depthwatch-wellwatch-drillwatch',
+    question: 'What is the difference between gWatch, DepthWatch, Wellwatch and Drillwatch?',
+    answer:
+      'gWatch measures 4D gravity change to track reservoir behaviour; DepthWatch tracks seafloor subsidence; Wellwatch monitors well injection integrity; Drillwatch monitors well drilling control. All four are developed and operated in-house.',
+  },
+  {
+    slug: 'environmental-monitoring',
+    question: 'Can your monitoring systems track the surrounding environment as well as reservoirs and wells?',
+    answer:
+      'Yes. Alongside the reservoir and well systems, we operate environmental monitoring covering earthquake and seismic activity, CO2 storage sites and geothermal operations.',
+  },
+];
+const subnavItems = [
+  { label: 'Overview', href: services.href },
+  ...services.links.map((l) => ({ label: l.label, href: l.href })),
+];
+---
+
+<BaseLayout title={`${line.title} · Reach Subsea`} motion>
+  <Header current="services" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Services', href: services.href }, { label: line.short }]}
+      title="Monitoring for reservoirs, wells and the environment"
+      lead="Our own gWatch, DepthWatch, Wellwatch and Drillwatch systems give operators continuous, high-precision insight."
+      image={{ src: `${base}images/hero-monitoring.jpg`, alt: '', focalPoint: { x: 1, y: 0.55 } }}
+      actions={[
+        { label: 'Discuss your project', url: '#contact', action: 'anchor' },
+        { label: 'See monitoring in 3D', url: worldPath, action: 'external', type: 'link' },
+      ]}
+    />
+
+    <SectionSubnav source="section-pages" label="Services" items={subnavItems} current={line.href} />
+
+    {/* How we deliver (PDF p12): the client's wording, with the R&D pointer kept */}
+    <SplitMedia
+      anchor="how-we-deliver"
+      background="white"
+      pictogram={line.pictogram}
+      title="Continuous, repeatable measurements"
+      body={`<p>We develop and operate our own monitoring systems (gWatch, DepthWatch, Wellwatch and Drillwatch, plus environmental monitoring), so clients get continuous, repeatable measurements rather than one-off snapshots. They are also the foundation of our research: see <a href="/services/technology-innovation/">Technology &amp; Innovation</a> for the R&amp;D behind them, including ASUMO and DIGIMON.</p>`}
+      actions={[{ label: 'Monitoring equipment', url: '/assets/survey-monitoring-equipment/', action: 'page' }]}
+      image={{ src: `${base}images/rov-zeerov-gwatch.jpg`, alt: 'An ROV carrying a gWatch seabed monitoring unit just above the sea surface', focalPoint: { x: 0.5, y: 0.5 } }}
+    />
+
+    <CardGrid anchor="industries" layout="strip" eyebrow="Industries we serve" background="white" spacing="sm" cards={industryCards} />
+
+    {/* The Monitoring row of the overview's lifecycle, zoomed in. Placeholder tasks until Reach confirms */}
+    <Lifecycle
+      anchor="lifecycle"
+      background="navy"
+      layout="focus"
+      focus={line.id}
+      tasks={lifecycleTasks[line.id]}
+      sectionHeader={{ title: 'From baseline to storage' }}
+      phases={lifecyclePhases}
+      rows={lifecycleRows}
+      services={serviceLines}
+    />
+
+    <CardGrid
+      anchor="what-we-do"
+      background="white"
+      sectionHeader={{ eyebrow: 'Capabilities', title: 'Geophysical monitoring', intro: 'Our proprietary systems for reservoirs, wells and the seafloor.' }}
+      layout="3-columns"
+      media="none"
+      surface="tint"
+      cards={capabilityCards('geophysical')}
+    />
+
+    <CardGrid
+      anchor="environmental"
+      background="white"
+      spacing="sm"
+      sectionHeader={{ title: 'Environmental monitoring', intro: 'Covering the natural environment around energy operations.' }}
+      layout="3-columns"
+      media="none"
+      surface="tint"
+      cards={capabilityCards('environmental')}
+    />
+
+    <FeedGrid
+      anchor="projects"
+      source="projects"
+      scope={{ term: line.id }}
+      columns={4}
+      background="tint"
+      sectionHeader={{
+        title: 'Monitoring in the field',
+        action: { label: 'All projects', url: '/projects/' },
+      }}
+      items={projectItems}
+      showLoadMore={false}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'About our reservoir, well and environmental monitoring technology.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="monitoring"
+      background="white"
+      items={faqItems}
+    />
+
+    {/* No named Monitoring contact on the dev site or in the PDF (department email only, PDF p31) */}
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title="Planning monitoring work?"
+      text="Tell us about the field, reservoir or storage site, and we will propose the monitoring system and campaign."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact={Boolean(line.contact)}
+      contact={line.contact && { label: line.title, ...line.contact }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

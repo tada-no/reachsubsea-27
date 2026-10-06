@@ -1,0 +1,47 @@
+---
+import Profiles from '../blocks/Profiles.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+
+// Placeholder people (no real names in demos); portraits omitted to show the empty state
+const people = [
+  {
+    name: 'Kari Nordmann',
+    role: 'Chairperson of the Board',
+    roleTone: 'accent' as const,
+    portrait: { alt: '' },
+    meta: 'Born 1968 · On the board since 2019',
+    bio: 'Holds a Master of Management degree. More than 25 years of capital markets and transaction experience, and an independent advisor to companies in the energy sector.',
+  },
+  {
+    name: 'Ola Nordmann',
+    role: 'Board member',
+    portrait: { alt: '' },
+    meta: 'Born 1975 · On the board since 2022',
+    bio: 'Holds an MSc in Naval Architecture and Marine Technology. Offshore operational experience and broad experience across equity capital, bond debt and bank financing markets.',
+  },
+];
+const team = ['Chief Executive Officer', 'Chief Commercial Officer', 'Chief Financial Officer', 'Chief Operating Officer', 'Chief Technology Officer'].map((role, i) => ({
+  name: i % 2 ? 'Ola Nordmann' : 'Kari Nordmann',
+  role,
+  portrait: { alt: '' },
+  contacts: [
+    { icon: 'phone', text: '+47\u00a0400\u00a000\u00a0000', href: 'tel:+4740000000' },
+    { icon: 'mail', text: 'name@reachsubsea.com', href: 'mailto:name@reachsubsea.com' },
+  ],
+}));
+const sectionHeader = {
+  eyebrow: 'Corporate governance',
+  title: 'Board of Directors',
+  intro: 'Listed on the Oslo Stock Exchange (Euronext), following the Norwegian recommendation for ownership and company management.',
+  action: { label: 'Governance & meetings', url: '#' },
+};
+---
+
+<VariantLabel name="Grid · White (management, as on Leadership & Board)" props='layout="grid" sectionHeader people' />
+<Profiles layout="grid" sectionHeader={{ title: 'Meet our management team' }} people={team} />
+
+<VariantLabel name="Rows · Tint (board, as on Leadership & Board)" props='background="tint" sectionHeader people' />
+<Profiles background="tint" sectionHeader={sectionHeader} people={people} />
+
+<VariantLabel name="Rows · White, no action" props='sectionHeader people' />
+<Profiles sectionHeader={{ title: 'Board of Directors' }} people={people} />

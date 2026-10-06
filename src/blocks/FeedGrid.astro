@@ -245,6 +245,20 @@ const instanceId = makeId('feed-grid');
     }
   }
 
+  /* Cards with spec rows (Assets overview vessels, 5 Oct 2026): three across below 1320 squashed the values
+     to three lines and stacked the kicker and badge, so they go 2 × n from 1319 down, like the 4-column feed */
+  @media (max-width: 1319px) {
+    .feed-grid__list:has(.card__specs) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  /* ...and one column below 900: two across at 768–899 left ~350px cards, the same squash again */
+  @media (max-width: 899px) {
+    .feed-grid__list:has(.card__specs) {
+      grid-template-columns: 1fr;
+    }
+  }
+
   /* Empty state */
   .feed-grid__empty {
     display: flex;

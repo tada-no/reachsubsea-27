@@ -1,0 +1,296 @@
+---
+// Profiles · reach/profiles (docs/05 §2.18, added 6 Oct 2026, Leadership & Board, Q103–Q107; outside the 14-block budget).
+// People from the People post type (`source` people, `group` management | board, `order`); a manual repeater with
+// the same fields is the fallback. Two layouts:
+//
+// Grid (management, Q104, after the Q2 2026 report p7): square portrait tiles (radius/md, no card box) with the
+// name, the role in text/accent and the contact meta (phone, email) under each. Five across from 1320 (a tile is
+// ~220 there, so the longest email still fits one line), three across at 768–1319 (3 + 2), and below 768 a
+// compact row: a square portrait (112, 96 on phones) beside the text.
+//
+// Rows (board): editorial rows with the full bio open: a square portrait beside name + role badge, one meta line
+// and the bio. Everything is visible and indexable (investors read the board's bios; no expand). The section
+// header runs full width above the rows (Q106; until then it sat in cols 1–4 beside them, which felt tight).
+// Portrait 160, 200 from 1200 (bio measure 44rem), and from 1320 the width of one Grid tile (Q107). Below 768: a
+// 112 portrait (96 on phones) beside the name and badge; the meta line and the bio run full width under both, so
+// the meta stays on one line. Rows are separated by space, not hairlines (Q91): 96 from 1200, 64 below, 48 on
+// phones (Q111). The chair's badge is Accent, every other role Neutral: one standout per list.
+//
+// No people → render nothing (docs/05 §0).
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Badge from '../components/Badge.astro';
+import Icon from '../components/Icon.astro';
+import MetaItem from '../components/MetaItem.astro';
+import { makeId } from '../lib/ids';
+import type { BadgeTone, BlockFields, ImageField, MetaField, SectionHeaderField } from '../lib/types';
+
+export interface ProfileField {
+  name: string;
+  /** Rows: a badge beside the name. Grid: a line in text/accent under it. */
+  role: string;
+  roleTone?: BadgeTone;
+  /** Square (1:1) in both layouts. Decorative (alt ""): the name sits beside it. */
+  portrait?: ImageField;
+  /** Rows: one short line, "Born 1969 · On the board since 2020". */
+  meta?: string;
+  bio?: string;
+  /** Grid: phone and email (tel:, mailto:). */
+  contacts?: MetaField[];
+}
+
+interface Props extends BlockFields {
+  layout?: 'grid' | 'rows';
+  sectionHeader: SectionHeaderField;
+  people?: ProfileField[];
+}
+
+const { layout = 'rows', sectionHeader, people = [], background, spacing, anchor } = Astro.props;
+const titleId = makeId('profiles', sectionHeader.title);
+const position = (image?: ImageField) =>
+  image?.focalPoint ? `object-position: ${image.focalPoint.x * 100}% ${image.focalPoint.y * 100}%` : undefined;
+---
+
+{
+  people.length > 0 && layout === 'grid' && (
+    <BlockSection slug="profiles" root="profiles" class="profiles--grid" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId}>
+      <div class="block__body">
+        <SectionHeader eyebrow={sectionHeader.eyebrow} title={sectionHeader.title} intro={sectionHeader.intro} action={sectionHeader.action} id={titleId} />
+        <ul class="profiles__grid">
+          {people.map((person) => (
+            <li class="profile-tile">
+              <div class="profile__portrait profile-tile__portrait">
+                {person.portrait?.src ? (
+                  <img src={person.portrait.src} alt="" loading="lazy" decoding="async" style={position(person.portrait)} />
+                ) : (
+                  <Icon name="user" size={24} />
+                )}
+              </div>
+              <div class="profile-tile__text">
+                <div class="profile-tile__heading">
+                  <h3 class="profile__name text-h5">{person.name}</h3>
+                  <p class="profile-tile__role text-small">{person.role}</p>
+                </div>
+                {person.contacts && person.contacts.length > 0 && (
+                  <ul class="profile-tile__meta">
+                    {person.contacts.map((item) => (
+                      <MetaItem icon={item.icon} text={item.text} href={item.href} as="li" />
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </BlockSection>
+  )
+}
+{
+  people.length > 0 && layout === 'rows' && (
+    <BlockSection slug="profiles" root="profiles" class="profiles--rows" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId}>
+      <div class="profiles__columns">
+        <div class="profiles__header">
+          <SectionHeader eyebrow={sectionHeader.eyebrow} title={sectionHeader.title} intro={sectionHeader.intro} action={sectionHeader.action} id={titleId} />
+        </div>
+        <ul class="profiles__list">
+          {people.map((person) => (
+            <li class="profile">
+              <div class="profile__portrait">
+                {person.portrait?.src ? (
+                  <img src={person.portrait.src} alt="" loading="lazy" decoding="async" style={position(person.portrait)} />
+                ) : (
+                  <Icon name="user" size={24} />
+                )}
+              </div>
+              <div class="profile__head">
+                <h3 class="profile__name text-h4">{person.name}</h3>
+                <Badge label={person.role} tone={person.roleTone ?? 'neutral'} />
+              </div>
+              {person.meta && <p class="profile__meta text-small">{person.meta}</p>}
+              {person.bio && <p class="profile__bio">{person.bio}</p>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  /* ── Grid: square portrait tiles, no card box (Q104) ── */
+  .profiles__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--wp--preset--spacing--48) var(--wp--custom--grid--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 1320px) {
+    .profiles__grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+  .profile-tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--24);
+    min-width: 0;
+  }
+  .profile-tile__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+    min-width: 0;
+  }
+  .profile-tile__heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+  }
+  .profile-tile__role {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .profile-tile__meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Below 768 a tile is a compact row: the square portrait beside the text, centred on it */
+  @media (max-width: 767px) {
+    .profiles__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--wp--preset--spacing--24);
+    }
+    .profile-tile {
+      flex-direction: row;
+      align-items: center;
+    }
+    .profile-tile__portrait {
+      flex: none;
+      width: 112px;
+    }
+  }
+  @media (max-width: 599px) {
+    .profile-tile {
+      gap: var(--wp--preset--spacing--16);
+    }
+    .profile-tile__portrait {
+      width: 96px;
+    }
+  }
+
+  /* ── Rows ── */
+  .profiles__columns {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
+  }
+  .profiles__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--64);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Row: portrait in its own column; name + badge, the meta line and the bio stack in the text column */
+  .profile {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    grid-template-areas:
+      'portrait head'
+      'portrait meta'
+      'portrait bio';
+    grid-template-rows: auto auto 1fr;
+    column-gap: var(--wp--custom--grid--gutter);
+  }
+  .profile__portrait {
+    grid-area: portrait;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--custom--color--bg--disabled);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .profile__portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .profile__head {
+    grid-area: head;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--12);
+  }
+  .profile__meta {
+    grid-area: meta;
+    margin-top: var(--wp--preset--spacing--4);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .profile__bio {
+    grid-area: bio;
+    margin-top: var(--wp--preset--spacing--12);
+    max-width: 40rem;
+    color: var(--wp--custom--color--text--secondary);
+  }
+
+  /* From 1200 the portrait grows to 200 and the bio takes a longer measure; from 1320 the portrait is exactly
+     one management tile (a fifth of the container less four gutters), so both people sections share one portrait
+     size (Q107). The section header runs full width above the rows (Q106). */
+  @media (min-width: 1200px) {
+    /* More air between directors once the portraits are large (Ross, 6 Oct 2026, Q111) */
+    .profiles__list {
+      gap: var(--wp--preset--spacing--96);
+    }
+    .profile {
+      grid-template-columns: 200px minmax(0, 1fr);
+    }
+    .profile__bio {
+      max-width: 44rem;
+    }
+  }
+  @media (min-width: 1320px) {
+    .profile {
+      grid-template-columns: calc((100% - 4 * var(--wp--custom--grid--gutter)) / 5) minmax(0, 1fr);
+    }
+  }
+
+  /* Below 768: a small portrait beside the name and badge; the meta line and bio run full width under both, so
+     the meta stays on one line and the bio keeps its measure (at 600 beside a 160 portrait it ran to ten lines).
+     Portraits 112, 96 on phones, as the grid's rows. */
+  @media (max-width: 767px) {
+    .profiles__list {
+      gap: var(--wp--preset--spacing--48);
+    }
+    .profile {
+      grid-template-columns: 112px minmax(0, 1fr);
+      grid-template-areas:
+        'portrait head'
+        'meta meta'
+        'bio bio';
+      grid-template-rows: auto auto auto;
+      align-items: center;
+    }
+    .profile__meta {
+      margin-top: var(--wp--preset--spacing--16);
+    }
+    .profile__bio {
+      margin-top: var(--wp--preset--spacing--8);
+    }
+  }
+  @media (max-width: 599px) {
+    .profile {
+      grid-template-columns: 96px minmax(0, 1fr);
+    }
+  }
+</style>

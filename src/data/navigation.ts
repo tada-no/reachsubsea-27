@@ -10,6 +10,9 @@ export interface MenuLinkItem {
   href: string;
   external?: boolean;
   children?: MenuLinkItem[];
+  /** A hairline above this row in the Mega menu, starting a new group (5 Oct 2026, Q79: Technology &
+   * Innovation after the three service lines). */
+  divider?: boolean;
 }
 
 /** A `Link`-style row (Strip, Search popular links, utility links). */
@@ -58,16 +61,15 @@ export const navSections: NavSection[] = [
     href: '/services/',
     description: 'Subsea, survey and monitoring services delivered from our own vessels and remote technology.',
     overview: { label: 'All services', url: '/services/' },
+    // 5 Oct 2026 (Q79): three service lines; Technology & Innovation stays in Services as the technology the
+    // three draw on, set apart by a hairline, with Research & Publications as a plain row under it. Explore 3D
+    // World left the list and the section pills: the panel's foot strip already carries it.
     links: [
       { label: 'Subsea', href: '/services/subsea/' },
       { label: 'Survey', href: '/services/survey/' },
       { label: 'Monitoring', href: '/services/monitoring/' },
-      {
-        label: 'Technology & Innovation',
-        href: '/services/technology-innovation/',
-        children: [{ label: 'Research & Publications', href: '/services/technology-innovation/research-publications/' }],
-      },
-      { label: 'Explore 3D World', href: worldPagePath },
+      { label: 'Technology & Innovation', href: '/services/technology-innovation/', divider: true },
+      { label: 'Research & Publications', href: '/services/technology-innovation/research-publications/' },
     ],
     feature: {
       media: 'image-bg',
@@ -83,15 +85,17 @@ export const navSections: NavSection[] = [
     href: '/assets/',
     description: 'Our fleet of vessels, uncrewed surface vessels, ROVs and survey equipment.',
     overview: { label: 'Fleet overview', url: '/assets/' },
+    // 4 Oct 2026 (Q78): vessels, ROVs and equipment have no page of their own. The overview is the fleet, so
+    // Vessels, ROVs and Equipment are anchors into it; Reach Remote (with Reach Remote 3 & 4) is the one child page.
     links: [
-      { label: 'Vessels', href: '/assets/vessels/' },
+      { label: 'Vessels', href: '/assets/#vessels' },
       {
         label: 'Reach Remote',
         href: '/assets/reach-remote/',
         children: [{ label: 'Reach Remote 3 & 4', href: '/assets/reach-remote/3-4/' }],
       },
-      { label: 'ROVs', href: '/assets/rovs/' },
-      { label: 'Survey & monitoring equipment', href: '/assets/survey-monitoring-equipment/' },
+      { label: 'ROVs', href: '/assets/#rovs' },
+      { label: 'Equipment', href: '/assets/#equipment' },
     ],
     feature: {
       media: 'image-bg',

@@ -1,0 +1,11 @@
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g class="pg-book">
+<path d="M48.0009 31.5043C50.997 25.809 57.2197 24.2397 63.6904 24.2397H73.1787V64.0795H63.6904C57.2197 64.0795 50.997 65.6494 48.0009 71.3447" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M37.1494 24.5859L28.5595 24.2397H22.8232V64.0795H32.3095C38.7802 64.0795 45.0048 65.6494 48.0009 71.3447" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M48.0009 31.5044C45.7666 27.2564 41.7353 25.3042 37.1494 24.5859" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="pg-page pg-lead" d="M48.0009 31.5043C50.997 25.809 57.2197 24.2397 63.6904 24.2397H73.1787V64.0795H63.6904C57.2197 64.0795 50.997 65.6494 48.0009 71.3447" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M48.0009 31.9712V69.8174" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="pg-mark" d="M36.7432 35.2085L32.8565 32.2632L28.9932 35.2085V22.939H36.7432V35.2085Z" stroke="currentColor" stroke-width="2.5" stroke-miterlimit="10"/>
+<path d="M79.3408 30.0186V70.0674H56.3486C56.3486 70.0674 55.0732 73.061 53.4912 73.061H42.5107C40.9267 73.061 39.6533 70.0674 39.6533 70.0674H16.6591V30.0186" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>

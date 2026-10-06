@@ -35,7 +35,7 @@ const { section, open = false } = Astro.props;
       <ul class="mega-menu__links mega-menu__col" style="--col-i: 1">
         {
           section.links.map((item) => (
-            <li>
+            <li class:list={[item.divider && 'mega-menu__divider']}>
               <MenuLink label={item.label} href={item.href} level="l1" external={item.external} />
               {item.children && item.children.length > 0 && (
                 <ul>
@@ -99,6 +99,23 @@ const { section, open = false } = Astro.props;
   .mega-menu__links {
     grid-column: 4 / span 5;
     align-self: start;
+    /* Shrink-wrapped to the widest row, so the group hairline below spans the longest label (5 Oct 2026) */
+    width: fit-content;
+    max-width: 100%;
+  }
+  /* A hairline as wide as the longest label before a row that starts a new group (5 Oct 2026, Q79: Technology &
+     Innovation and Research & Publications after the three service lines), with space/8 either side of it */
+  .mega-menu__divider {
+    margin-top: var(--wp--preset--spacing--8);
+    padding-top: var(--wp--preset--spacing--8);
+  }
+  .mega-menu__divider::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 1px;
+    margin-bottom: var(--wp--preset--spacing--8);
+    background-color: var(--wp--custom--color--border--subtle);
   }
   /* L2 children share the L1 left edge and sit tight under their parent (17 Sep 2026) */
   .mega-menu__links > li > ul {

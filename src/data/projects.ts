@@ -12,7 +12,8 @@ export interface ProjectRef {
   service: ServiceId;
   /** Short work type for the card kicker, e.g. "Construction support". */
   work: string;
-  year: number;
+  /** Left out where the source gives no date (never guessed). */
+  year?: number;
   /** Field or area, one short line. */
   field: string;
   vessels?: string[];
@@ -78,10 +79,84 @@ export const projects: ProjectRef[] = [
     image: { src: `${base}images/project-suction-anchors.jpg`, alt: 'Two yellow suction anchors on deck, with a crew member in red overalls', focalPoint: { x: 0.5, y: 0.6 } },
     url: '/projects/suction-anchor-installation/',
   },
+  // Monitoring (6 Oct 2026): the dev site's real monitoring projects (PDF p13 names three; ASUMO has no
+  // featured image on dev, so it borrows the gWatch ROV photo until Reach supplies one).
+  {
+    slug: 'gwatch-equinor-gas-fields',
+    title: 'gWatch surveys at Equinor gas fields',
+    service: 'monitoring',
+    work: 'gWatch',
+    year: 2023,
+    field: 'Equinor gas fields, North Sea',
+    image: { src: `${base}images/project-gwatch-equinor.jpg`, alt: 'Two engineers at the control room desk preparing for a gWatch campaign', focalPoint: { x: 0.5, y: 0.45 } },
+    url: '/projects/reservoir-monitoring-surveys-using-gwatch-at-several-equinor-operated-gas-fields/',
+  },
+  {
+    slug: 'depthwatch-shell-4d-seismic',
+    title: 'DepthWatch for 4D seismic, with Shell',
+    service: 'monitoring',
+    work: 'DepthWatch',
+    year: 2023,
+    field: 'Shell',
+    image: { src: `${base}images/project-depthwatch-shell.jpg`, alt: 'Engineers assembling a DepthWatch seabed unit in the workshop', focalPoint: { x: 0.5, y: 0.5 } },
+    url: '/projects/unlocking-enhanced-value-in-4d-seismic-with-reach-subseas-depthwatch-technology-insights-from-reach-subsea-and-shell/',
+  },
+  {
+    slug: 'ormen-lange-gravimetry',
+    title: 'Gravimetry milestone at Ormen Lange',
+    service: 'monitoring',
+    work: 'gWatch',
+    year: 2023,
+    field: 'Ormen Lange, Shell Norge',
+    image: { src: `${base}images/project-ormen-lange.jpg`, alt: 'A gravimetry sensor on the seabed, lit by the ROV’s lamps', focalPoint: { x: 0.5, y: 0.5 } },
+    url: '/projects/reach-subsea-sets-a-new-milestone-for-accuracy-and-efficiency-of-gravimetry-surveys-with-shell-norge-at-ormen-lange-field/',
+  },
+  {
+    slug: 'asumo',
+    title: 'ASUMO marine-earth monitoring',
+    service: 'monitoring',
+    work: 'Research',
+    year: 2023,
+    field: 'With JAMSTEC and the University of Bergen',
+    image: { src: `${base}images/rov-zeerov-gwatch.jpg`, alt: 'A gWatch seabed monitoring unit carried by an ROV', focalPoint: { x: 0.5, y: 0.5 } },
+    url: '/projects/asumo/',
+  },
+  // Survey (5 Oct 2026): the three real projects the client PDF p10 names, read from the dev site. The
+  // cable-route page gives no date, so none is shown. Pipeline-inspection photo is the charter vessel.
+  {
+    slug: 'site-survey-campaign',
+    title: 'Site survey campaign in the Norwegian sector',
+    service: 'survey',
+    work: 'Site survey',
+    year: 2019,
+    field: 'Norwegian sector, 100–390 m',
+    image: { src: `${base}images/project-site-survey-norway.jpg`, alt: 'A white and black survey vessel under way on grey water, seen from above', focalPoint: { x: 0.5, y: 0.5 } },
+    url: '/projects/site-survey-campaign/',
+  },
+  {
+    slug: 'pipeline-inspection-campaign',
+    title: 'Annual pipeline inspection at Ormen Lange',
+    service: 'survey',
+    work: 'Pipeline inspection',
+    year: 2020,
+    field: 'Ormen Lange, Norske Shell',
+    vessels: ['Siem Pride'],
+    image: { src: `${base}images/project-pipeline-ormen-lange.jpg`, alt: 'The red and white vessel Siem Pride at anchor under a grey sky', focalPoint: { x: 0.5, y: 0.5 } },
+    url: '/projects/pipeline-inspection-campaign/',
+  },
+  {
+    slug: 'geophysical-and-uxo-power-cable-route-survey',
+    title: 'Cable-route survey to Seagreen Offshore Windfarm',
+    service: 'survey',
+    work: 'Cable route',
+    field: 'Carnoustie to Seagreen, UK',
+    image: { src: `${base}images/project-cable-route-seagreen.jpg`, alt: 'A sidescan sonar mosaic of the seabed, rippled sand with a cable corridor running across it', focalPoint: { x: 0.4, y: 0.5 } },
+    url: '/projects/geophysical-and-uxo-power-cable-route-survey/',
+  },
 ];
 
 /** A service line's projects, newest first. */
 export function projectsFor(service: ServiceId, limit?: number): ProjectRef[] {
-  const list = projects.filter((p) => p.service === service).sort((a, b) => b.year - a.year);
+  const list = projects.filter((p) => p.service === service).sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
   return limit ? list.slice(0, limit) : list;
 }

@@ -207,9 +207,10 @@
       "flattened": true
     },
     "book": {
-      "id": "45:151",
-      "original": "book",
-      "flattened": true
+      "id": "412:7967",
+      "original": "Pictogram/book",
+      "flattened": false,
+      "note": "stroked original from Ross (6 Oct 2026, Research partnerships); replaces the earlier flattened library glyph 45:151, which had no SVG in src/assets/pictograms"
     },
     "head-time": {
       "id": "47:84",
@@ -363,8 +364,9 @@
     },
     "reach-remote": {
       "id": "52:95",
-      "original": "Reach Remote 1",
-      "flattened": false
+      "original": "Pictogram/reach-remote",
+      "flattened": false,
+      "note": "stroked original from Ross (6 Oct 2026), Tech & Innovation Reach Remote card; parent Tile/reach-remote"
     },
     "subsea-infrastructure": {
       "id": "52:135",

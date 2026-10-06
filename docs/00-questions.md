@@ -35,6 +35,19 @@ Context: after Q108, Ross: the footer link should move, and the mobile menu need
 
 **Answer:** as ticked.
 
+### Q111. Board rows spaced out (6 Oct 2026)
+Context: Ross: vertically space the board out.
+- [x] Space between directors: `space/96` from 1200 (was 48), `space/64` at 768–1199 (was 48), `space/48` on phones (was 40)
+
+**Answer:** as ticked.
+
+### Q110. Board portraits from Reach's group photo (6 Oct 2026)
+Context: Ross supplied the board's group photo (`assets/10543 Reach subsea-001.jpg`, 5138px square, colour) to crop the five portraits from. Standing, left to right: Rachid Bendriss, Hilde Drønen, Arvid Pettersen; seated: Espen Gjerde (left) and Martha Kold Monclair (right, identified by elimination: her live-site photo shows different hair, so worth confirming).
+- [x] Each cropped square from the group photo to the management framing (head about 46% of the tile, a little headroom), 800 × 800, in colour, with the standard photo tint
+- [x] Replaces the live site's black-and-white shots; management and board now read as one colour set
+
+**Answer:** as ticked. The two seated crops have colleagues behind them (a group photo), kept as is.
+
 ### Q108. Explore 3D World moves to Home › Explore 3D World (6 Oct 2026)
 Context: Ross asked whether the page should sit at Home › Explore 3D World. Claude: yes. It spans the three service lines, the fleet and the Careers route, and isn't a service; under Services it showed a pill row with nothing current. Against: the client screens PDF files it as "11 — Services — Explore 3D World", so tell the client.
 - [x] Landing page `/3d-world/` (was `/services/3d-world/`), breadcrumb Home › Explore 3D World, no Services subnav
@@ -44,6 +57,50 @@ Context: Ross asked whether the page should sit at Home › Explore 3D World. Cl
 - [x] The live site's `/3d-world/` (the Unity world) becomes the landing page, so old links still land one click from the world: no redirect (docs/09 §7)
 
 **Answer:** as ticked. Departs from the client PDF's Services placement and the discovery brief's sitemap (docs/01), to confirm with the client.
+
+### Q107. Board portraits the same size as management (6 Oct 2026)
+Context: Ross: the board images can be the same dimensions as the management ones.
+- [x] Board portraits square (were 4:5), re-cropped from the live-site sources to the management framing (head about 46% of the tile, a little headroom), black and white as before
+- [x] From 1320 a board portrait is exactly one management tile wide (a fifth of the container less four gutters: 230 at 1440) and shares its left edge; 200 at 1200–1319, 160 at 768–1199 (where management tiles are three across and larger); 112 / 96 on phones, the same as management's rows
+
+**Answer:** as ticked.
+
+### Q106. Board of Directors: header above the rows (6 Oct 2026)
+Context: Ross: the Profiles Rows block felt tight with the intro in the first column (cols 1–4, sticky, beside the rows from 1200).
+- [x] The section header runs full width above the rows, like the management grid (eyebrow, H2, intro; "Governance & meetings" at the far end from 900), no sticky column
+- [x] The rows take the full container: portrait 200 from 1200 (160 below), the bio's measure opened from 40 to 44rem (~6 lines at 1440)
+
+**Answer:** as ticked. Below 768 unchanged.
+
+### Q105. Leadership: management portraits from the colour originals, standard tint (6 Oct 2026)
+Context: Ross: use the originals in `assets/` for the management images (Jostein Alendal 2024, Audun Brandtzæg and Inge Grutle 2024, Arne Joa and Bård Thuen Høgheim Oct 2025: the shoots behind the Q2 report's page 7, up to 6300px). He first asked for them untinted, then for the standard site filter.
+- [x] Re-cropped square from the originals to the report's framing (head about 46% of the tile, a little headroom, shoulders in), 800 × 800, in colour
+- [x] The standard site photo tint (navy screen blend, base.css), like every other photo
+- [ ] No tint (tried, reverted the same day)
+
+**Answer:** as ticked. Replaces the black-and-white web copies and the old 479px Høgheim shot. No exception to the site-wide photo tint.
+
+### Q104. Leadership: management portraits like the Q2 report (6 Oct 2026)
+Context: Ross: the management cards' portraits felt squeezed; the Q2 2026 report (p7) crops better. Claude agreed: the 3:2 card crop cut the tops of heads and pressed faces between the card edge and the text, and the bordered card read as a product card. The report uses square tiles with headroom and shoulders, no box, the same framing for all five. It also carries bios and "years in subsea".
+- [x] Report style, five across: square rounded portrait tiles (`radius/md`), no card box; name (`Heading/H5`), role in `text/accent`, phone and email meta. Five across from 1320, 3 + 2 at 768–1319, compact rows (square 112, 96 on phones) below 768
+- [ ] Report crop, keep the 3 + 2 cards · [ ] Report style, 3 + 2
+- [ ] Use the report's bios and "years in subsea"
+- [x] Names, roles and contacts only
+
+**Answer:** as ticked. Built as a second Profiles layout, **Grid** (docs/05 §2.18), so management and board come from one block fed by the People post type; the Card grid `contacts` shape from Q103 is removed. Portraits re-cropped square from the 800px sources to the report's framing (its own images are ~300px with the tint baked in); management order now follows the report (CEO, CCO, CFO, COO, CTO). Worth asking Reach for: the report's colour originals and its newer photo of Bård Thuen Høgheim (ours is the older 479px casual shot); the report calls Inge Grutle "Chief Operations Officer", the dev site "Chief Operating Officer".
+
+### Q103. Company › Leadership & Board (6 Oct 2026)
+Context: Client PDF p32–33 (Design reference p15): hero, five executives with initials avatars and direct phone and email, five board members with long bios, three FAQs. All ten people have matching black-and-white portraits on the live and dev sites; the dev board page is out of date (seven names), the live /investors/ page and the PDF agree on the current five.
+- [x] Real black-and-white portraits, not initials (live/dev photos, cropped 4:5 into `public/images/people/`, the site's navy photo tint on top)
+- [ ] Initials as in the PDF
+- [x] Management: five equal portrait cards, 3 + 2 (Card grid 3 columns, image-top: name · role · phone · email)
+- [ ] CEO lead + four · [ ] Five across
+- [x] Board: editorial rows with the bios open (new **Profiles** block, docs/05 §2.18: portrait · name + role badge · "Born 1969 · On the board since 2020" · bio)
+- [ ] Portrait grid with bios on expand · [ ] Cards as in the PDF
+- [x] Show the executives' direct phone and email, flagged to confirm with Reach
+- [ ] Leave them off
+
+**Answer:** as ticked. Claude's calls on the way: one `people.ts` (People post type) feeds this page and About's management table; FAQ answers are built from it (the PDF's "See this page for the full current Board…" pointed at itself); the hero lead is cut to two lines and the Euronext listing stays as the board intro; contact cards keep three columns down to 900 and become compact rows below 768 (Card grid `contacts`, set automatically when image-top cards carry only name, role and meta); the board header sits beside the rows from 1200 and stacks below; hero `hero-leadership.jpg` is *Northern Maria* with the sea extended left so the vessel sits right of the title. To confirm with Reach: every phone and email, Hilde Drønen's year on the board, "MKOLD AS" (live) vs "MMOLD AS" (PDF).
 
 ### Q102. How it works: the steps become a 3-column card row with explaining screenshots (6 Oct 2026)
 Context: Ross: choosing a step wasn't intuitive. The steps should be their own 3-column block, with images that explain each one; Take the controls should at least show the ROV and the controls (Ross supplied a Pilot mode screenshot).
@@ -213,6 +270,19 @@ Context: Ross's first review of the page. Hero copy and image changed on his cal
 
 **Answer:** as ticked. Figma (6 Oct 2026, on page approval): `radius/xs` variable (VariableID:417:22) and `Block/Year bars` (417:14015) added.
 
+### Q85. Hero copy short, icons never reused, Tech video cards (6 Oct 2026)
+Context: Ross found the service-page heroes busy. Claude agreed with all points.
+- [x] Leads cut to 2 lines (checked at 900 and 1000): Services overview, Survey, Technology, Research, Assets; the dropped copy is already in each page's first block (Tech: the products intro now carries "Technology is one of the core drivers…"). Services title "Services built for…" → "Services for the full offshore asset lifecycle"
+- [x] Tech hero image changed to Reach Remote from the bow, focal point set low so the vessel sits top right and the copy has plain water
+- [x] Icons: the six pictograms on the Tech page (four products, monitoring heritage, research partnerships) were all in use elsewhere. Each is now a `needed-…` placeholder (dashed "Icon needed" box, `Pictogram.astro`). **Ross to suggest or make:** Reach Pilot, Reach Horizon, Reach Relay (Reach Remote now uses Ross's `reach-remote`, Figma 52:95; Research partnerships uses Ross's stroked `book`, Figma 412:7967; the Monitoring card now carries the Monitoring line's own pictogram, Ross 6 Oct 2026: same meaning, so not a reuse)
+- [x] Assets ROV section (Ross, 6 Oct 2026): PDF p20's bento info partly restored: title "15 ROV systems, by class" (Key figures) with the PDF's intro (carried aboard the crewed vessels; 13 work-class and 2 Surveyor Interceptor), and each class card shows "N in service" and a "Carried on" row, counted from the vessels' ROV lists (Normand Jarstein, a project charter, left out as in the PDF; ZEEROV carried on the Reach Remote pair, no count). The Q2 report quote is not repeated and the bento boxes are not rebuilt (one uniform card row). The named vessels do not sum to 15 (the PDF's own reconciliation note), so no total is claimed
+- [x] `book` loop (Ross, 6 Oct 2026): reworked from Ross's Icons8 literature Lottie: the right page lifts about 4px as it narrows edge-on, turns over the spine onto the left and holds, the whole book dips 1px as it lands, then the page resets to the right (a duplicate page, so the turn only runs one way). Solid, transform only, 3.2s, plays on reveal and hover like the other pictograms. `reach-remote` loop (Ross: no lines appearing on the antenna): the clouds ease across the icon at a constant speed on a seamless loop (the set is drawn twice inside a fixed clip) while the sea flows as in every other icon, 3.2s, solid
+- [x] Sea is the same in every icon (Ross, 6 Oct 2026): `marine` (two waves), `seabed-repair` and `survey-rov` had a flattened static wave; each now carries the shared stroked sea (`pg-flow`, two extra periods outside a fixed clip) and the three icons now play that loop on reveal and hover
+- [x] Two dummy video cards added to Tech (the PDF's "Reach Remote — the onshore ROC in action", "Reach Pilot — computer vision in action"), no badge on the card (Ross: the word is not needed), both opening the promo film until real footage exists
+- [x] Plain-left heroes (Ross: "pad the left of the best candidates"): Survey, Services overview, Monitoring, Research and Technology use padded copies in `public/images/hero-*.jpg` (the left, and for Monitoring and Tech the sky and water around it, extended with a blurred stretch of the photo's own edge, feathered in; the originals are untouched and still used elsewhere). Focal point x = 1 keeps the subject right. In WordPress the editor would pick a photo with the subject on the right and click the focal point
+- [x] Photo-hero lead: 760 measure and balanced wrapping (Ross: unbalanced lines), all two lines
+- [x] Section subnav (Ross: a glitch clicking between pills): each pill is a full page load, which threw the page to the top and reset the row's sideways scroll. The bar now remembers whether it was docked and its sideways scroll and restores both on the next page
+
 ### Q84. Services › Technology & Innovation › Research & Publications (6 Oct 2026)
 Context: the library of Reach's published research, a secondary page under Technology & Innovation. Source: client PDF p9 and the live Selection of Publications page (reachsubsea.no/selection-of-publications/). No question put to Ross; defaults taken from the template.
 - [x] Sections: Hero Photo (ROV on the seabed) · Subnav (Research & Publications active; the PDF shows no active pill, but a lit pill tells people where they are) · Year bars (new, slim: a count per year 2013–2026, the PDF's "year-by-year counts") · Data list Publications (49 real entries, filter chips for year runs and topic, 10 shown then Load more) · Accordion (3 FAQs, drafted) · CTA panel
@@ -221,6 +291,79 @@ Context: the library of Reach's published research, a secondary page under Techn
 - [ ] Open for Reach: the topic grouping (Gravity & subsidence 25 · CO2 storage 11 · Passive seismic 13) is my draft; bylines carry only the first author's surname as on the live site; the FAQ answers and hero lead are drafted (the PDF has no copy for them); confirm 48 vs 49
 
 **Answer:** built at `/services/technology-innovation/research-publications/`; new block `src/blocks/YearBars.astro` (docs/05 §2.17).
+
+### Q83. Services › Technology & Innovation single (6 Oct 2026)
+Context: the page for the technology under the three lines (Q79), on the service-single template. Source: client PDF p15–16 (from the 2Q 2026 Report). No question put to Ross; defaults taken from the template.
+- [x] Sections: Hero Photo (Reach Remote 3 & 4 from above, dark water) · Subnav · Card grid 2 cols `pictogram-panel` (Pilot, Remote, Horizon, Relay: the page's focus) · Stats band Feature (750+ lead, 90%, 25x; two new key figures `fuel-saving`, `relay-speed`) · Split media (Reach Remote in service, links to the Assets page) · Card grid 2 cols icon "Established technology and research heritage" (Monitoring, Research) · Accordion (the PDF's 3 FAQs) · CTA panel
+- [x] Dropped: the PDF's two illustrative video cards (no real footage), the "REAL" badges (review annotation), the research-library callout (folded into the heritage card), DNV named beside AROS (PDF p31, no third-party brands)
+- [x] Pictograms from the library: Pilot survey-rov, Remote marine, Horizon technology, Relay subsea-telemetry. Reach to confirm the matches
+- [ ] Open: Pilot, Horizon, Relay and Research & Publications pages are not built (links point at the planned URLs); DigiMon and ASUMO kept as the client wrote them
+
+**Answer:** built at `/services/technology-innovation/`.
+
+### Q82. Services › Survey single (5 Oct 2026)
+Context: third service single, on the Subsea / Monitoring template. Source: client PDF p10–11 (Survey Services, Full Resolution screens), dev site survey projects. No question put to Ross; defaults taken from the template.
+- [x] Sections: Hero Photo · Subnav · Split media (the PDF's "How we deliver", two paragraphs tightened to one pair) · Industries strip (4, PDF chips) · Lifecycle Focus (navy, placeholder tasks) · Card grid 3 cols (the PDF's six capability boxes, titles verbatim) · Card bento (Northern Maria, Surveyor Interceptor, DriX Orca, Reach Remote + the PDF's 500+ / 9 stats; "2 modes" is shown by crewed vs uncrewed cards) · Feed Projects (3) · Accordion (the PDF's 3 FAQs) · CTA Panel
+- [x] The PDF's overlapping "How we deliver / Industries / photo" cards and the "Related services" row are dropped (nothing overlaps the hero; the Subnav does the related links); the video cards are dropped (no real footage, PDF p31)
+- [x] Hero: Offshore Surveyor from above (calm green water, subject right); the PDF's blue Go Electra moves into the Split media
+- [ ] Open for Ross/Reach: a named Survey contact (none on dev or PDF, so no contact card); capability summaries, scope items and lifecycle tasks are drafts; cable-route project has no date on dev (none shown); the site-survey project's dev photo shows a fishing-type vessel, and the cable-route photo is a sidescan mosaic (real, but not a vessel); Siem Pride and the other third-party vessels are named only in alt text
+
+**Answer:** built at `/services/survey/`; data in `services.ts` (survey capabilities, industries, `lifecycleTasks.survey`) and `projects.ts` (three survey projects, `year` now optional).
+
+### Q81. Services › Monitoring single (6 Oct 2026)
+Context: second service single, on the Subsea template. Source: client PDF p12–14 (Monitoring), dev site Monitoring page and its monitoring projects.
+- [x] Capabilities as two grouped sections, as the PDF: Geophysical (6) and Environmental (3), each with its own heading and intro; the overview card's six labels are unchanged
+- [x] Lifecycle block included (navy, Monitoring row, placeholder tasks for Reach to confirm)
+- [x] Proof is the projects feed only (no video block): dev site has no gWatch video URL, and PDF p31 says video/spec links render only when a real file exists, so none yet
+- [x] Hero: Northern Maria at sea (calm water, subject right), not the PDF's red vessel
+- [ ] Open for Ross/Reach: a named Monitoring contact (none on dev or in the PDF, so the CTA panel shows no contact card); real gWatch video URL; a real ASUMO image (borrows the gWatch ROV photo); industries folded 5→4 (reservoir management + well integrity & drilling) with stand-in pictograms for geothermal and seismic; the gWatch ROV photo shows a third-party brand on the unit (PDF p31 bans third-party names in copy, not photos: confirm); the geophysical capability summaries and scope lists are drafts from the PDF intro and dev projects.
+
+**Seismic risk monitoring pictogram (6 Oct 2026, same session):** the library's flattened glyphs can't be trimmed, so Ross pointed to the stroked originals in Figma (`Pictogram/subsea-telemetry` 394:7809; `seabed-scanner` is 394:7777): real 2.5 strokes, one vector per part, on the 96 grid. `src/assets/pictograms/subsea-telemetry.svg` is that file with parts tagged (`pg-arc`, `pg-cable`, `pg-sea`/`pg-wave`, `pg-dot`), and its 3.2s loop is in `Pictogram.astro` (swell, seabed sensors ping, box pings, a gap runs up the cable, antenna pings, sediment stirs). Industry tiles now use stroked Figma originals too: `carbon-storage` (394:7870) and `geothermal` (394:7959), both animated in `Pictogram.astro` on the same 3.2s cycle (CO2 letters hop, a gap runs round each arrow; swell + a gap rising up each heat arrow). The flattened `co2`/`mountain` exports are gone.
+
+**Answer:** as ticked. Built at `/services/monitoring/`; data in `services.ts` (`Capability.group`, monitoring capabilities, industries, `lifecycleTasks.monitoring`) and `projects.ts` (four monitoring projects).
+
+### Q80. Services overview cards: the sub-service lists (5 Oct 2026)
+Context: the three line cards listed four chevron links each, to the dev site's child pages (`/services/subsea/imr/` and the like). Those pages are not being built (Q63: the capability detail lives on the single, the dev child URLs redirect there), and the client PDF has no sub-service pages in its sitemap, so every link led to a 404. Ross asked where they were meant to go and whether the PDF referenced them.
+- [x] Plain list, no links or chevrons, six short labels per card cut from the PDF's capability boxes (Subsea p8, Survey p10, Monitoring p12), so the overview and the single say the same things; the card's one action does the navigating
+- [ ] Chevron links, all to the single's capability section
+- [ ] Drop the lists
+
+**Answer:** as ticked. `subServices` is gone from `services.ts`; each line carries `scope` instead. Closes the open item in Q63. **Card stroke (same day):** the White card keeps its 1px stroke only on a white ground; on tint (as on navy since 4 Oct) the ground draws the edge. Site-wide, one rule in Card. **List marker (same day):** card scope lists take a 6px accent dot instead of the 19 Sep dash (Ross: a bullet, nearer the discs in rich-text prose); applies to the Subsea capability cards too. *Figma: Card scope list marker.*
+
+### Q79. Three service lines, Technology & Innovation as the technology under them; 3D stage off Home (5 Oct 2026)
+Context: the client now counts three services, Subsea, Survey and Monitoring. Technology & Innovation stays under Services but is what the three draw on (client PDF p15), not a fourth line. The client also asked for the "See our operations in 3D" stage to come off the Home page, since the 3D World already has enough entries. Ross asked what Claude thought: agreed on both, and recommended carrying the three-line count through the site rather than changing the Home block alone.
+- [x] Full sweep: Home "Three services, one partner" (3 icon cards, 3 columns); Services overview "Our three service lines" (3 pictogram panels) with Technology & Innovation as its own Split media block after the lifecycle's foundation row; the Services mega menu keeps Technology & Innovation after a hairline, with Research & Publications as a plain row under it (Ross's review of the first cut: group labels and the Explore 3D World row and pill removed, the panel's foot strip carries the 3D World); the Services FAQ answer says three; brief sitemap noted
+- [ ] Home block only
+- [x] Remove the 3D World stage from Home; it stays on Services overview and Careers, plus the Services menu strip, the footer and the Assets hero
+- [ ] Keep the Home stage until the client confirms in writing
+
+**Answer:** as ticked. `serviceLines` keeps the Technology & Innovation entry (the Lifecycle foundation row, the Subsea single's handoffs and the menu read it); pages that list the lines filter it out. The Technology block's wording is drafted from the line's summary and the PDF p15 product names, for Reach to confirm. Figma to follow with the Assets overview pass.
+
+### Q78. Assets: no single pages for vessels or ROVs; cards like the Q2 report (4 Oct 2026, Assets overview)
+Context: the first build gave every vessel and ROV card a "View" link to a single page, with icon meta rows. Ross: none of the vessel or ROV cards will have a page of their own; the cards should be like the dev site's listing cards, the client PDF and p13 of the Q2 2026 report (`ref/REA26 2842 130 Q2 Report 2026 digital v3.pdf`, "Status of vessels and assets"), without the status row.
+- [x] Card gains a `specs` field (label · value rows, no rules, labels in one column per card). Vessels: Charter · Owner · Crane · Assets (the client PDF's own labels, p20; Ross, 4 Oct 2026: short labels so the column never wraps). ROVs: Power · Depth rating · Size · Weight · Payload ("Size" for the dev's "Dimensions"; "Depth rating" kept), plus the spec sheet link where the file exists. DriX gets its four rows too. No actions on any of them
+- [x] Vessel grid three across (the rows need the room), as in the report. **5 Oct 2026 sweep (Ross):** two across below 1320, where three squashed the values to three lines; the "In service" badge dropped from the vessel cards (Joining and Sale agreed stay), it stacked under the long kickers and the fleet register already says it
+- [x] The Q2 2026 report (p13–16) is the newest client source and wins where the sites differ: Olympic Taurus's charter (April 2024 – April 2027, 1-year option), Havila Subsea's ROVs (2 Schilling HD WROV + 1 Surveyor Interceptor), Normand Jarstein's record (IMR and Construction Vessel, May 2026 – May 2028 + 1 year, Solstad Maritime ASA, 250 ton, 2 Constructors), Viking Vigor "2026 →"
+- [x] With no single pages, the Vessels, ROVs and Equipment nav items become anchors into the overview (`/assets/#vessels`, `/assets/#rovs`, `/assets/#equipment`); Reach Remote, with Reach Remote 3 & 4 under it, is the section's one child page
+- [x] Survey & monitoring equipment is its own block, not a card in the ROV grid (Ross, 4 Oct 2026: an instrument list is not an ROV; the PDF p20 also gives it its own section). Split media, image Start (the gWatch placement photo), with the two items as pictogram tiles under the lead (new Split media `tiles` field, library pictograms survey · global-monitoring) and Survey / Monitoring services as the actions
+- [ ] Keep Vessels, ROVs and Equipment as pages of their own
+- [ ] Vessels and ROVs as anchors, Equipment as a page
+
+**Answer:** as ticked. This reverses the Q77 note "no charter periods on the overview cards": the report's cards carry them, so ours do. The `url` on each asset stays in `assets.ts` for the redirect map only (every live and dev `/assets/<slug>/` vessel and ROV single redirects to the overview's anchor).
+
+### Q77. Assets overview: fleet visual, vessel row, Viking Reach (3 Oct 2026, Assets overview)
+Context: first build of `/assets/` (Fleet overview), the Assets section landing page. Source: client PDF p19–22 ("08 — Services — Assets & Fleet"), rated "Dev" in docs/03 §5, so the dev site's `assets` post type supplies the data (survey of both sites, 3 Oct 2026: dev has 20 posts with spec tables, live 17 with almost none; neither has a type or status field). Page outline proposed by Claude: Hero Photo (PDF title and lead, stats moved below) · Subnav (Overview · Vessels · Reach Remote · ROVs · Survey & monitoring equipment) · **Fleet at a glance** · the chartered fleet as Asset cards · the uncrewed fleet as a Card bento · ROV systems on navy · Survey & monitoring equipment · projects feed · the PDF's three FAQs · CTA panel with Knut Jacob Medhaug, VP Group Assets.
+- [x] First block under the hero: a slim custom visual, one marker per unit grouped by type (filled = in service, ring = joining), big figure per group, derived from `src/data/assets.ts`
+- [ ] Fleet timeline track (vessel bars by year)
+- [ ] Plain Stats band
+- [x] Vessel row: all 11 vessels, one Asset card each (9 in service, Viking Vigor and NB76 with a "Joining" badge), four across from 1320; the Vessels child page adds filters and full specs
+- [ ] 9 in service, newbuilds as their own section (PDF)
+- [ ] A featured few plus "All vessels"
+- [x] Viking Reach: stays in the fleet with a "Sale agreed" badge (MoA 4 Aug 2026, close expected Q4 2026; neither site marks it). Flag for the client in the handoff
+- [ ] In service, no mention
+- [ ] Leave it out (fleet would drop to 10 against the key figure 11)
+
+**Answer:** as ticked. Also decided by Claude, open to change: no charter periods on the overview cards (they live on the Investors charter page); no per-class ROV unit counts (the per-vessel breakdown does not reconcile with the reported 15, and the Viking Reach sale changes it); where prose and spec table disagree on a dev page (Deep Cygnus and Olympic Triton ROVs, DriX 8 m vs 7.7 m) the spec table wins; Olympic Taurus keeps "In service" although its published charter ended April 2026 (the 2Q 2026 report lists it); spec-sheet links render only where a PDF exists.
 
 ### Q76. Favicon from the brand icon (22 Sep 2026, deploy sweep)
 Context: the site had no icon link, so browsers asked for /favicon.ico and got a 404. Ross supplied `Reach-icon-600x600.svg` (navy R, sage bars bleeding to both edges). On the full 600 canvas the R is 40% of the square and smudges at 16px; a 478px crop around the R keeps 60px of each bar and reads. Comparison sheet: full canvas and crop, bare and on a navy tile, at 16 / 32 / 64 / 180 on light and dark.

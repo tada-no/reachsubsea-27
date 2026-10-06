@@ -1,0 +1,39 @@
+<svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g class="pg-sea"><path class="pg-wave pg-lead" d="M-13.2 18C-13.2 18 -7.47 23.77 0.4 18C0.4 18 6.13 23.77 14.0 18C14.0 18 19.73 23.77 27.6 18C27.6 18 33.33 23.77 41.2 18C41.2 18 46.93 23.77 54.8 18C54.8 18 60.53 23.77 68.4 18C68.4 18 74.13 23.77 82.0 18C82.0 18 87.73 23.77 95.6 18C95.6 18 101.33 23.77 109.2 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+<path d="M14 55.0518C18.4401 54.2958 23.0146 53.735 27.5587 53.9981C36.8361 54.4541 46.0091 57.8001 55.3459 58.2208C64.7541 58.75 72.7301 56.5479 82 55.0519" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14 71.2906C18.4401 70.5346 23.0146 69.9738 27.5587 70.2369C36.8361 70.6929 46.0091 74.0389 55.3459 74.4596C64.7541 74.9888 72.7301 72.7867 82 71.2907" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="15.9201" cy="63.3893" r="1" fill="currentColor"/>
+<circle cx="45.9809" cy="68.7111" r="1" fill="currentColor"/>
+<circle cx="48.1568" cy="64.3894" r="1.25" fill="currentColor"/>
+<circle cx="58.1528" cy="66.7159" r="1" fill="currentColor"/>
+<circle cx="60.3024" cy="71.304" r="1" fill="currentColor"/>
+<circle cx="55.0491" cy="59.8434" r="1.25" fill="currentColor"/>
+<circle cx="45.2375" cy="58.8458" r="1.25" fill="currentColor"/>
+<circle cx="17.5828" cy="58.8458" r="1.25" fill="currentColor"/>
+<circle cx="20.2432" cy="66.7159" r="1" fill="currentColor"/>
+<circle cx="30.0959" cy="64.3894" r="1" fill="currentColor"/>
+<path d="M40.5684 64.3894H40.5685" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M35.8082 61.1102H35.8083" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="27.4569" cy="68.7111" r="1" fill="currentColor"/>
+<circle cx="34.6458" cy="67.2261" r="1" fill="currentColor"/>
+<circle cx="52.7213" cy="68.7111" r="1" fill="currentColor"/>
+<circle cx="68.3808" cy="72.3555" r="1" fill="currentColor"/>
+<circle cx="67.5595" cy="66.1856" r="1" fill="currentColor"/>
+<path d="M81.3198 66.7159H81.3199" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="23.5686" cy="55.4095" r="1.25" fill="currentColor"/>
+<circle cx="33.6457" cy="55.843" r="1.25" fill="currentColor"/>
+<circle cx="27.6172" cy="59.3012" r="1.25" fill="currentColor"/>
+<path d="M81.3198 59.8434H81.3199" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M76.11 57.183H76.1101" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M73.3834 63.1376H73.3835" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="73.701" cy="68.7111" r="1" fill="currentColor"/>
+<circle cx="62.2229" cy="63.1376" r="1.25" fill="currentColor"/>
+<circle cx="69.2013" cy="59.8434" r="1.25" fill="currentColor"/>
+<circle cx="22.6818" cy="61.8836" r="1" fill="currentColor"/>
+<path class="pg-shaft pg-shaft--a" pathLength="100" d="M35.8083 77.1084C45.6404 59.8434 30.1159 51.712 35.8083 42.5385" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="pg-head pg-head--a"><path d="M37.6371 46.144L35.8083 42.5384" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M31.445 45.2735L35.8083 42.5384" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+<path class="pg-shaft pg-shaft--b" pathLength="100" d="M47.8095 77.1084C57.6416 59.8434 42.1171 51.712 47.8095 42.5385" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="pg-head pg-head--b"><path d="M49.6383 46.144L47.8095 42.5384" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M43.4462 45.2735L47.8095 42.5384" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+<path class="pg-shaft pg-shaft--c" pathLength="100" d="M59.8107 77.1084C69.6428 59.8434 54.1183 51.712 59.8107 42.5385" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="pg-head pg-head--c"><path d="M61.6395 46.144L59.8107 42.5384" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M55.4474 45.2735L59.8107 42.5384" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>

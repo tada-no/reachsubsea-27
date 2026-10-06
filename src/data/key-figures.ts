@@ -18,6 +18,9 @@ export const keyFigures: StatField[] = [
   // Distinct from Countries reached (clients in 9 countries). Added 19 Sep 2026
   { key: 'office-countries', value: '4', label: 'Countries with an office' },
   { key: 'newbuilds', value: '4', label: 'Newbuilds joining the fleet' },
+  // Design Reference PDF p15 (Technology & Innovation), from the 2Q 2026 Report: Reach Remote's fuel saving against a crewed vessel, and Reach Relay's speed against the third-party link it replaced (6 Oct 2026)
+  { key: 'fuel-saving', value: '90%', label: 'Fuel saving versus a crewed vessel, up to' },
+  { key: 'relay-speed', value: '25x', label: 'Faster than the third-party solution it replaces, up to' },
   // Live /careers/ Trainees block ("Since 2013 … each trainee who successfully completes their final exams
   // … has been offered a full-time position") and the PDF's Careers stats (p22: 2013, 100%). Added 20 Sep 2026
   { key: 'trainee-since', value: '2013', label: 'Trainee programme since' },

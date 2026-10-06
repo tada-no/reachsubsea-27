@@ -1,0 +1,371 @@
+---
+// Assets › Overview (3 Oct 2026, Q77): the landing page of the top-level Assets section (nav label "Fleet
+// overview"). Content: client PDF p19–22 ("08 — Services — Assets & Fleet", rated "Dev" in docs/03 §5) for
+// intent and wording, the dev site's `assets` post type for every spec (src/data/assets.ts, a source per
+// entry), key-figures.ts for the fleet-wide figures. Built for a client checking which vessel or ROV spread
+// fits a job, an engineer looking up an ROV class and an investor sizing up the fleet: the fleet at a glance
+// (figures and one marker per unit) · every vessel as one card · the uncrewed fleet · ROV systems · the survey
+// and monitoring equipment · recent deployments · the PDF's three FAQs · a named contact.
+// Not used from the PDF: the stats strip over the hero (now the first block below it), the "illustrative"
+// video row, the ROV reconciliation note and the Q2 report quote, the "Video / spec sheet: add link" chips
+// (spec-sheet links render only where a file exists), charter periods on the cards (Investors charter page).
+// No single pages for vessels or ROVs (Ross, 4 Oct 2026, Q78): the cards are the records, as in the client PDF
+// and the Q2 report. Vessels, ROVs and Equipment in the nav are anchors into this page; Reach Remote is the
+// one child page. Redirects to this page: dev /company/assets/ (the hub) and every live and dev /assets/<slug>/
+// vessel and ROV single (→ #vessels or #rovs); dev /company/assets/vessels|rovs/ → #vessels / #rovs; live
+// /assets/reach-remote-1-2/, /assets/reach-remote/, dev /assets/reach-remote-1|2/, /company/assets/remote-vessels/
+// and /services/reach-remote/* → /assets/reach-remote/; live /assets/reach-remote-3-4/ and dev
+// /assets/reach-remote-3|4/ → /assets/reach-remote/3-4/.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import SectionSubnav from '../../blocks/SectionSubnav.astro';
+import FleetRegister from '../../blocks/FleetRegister.astro';
+import type { FleetGroup, FleetUnit } from '../../blocks/FleetRegister.astro';
+import FeedGrid from '../../blocks/FeedGrid.astro';
+import CardBento from '../../blocks/CardBento.astro';
+import CardGrid from '../../blocks/CardGrid.astro';
+import Accordion from '../../blocks/Accordion.astro';
+import CtaBand from '../../blocks/CtaBand.astro';
+import { navSections } from '../../data/navigation';
+import { worldPath } from '../../data/world';
+import { pickFigures } from '../../data/key-figures';
+import { projects } from '../../data/projects';
+import { cardPresets } from '../../data/card-presets';
+import { assets, assetsOf, fleetCounts, fleetContact, statusBadge, unitsOf } from '../../data/assets';
+import type { Asset } from '../../data/assets';
+import type { CardField } from '../../lib/types';
+
+const base = import.meta.env.BASE_URL;
+const section = navSections.find((s) => s.id === 'assets')!;
+const subnavItems = [
+  { label: 'Overview', href: section.href },
+  ...section.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+const [fleet, newbuilds, rovSystems, uncrewedDays] = pickFigures(['fleet', 'newbuilds', 'rov-systems', 'uncrewed-days']);
+const vessels = assetsOf('vessel');
+const usvs = assetsOf('usv');
+const rovs = assetsOf('rov');
+const reachRemote = usvs.filter((a) => a.slug.startsWith('reach-remote'));
+const drix = usvs.filter((a) => a.slug.startsWith('drix'));
+const rr12 = assets.find((a) => a.slug === 'reach-remote-1-2')!;
+const rr34 = assets.find((a) => a.slug === 'reach-remote-3-4')!;
+
+// The Key figures "fleet" (11) is the chartered vessels plus Reach Remote 1 & 2; "newbuilds" (4) is the two
+// chartered newbuilds plus Reach Remote 3 & 4 (PDF p19 status note). Check the data file still adds up.
+const derivedFleet = fleetCounts.vessels.inService + unitsOf(reachRemote.filter((a) => a.status !== 'newbuild'));
+const derivedNewbuilds = fleetCounts.vessels.joining + unitsOf(reachRemote.filter((a) => a.status === 'newbuild'));
+if (String(derivedFleet) !== fleet.value || String(derivedNewbuilds) !== newbuilds.value) {
+  console.warn(`[assets] key figures (${fleet.value} in service, ${newbuilds.value} joining) differ from assets.ts (${derivedFleet}, ${derivedNewbuilds})`);
+}
+
+// Fleet at a glance: one marker per unit, from the data file (the ROV total from Key figures)
+const unitsFor = (list: Asset[]): FleetUnit[] =>
+  list.flatMap((a) => {
+    const status: FleetUnit['status'] = a.status === 'newbuild' ? 'joining' : 'in-service';
+    const names = a.unitNames ?? Array.from({ length: a.units ?? 1 }, () => a.name);
+    return names.map((name) => ({ name, status }));
+  });
+const joiningNote = (list: Asset[]) => {
+  const joining = list.filter((a) => a.status === 'newbuild');
+  if (!joining.length) return undefined;
+  const when = [...new Set(joining.map((a) => a.joining).filter(Boolean))].join(' and ');
+  return `${unitsOf(joining)} joining ${when}`;
+};
+const fleetGroups: FleetGroup[] = [
+  { key: 'vessels', value: String(fleetCounts.vessels.inService), label: 'Chartered vessels', note: joiningNote(vessels), units: unitsFor(vessels) },
+  { key: 'reach-remote', value: String(unitsOf(reachRemote.filter((a) => a.status !== 'newbuild'))), label: 'Reach Remote USVs', note: joiningNote(reachRemote)?.replace('joining', 'in build, due'), units: unitsFor(reachRemote) },
+  { key: 'drix', value: String(unitsOf(drix)), label: 'DriX survey USVs', note: 'Shallow-water hydrographic survey', units: unitsFor(drix) },
+  // PDF p20, cited to the 2Q 2026 report: 13 WROV systems and two Surveyor Interceptor systems
+  { key: 'rovs', value: rovSystems.value, label: rovSystems.label, note: '13 work-class and 2 Surveyor Interceptor', units: Array.from({ length: Number(rovSystems.value) }, (_, i) => ({ name: `ROV system ${i + 1}`, status: 'in-service' as const })) },
+];
+
+// Every vessel as one card (Q77; Ross, 4 Oct 2026): the Q2 2026 report's "Status of vessels and assets"
+// cards (p13–16) without the status row: photo, kind, name, then Charter · Owner · Crane · Assets (the client
+// PDF's own labels, p20; Ross, 4 Oct 2026: short labels so the column never wraps). The card is the whole record; vessels have no page of their own, like the client PDF and the report.
+// Feed grid source Assets, type = vessel, in service first, newbuilds last.
+const assetsRow = (a: Asset) =>
+  a.rovs?.length ? `${a.rovs.join(', ')}, survey equipment` : a.status === 'newbuild' ? 'Will be mobilised with WROVs and survey equipment' : 'Survey equipment';
+const vesselSpecs = (a: Asset) => [
+  { label: 'Charter', value: a.charter ?? '' },
+  { label: 'Owner', value: a.owner ?? '' },
+  { label: 'Crane', value: a.specs.crane ?? 'None' },
+  { label: 'Assets', value: assetsRow(a) },
+];
+const vesselItems = vessels.map((a) =>
+  cardPresets.asset({
+    media: 'image-top',
+    surface: 'white',
+    image: a.image,
+    eyebrow: a.kindShort ?? a.kind,
+    // Only a badge that says something: Joining and Sale agreed. "In service" on the other eight stacked under
+    // the long kickers and said what the fleet register already says (5 Oct 2026 sweep).
+    badge: a.status === 'in-service' ? undefined : statusBadge(a),
+    title: a.name,
+    meta: undefined,
+    specs: vesselSpecs(a),
+    action: undefined,
+    facets: { status: a.status },
+  }),
+);
+
+// The uncrewed fleet (lead-tall-wide, 6 cells): Reach Remote 1 & 2 lead · uncrewed days · Reach Remote 3 & 4
+// (tall) · endurance · DriX · Reach Horizon (how the USVs are run from shore, dev Reach Remote page).
+const usvCard = (a: Asset, overrides: Partial<CardField> = {}): CardField => ({
+  media: 'image-bg',
+  image: a.image,
+  eyebrow: a.kind,
+  badge: statusBadge(a),
+  title: a.name,
+  description: a.summary,
+  action: { label: `View ${a.name.split(' ')[0] === 'DriX' ? 'DriX' : 'Reach Remote'}`, url: a.url, action: 'page', context: a.name },
+  ...overrides,
+});
+const uncrewedCards: CardField[] = [
+  usvCard(rr12, { size: 'featured', action: { label: 'Meet Reach Remote', url: rr12.url, action: 'page' } }),
+  { media: 'stat', surface: 'navy', statValue: uncrewedDays.value, title: uncrewedDays.label },
+  // Short on purpose: the tall cell is 3 columns wide, so the copy must hold to three lines (docs/08 card sweep)
+  usvCard(rr34, { description: 'In build at Kongsberg Maritime, co-funded by the EU Innovation Fund.', action: { label: 'Read more', url: rr34.url, action: 'page', context: rr34.name } }),
+  { media: 'stat', surface: 'white', statValue: (rr12.specs.endurance ?? '').replace(/\D.*$/, ''), title: 'Days at sea per mission, uncrewed' },
+  ...drix.map((a) =>
+    usvCard(a, {
+      action: undefined,
+      specColumns: 2,
+      specs: [
+        { label: 'Length', value: a.specs.length ?? '' },
+        { label: 'Draft', value: a.specs.draft ?? '' },
+        { label: 'Beam', value: a.specs.beam ?? '' },
+        { label: 'Multibeam', value: 'EM2040' },
+      ],
+    }),
+  ),
+  {
+    media: 'none',
+    surface: 'tint',
+    eyebrow: 'Reach Horizon',
+    title: 'Controlled from shore',
+    description: 'Both Reach Remote vessels are run from our onshore remote operations centre, with four levels of oversight from monitoring to direct control.',
+    action: { label: 'How remote operations work', url: rr12.url, action: 'page' },
+  },
+];
+
+// ROV systems: one card per class with the dev spec table as rows (Power · Depth rating · Size · Weight ·
+// Payload; "Size" for the dev's "Dimensions", Ross, 4 Oct 2026), the spec sheet linked only where the file
+// exists (PDF p31 convention). No page of their own (Ross, 4 Oct 2026).
+const rovSpecs = (a: Asset) =>
+  [
+    a.specs.power && { label: 'Power', value: a.specs.power },
+    a.specs.depth && { label: 'Depth rating', value: a.specs.depth },
+    a.specs.dimensions && { label: 'Size', value: a.specs.dimensions },
+    a.specs.weight && { label: 'Weight', value: a.specs.weight },
+    a.specs.payload && { label: 'Payload', value: a.specs.payload },
+  ].filter(Boolean) as { label: string; value: string }[];
+// What each class is carried on (PDF p20 "Known deployments, by system"), counted from the vessels' own ROV lists so
+// it is edited once. Normand Jarstein is a project charter and, as in the PDF, is left out of the class counts; the
+// ZEEROV is carried on the Reach Remote pair. The named vessels do not add up to the fleet-wide figure (the PDF's own
+// reconciliation note), so no total is claimed here.
+const classKey: Record<string, string> = { 'constructor-wrov': 'Constructor', 'supporter-wrov': 'Supporter', 'schilling-robotics-hd-wrov': 'HD', 'surveyor-interceptor': 'Surveyor Interceptor' };
+const join = (names: string[]) => (names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0]);
+const rovDeployment = (a: Asset): { count?: string; carriers: string } | undefined => {
+  const onZeerov = reachRemote.filter((r) => r.status !== 'newbuild' && r.rovs?.includes('ZEEROV'));
+  if (a.slug === 'zeerov') return { count: `${unitsOf(onZeerov)} in service`, carriers: join(onZeerov.map((r) => r.name)) };
+  const key = classKey[a.slug];
+  const carriers = vessels.filter((v) => v.slug !== 'normand-jarstein' && v.rovs?.some((r) => r.includes(key)));
+  if (!key || carriers.length === 0) return undefined;
+  const count = carriers.reduce((n, v) => n + Number(v.rovs!.find((r) => r.includes(key))!.match(/^\d+/)?.[0] ?? 1), 0);
+  return { count: `${count} in service`, carriers: join(carriers.map((v) => v.name)) };
+};
+// Short kickers so the count pill sits on the same line (Ross, 6 Oct 2026); the full class names live in the data
+const rovKicker: Record<string, string> = { 'constructor-wrov': 'Heavy-duty WROV', 'supporter-wrov': 'Compact WROV', 'schilling-robotics-hd-wrov': 'Compact WROV', 'surveyor-interceptor': 'Survey ROV', zeerov: 'Electric ROV' };
+const rovCards: CardField[] = rovs.map((a) => ({
+  media: 'image-top' as const,
+  image: a.image,
+  eyebrow: rovKicker[a.slug] ?? a.kind,
+  title: a.name,
+  badge: rovDeployment(a)?.count ? { label: rovDeployment(a)!.count!, tone: 'accent' as const } : undefined,
+  // The vessels come last in the rows, so a long list wraps at the foot without moving the rows above it out of line
+  specs: [...rovSpecs(a), ...(rovDeployment(a) ? [{ label: 'Carried on', value: rovDeployment(a)!.carriers }] : [])],
+  specColumns: 2 as const,
+  // The spec sheet is the card's one action (Link File: label + download icon at the foot), not a sub-link row;
+  // the sub-link list is for cards with several files (Ross, 5 Oct 2026).
+  action: a.specSheet,
+}));
+
+// Survey and monitoring equipment (PDF p20 "Survey & monitoring assets", its DriX card now in the uncrewed bento): its own
+// block, not a card in the ROV grid (Ross, 4 Oct 2026: an instrument list is not an ROV). Two icon cards side by side, each
+// with its own service link; the photo went (Ross, 6 Oct 2026: another ROV under "Beyond the ROVs" added nothing).
+// Library pictograms: survey, global-monitoring.
+const equipmentCards: CardField[] = [
+  {
+    media: 'icon',
+    pictogram: 'survey',
+    title: 'Survey suite',
+    description: 'Kongsberg EM2040 multibeam, Topas PS120 sub-bottom profiler and HiPAP 502 positioning.',
+    action: { label: 'Survey services', url: '/services/survey/', action: 'page' },
+  },
+  {
+    media: 'icon',
+    pictogram: 'global-monitoring',
+    title: 'Monitoring technology',
+    description: 'gWatch, DepthWatch, WellWatch and DrillWatch, through vessel- and ROV-mounted sensors.',
+    action: { label: 'Monitoring services', url: '/services/monitoring/', action: 'page' },
+  },
+];
+
+// Proof: the newest projects across every line (Projects query, newest first, in WP)
+const projectItems = [...projects]
+  .sort((a, b) => b.year - a.year)
+  .slice(0, 4)
+  .map((p) =>
+    cardPresets.project({
+      media: 'image-top',
+      surface: 'white',
+      image: p.image,
+      eyebrow: `${p.work} · ${p.year}`,
+      title: p.title,
+      description: undefined,
+      meta: [{ icon: 'map-pin', text: p.field }],
+      action: { label: 'Read project', url: p.url, context: p.title },
+    }),
+  );
+
+// The PDF's three fleet FAQs (p21), answers rebuilt from the data (FAQ post type, topic Assets)
+const vesselsInService = fleetCounts.vessels.inService;
+const faqItems = [
+  {
+    slug: 'how-many-vessels',
+    question: 'How many vessels does Reach Subsea operate?',
+    answer: `A fleet of ${fleet.value} in service: ${vesselsInService} chartered vessels plus Reach Remote 1 & 2, our own uncrewed surface vessels, together with two DriX survey vehicles. ${newbuilds.value} more are joining: Viking Vigor, Newbuild NB76 and Reach Remote 3 & 4.`,
+    open: true,
+  },
+  {
+    slug: 'chartered-vs-newbuilds',
+    question: 'What is the difference between the chartered fleet and the newbuilds?',
+    answer: 'The chartered fleet is operating today. The newbuilds, Viking Vigor and Newbuild NB76, are vessels still under construction or mobilising, shown separately until they enter service.',
+  },
+  {
+    slug: 'owned-or-chartered',
+    question: 'Does Reach Subsea own any vessels outright, or are they all chartered?',
+    answer: 'Both. Most of the active fleet is chartered from partners such as Olympic Subsea, Havila Shipping and Solstad Maritime, while Reach Remote 1–4 and the DriX vehicles are owned and operated by Reach Subsea.',
+  },
+];
+---
+
+<BaseLayout title="Fleet overview · Reach Subsea" motion>
+  <Header current="assets" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Assets' }]}
+      title="A versatile fleet, built for demanding offshore environments"
+      lead="High-specification crewed and uncrewed vessels, both equipped with work-class ROVs and survey systems."
+      image={{ src: `${base}images/vessel-deep-cygnus.jpg`, alt: '', focalPoint: { x: 0.62, y: 0.5 } }}
+      actions={[
+        { label: 'Talk to our team', url: '#contact', action: 'anchor' },
+        { label: 'Explore the 3D World', url: worldPath, action: 'external', type: 'link' },
+      ]}
+    />
+
+    <SectionSubnav source="section-pages" label="Assets" items={subnavItems} current={section.href} />
+
+    <FleetRegister
+      anchor="at-a-glance"
+      background="white"
+      sectionHeader={{ title: 'The fleet at a glance' }}
+      groups={fleetGroups}
+    />
+
+    <FeedGrid
+      anchor="vessels"
+      source="assets"
+      scope={{ term: 'vessel' }}
+      columns={3}
+      count={12}
+      background="tint"
+      sectionHeader={{
+        title: 'The chartered fleet',
+        intro: 'Long-term chartered vessels, each mobilised with the ROVs and survey systems its work needs, and the two newbuilds joining them.',
+      }}
+      items={vesselItems}
+      showLoadMore={false}
+    />
+
+    <CardBento
+      anchor="uncrewed"
+      pattern="lead-tall-wide"
+      background="white"
+      sectionHeader={{
+        title: 'The uncrewed fleet',
+        action: { label: 'Reach Remote', url: rr12.url },
+      }}
+      cards={uncrewedCards}
+    />
+
+    <CardGrid
+      anchor="rovs"
+      background="navy"
+      sectionHeader={{
+        title: `${rovSystems.value} ROV systems, by class`,
+        intro: 'ROVs are not a delivery mode of their own: they are carried aboard the crewed vessels above. 13 work-class systems and 2 Surveyor Interceptor systems, grouped by class.',
+      }}
+      layout="3-columns"
+      media="image-top"
+      surface="white"
+      cards={rovCards}
+    />
+
+    <CardGrid
+      anchor="equipment"
+      background="white"
+      sectionHeader={{
+        title: 'Survey and monitoring equipment',
+        intro: 'Beyond the ROVs, our vessels carry dedicated survey instrumentation and the monitoring technology delivered through them.',
+      }}
+      layout="2-columns"
+      media="icon"
+      surface="tint"
+      cards={equipmentCards}
+    />
+
+    <FeedGrid
+      anchor="projects"
+      source="projects"
+      columns={4}
+      background="tint"
+      sectionHeader={{
+        title: 'Recent deployments across the fleet',
+        action: { label: 'All projects', url: '/projects/' },
+      }}
+      items={projectItems}
+      showLoadMore={false}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about our fleet, ROVs and uncrewed vessels.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="assets"
+      background="white"
+      items={faqItems}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title="Would you like to know more?"
+      text="Reach out to us today."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact
+      contact={{ label: 'Fleet', ...fleetContact }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

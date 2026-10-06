@@ -46,6 +46,28 @@ const { source, label, items, current } = Astro.props;
         ))}
       </div>
     </nav>
+    <script is:inline>
+      (function () {
+        try {
+          var n = document.querySelector('[data-subnav-source="section-pages"]');
+          var k = sessionStorage.getItem('reach-subnav');
+          if (!n || !k) return;
+          sessionStorage.removeItem('reach-subnav');
+          var s = JSON.parse(k);
+          var r = n.querySelector('.subnav__row');
+          if (r) r.scrollLeft = s.x;
+          if (s.docked) {
+            // The page below the bar has not been parsed yet, so scrolling now would clamp to 0: wait for it
+            history.scrollRestoration = 'manual';
+            var go = function () {
+              window.scrollTo(0, n.getBoundingClientRect().top + window.scrollY);
+            };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+            else go();
+          }
+        } catch (e) {}
+      })();
+    </script>
   )
 }
 
@@ -140,6 +162,41 @@ const { source, label, items, current } = Astro.props;
   }
 
   document.querySelectorAll<HTMLElement>('[data-subnav]').forEach(initSubnav);
+
+  // Same-page anchors in the bar (4 Oct 2026, Assets: Vessels and ROVs & equipment are anchors into the
+  // overview). The browser's own jump lands the target under the sticky bars: base.css clears the docked
+  // subnav for a jump down (the header hides on a downward scroll), but a jump up brings the header back
+  // (72px once scrolled) over the subnav. So the bar scrolls the target itself, allowing for the header
+  // when the target is above, and keeps the URL and focus in step with a native jump.
+  const BAR = 72;
+  const GAP = 24;
+  document.addEventListener('click', (event) => {
+    const link = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-subnav] a[href*="#"]');
+    if (!link || link.pathname !== location.pathname || !link.hash) return;
+    const target = document.getElementById(decodeURIComponent(link.hash.slice(1)));
+    if (!target) return;
+    event.preventDefault();
+    const above = target.getBoundingClientRect().top < 0;
+    const top = target.getBoundingClientRect().top + window.scrollY - BAR - GAP - (above ? BAR : 0);
+    window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
+    history.pushState(null, '', link.hash);
+    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
+  });
+
+  // Moving between section pages (6 Oct 2026, Ross: a glitch clicking between pills): each pill is a full page
+  // load, which threw the page back to the top, replayed the hero and reset the row's sideways scroll. The bar
+  // now remembers its sideways scroll and whether it was docked; the next page (inline script after the nav)
+  // restores both, so the bar stays where the eye is.
+  document.addEventListener('click', (event) => {
+    const link = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-subnav-source="section-pages"] a[href]');
+    if (!link || link.pathname === location.pathname || event.defaultPrevented) return;
+    const nav = link.closest<HTMLElement>('[data-subnav]');
+    const row = nav?.querySelector<HTMLElement>('.subnav__row');
+    try {
+      sessionStorage.setItem('reach-subnav', JSON.stringify({ x: row?.scrollLeft ?? 0, docked: nav?.classList.contains('is-docked') ?? false }));
+    } catch {}
+  });
 
   // Docked state: a 1px sentinel just above the bar leaves the viewport's top band when the bar sticks.
   document.querySelectorAll<HTMLElement>('[data-subnav]').forEach((nav) => {

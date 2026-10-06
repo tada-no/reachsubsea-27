@@ -60,15 +60,9 @@ export const values: CompanyValue[] = [
 /** The promise (live /about/, dev vision-values-and-promise). The last word is the one the values carry. */
 export const promise = { lead: 'Everything within', word: 'Reach', short: 'Within Reach.' };
 
-/** Management team (dev /company/who-we-are/about-us/, Sep 2026). Names and roles only on About;
- * portraits and bios live on Leadership & Board. */
-export const management = [
-  { name: 'Jostein Alendal', role: 'Chief Executive Officer' },
-  { name: 'Arne Joa', role: 'Chief Financial Officer' },
-  { name: 'Inge Grutle', role: 'Chief Operating Officer' },
-  { name: 'Bård Thuen Høgheim', role: 'Chief Commercial Officer' },
-  { name: 'Audun Brandtzæg', role: 'Chief Technology Officer' },
-];
+/** Management team: names and roles only on About; portraits, contacts and the board live on Leadership & Board.
+ * One list for the site since 6 Oct 2026 (people.ts, the People post type). */
+export { management } from './people';
 
 /** HSEQ certificates (dev about-us). Certificate PDFs to come from Reach; they live on HSEQ. */
 export const certificates = [

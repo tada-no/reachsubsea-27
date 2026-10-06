@@ -1,7 +1,8 @@
 ---
 // Home (17 Sep 2026 redesign, Q49–Q53 in docs/00-questions.md). Same blocks and tokens, new composition:
 // Video hero (header overlays it) · Stats panel (counts up) · Live operations map (sample data) · Bento of mixed Card variants ·
-// Services, 4 portrait cards · 3D World stage with named zones · Newsroom (editorial feed) ·
+// Services, 3 portrait cards (5 Oct 2026, Q79: three lines, Technology & Innovation is the technology under
+// them; the 3D World stage left the page the same day, the client's call) · Newsroom (editorial feed) ·
 // LinkedIn rail (dummy) · FAQ · CTA panel straddling the darker footer.
 // Copy follows the client's Full Resolution Page Screens PDF (Home) where it has any.
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -11,7 +12,6 @@ import PageHero from '../blocks/PageHero.astro';
 import CardGrid from '../blocks/CardGrid.astro';
 import CardBento from '../blocks/CardBento.astro';
 import StatsBand from '../blocks/StatsBand.astro';
-import Embed from '../blocks/Embed.astro';
 import FeedGrid from '../blocks/FeedGrid.astro';
 import SocialFeed from '../blocks/SocialFeed.astro';
 import Accordion from '../blocks/Accordion.astro';
@@ -20,7 +20,6 @@ import LiveOperations from '../blocks/LiveOperations.astro';
 import { liveOperations } from '../data/live-operations';
 import { cardPresets } from '../data/card-presets';
 import { pickFigures } from '../data/key-figures';
-import { worldPath, worldSceneUrl } from '../data/world';
 import type { CardField } from '../lib/types';
 
 // Bento: 7 cards on a 12-column grid (6×2 · 3 · 3×2 / 3 · then 4 · 5 · 3).
@@ -84,6 +83,8 @@ const bentoCards: CardField[] = [
   },
 ];
 
+// Three service lines (5 Oct 2026, Q79). Technology & Innovation is the technology under them, not a fourth
+// line: it has its own block on the Services overview and stays in the Services menu under its own label.
 const serviceCards = [
   cardPresets.service({
     pictogram: 'subsea-infrastructure',
@@ -105,13 +106,6 @@ const serviceCards = [
     title: 'Monitoring',
     description: 'Continuous asset and environmental monitoring, on the seabed or the surface.',
     action: { label: 'Monitoring', url: '/services/monitoring/', action: 'page' },
-  }),
-  cardPresets.service({
-    pictogram: 'technology',
-    eyebrow: undefined,
-    title: 'Technology & Innovation',
-    description: 'Remote operations and in-house ROV technology, including Reach Remote.',
-    action: { label: 'Technology', url: '/services/technology-innovation/', action: 'page' },
   }),
 ];
 
@@ -258,23 +252,11 @@ const faqItems = [
     />
 
     <CardGrid
-      sectionHeader={{ title: 'Four services, one partner' }}
-      layout="4-columns"
+      sectionHeader={{ title: 'Three services, one partner' }}
+      layout="3-columns"
       media="icon"
       surface="tint"
       cards={serviceCards}
-    />
-
-    <Embed
-      type="3d-world"
-      state="poster"
-      title="See our operations in 3D"
-      text="Fly through four working zones, from the vessel on the surface to the ROV on the seabed. An 18 MB scene, best on a tablet or computer."
-      worldUrl={worldSceneUrl}
-      fullScreenUrl={worldPath}
-      poster={{ src: `${import.meta.env.BASE_URL}images/3d-world-poster.jpg`, alt: 'An ROV surveying a pipeline on the seabed in the Reach Subsea 3D World' }}
-      posterVideo={{ src: `${import.meta.env.BASE_URL}video/promo.mp4`, start: 15, end: 45 }}
-      showZones
     />
 
     <FeedGrid
