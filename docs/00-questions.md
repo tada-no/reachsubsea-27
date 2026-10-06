@@ -10,6 +10,14 @@ _No open questions right now._
 
 ## Answered log
 
+### Q97. Year bars: review demo, short runs (6 Oct 2026)
+Context: Ross asked whether the bar chart was on the blocks review (/blocks/stats/). It wasn't anywhere in /blocks; it now has its own entry, /blocks/year-bars/ (White, Tint with eyebrow, Navy with a five-year run). The five-year run showed two edge cases the Research page (14 years) never hits.
+- [x] Bar width capped at 48 (`space/48`), centred in the column: five years had stretched to 100px blocks at 1440 (61 at 375). Fourteen years stay about 34, so the Research page doesn't change
+- [x] Every-other-year labels under 400px only with 10+ years: five years at 327px had dropped two labels for no reason
+- [ ] Leave bars filling their columns
+
+**Answer:** cap at 48 (Recommended option).
+
 ### Q93. Filter chip counts in brackets (6 Oct 2026)
 Context: Ross: "2025–26  7" is confusing; brackets? And why wasn't it caught? Agreed: a bare count after a label that is itself a number reads as part of it. Missed because the counts were checked by measurement (update, no jump), never read as text in chip form; in the rail they sat in their own column.
 - [x] Counts bracketed site-wide (Filter chip): "2025–26 (7)", "Crewed (4)"; right-aligned as a column in the rail; min 4ch so widths still hold

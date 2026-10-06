@@ -6,7 +6,7 @@
 // profile, in a 240px chart. Bars are accent, square-based on one hairline baseline with 2px top corners; the
 // count sits just above each bar and the year below. No y axis: every bar carries its count. The chart is a list
 // for assistive tech ("4 publications, 2025"; the full year is always read). Years shorten to ’13 when the chart
-// is under 600px wide, and under 400px every other year is labelled, counting back from the latest so the
+// is under 600px wide, and under 400px (with 10+ years) every other year is labelled, counting back from the latest so the
 // current year always has its label. Motion (data-grow in motion.ts): the bars grow up from the baseline left to
 // right as the chart enters, each count appearing as its bar lands; reduced motion shows the chart at once.
 // Filter (Q88): with `filterTarget` (a Data list's section id) each column is a button that filters that list
@@ -152,11 +152,14 @@ const titleId = makeId('year-bars', title);
     padding: var(--wp--preset--spacing--24) calc(var(--wp--preset--spacing--12) / 2) 0;
     border-bottom: 1px solid var(--wp--custom--color--border--default);
   }
+  /* A short run (5 years) would stretch the bars into blocks (100px at 1440); 48 at most keeps them bars.
+     Fourteen years sit at about 34, under the cap (Q97) */
   .year-bars__stack {
     position: relative;
     display: flex;
     justify-content: center;
     width: 100%;
+    max-width: var(--wp--preset--spacing--48);
     height: calc(var(--n) / var(--max) * 100%);
     min-height: var(--wp--preset--spacing--4);
   }
@@ -211,9 +214,10 @@ const titleId = makeId('year-bars', title);
       display: inline;
     }
   }
-  /* Under 400px the short years run together (2–5px apart), so every other one shows */
+  /* Under 400px fourteen short years run together (2–5px apart), so every other one shows; only for a long
+     run (10+ years): five years at 327px have room for every label */
   @container (max-width: 399px) {
-    .year-bars__bar:nth-last-child(even) .year-bars__year > [aria-hidden] {
+    .year-bars__chart:has(> .year-bars__bar:nth-child(10)) .year-bars__bar:nth-last-child(even) .year-bars__year > [aria-hidden] {
       visibility: hidden;
     }
   }

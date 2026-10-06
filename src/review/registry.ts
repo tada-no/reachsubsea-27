@@ -20,6 +20,8 @@ export const blocks: BlockEntry[] = [
   { slug: 'figures', name: 'Figures', component: 'Figures', spec: '§2.4b', figma: '', variants: 'Layout Sticky · Cards' },
   { slug: 'split-embed', name: 'Split embed', component: 'SplitEmbed', spec: '§2.4c', figma: '', variants: 'Position End · Start' },
   { slug: 'stats', name: 'Stats band', component: 'StatsBand', spec: '§2.5', figma: '169:2557', variants: 'Count 3 · 4 × Style Plain · Panel' },
+  // Research & Publications (6 Oct 2026, Q84–Q88). On the page each column filters the Data list (filterTarget)
+  { slug: 'year-bars', name: 'Year bars', component: 'YearBars', spec: '§2.17', figma: '417:14015', variants: 'Background White · Tint · Navy; Show eyebrow · body; filterTarget (filters a Data list)' },
   { slug: 'results-band', name: 'Results band', component: 'ResultsBand', spec: '§2.5b', figma: '', variants: 'Latest results with report cards' },
   { slug: 'accordion', name: 'Accordion / FAQ', component: 'Accordion', spec: '§2.6', figma: '175:2673', variants: 'Layout Stacked · Split' },
   { slug: 'data-list', name: 'Data list', component: 'DataList', spec: '§2.7', figma: '200:4079', variants: 'Type Reports · Documents · Dates · Publications' },

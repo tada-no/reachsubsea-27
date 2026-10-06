@@ -1,0 +1,33 @@
+---
+import YearBars from '../blocks/YearBars.astro';
+import VariantLabel from '../review/VariantLabel.astro';
+import { publications, publicationsByYear } from '../data/documents';
+
+const bars = publicationsByYear();
+const total = publications.length;
+const first = bars[0].year;
+const last = bars[bars.length - 1].year;
+// A short run, to show how few columns read (the bars widen to fill the chart)
+const recent = bars.slice(-5);
+---
+
+<VariantLabel name="Default · White" props='title body bars={publicationsByYear()} unit="publications"' />
+<YearBars
+  title={`${total} publications, ${first} to ${last}`}
+  body="Spanning 4D gravity monitoring, seafloor subsidence, CO2 storage and drill-bit seismic, in First Break, EAGE and SEG."
+  unit="publications"
+  bars={bars}
+/>
+
+<VariantLabel name="With eyebrow · Tint" props='eyebrow background="tint"' />
+<YearBars
+  eyebrow="Research output"
+  background="tint"
+  title={`${total} publications, ${first} to ${last}`}
+  body="Spanning 4D gravity monitoring, seafloor subsidence, CO2 storage and drill-bit seismic, in First Break, EAGE and SEG."
+  unit="publications"
+  bars={bars}
+/>
+
+<VariantLabel name="Short run · Navy, no body" props='background="navy" bars={last 5 years}' />
+<YearBars background="navy" title={`The last five years`} unit="publications" bars={recent} />
