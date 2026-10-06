@@ -28,7 +28,8 @@
     "Mobile menu": "123:2493",
     "Search panel": "124:2565",
     "Footer": "125:2893",
-    "Media toggle": "365:2366"
+    "Media toggle": "365:2366",
+    "Search field": "417:13785"
   },
   "components": {
     "Logo": {
@@ -117,13 +118,15 @@
     "Filter chip": {
       "id": "92:337",
       "type": "COMPONENT_SET",
-      "variants": 5,
+      "variants": 10,
       "props": [
         "Label",
         "Show count",
         "Count",
+        "Layout",
         "State"
-      ]
+      ],
+      "notes6Oct": "6 Oct 2026 (Q89–Q93): Layout axis Chip · List added (List variants 417:13720 Default, 417:13724 Hover, 417:13729 Selected, 417:13735 Focus, 417:13741 Disabled; 320×40, padding space/8, radius/sm, no fill or stroke, Box 16 radius/xs with 1px border/strong (Disabled border/subtle; Selected action/primary/bg + tick), label fills, count right-aligned). Chip variants: padding 28 unbound (space/16 + space/12, no single token) except Selected 16; Count default \"(12)\". Cloned List variants lost their text property links; re-linked by hand. List example on the doc frame: 417:13747."
     },
     "Breadcrumb": {
       "id": "93:366",
@@ -216,13 +219,23 @@
       "id": "116:928",
       "type": "COMPONENT_SET",
       "variants": 9,
-      "props": ["Label#116:0", "Type (Trigger, Link)", "State (Default, Hover, Open (Trigger only), Current, Focus)"]
+      "props": [
+        "Label#116:0",
+        "Type (Trigger, Link)",
+        "State (Default, Hover, Open (Trigger only), Current, Focus)"
+      ]
     },
     "Header": {
       "id": "118:1065",
       "type": "COMPONENT_SET",
       "variants": 5,
-      "variantIds": { "Desktop": "118:923", "Desktop scrolled": "118:982", "Compact": "118:1041", "Mobile": "118:1053", "Desktop overlay": "246:8985" },
+      "variantIds": {
+        "Desktop": "118:923",
+        "Desktop scrolled": "118:982",
+        "Compact": "118:1041",
+        "Mobile": "118:1053",
+        "Desktop overlay": "246:8985"
+      },
       "layers": "Logo · Right > Nav (6 × Nav item instances) · Actions > Search, Menu (Icon button Ghost Medium)",
       "phase4Notes": "17 Sep 2026 (Q49/Q50, done prior to this session, verified in it): Nav dropped from 8 to 6 items (Services, Assets, Company, Investors, Careers, Contact — Projects and Newsroom moved into the Site menu). New 'Desktop overlay' variant added: transparent fill, Navy Color mode forced on the bar so text/icon tokens resolve white, matching Header.astro's `overlay` prop (transparent-over-hero, solid on scroll/panel-open)."
     },
@@ -230,28 +243,62 @@
       "id": "119:1055",
       "type": "COMPONENT_SET",
       "variants": 6,
-      "props": ["Label#119:0", "Show external icon#119:7", "Level (L1, L2)", "State (Default, Hover, Current)"],
-      "variantIds": { "L1 Default": "119:1019", "L2 Default": "119:1037" }
+      "props": [
+        "Label#119:0",
+        "Show external icon#119:7",
+        "Level (L1, L2)",
+        "State (Default, Hover, Current)"
+      ],
+      "variantIds": {
+        "L1 Default": "119:1019",
+        "L2 Default": "119:1037"
+      }
     },
     "Mega menu panel": {
       "id": "120:1045",
       "type": "COMPONENT",
-      "props": ["Title#120:0", "Description#120:1", "Show group labels#120:2", "Show column 2#120:3", "Show feature#120:4", "Show strip#120:5"],
-      "exposedInstances": ["Overview link", "Card", "Strip link ×3"],
-      "examples": { "Services": "121:1152", "Assets": "121:1462", "Projects": "121:1668", "Company": "121:1865", "Investors": "121:2062", "Careers": "121:2263", "Newsroom": "121:2463" }
+      "props": [
+        "Title#120:0",
+        "Description#120:1",
+        "Show group labels#120:2",
+        "Show column 2#120:3",
+        "Show feature#120:4",
+        "Show strip#120:5"
+      ],
+      "exposedInstances": [
+        "Overview link",
+        "Card",
+        "Strip link ×3"
+      ],
+      "examples": {
+        "Services": "121:1152",
+        "Assets": "121:1462",
+        "Projects": "121:1668",
+        "Company": "121:1865",
+        "Investors": "121:2062",
+        "Careers": "121:2263",
+        "Newsroom": "121:2463"
+      }
     },
     "Site menu panel": {
       "id": "122:2417",
       "type": "COMPONENT_SET",
       "variants": 2,
-      "variantIds": { "Breakpoint=Desktop": "122:1867", "Breakpoint=1200": "122:2143" },
+      "variantIds": {
+        "Breakpoint=Desktop": "122:1867",
+        "Breakpoint=1200": "122:2143"
+      },
       "phase4Notes": "17 Sep 2026 (Q49, done prior to this session, verified in it): reimagined per SiteMenuPanel.astro — no longer a flat sitemap. 3-column Main (Column/Links: Menu link/Large Projects, Newsroom, Events, FAQ · Card instance for the featured project · Column/Feeds: Section/Reach Newsroom + Section/Events) plus a Strip (Contact link + 3D World button). Starts at 1200 in code (900–1199 now uses the Mobile menu instead)."
     },
     "Menu accordion": {
       "id": "123:2521",
       "type": "COMPONENT_SET",
       "variants": 2,
-      "props": ["Title#123:0", "Show chevron#123:3", "State (Closed, Open)"]
+      "props": [
+        "Title#123:0",
+        "Show chevron#123:3",
+        "State (Closed, Open)"
+      ]
     },
     "Mobile menu panel": {
       "id": "123:2522",
@@ -261,13 +308,19 @@
       "id": "124:2645",
       "type": "COMPONENT_SET",
       "variants": 2,
-      "variantIds": { "Desktop": "124:2570", "Mobile": "124:2611" }
+      "variantIds": {
+        "Desktop": "124:2570",
+        "Mobile": "124:2611"
+      }
     },
     "Footer": {
       "id": "125:3011",
       "type": "COMPONENT_SET",
       "variants": 2,
-      "variantIds": { "Desktop": "125:2898", "Mobile": "125:2953" },
+      "variantIds": {
+        "Desktop": "125:2898",
+        "Mobile": "125:2953"
+      },
       "notes": "Navy mode on each variant; Mobile also sets Layout/Typography Mobile modes. No component properties: link text is edited in place."
     },
     "Media toggle": {
@@ -288,8 +341,13 @@
       "id": "386:2393",
       "type": "COMPONENT_SET",
       "variants": 2,
-      "props": ["Scheme (Light, Dark)"],
-      "variantIds": { "Light": "386:2387", "Dark": "386:2388" },
+      "props": [
+        "Scheme (Light, Dark)"
+      ],
+      "variantIds": {
+        "Light": "386:2387",
+        "Dark": "386:2388"
+      },
       "in": "Components / Logo 54:22, Group/Favicon 386:2390",
       "note": "Tab icon from Reach-icon-600x600.svg, 478 px crop around the R, drawn at 64. Fills bound: R navy/800 (Light) or white (Dark), bars sage/400, tile bg/default or navy/900. Site files public/favicon.svg (R follows prefers-color-scheme) and favicon.ico 16 + 32, built by scripts/favicon.mjs (22 Sep 2026, Q76)."
     },
@@ -298,6 +356,23 @@
       "type": "COMPONENT",
       "in": "Components / Logo 54:22, Group/Favicon 386:2390",
       "note": "apple-touch-icon.png at 180: tile navy/800, R white, bars sage/400."
+    },
+    "Search field": {
+      "id": "417:13857",
+      "type": "COMPONENT_SET",
+      "variants": 4,
+      "props": [
+        "Placeholder#417:20",
+        "Value#417:25",
+        "State (Default, Hover, Focus, Filled)"
+      ],
+      "variantIds": {
+        "Default": "417:13824",
+        "Hover": "417:13832",
+        "Focus": "417:13840",
+        "Filled": "417:13849"
+      },
+      "notes": "Added 6 Oct 2026 (Q88). Code: src/components/SearchField.astro. 320×48 (instances FILL), padding space/16 / space/4, gap space/8, radius/md, bg/default, 1px border/default (Hover border/strong), Icon/search 20 icon/primary, text Body/Body (placeholder text/secondary, Filled value text/primary), Clear = Icon button Ghost Small with Icon/x, visible on Filled only. Focus: absolute 328×56 ring, 2px border/focus. Placeholder and Value are separate TEXT properties because linked variants share one default."
     }
   },
   "ledgers": {

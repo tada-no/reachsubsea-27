@@ -61,7 +61,7 @@ Context: Ross asked whether the library is the best design: ticks on the chips, 
 - [x] Row eyebrows `text/accent` for every Data list type, matching card eyebrows
 - [x] Year bars columns filter the library: a click picks that year (a removable "2017" chip appears in the Year row) and scrolls to the list; hover darkens the bar
 - [x] Kept: the tick on selected chips (the site-wide Filter chip, and a non-colour selected cue) and newest-first year chips (they filter a newest-first list; the chart reads as a timeline)
-- [ ] Figma: Search field component, Data list Publications rail variant
+- [x] Figma (6 Oct 2026): Search field component (417:13857), Data list Publications Desktop/Mobile rebuilt as the rail + reading list (199:3984, 199:4096; new property `Show clear all`), Filter chip `Layout` Chip · List, page frame "Research & Publications" (419:13892) on Pages
 
 **Answer:** as ticked.
 
@@ -84,7 +84,7 @@ Context: Ross's first review of the page. Hero copy and image changed on his cal
 - [ ] Not taken: taller chart (160 → 200) and a "2026 so far" label for the part year
 - Found in the review: under 560px the full year was `display:none` and the short one `aria-hidden`, so screen readers heard no year; now a hidden full year is always read. Short years sat 2–5px apart at 375, so under 400px every other year is labelled (from 2026 back); full years now need 600px (they sat 6px apart at 1280)
 
-**Answer:** as ticked. Figma: `radius/xs` variable and the Year bars block wait for page approval.
+**Answer:** as ticked. Figma (6 Oct 2026, on page approval): `radius/xs` variable (VariableID:417:22) and `Block/Year bars` (417:14015) added.
 
 ### Q84. Services › Technology & Innovation › Research & Publications (6 Oct 2026)
 Context: the library of Reach's published research, a secondary page under Technology & Innovation. Source: client PDF p9 and the live Selection of Publications page (reachsubsea.no/selection-of-publications/). No question put to Ross; defaults taken from the template.

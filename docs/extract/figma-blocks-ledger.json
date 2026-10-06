@@ -34,7 +34,8 @@
     "Results band": "321:6312",
     "Lifecycle": "324:6654",
     "Values": "329:6823",
-    "Offices map": "373:7048"
+    "Offices map": "373:7048",
+    "Year bars": "417:13858"
   },
   "blocks": {
     "Page hero": {
@@ -426,7 +427,8 @@
         "Show tabs": "Show tabs#200:18",
         "Show archive toggle": "Show archive toggle#200:27",
         "Show filters": "Show filters#200:36",
-        "Show load more": "Show load more#200:45"
+        "Show load more": "Show load more#200:45",
+        "Show clear all": "Show clear all#419:0"
       },
       "propertyCoverage": "Reports: section header, latest, tabs, archive · Documents: section header, latest, archive · Dates: section header · Publications: section header, filters, load more",
       "layers": "Section header (exposed) · Body > [Tabs (Subnav items; Mobile FIXED 327 clipped)] · [Desktop: Columns SPACE_BETWEEN > Latest (Navy panel 416) + Archive (864) > Table (bg/default, border/subtle, radius/lg, clips) > Header row + Rows (padding space/24 × space/16, bottom rule) + archive toggle Link Expand] · [Mobile Reports: Latest + Years > open year frame styled as Accordion item Open + closed Accordion item instances + toggle] · [Documents Mobile / Dates Mobile / Publications Mobile: rows with top rules] · [Publications: Filters (Facets of Filter chips + result count), List 880, More > Button Outline]",
@@ -436,7 +438,8 @@
         "Reports on Tint": "200:4083",
         "General meetings, no Latest": "200:4327",
         "Financial calendar on Navy": "200:4436"
-      }
+      },
+      "publications6Oct": "Type=Publications rebuilt 6 Oct 2026 (Q88–Q93). Desktop 199:3984: Body HORIZONTAL SPACE_BETWEEN > Rail 304 (199:3996; Search 418:7297 = Search field instance + Summary 24 tall with Result count and Clear all 418:7306 hidden by Show clear all; Facets 418:7311 > Facet Topic / Facet Year, each Label + Options frame holding Rows (overhang 8) of Filter chip Layout=List with counts) + Results 864 (418:7290: List gap stack/lg, rows without rules, gap grid/gutter, eyebrow text/accent, Link External Publisher; More). Mobile 199:4096: Rail (Search 419:7305, Facets 419:7316 with Topic then Year chip rows, bracketed counts) above Results 419:7358 (rows: Text gap 4 then link, gap 40 between papers). Old Year/Topic pill rows with an All chip removed."
     },
     "Embed": {
       "id": "203:4644",
@@ -566,6 +569,26 @@
         "Mobile not built (code: 5:4 map edge to edge, one card column, the address card docks along the bottom of the map).",
         "The address-card overlay, the hovered/active pin states and the 'All offices' button are not represented (static home view only)."
       ]
+    },
+    "Year bars": {
+      "id": "417:14015",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "axes": "Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "Desktop": "417:13863",
+        "Mobile": "417:13939"
+      },
+      "keys": {
+        "Title": "Title#417:30",
+        "Body": "Body#417:33",
+        "Show body": "Show body#417:36"
+      },
+      "layers": "Columns (Desktop: SPACE_BETWEEN, bottom-aligned; Mobile: vertical, gap space/48) > Text 528 (Title Heading/H2, Body Body/Body text/secondary, gap stack/md) + Chart 640x240 > 14 × Bar <year> (gap 8) > Plot (bottom rule border/default, padding x 6 / Mobile 2, gap 4) > Count Body/Caption + Fill (sage/400, radius/xs top) · Year Body/Caption",
+      "notes": "Built 6 Oct 2026 from src/blocks/YearBars.astro with the Research & Publications data (49 papers, 2013–2026, max 6). Bar heights are n/6 × 188. Mobile: short years ’13, every other year label emptied (fills []) counting back from the latest, so the plots keep one baseline. Hover (sage/500) and the grow-in motion are code-only.",
+      "examples": {
+        "Research & Publications on White": "417:14016"
+      }
     }
   },
   "components": {
@@ -1305,6 +1328,36 @@
     "openItems": [
       "Pictogram/chat-active (45:82): the code draws the dots smaller (r 1.6 against the library's 2.03 rings, Ross 22 Sep 2026); the Figma glyph should follow.",
       "Pictogram loops (six topic pictograms traced as strokes and animated) have no Figma representation, as before."
+    ]
+  },
+  "phase4ResearchPublications6Oct": {
+    "date": "2026-10-06",
+    "context": "Research & Publications page approved (Q84, Q86–Q93, commit 6c0a21a). Pushed to Figma: radius/xs, Filter chip Layout List + padding/count changes, Search field component, Block/Year bars, Data list Publications rebuild, and the page frame.",
+    "variables": {
+      "radius/xs": "VariableID:417:22 (Radius, 2, CORNER_RADIUS)"
+    },
+    "components": "See figma-components-ledger.json: Filter chip (92:337) Layout axis, Search field (417:13857)",
+    "pageFrame": {
+      "id": "419:13892",
+      "name": "Research & Publications",
+      "x": 14760,
+      "height": 3732,
+      "source": "src/pages/services/technology-innovation/research-publications/index.astro",
+      "sections": {
+        "Header (Desktop overlay)": "419:13893",
+        "Page hero (Photo, Desktop; hero-publications.jpg, image hash a59f197c…)": "419:13939",
+        "Section subnav (Research & Publications active)": "419:13968",
+        "Year bars": "419:13981",
+        "Data list Publications on tint": "419:14057",
+        "Accordion Split, research FAQ, on white": "419:14167",
+        "CTA panel on tint (no contact card)": "419:14196",
+        "Footer": "419:14212"
+      }
+    },
+    "codeOnly": [
+      "Year bars grow-in and hover; columns filtering the list (reach:filter)",
+      "Live facet counts, disabled options at 0, single-year chip from the chart",
+      "Sticky rail (1100+ wide and 800+ tall)"
     ]
   }
 }
