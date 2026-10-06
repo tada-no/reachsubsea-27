@@ -2,10 +2,13 @@
 // Mobile menu panel (docs/04 §16): what the hamburger opens below 900px. Modal, full height under
 // the header (the menu icon becomes `x`), scroll-locked. Menu accordion rows, one open at a time
 // (the current section starts open); Contact is the last row, a plain link (no chevron, no panel). Then, after
-// stack/lg: Open positions ↗ · FAQ · Contact us · LinkedIn · Facebook (text links, 17 Sep 2026) · legal.
-import Link from '../Link.astro';
+// stack/lg (redone 6 Oct 2026, Q113): one 2-column grid of small links in the accordion children's style
+// (48px rows, Body/Body text/secondary, ↗ on external links): Open positions · FAQ · LinkedIn · Facebook; then the
+// legal links on one row. Explore 3D World is a row after Contact, like it, with the cube icon where a chevron
+// sits (Q112: below 900 it was the one menu entry missing). "Contact us" went: it repeated the Contact row.
+import Icon from '../Icon.astro';
 import MenuAccordion from './MenuAccordion.astro';
-import { navSections, mobileUtility, socialLinks, legalLinks } from '../../data/navigation';
+import { navSections, mobileUtility, socialLinks, legalLinks, siteMenu } from '../../data/navigation';
 
 interface Props {
   id: string;
@@ -25,30 +28,40 @@ const { id, open = false, current } = Astro.props;
       <div class="menu-accordion">
         <a class="mobile-menu__contact text-h5" href="/contact/">Contact</a>
       </div>
+      <div class="menu-accordion">
+        <a class="mobile-menu__contact text-h5" href={siteMenu.world.href}>
+          Explore 3D World
+          <Icon name="cube-3d-sphere" size={20} class="mobile-menu__row-icon" />
+        </a>
+      </div>
     </div>
-    <div class="mobile-menu__utility">
-      <Link label="Open positions" href="https://hr-manager.net/reachsubsea" action="external" size="small" />
-      <Link label="FAQ" href="/faq/" size="small" />
-      <Link label="Contact us" href="/contact/" size="small" />
-      <ul class="mobile-menu__social">
-        {
-          socialLinks.map((social) => (
-            <li>
-              <Link label={social.label} href={social.href} action="external" size="small" />
-            </li>
-          ))
-        }
-      </ul>
-      <ul class="mobile-menu__legal">
-        {
-          legalLinks.map((link) => (
-            <li>
-              <a class="text-caption" href={link.url}>{link.label}</a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
+    <ul class="mobile-menu__utility">
+      {
+        [...mobileUtility.map((l) => ({ label: l.label, href: l.url, external: l.external })), ...socialLinks.map((l) => ({ label: l.label, href: l.href, external: true }))].map((link) => (
+          <li>
+            <a
+              class="menu-accordion__link text-body"
+              href={link.href}
+              target={link.external ? '_blank' : undefined}
+              rel={link.external ? 'noopener noreferrer' : undefined}
+            >
+              {link.label}
+              {link.external && <span class="visually-hidden"> (opens in a new tab)</span>}
+              {link.external && <Icon name="arrow-up-right" size={16} class="menu-accordion__icon" />}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <ul class="mobile-menu__legal">
+      {
+        legalLinks.map((link) => (
+          <li>
+            <a class="text-caption" href={link.url}>{link.label}</a>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </div>
 
@@ -68,25 +81,32 @@ const { id, open = false, current } = Astro.props;
   .mobile-menu__contact {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--12);
     min-height: 56px;
     color: var(--wp--custom--color--text--primary);
   }
+  .mobile-menu__row-icon {
+    flex: none;
+    color: var(--wp--custom--color--icon--accent);
+  }
+  /* Small links: two columns of 48px rows, then the legal links in the same columns */
   .mobile-menu__utility {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--wp--preset--spacing--16);
-    margin-top: var(--wp--custom--stack--lg);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    margin: var(--wp--custom--stack--md) 0 0;
+    padding: 0;
+    list-style: none;
   }
-  .mobile-menu__social {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--24);
-  }
+  /* Same two columns as the links above, so both rows line up */
   .mobile-menu__legal {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wp--preset--spacing--8);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--wp--preset--spacing--8) var(--wp--custom--grid--gutter);
+    margin: var(--wp--custom--stack--sm) 0 0;
+    padding: 0;
+    list-style: none;
   }
   .mobile-menu__legal a {
     color: var(--wp--custom--color--text--secondary);

@@ -3,13 +3,14 @@
 // too, so nothing depends on a local server.
 export const worldSceneUrl = 'https://tada-no.github.io/reach-world/';
 // The scene opens in the site, under the header (Q96, 6 Oct 2026, like the dev site's Unity world today): every
-// link into the world goes to the /3d-world/ page (src/pages/3d-world.astro), which frames the scene full height
-// and passes `?zone=N` and `?careers=1` through. Only the in-place poster embeds load `worldSceneUrl` directly.
-export const worldPath = '/3d-world/';
+// link into the world goes to /3d-world/explore/ (src/pages/3d-world/explore.astro), which frames the scene full
+// height and passes `?zone=N` and `?careers=1` through. Only the in-place poster embeds load `worldSceneUrl` directly.
+export const worldPath = '/3d-world/explore/';
 export const worldLabel = 'Explore Reach in interactive 3D';
-// Landing page (6 Oct 2026, client screens PDF p28–29): Services › Explore 3D World. Site-wide entries (menu strip,
-// footer, overview links) go here; its Launch button and zone cards open the world.
-export const worldPagePath = '/services/3d-world/';
+// Landing page (6 Oct 2026, client screens PDF p28–29): Home › Explore 3D World (Q108: it spans the service lines,
+// the fleet and Careers, so it sits on its own rather than under Services). Site-wide entries (the Services menu
+// strip, footer, overview links) go here; its Launch button and zone cards open the world.
+export const worldPagePath = '/3d-world/';
 // Careers route (20 Sep 2026, reach-world v45–v48): `?careers=1` opens the world's home panel on "From ship to
 // seabed" (the five-stop route, and "Fly a survey line"). The Careers banner loads the scene with it in place, and
 // its full-screen link opens the in-site page with it.

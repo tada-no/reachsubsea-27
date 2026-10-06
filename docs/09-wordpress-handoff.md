@@ -31,7 +31,7 @@ Read with: [05-blocks-spec.md](05-blocks-spec.md) (block behaviour) · [04-compo
 | Status | Pages |
 |---|---|
 | **Built, reviewed** | Home · Services overview · Services › Subsea · Company › About · Investors › Overview · Investors › Why invest · Careers › Overview |
-| **Built, utility** | `/3d-world/` (full-viewport iframe page) · header and mega menus · footer |
+| **Built, utility** | `/3d-world/explore/` (full-viewport iframe page) · header and mega menus · footer |
 | **Review routes, not pages** (do not ship) | `/blocks/*` · `/header/*` · `/live-operations-review/` |
 | **Specified in docs/05 §3, not built** | Survey · Monitoring · Technology & Innovation (reuse the Subsea template) · Research & Publications · Assets overview · Asset single · Reach Remote · Reach Remote 3 & 4 · Projects archive · Project single · Leadership & Board · HSEQ · Sustainability · Charter agreements · Reports & presentations · Governance & meetings · Financial calendar · Share information · Life at Reach · Our culture · Why work with us · Newsroom · News single · Events · Press & media · Contact · FAQ · Privacy · Transparency Act · 404 |
 | **Templates, not blocks** (Phase 4, not built) | Search results · news and project single layouts · archive pagination |
@@ -156,7 +156,7 @@ Shared field shapes (`src/lib/types.ts`): **SectionHeader** = eyebrow, title, in
 | `?careers=1` opens "From ship to seabed" | Implemented (it only checks the parameter exists) |
 | The published scene has no careers route yet (docs/00 Q66, `world.ts`) | Out of date: the published `gh-pages` build is **v44** and *does* have `?careers=1`. What is unpublished is v45–v48 ("Fly a survey line", the hoop scoring, sounds): local `main` is 4 commits ahead of origin. The Careers page copy already promises the survey line |
 
-**Where the site links to it (Q95–Q96, 6 Oct 2026; `src/data/world.ts`):** menu strips, the Site menu, popular searches, the footer and the Services overview hero go to the landing page `/services/3d-world/` (`worldPagePath`). Everything that opens the world goes to the in-site `/3d-world/` page (`worldPath`): the landing page's Launch and zone cards, the embeds' "Open full screen" and zone links, the service heroes, the Careers banner (`?careers=1`). That page frames the scene (`worldSceneUrl`, the published build) full height under a solid header, with `?embed=1` and `zone` / `careers` passed through. Only the in-place poster embeds load `worldSceneUrl` directly. In WordPress: `/3d-world/` is a page template with the header and no footer, reading the scene URL from the "3D World" options page. It keeps the dev site's current URL, so no redirect is needed.
+**Where the site links to it (Q95–Q96, Q108, 6 Oct 2026; `src/data/world.ts`):** menu strips, the Site menu, popular searches, the footer and the Services overview hero go to the landing page `/3d-world/` (`worldPagePath`; Home › Explore 3D World, not under Services, Q108). Everything that opens the world goes to the in-site `/3d-world/explore/` page (`worldPath`): the landing page's Launch and zone cards, the embeds' "Open full screen" and zone links, the service heroes, the Careers banner (`?careers=1`). That page frames the scene (`worldSceneUrl`, the published build) full height under a solid header, with `?embed=1` and `zone` / `careers` passed through. Only the in-place poster embeds load `worldSceneUrl` directly. In WordPress: `/3d-world/` is an ordinary page (the landing page) and `/3d-world/explore/` its child, a page template with the header and no footer, reading the scene URL from the "3D World" options page. The live site's `/3d-world/` keeps working: old links land on the landing page, one click from the world, so no redirect is needed.
 
 **What an editor should be able to set** (the Embed block already models most of it): scene URL (one global setting), poster image + alt, poster loop video, title / eyebrow / text, zones on or off, zone names and numbers, the "careers" route as a preset. **Hard-coded today and should become settings:** the world origin, the `?careers=1` suffix, "An 18 MB scene" (typed on three pages), the zone names (copied from the world), the launch and exit labels, the iframe `title` and `allow` attributes (the Embed block and `/3d-world/` page differ: only the page adds `xr-spatial-tracking`), and the launch gating (900px breakpoint, `any-pointer: coarse`, Save-Data).
 
@@ -169,7 +169,7 @@ Shared field shapes (`src/lib/types.ts`): **SectionHeader** = eyebrow, title, in
 - **Cache-busting:** bump `RELEASE` (currently `v48`) in the HTML on every change to `src/` or `glb/`.
 - **Publishing is manual and personal:** `Publish demo.command` force-builds a `gh-pages` commit and pushes it. The repo (`tada-no/reach-world`) is private, the Pages site is public, and the site currently lives under the `tada-no` GitHub account. It needs a proper owner and host before launch.
 - **Content that needs a developer to change (today):** the zones and pin copy, the careers stop wording (still marked "Draft text, Reach to confirm") and the HR-Manager URL live in the world's source, not in WordPress. Q94 moves all of it to WordPress, served over the API below.
-- **Legacy:** the live WordPress `/3d-world/` embeds `world.reachsubsea.com`, a Unity build, which this replaces. It needs a redirect and a decision on the subdomain.
+- **Legacy:** the live WordPress `/3d-world/` embeds `world.reachsubsea.com`, a Unity build, which this replaces. `/3d-world/` becomes the landing page (Q108), so its URL needs no redirect; the subdomain still needs a decision.
 - **Untested:** iPhone Safari, hybrid touchscreen laptops (they match `any-pointer: coarse` and lose in-place launch), and whether scrolling the page over a launched iframe is trapped by the orbit controls.
 
 **Recommended work in the world repo before the WordPress embed is built:**
@@ -218,7 +218,7 @@ Superseded by the brief for the 3D World chat, `docs/prompts/3d-world-embed.md` 
 - **Images:** shown as plain `<img>` in the info panels, so no CORS is needed on uploads. If an image is ever used as a WebGL texture, uploads need `Access-Control-Allow-Origin` too. Serve a medium size (about 800 px wide), not the original.
 - **Not in the API:** nothing private, no drafts (published posts only), no user data.
 
-**Still open:** the world's final host and owner (§7 above). The Explore 3D World landing page (`/services/3d-world/`, Q95) reads the same zones.
+**Still open:** the world's final host and owner (§7 above). The Explore 3D World landing page (`/3d-world/`, Q95, Q108) reads the same zones.
 
 ---
 

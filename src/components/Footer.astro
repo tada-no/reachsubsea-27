@@ -4,6 +4,7 @@
 // (Contact moved there from Company on 22 Sep 2026, Q75).
 // (2 cols each). Divider, then a legal row (copyright + Transparency Act + Privacy & Cookie Policy).
 // Mobile: everything stacks (brand, then the 4 link columns, then the legal row).
+// Explore 3D World sits under Explore, after Projects (6 Oct 2026, Q112: its page left Services, Q108).
 import fs from 'node:fs';
 import path from 'node:path';
 import Eyebrow from './Eyebrow.astro';
@@ -28,7 +29,6 @@ const columns: FooterColumn[] = [
       { label: 'Subsea', href: '/services/subsea/' },
       { label: 'Survey', href: '/services/survey/' },
       { label: 'Monitoring', href: '/services/monitoring/' },
-      { label: 'Explore 3D World', href: worldPagePath },
       { label: 'Fleet overview', href: '/assets/' },
       { label: 'Reach Remote', href: '/assets/reach-remote/' },
     ],
@@ -46,6 +46,7 @@ const columns: FooterColumn[] = [
     title: 'Explore',
     links: [
       { label: 'Projects', href: '/projects/' },
+      { label: 'Explore 3D World', href: worldPagePath },
       { label: 'Investors', href: '/investors/' },
       { label: 'Careers', href: '/careers/' },
       { label: 'Newsroom', href: '/newsroom/' },

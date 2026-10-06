@@ -1,33 +1,25 @@
 ---
-// Services › Explore 3D World (6 Oct 2026): the landing page for the interactive 3D World, from the client screens
-// PDF p28–29 ("11 — Services — Explore 3D World") and the Design Reference p13 ("landing page introducing the real
-// interactive 3D exploration tool"). The scene itself is a separate app with its content from WordPress (Q94); this
-// page explains it, and its Launch button and zone cards open it on the in-site /3d-world/ page, under the header
-// (Q96). Kept from the PDF: hero with Launch, How it works, the four zones, FAQ, CTA. Changed: the three cards over
-// the hero's edge (no overlaps, docs/06 §2) become How it works below it, with "Best viewed on" under its intro and
-// the steps as three cards, each with a screenshot that shows it (Q98–Q102). Cut: the 500+ / 9 / 2 modes stats band
-// (repeats Home and Services) and Related services (the Services subnav links the three lines). Zone names, order
-// and assets follow the world build, not the PDF's draft (src/data/world.ts).
-import BaseLayout from '../../../layouts/BaseLayout.astro';
-import Header from '../../../components/header/Header.astro';
-import Footer from '../../../components/Footer.astro';
-import PageHero from '../../../blocks/PageHero.astro';
-import SectionSubnav from '../../../blocks/SectionSubnav.astro';
-import CardGrid from '../../../blocks/CardGrid.astro';
-import Accordion from '../../../blocks/Accordion.astro';
-import CtaBand from '../../../blocks/CtaBand.astro';
-import { worldPath, worldPagePath, worldZones, worldZoneUrl } from '../../../data/world';
-import { navSections } from '../../../data/navigation';
-import type { CardField } from '../../../lib/types';
+// Explore 3D World (6 Oct 2026): the landing page for the interactive 3D World, from the client screens PDF p28–29
+// ("11 — Services — Explore 3D World") and the Design Reference p13 ("landing page introducing the real interactive
+// 3D exploration tool"). Home › Explore 3D World, not under Services (Q108): it spans the three service lines, the
+// fleet and Careers, and is not a service. The scene itself is a separate app with its content from WordPress (Q94);
+// this page explains it, and its Launch button and zone cards open it on the in-site /3d-world/explore/ page, under
+// the header (Q96). Kept from the PDF: hero with Launch, How it works, the four zones, FAQ, CTA. Changed: the three
+// cards over the hero's edge (no overlaps, docs/06 §2) become How it works below it, with "Best viewed on" under its
+// intro and the steps as three cards, each with a screenshot that shows it (Q98–Q102). Cut: the 500+ / 9 / 2 modes
+// stats band (repeats Home and Services) and Related services (How it works links to the Services overview). Zone
+// names, order and assets follow the world build, not the PDF's draft (src/data/world.ts).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import CardGrid from '../../blocks/CardGrid.astro';
+import Accordion from '../../blocks/Accordion.astro';
+import CtaBand from '../../blocks/CtaBand.astro';
+import { worldPath, worldZones, worldZoneUrl } from '../../data/world';
+import type { CardField } from '../../lib/types';
 
 const base = import.meta.env.BASE_URL;
-const services = navSections.find((s) => s.id === 'services')!;
-
-// Not one of the section's pills (Q79): the subnav shows the section with nothing current
-const subnavItems = [
-  { label: 'Overview', href: services.href },
-  ...services.links.map((l) => ({ label: l.label, href: l.href })),
-];
 
 // How it works (Q102): one card per thing you do, each image showing it in the world (screenshots from reach-world
 // review/shots and Ross, 6 Oct 2026; clean renders asked of the 3D World chat, docs/prompts/3d-world-embed.md §8)
@@ -91,19 +83,17 @@ const faqItems = [
 ---
 
 <BaseLayout title="Explore 3D World · Reach Subsea" motion>
-  <Header current="services" overlay />
+  <Header overlay />
   <main id="main">
     <PageHero
       style="photo"
       animate
-      breadcrumb={[{ label: 'Home', href: base }, { label: 'Services', href: services.href }, { label: 'Explore 3D World' }]}
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Explore 3D World' }]}
       title="Explore Reach in 3D"
       lead="Fly between four working zones and click any vessel, ROV or structure to see what it does."
       image={{ src: `${base}images/world-hero.jpg`, alt: '', focalPoint: { x: 0.6, y: 0.5 } }}
       actions={[{ label: 'Launch 3D World', url: worldPath }]}
     />
-
-    <SectionSubnav source="section-pages" label="Services" items={subnavItems} current={worldPagePath} />
 
     {/* PDF "How it works" and "Best viewed on" cards: the section header carries the intro and the two notes,
         then the three things you do in the world as cards, each with a screenshot that shows it (Q102) */}
@@ -117,6 +107,7 @@ const faqItems = [
           { icon: 'device-desktop', text: 'Best on a computer or tablet' },
           { icon: 'browser', text: 'Runs in your browser' },
         ],
+        action: { label: 'Our services', url: '/services/', action: 'page' },
       }}
       layout="3-columns"
       media="image-top"

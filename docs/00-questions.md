@@ -10,6 +10,33 @@ _No open questions right now._
 
 ## Answered log
 
+### Q113. Mobile menu foot tidied: rows and one link grid (6 Oct 2026)
+Context: Ross: tidy the links under the mobile menu, and after a first pass, "still a mess". The foot mixed four looks: a navy button, bold Link Small rows with arrows, a social row and a caption row, each spaced differently, and "Contact us" repeated the Contact row.
+- [x] Explore 3D World becomes a menu row after Contact, the same 56px `Heading/H5` row, with the cube icon where a chevron sits (replaces Q112's navy button)
+- [x] Open positions ↗ · FAQ · LinkedIn ↗ · Facebook ↗ as one 2-column grid in the accordion children's style (48px rows, `Body/Body` `text/secondary`, a small ↗ on external links), `stack/md` below the rows
+- [x] Privacy & Cookie Policy · Transparency Act (Caption) in the same two columns, `stack/sm` below
+- [x] "Contact us" removed (the Contact row covers it). The list reads `mobileUtility` and `socialLinks` in `navigation.ts`
+
+**Answer:** as ticked.
+
+### Q112. Explore 3D World in the footer's Explore column and in the mobile menu (6 Oct 2026)
+Context: after Q108, Ross: the footer link should move, and the mobile menu needs a link. Claude agreed: the footer listed it under Services & Assets, and below 900 the menu had no way to the 3D World (desktop has it in every menu strip and the Site menu).
+- [x] Footer: out of Services & Assets, into Explore after Projects
+- [x] Mobile menu: a 3D World entry after the Contact row (first the menu strips' navy button; a menu row since Q113)
+- [x] Not a row in the Services accordion: the page left Services (Q108) and Q79 took the row out of the Services menu
+
+**Answer:** as ticked.
+
+### Q108. Explore 3D World moves to Home › Explore 3D World (6 Oct 2026)
+Context: Ross asked whether the page should sit at Home › Explore 3D World. Claude: yes. It spans the three service lines, the fleet and the Careers route, and isn't a service; under Services it showed a pill row with nothing current. Against: the client screens PDF files it as "11 — Services — Explore 3D World", so tell the client.
+- [x] Landing page `/3d-world/` (was `/services/3d-world/`), breadcrumb Home › Explore 3D World, no Services subnav
+- [x] The framed world moves to `/3d-world/explore/` (was `/3d-world/`); `?zone=N` and `?careers=1` unchanged. Every link reads `worldPath` / `worldPagePath` in `src/data/world.ts`
+- [x] The menu entries stay where they are (Services menu strip, footer, Site menu, popular searches); menu placement is not the page's parent
+- [x] How it works gains a section header action "Our services" → `/services/`, standing in for the intro links lost in Q102
+- [x] The live site's `/3d-world/` (the Unity world) becomes the landing page, so old links still land one click from the world: no redirect (docs/09 §7)
+
+**Answer:** as ticked. Departs from the client PDF's Services placement and the discovery brief's sitemap (docs/01), to confirm with the client.
+
 ### Q102. How it works: the steps become a 3-column card row with explaining screenshots (6 Oct 2026)
 Context: Ross: choosing a step wasn't intuitive. The steps should be their own 3-column block, with images that explain each one; Take the controls should at least show the ROV and the controls (Ross supplied a Pilot mode screenshot).
 - [x] How it works is a Card grid: 3 columns, `image-top`, white cards on white. The section header carries the intro and the two notes (Section header gains an optional `meta` row)

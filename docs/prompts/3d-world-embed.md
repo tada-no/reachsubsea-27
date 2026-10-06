@@ -5,14 +5,14 @@ Written 6 Oct 2026 in the website chat (reach-web-2027), after decisions Q94–Q
 ## What the website decided
 
 - **Q94 · Hosting and content.** The world stays a separate static app on its own host. Its words, images and links move to WordPress and reach the world through a read-only API. Positions, cameras and animation stay in the world's code.
-- **Q95 · Landing page.** `/services/3d-world/` explains the world, shows the four zones (the world's names, order and assets) and launches it.
-- **Q96 · Framed under the site header.** The world opens inside the website at `/3d-world/`, in an iframe that fills the screen below the site header, like the dev site's Unity world today. Every website link into the world goes there. The in-place poster embeds on Services and Careers (a 16:9 stage that loads the scene on click) stay too.
+- **Q95 · Landing page.** `/3d-world/` (Home › Explore 3D World since Q108) explains the world, shows the four zones (the world's names, order and assets) and launches it.
+- **Q96 · Framed under the site header.** The world opens inside the website at `/3d-world/explore/`, in an iframe that fills the screen below the site header, like the dev site's Unity world today. Every website link into the world goes there. The in-place poster embeds on Services and Careers (a 16:9 stage that loads the scene on click) stay too.
 
 So the world will run framed in two sizes:
 
 | Where | Frame size (approx.) | URL the frame loads |
 |---|---|---|
-| `/3d-world/` page | full width × (viewport − header): 1440 × 803, 1100 × 704, 375 × 627 | `…/reach-world/?embed=1` (+ `&zone=N` or `&careers=1`) |
+| `/3d-world/explore/` page | full width × (viewport − header): 1440 × 803, 1100 × 704, 375 × 627 | `…/reach-world/?embed=1` (+ `&zone=N` or `&careers=1`) |
 | In-place embeds (Services, Careers) | container width × 16:9, about 1312 × 738 at 1440 | `…/reach-world/?embed=1` (Careers adds `&careers=1`) |
 
 ## To do, in priority order
@@ -35,7 +35,7 @@ Inside the frame the world keeps every key, so a keyboard user can't Tab back to
   ```
   Send it once for each allowed origin (`postMessage` takes a single target origin). Never use `'*'`.
 - Allowed origins: `https://www.reachsubsea.com`, `https://reachsubsea.com`, `https://reachsubseadev.wpenginepowered.com`, `http://localhost:4321`, `http://localhost:4322`. Keep the list in one constant, so the WordPress developer can add staging.
-- The website already listens: it checks the origin and the frame, then moves focus to its header (`reach-web-2027/src/pages/3d-world.astro`).
+- The website already listens: it checks the origin and the frame, then moves focus to its header (`reach-web-2027/src/pages/3d-world/explore.astro`).
 - Add it to the keyboard help line ("Escape closes panels or leaves Pilot mode…") as "…then returns to the website menu".
 
 ### 3. Links leave the frame properly
@@ -82,7 +82,7 @@ The website's zone cards list each zone's clickable assets. Two pins still have 
 
 ### 8. Two clean screenshots for the landing page
 
-The landing page's How it works (`/services/3d-world/`) is three cards, each with a screenshot that shows the step (3:2). Take the controls uses Ross's own Pilot mode screenshot. The other two are crops of `review/shots/careers_8_v42_desktop.jpg`, only 846 px wide. Clean ones would be better: 1800 × 1200 (3:2), desktop UI at 1440 scale, no cursor, the UI large enough to read at about 400 px wide.
+The landing page's How it works (`/3d-world/`) is three cards, each with a screenshot that shows the step (3:2). Take the controls uses Ross's own Pilot mode screenshot. The other two are crops of `review/shots/careers_8_v42_desktop.jpg`, only 846 px wide. Clean ones would be better: 1800 × 1200 (3:2), desktop UI at 1440 scale, no cursor, the UI large enough to read at about 400 px wide.
 - **Fly between four zones:** a zone overview with the zone switcher (arrows and the zone name) and a few pins in the shot, ideally with the welcome panel listing the zones. Replaces `public/images/world-step-zones.jpg`.
 - **Click any vessel or ROV:** a pin clicked and its ordinary info panel open beside the asset (not the careers-route panel, which today's crop shows). Replaces `world-step-panel.jpg`.
 
@@ -97,7 +97,7 @@ Hand them to the website chat.
 
 ## Website files, for reference
 
-- `src/pages/3d-world.astro`: the framed page. It passes `zone` and `careers` through, adds `embed=1` and listens for `reach-world:release-focus`.
+- `src/pages/3d-world/explore.astro`: the framed page (`/3d-world/explore/`). It passes `zone` and `careers` through, adds `embed=1` and listens for `reach-world:release-focus`.
 - `src/data/world.ts`: the scene URL, the in-site paths and the zone list.
 - `src/blocks/Embed.astro`: the in-place poster embeds.
 - `docs/09-wordpress-handoff.md` §7 and §7.1: the hosting and API contract the WordPress developer builds against.
