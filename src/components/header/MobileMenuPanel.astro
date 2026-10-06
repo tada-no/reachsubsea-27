@@ -1,11 +1,12 @@
 ---
 // Mobile menu panel (docs/04 §16): what the hamburger opens below 900px. Modal, full height under
 // the header (the menu icon becomes `x`), scroll-locked. Menu accordion rows, one open at a time
-// (the current section starts open); Contact is the last row, a plain link (no chevron, no panel). Then, after
-// stack/lg (redone 6 Oct 2026, Q113): one 2-column grid of small links in the accordion children's style
-// (48px rows, Body/Body text/secondary, ↗ on external links): Open positions · FAQ · LinkedIn · Facebook; then the
-// legal links on one row. Explore 3D World is a row after Contact, like it, with the cube icon where a chevron
-// sits (Q112: below 900 it was the one menu entry missing). "Contact us" went: it repeated the Contact row.
+// (the current section starts open); Contact is the last row, a plain link (no chevron, no panel). Then the
+// desktop menu strip, full bleed (6 Oct 2026, Q114): a bg/tint band holding the navy 3D World button at full width,
+// the same button as every Mega menu and the Site menu (Q112: below 900 the 3D World had no menu entry). Then
+// (Q113) one 2-column grid of small links in the accordion children's style (48px rows, Body/Body text/secondary,
+// ↗ on external links): Open positions · FAQ · LinkedIn · Facebook; then the legal links in the same columns.
+// "Contact us" went: it repeated the Contact row.
 import Icon from '../Icon.astro';
 import MenuAccordion from './MenuAccordion.astro';
 import { navSections, mobileUtility, socialLinks, legalLinks, siteMenu } from '../../data/navigation';
@@ -22,46 +23,50 @@ const { id, open = false, current } = Astro.props;
 ---
 
 <div class="mobile-menu" id={id} role="dialog" aria-modal="true" aria-label="Menu" hidden={!open}>
-  <div class="container mobile-menu__body">
-    <div class="mobile-menu__accordions">
+  <div class="mobile-menu__body">
+    <div class="container mobile-menu__accordions">
       {navSections.map((section) => <MenuAccordion section={section} open={open && section.id === current} />)}
       <div class="menu-accordion">
         <a class="mobile-menu__contact text-h5" href="/contact/">Contact</a>
       </div>
-      <div class="menu-accordion">
-        <a class="mobile-menu__contact text-h5" href={siteMenu.world.href}>
-          Explore 3D World
-          <Icon name="cube-3d-sphere" size={20} class="mobile-menu__row-icon" />
+    </div>
+    <div class="mobile-menu__strip">
+      <div class="container">
+        <a class="menu-world mobile-menu__world has-surface-navy" href={siteMenu.world.href}>
+          <span class="text-button-sm">{siteMenu.world.label}</span>
+          <Icon name="cube-3d-sphere" size={24} />
         </a>
       </div>
     </div>
-    <ul class="mobile-menu__utility">
-      {
-        [...mobileUtility.map((l) => ({ label: l.label, href: l.url, external: l.external })), ...socialLinks.map((l) => ({ label: l.label, href: l.href, external: true }))].map((link) => (
-          <li>
-            <a
-              class="menu-accordion__link text-body"
-              href={link.href}
-              target={link.external ? '_blank' : undefined}
-              rel={link.external ? 'noopener noreferrer' : undefined}
-            >
-              {link.label}
-              {link.external && <span class="visually-hidden"> (opens in a new tab)</span>}
-              {link.external && <Icon name="arrow-up-right" size={16} class="menu-accordion__icon" />}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-    <ul class="mobile-menu__legal">
-      {
-        legalLinks.map((link) => (
-          <li>
-            <a class="text-caption" href={link.url}>{link.label}</a>
-          </li>
-        ))
-      }
-    </ul>
+    <div class="container mobile-menu__links">
+      <ul class="mobile-menu__utility">
+        {
+          [...mobileUtility.map((l) => ({ label: l.label, href: l.url, external: l.external })), ...socialLinks.map((l) => ({ label: l.label, href: l.href, external: true }))].map((link) => (
+            <li>
+              <a
+                class="menu-accordion__link text-body"
+                href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noopener noreferrer' : undefined}
+              >
+                {link.label}
+                {link.external && <span class="visually-hidden"> (opens in a new tab)</span>}
+                {link.external && <Icon name="arrow-up-right" size={16} class="menu-accordion__icon" />}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="mobile-menu__legal">
+        {
+          legalLinks.map((link) => (
+            <li>
+              <a class="text-caption" href={link.url}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 </div>
 
@@ -86,27 +91,32 @@ const { id, open = false, current } = Astro.props;
     min-height: 56px;
     color: var(--wp--custom--color--text--primary);
   }
-  .mobile-menu__row-icon {
-    flex: none;
-    color: var(--wp--custom--color--icon--accent);
+  /* The desktop menu strip: bg/tint, full bleed; the shared 3D World button (SiteMenuPanel) at full width */
+  .mobile-menu__strip {
+    margin-top: var(--wp--custom--stack--md);
+    padding-block: var(--wp--preset--spacing--16);
+    background-color: var(--wp--custom--color--bg--tint);
   }
-  /* Small links: two columns of 48px rows, then the legal links in the same columns */
-  .mobile-menu__utility {
+  .mobile-menu .mobile-menu__world {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-left: 0;
+  }
+  /* Small links and legal links share two columns: the first as wide as its longest link (Privacy & Cookie Policy
+     never wraps), the second takes the rest, so both groups line up */
+  .mobile-menu__links {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: max-content minmax(0, 1fr);
     column-gap: var(--wp--custom--grid--gutter);
-    margin: var(--wp--custom--stack--md) 0 0;
-    padding: 0;
-    list-style: none;
+    margin-top: var(--wp--custom--stack--md);
   }
-  /* Same two columns as the links above, so both rows line up */
+  .mobile-menu__utility,
   .mobile-menu__legal {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--wp--preset--spacing--8) var(--wp--custom--grid--gutter);
-    margin: var(--wp--custom--stack--sm) 0 0;
-    padding: 0;
-    list-style: none;
+    display: contents;
+  }
+  .mobile-menu__legal li {
+    margin-top: var(--wp--custom--stack--sm);
   }
   .mobile-menu__legal a {
     color: var(--wp--custom--color--text--secondary);

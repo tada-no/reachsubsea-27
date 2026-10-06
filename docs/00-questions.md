@@ -10,6 +10,14 @@ _No open questions right now._
 
 ## Answered log
 
+### Q114. Mobile menu: the 3D World as the desktop menu strip (6 Oct 2026)
+Context: Ross: the Explore 3D World entry could be more of a button in the footer and the mobile menu. Claude: yes for the mobile menu, as the desktop menu strip (Q113's plain row undersold it, and the earlier button floated among mixed links); no for the footer, where a button would be the one loud thing in four quiet link columns.
+- [x] Mobile menu: after the Contact row, a full-bleed `bg/tint` strip (`space/16` padding, `stack/md` above) holding the navy 3D World button at full width, label left, cube icon right: the same button as every Mega menu and the Site menu. The 3D World row goes
+- [x] The small links and legal links share one grid: the first column as wide as its longest link (Privacy & Cookie Policy no longer wraps), the second takes the rest, `grid/gutter` apart
+- [x] Footer unchanged: Explore 3D World stays a link under Explore
+
+**Answer:** as ticked.
+
 ### Q113. Mobile menu foot tidied: rows and one link grid (6 Oct 2026)
 Context: Ross: tidy the links under the mobile menu, and after a first pass, "still a mess". The foot mixed four looks: a navy button, bold Link Small rows with arrows, a social row and a caption row, each spaced differently, and "Contact us" repeated the Contact row.
 - [x] Explore 3D World becomes a menu row after Contact, the same 56px `Heading/H5` row, with the cube icon where a chevron sits (replaces Q112's navy button)
