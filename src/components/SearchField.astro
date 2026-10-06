@@ -1,0 +1,81 @@
+---
+// Search field (docs/04 §10b, 6 Oct 2026, Q88): an in-page filter field, the small sibling of the header
+// Search panel's field (§16). 48 tall, radius/md, 1px border/default (hover border/strong), search icon,
+// clear button once there is text. It filters what is on the page as you type, so there is no submit; the
+// block that owns it listens for `input` on [data-search-field] and `click` on [data-search-clear].
+import Icon from './Icon.astro';
+import IconButton from './IconButton.astro';
+
+interface Props {
+  id: string;
+  /** Read by screen readers; the placeholder carries the visible hint. */
+  label: string;
+  placeholder?: string;
+  class?: string;
+}
+
+const { id, label, placeholder, class: className } = Astro.props;
+---
+
+<div class:list={['search-field', className]} role="search">
+  <label class="visually-hidden" for={id}>{label}</label>
+  <Icon name="search" size={20} class="search-field__icon" />
+  <input
+    class="search-field__input text-body"
+    id={id}
+    type="search"
+    placeholder={placeholder ?? label}
+    autocomplete="off"
+    spellcheck="false"
+    data-search-field
+  />
+  <IconButton icon="x" label="Clear search" type="button" variant="ghost" size="small" class="search-field__clear" data-search-clear hidden />
+</div>
+
+<style is:global>
+  .search-field {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    height: var(--wp--preset--spacing--48);
+    padding-inline: var(--wp--preset--spacing--16) var(--wp--preset--spacing--4);
+    background-color: var(--wp--custom--color--bg--default);
+    border: 1px solid var(--wp--custom--color--border--default);
+    border-radius: var(--wp--custom--radius--md);
+    transition: border-color var(--wp--custom--motion--duration-fast) var(--wp--custom--motion--ease-out);
+  }
+  .search-field:hover {
+    border-color: var(--wp--custom--color--border--strong);
+  }
+  /* The whole box takes the focus ring, not the bare input inside it (as the Search panel) */
+  .search-field:has(.search-field__input:focus-visible) {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+  }
+  .search-field__icon {
+    flex: none;
+    color: var(--wp--custom--color--icon--primary);
+  }
+  .search-field__input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    appearance: none;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .search-field__input:focus-visible {
+    outline: none;
+  }
+  .search-field__input::placeholder {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .search-field__input::-webkit-search-cancel-button {
+    display: none;
+  }
+  .search-field__clear {
+    flex: none;
+  }
+</style>

@@ -71,6 +71,8 @@
 
   /* ── Radius ───────────────────────────────────────────────── */
   --wp--custom--radius--none: 0px;
+  /* xs (6 Oct 2026): chart marks only, the top corners of a bar; 8px rounds a 24px bar into a pill */
+  --wp--custom--radius--xs: 2px;
   --wp--custom--radius--sm: 8px;
   --wp--custom--radius--md: 16px;
   --wp--custom--radius--lg: 24px;

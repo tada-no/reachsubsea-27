@@ -2,8 +2,11 @@
 // Data list · reach/data-list (docs/05 §2.7). Type Reports · Documents · Dates · Publications.
 // Latest is a Navy panel (not a Card instance, it holds several actions): 416 beside the table on
 // Desktop, full width on Mobile. Reports/Documents share the "newest N, then archive toggle"
-// pattern; Reports alone has tabs; Publications alone has filter chips + Load more. Row style is
-// shared everywhere: header UI/Eyebrow text/secondary, rows padding y space/16, 1px border/subtle
+// pattern; Reports alone has tabs; Publications alone has a search field, multi-select filter chips
+// (OR within a facet, AND across, Q90) + Load more,
+// in a sticky rail beside the list from 1100 (Q88). Row style is
+// shared everywhere: header UI/Eyebrow text/secondary, row eyebrows text/accent (as card eyebrows, Q88),
+// rows padding y space/16, 1px border/subtle
 // dividers, no zebra. Mobile drops the boxed table for plain top-rule rows, except Reports, whose
 // nested quarter groups become closed/open Accordion items instead (same underlying data).
 import BlockSection from '../components/BlockSection.astro';
@@ -13,6 +16,7 @@ import Link from '../components/Link.astro';
 import Button from '../components/Button.astro';
 import MetaItem from '../components/MetaItem.astro';
 import FilterChip from '../components/FilterChip.astro';
+import SearchField from '../components/SearchField.astro';
 import AccordionItem from '../components/AccordionItem.astro';
 import { makeId } from '../lib/ids';
 import type { BlockFields, LinkField, SectionHeaderField } from '../lib/types';
@@ -104,6 +108,17 @@ const yearsArchiveCount = yearsHidden.length;
 const meetingsShown = meetings.slice(0, visibleYears);
 const meetingsHidden = showArchiveToggle ? meetings.slice(visibleYears) : [];
 const meetingsArchiveCount = meetingsHidden.length;
+
+// Publications facets: which option a publication falls under
+const facetValueOf = (p: Publication, facet: string) => (facet === 'year' ? p.yearId : facet === 'topic' ? p.topicId : undefined);
+
+// Publications search: title, authors, venue, topic and year, lower-cased with accents folded (Vassvåg = vassvag)
+const searchText = (p: Publication) =>
+  [p.title, p.byline, p.topicLabel, p.year]
+    .join(' ')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
 
 type QuarterEntry = { n: number; label: string; date: string; report?: { url: string }; presentation?: { url: string }; webcast?: { url: string } };
 
@@ -445,49 +460,84 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
     {
       /* ── Publications ────────────────────────────────────────── */
       type === 'publications' && (
-        <div class="data-list__main data-list__main--capped">
-          {facets.length > 0 && (
-            <div class="data-list__facets">
-              {facets.map((facet) => (
-                <div class="data-list__facet">
-                  <span class="data-list__facet-label text-eyebrow">{facet.label}</span>
-                  <div class="data-list__facet-chips scroll-row">
-                    <FilterChip label="All" selected data-facet={facet.id} data-value="all" aria-pressed="true" />
-                    {facet.options.map((opt) => (
-                      <FilterChip label={opt.label} data-facet={facet.id} data-value={opt.id} aria-pressed="false" />
-                    ))}
+        <div class="data-list__pubs">
+          <div class="data-list__rail">
+            <div class="data-list__search">
+              <SearchField id={`${instanceId}-search`} label="Search publications" placeholder="Title, author or journal" />
+              {/* The count belongs to the search: right under it, with Clear all once anything narrows the list (Q89) */}
+              <div class="data-list__summary">
+                <p class="data-list__count text-small" aria-live="polite" data-pub-count data-total={publications.length}>
+                  {publications.length} publication{publications.length === 1 ? '' : 's'}
+                </p>
+                <Link label="Clear all" showIcon={false} size="small" class="data-list__clear-all" data-pub-reset data-off />
+              </div>
+            </div>
+            {facets.length > 0 && (
+              <div class="data-list__facets">
+                {facets.map((facet) => (
+                  <div class="data-list__facet" role="group" aria-labelledby={`${instanceId}-${facet.id}`}>
+                    <span class="data-list__facet-label text-eyebrow" id={`${instanceId}-${facet.id}`}>
+                      {facet.label}
+                    </span>
+                    <div class="data-list__facet-chips scroll-row">
+                      {facet.options.map((opt) => (
+                        <FilterChip
+                          label={opt.label}
+                          count={publications.filter((p) => facetValueOf(p, facet.id) === opt.id).length}
+                          data-facet={facet.id}
+                          data-value={opt.id}
+                          aria-pressed="false"
+                        />
+                      ))}
+                      {/* One year picked from the Year bars chart (Q88): filled in and shown by the script */}
+                      {facet.id === 'year' && (
+                        <FilterChip label="" count="" data-facet="year" data-value="" data-single-year aria-pressed="false" hidden />
+                      )}
+                    </div>
                   </div>
-                </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div class="data-list__pub-results">
+            <ul class="data-list__pub-list">
+              {publications.map((p, i) => (
+                <li
+                  class="data-list__row"
+                  data-pub-row
+                  data-year={p.yearId}
+                  data-single={p.year}
+                  data-topic={p.topicId}
+                  data-search={searchText(p)}
+                  hidden={i >= count}
+                  tabindex="-1"
+                >
+                  <div class="data-list__pub-main">
+                    <p class="text-eyebrow data-list__row-eyebrow">
+                      {p.year} · {p.topicLabel}
+                    </p>
+                    <h3 class="text-h5">{p.title}</h3>
+                    <p class="text-small data-list__pub-byline">{p.byline}</p>
+                  </div>
+                  <div class="data-list__pub-action">
+                    <Link label={p.link.label} href={p.link.url} action={p.link.action} size="small" />
+                  </div>
+                </li>
               ))}
+            </ul>
+
+            <div class="data-list__no-match" data-pub-empty hidden>
+              <p class="text-body">No publications match these filters.</p>
+              <Link label="Clear search and filters" showIcon={false} size="small" data-pub-reset />
             </div>
-          )}
 
-          <p class="data-list__count text-small" aria-live="polite" data-pub-count>
-            {publications.length} publication{publications.length === 1 ? '' : 's'}
-          </p>
-
-          <ul class="data-list__pub-list">
-            {publications.map((p, i) => (
-              <li class="data-list__row" data-pub-row data-year={p.yearId} data-topic={p.topicId} hidden={i >= count} tabindex="-1">
-                <div class="data-list__pub-main">
-                  <p class="text-eyebrow data-list__row-eyebrow">
-                    {p.year} · {p.topicLabel}
-                  </p>
-                  <h3 class="text-h5">{p.title}</h3>
-                  <p class="text-small data-list__pub-byline">{p.byline}</p>
-                </div>
-                <div class="data-list__pub-action">
-                  <Link label={p.link.label} href={p.link.url} action={p.link.action} size="small" />
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          {showLoadMore && publications.length > count && (
-            <div class="data-list__load-more">
-              <Button label="Load more" variant="outline" data-load-more />
-            </div>
-          )}
+            {showLoadMore && publications.length > count && (
+              <div class="data-list__load-more">
+                <Button label="Load more" variant="outline" data-load-more />
+              </div>
+            )}
+          </div>
         </div>
       )
     }
@@ -511,21 +561,45 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
     });
   }
 
-  function activeFacetValue(root: Element, facet: string) {
-    const active = root.querySelector(`[data-facet="${facet}"][aria-pressed="true"]`);
-    return active?.getAttribute('data-value') ?? 'all';
+  // Multi-select (Q90): the picked values of one facet; none picked = no limit
+  function activeFacetValues(root: Element, facet: string) {
+    return Array.from(root.querySelectorAll<HTMLElement>(`[data-facet="${facet}"][aria-pressed="true"]`))
+      .map((chip) => chip.dataset.value ?? '')
+      .filter(Boolean);
+  }
+
+  // Which row fields a facet value can match: a year run or a single year (from the Year bars chart), a topic
+  const ROW_FIELDS: Record<string, ('year' | 'single' | 'topic')[]> = { year: ['year', 'single'], topic: ['topic'] };
+
+  const fold = (text: string) =>
+    text
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+
+  // One test for every publications filter: any picked value within a facet (OR), every facet (AND), the search
+  function publicationMatcher(root: Element, override?: { facet: string; values: string[] }) {
+    const picked = Object.keys(ROW_FIELDS).map((facet) => ({
+      facet,
+      values: override?.facet === facet ? override.values : activeFacetValues(root, facet),
+    }));
+    const field = root.querySelector<HTMLInputElement>('[data-search-field]');
+    const terms = fold(field?.value ?? '').split(/\s+/).filter(Boolean);
+    return (row: HTMLElement) =>
+      picked.every(
+        ({ facet, values }) => values.length === 0 || values.some((v) => ROW_FIELDS[facet].some((f) => row.dataset[f] === v)),
+      ) && terms.every((t) => (row.dataset.search ?? '').includes(t));
   }
 
   function filterPublications(root: Element) {
-    const year = activeFacetValue(root, 'year');
-    const topic = activeFacetValue(root, 'topic');
+    const matches = publicationMatcher(root);
     const step = Number(root.getAttribute('data-count') || '4');
     const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-pub-row]'));
     let shown = 0;
     let matched = 0;
     rows.forEach((row) => {
-      const matches = (year === 'all' || row.dataset.year === year) && (topic === 'all' || row.dataset.topic === topic);
-      if (!matches) {
+      if (!matches(row)) {
         row.hidden = true;
         return;
       }
@@ -533,21 +607,69 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
       row.hidden = shown >= step;
       if (shown < step) shown += 1;
     });
-    const countEl = root.querySelector('[data-pub-count]');
-    if (countEl) countEl.textContent = `${matched} publication${matched === 1 ? '' : 's'}`;
+    const countEl = root.querySelector<HTMLElement>('[data-pub-count]');
+    if (countEl) {
+      const total = Number(countEl.dataset.total || rows.length);
+      countEl.textContent =
+        matched === total ? `${total} publication${total === 1 ? '' : 's'}` : `${matched} of ${total} publications`;
+    }
+    const empty = root.querySelector<HTMLElement>('[data-pub-empty]');
+    if (empty) empty.hidden = matched > 0;
+    updateFacetCounts(root, rows);
+    // Clear all shows once a search or any facet narrows the list
+    const field = root.querySelector<HTMLInputElement>('[data-search-field]');
+    const narrowed = Boolean(field?.value.trim()) || root.querySelector('[data-facet][aria-pressed="true"]') !== null;
+    root.querySelector<HTMLElement>('.data-list__clear-all')?.toggleAttribute('data-off', !narrowed);
     const loadMoreWrap = root.querySelector<HTMLElement>('.data-list__load-more');
     if (loadMoreWrap) loadMoreWrap.hidden = shown >= matched;
+  }
+
+  // Each option's count is its own share given the search and the other facet (Q89, Q90), so it does not
+  // move as options in its own facet are ticked. An option with none is disabled unless it is ticked.
+  function updateFacetCounts(root: Element, rows: HTMLElement[]) {
+    root.querySelectorAll<HTMLButtonElement>('[data-facet]').forEach((chip) => {
+      const facet = chip.dataset.facet;
+      const value = chip.dataset.value;
+      if (!facet || !value) return;
+      const n = rows.filter(publicationMatcher(root, { facet, values: [value] })).length;
+      const countEl = chip.querySelector('.filter-chip__count');
+      if (countEl) countEl.textContent = String(n);
+      chip.disabled = n === 0 && chip.getAttribute('aria-pressed') !== 'true';
+    });
+  }
+
+  // Ticks or unticks one option; the single-year chip only lives while it is ticked
+  function toggleChip(chip: HTMLElement, on = chip.getAttribute('aria-pressed') !== 'true') {
+    chip.setAttribute('aria-pressed', String(on));
+    if (!on && chip.hasAttribute('data-single-year')) chip.hidden = true;
+  }
+
+  function pickSingleYear(root: Element, year: string) {
+    const single = root.querySelector<HTMLElement>('[data-single-year]');
+    if (!single) return;
+    single.dataset.value = year;
+    const label = single.querySelector('.filter-chip__label');
+    if (label) label.textContent = year;
+    single.hidden = false;
+    // A chart pick is a jump to that one year: it replaces the other year ticks
+    root.querySelectorAll<HTMLElement>('[data-facet="year"]').forEach((chip) => toggleChip(chip, chip === single));
+    filterPublications(root);
+  }
+
+  function resetPublications(root: Element) {
+    const field = root.querySelector<HTMLInputElement>('[data-search-field]');
+    if (field) field.value = '';
+    root.querySelector<HTMLElement>('[data-search-clear]')?.toggleAttribute('hidden', true);
+    root.querySelectorAll<HTMLElement>('[data-facet]').forEach((chip) => toggleChip(chip, false));
+    filterPublications(root);
   }
 
   function revealMore(button: HTMLElement) {
     const root = button.closest('.data-list');
     if (!root) return;
-    const year = activeFacetValue(root, 'year');
-    const topic = activeFacetValue(root, 'topic');
+    const matches = publicationMatcher(root);
     const step = Number(root.getAttribute('data-count') || '4');
-    const matching = Array.from(root.querySelectorAll<HTMLElement>('[data-pub-row]')).filter(
-      (row) => (year === 'all' || row.dataset.year === year) && (topic === 'all' || row.dataset.topic === topic),
-    );
+    const matching = Array.from(root.querySelectorAll<HTMLElement>('[data-pub-row]')).filter(matches);
     const hiddenMatching = matching.filter((row) => row.hidden);
     const toShow = hiddenMatching.slice(0, step);
     toShow.forEach((row) => {
@@ -559,6 +681,23 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
     }
     toShow[0]?.focus();
   }
+
+  // Search as you type (Search field, Q88)
+  document.addEventListener('input', (event) => {
+    const field = (event.target as Element).closest?.<HTMLInputElement>('[data-search-field]');
+    const root = field?.closest('.data-list');
+    if (!field || !root) return;
+    root.querySelector<HTMLElement>('[data-search-clear]')?.toggleAttribute('hidden', field.value === '');
+    filterPublications(root);
+  });
+
+  // Another block asks for a filter, e.g. a Year bars column: { target: section id, facet: 'year', value: '2017' }
+  document.addEventListener('reach:filter', (event) => {
+    const { target, facet, value } = (event as CustomEvent<{ target: string; facet: string; value: string }>).detail;
+    const root = document.getElementById(target);
+    if (!root?.classList.contains('data-list') || facet !== 'year') return;
+    pickSingleYear(root, value);
+  });
 
   document.addEventListener('click', (event) => {
     const target = event.target as Element;
@@ -582,12 +721,31 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
 
     const chip = target.closest<HTMLElement>('[data-facet]');
     if (chip) {
-      const facet = chip.getAttribute('data-facet');
       const root = chip.closest('.data-list');
-      if (facet && root) {
-        root.querySelectorAll(`[data-facet="${facet}"]`).forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      if (root) {
+        toggleChip(chip);
         filterPublications(root);
       }
+      return;
+    }
+
+    const clear = target.closest<HTMLElement>('[data-search-clear]');
+    if (clear) {
+      const root = clear.closest('.data-list');
+      const field = root?.querySelector<HTMLInputElement>('[data-search-field]');
+      if (root && field) {
+        field.value = '';
+        clear.hidden = true;
+        field.focus();
+        filterPublications(root);
+      }
+      return;
+    }
+
+    const reset = target.closest<HTMLElement>('[data-pub-reset]');
+    if (reset) {
+      const root = reset.closest('.data-list');
+      if (root) resetPublications(root);
       return;
     }
 
@@ -760,11 +918,66 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
   .data-list__mobile-rows > .data-list__row:first-child {
     border-top: none;
   }
+  /* Accent, as a card's eyebrow (Q88): rows and cards read as one family */
   .data-list__row-eyebrow {
-    color: var(--wp--custom--color--text--secondary);
+    color: var(--wp--custom--color--text--accent);
   }
 
   /* ── Publications ──────────────────────────────────────────── */
+  /* Below 1100 the rail (search + count, then facets as chip rows) sits above the list; from 1100 it is a
+     narrow sticky column (cols 1–3 from 1280 with col 4 left as air, cols 1–4 at 1100–1279) beside the list (cols 5–12), so the filters stay in
+     reach down 49 rows (Q88), and the facets become a plain refinement list (Q89). At 900 a rail was too
+     narrow for the search hint and pushed titles to four lines */
+  /* Filters to list: more than the space between papers, so the chips never read as part of the first one */
+  .data-list__pubs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
+  }
+  .data-list__rail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    min-width: 0;
+  }
+  .data-list__pub-results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    min-width: 0;
+  }
+  .data-list__search {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .data-list__summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--16);
+  }
+  .data-list__summary .data-list__count {
+    padding-top: 0;
+  }
+  /* No jump when Clear all appears (Q92): its 44px target overhangs the 24px count line instead of
+     growing it (12px padding pulled back out), and it is always laid out, only shown or hidden */
+  .data-list__clear-all {
+    margin-block: calc(-1 * var(--wp--preset--spacing--12));
+  }
+  .data-list__clear-all[data-off] {
+    visibility: hidden;
+  }
+  .data-list__count {
+    font-variant-numeric: tabular-nums;
+  }
+  .data-list__no-match {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--8);
+    padding-block: var(--wp--preset--spacing--24);
+  }
   .data-list__facets {
     display: flex;
     flex-direction: column;
@@ -791,15 +1004,20 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
     color: var(--wp--custom--color--text--secondary);
     padding-top: var(--wp--preset--spacing--8);
   }
+  /* A reading list, not a table (Q91): papers are grouped by space alone, the gap between them (24 → 40)
+     well clear of the 4px inside one, so no rules. The link sits on the paper's first line */
   .data-list__pub-list {
     display: flex;
     flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
   }
   .data-list__pub-list .data-list__row {
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--wp--custom--grid--gutter);
+    padding-block: 0;
+    border-top: none;
   }
   .data-list__pub-main {
     display: flex;
@@ -818,6 +1036,114 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
     justify-content: center;
     padding-top: var(--wp--preset--spacing--8);
   }
+  @media (min-width: 1100px) {
+    .data-list__pubs {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--wp--custom--grid--gutter);
+      align-items: start;
+    }
+    .data-list__rail {
+      grid-column: 1 / span 4;
+      gap: var(--wp--custom--stack--lg);
+    }
+    .data-list__pub-results {
+      grid-column: 5 / -1;
+    }
+    .data-list__rail .data-list__facets {
+      gap: var(--wp--custom--stack--md);
+    }
+    .data-list__rail .data-list__facet {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--wp--preset--spacing--4);
+    }
+    .data-list__rail .data-list__facet-label {
+      width: auto;
+    }
+    .data-list__rail .data-list__facet-chips {
+      flex-direction: column;
+      gap: 0;
+      overflow: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+    }
+    /* Filter chip, Layout List (Q89): in the rail each option is a plain row, no pill. A 16px tick slot
+       keeps labels aligned; the picked row shows the tick in accent and bold text; the count sits right.
+       The row's 8px side padding is pulled back out so the labels line up with the facet label */
+    .data-list__rail .filter-chip,
+    .data-list__rail .filter-chip[aria-pressed='true'] {
+      display: flex;
+      width: auto;
+      margin-inline: calc(-1 * var(--wp--preset--spacing--8));
+      padding-inline: var(--wp--preset--spacing--8);
+      border-radius: var(--wp--custom--radius--sm);
+      background-color: transparent;
+      box-shadow: none;
+      white-space: normal;
+      text-align: left;
+    }
+    .data-list__rail .filter-chip > * {
+      scroll-snap-align: none;
+    }
+    /* Multi-select (Q90): the tick slot is drawn as a checkbox, so it reads as "tick as many as you like" */
+    .data-list__rail .filter-chip__check {
+      display: block;
+      flex: none;
+      color: transparent;
+      border-radius: var(--wp--custom--radius--xs);
+      box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--strong);
+    }
+    .data-list__rail .filter-chip__label {
+      flex: 1;
+      min-width: 0;
+    }
+    /* Right-aligned so (7) and (14) line up as a column */
+    .data-list__rail .filter-chip__count {
+      text-align: right;
+    }
+    .data-list__rail .filter-chip[aria-pressed='true'] {
+      background-color: transparent;
+      color: var(--wp--custom--color--text--primary);
+    }
+    .data-list__rail .filter-chip[aria-pressed='true'] .filter-chip__check {
+      color: var(--wp--custom--color--action--primary--fg);
+      background-color: var(--wp--custom--color--action--primary--bg);
+      box-shadow: none;
+    }
+    .data-list__rail .filter-chip:disabled .filter-chip__check {
+      box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--subtle);
+    }
+    .data-list__rail .filter-chip[aria-pressed='true'] .filter-chip__count {
+      color: var(--wp--custom--color--text--secondary);
+    }
+    .data-list__rail .filter-chip:disabled {
+      box-shadow: none;
+    }
+    .data-list__rail .filter-chip:not(:disabled):hover {
+      background-color: var(--wp--custom--color--action--outline--bg-hover);
+      box-shadow: none;
+    }
+    .data-list__rail .filter-chip:disabled .filter-chip__count {
+      color: inherit;
+    }
+  }
+  /* Docks under the section subnav (72 tall) wherever the header leaves it; only on screens tall enough
+     to hold the whole rail (about 650 + 104 offset), or its last options would hang below the fold */
+  @media (min-width: 1100px) and (min-height: 800px) {
+    .data-list__rail {
+      position: sticky;
+      top: calc(var(--reach-subnav-top, 0px) + var(--wp--preset--spacing--72) + var(--wp--preset--spacing--32));
+    }
+  }
+  /* From 1280 the rail narrows to cols 1–3 and col 4 becomes air; below that 3 cols (229 at 1100)
+     clipped the search hint */
+  @media (min-width: 1280px) {
+    .data-list__rail {
+      grid-column: 1 / span 3;
+    }
+  }
+
 
   /* ── Breakpoints ───────────────────────────────────────────── */
   @media (max-width: 899px) {
@@ -860,6 +1186,10 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
     .data-list__pub-list .data-list__row {
       flex-direction: column;
       gap: var(--wp--preset--spacing--8);
+    }
+    /* With the link under the byline, 24 between papers read the same as byline to link */
+    .data-list__pub-list {
+      gap: var(--wp--preset--spacing--40);
     }
   }
 </style>

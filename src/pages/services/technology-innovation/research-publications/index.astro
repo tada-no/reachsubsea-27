@@ -1,0 +1,121 @@
+---
+// Services › Technology & Innovation › Research & Publications (6 Oct 2026): the library of Reach's academic and
+// industry output. Content: client PDF p9 ("07 — Services — Research & Publications": year-by-year counts, the
+// publications with authors and venues, FAQ, CTA) and the live Selection of Publications page, which has 49
+// entries (the PDF says 48). A secondary page: reached from the Technology page's research card and the Services
+// menu. Built for a researcher, partner or investor checking the substance behind the monitoring technology:
+// what has been published and when · the full list, filterable · FAQ · contact.
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Header from '../../../../components/header/Header.astro';
+import Footer from '../../../../components/Footer.astro';
+import PageHero from '../../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../../blocks/SectionSubnav.astro';
+import YearBars from '../../../../blocks/YearBars.astro';
+import DataList from '../../../../blocks/DataList.astro';
+import Accordion from '../../../../blocks/Accordion.astro';
+import CtaBand from '../../../../blocks/CtaBand.astro';
+import { navSections } from '../../../../data/navigation';
+import { publications, publicationFacets, publicationsByYear } from '../../../../data/documents';
+
+const base = import.meta.env.BASE_URL;
+const services = navSections.find((s) => s.id === 'services')!;
+const researchHref = '/services/technology-innovation/research-publications/';
+const total = publications.length;
+const firstYear = Math.min(...publications.map((p) => p.year));
+const lastYear = Math.max(...publications.map((p) => p.year));
+
+// The Tech page's three PDF FAQs (p16), answers verbatim: the PDF names a page-specific FAQ but gives no text for it
+const faqItems = [
+  {
+    slug: 'research-development-investment',
+    question: 'What research and development does Reach Subsea invest in?',
+    answer:
+      'Several active programmes: AI-enabled perception and robotics for our ROV fleet (Reach Pilot), autonomous and remote vessel operations (Reach Remote), in-house data infrastructure (Reach Relay), and geophysical monitoring technology developed with research partners including ASUMO and DIGIMON.',
+    open: true,
+  },
+  {
+    slug: 'research-partnerships',
+    question: 'Who does Reach Subsea do research with?',
+    answer:
+      'DIGIMON (CCS monitoring) and ASUMO (seafloor and earthquake monitoring), delivered with research institutes, universities and industry partners.',
+  },
+  {
+    slug: 'published-research',
+    question: 'Where can I read Reach Subsea’s published research?',
+    answer: `Our Research & Publications library lists ${total} conference papers and journal articles from ${firstYear} to ${lastYear}, co-authored by our geophysics and monitoring teams.`,
+  },
+];
+const subnavItems = [
+  { label: 'Overview', href: services.href },
+  ...services.links.map((l) => ({ label: l.label, href: l.href })),
+];
+---
+
+<BaseLayout title="Research & Publications · Reach Subsea" motion>
+  <Header current="services" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Services', href: services.href },
+        { label: 'Technology & Innovation', href: '/services/technology-innovation/' },
+        { label: 'Research & Publications' },
+      ]}
+      title="The science behind how we work"
+      lead="Conference papers and journal articles co-authored by our geophysics and monitoring teams, published continuously since 2013."
+      image={{ src: `${base}images/hero-publications.jpg`, alt: '', focalPoint: { x: 1, y: 0.5 } }}
+      actions={[
+        { label: 'Browse the library', url: '#library', action: 'anchor' },
+        { label: 'About our technology', url: '/services/technology-innovation/', action: 'page', type: 'link' },
+      ]}
+    />
+
+    <SectionSubnav source="section-pages" label="Services" items={subnavItems} current={researchHref} />
+
+    <YearBars
+      anchor="by-year"
+      background="white"
+      title={`${total} publications, ${firstYear} to ${lastYear}`}
+      body="Spanning 4D gravity monitoring, seafloor subsidence, CO2 storage and drill-bit seismic, in First Break, EAGE and SEG."
+      unit="publications"
+      bars={publicationsByYear()}
+      filterTarget="library"
+    />
+
+    <DataList
+      anchor="library"
+      type="publications"
+      background="tint"
+      sectionHeader={{ title: 'Research & publications library' }}
+      publications={publications}
+      facets={publicationFacets}
+      count={10}
+      showLoadMore
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about our R&D programme and the technology behind our services.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="research-publications"
+      background="white"
+      items={faqItems}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title="Interested in partnering on R&D?"
+      text="We work with research institutes, universities and industry partners across our technology programmes."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

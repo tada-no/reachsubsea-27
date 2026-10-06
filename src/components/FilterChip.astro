@@ -1,5 +1,8 @@
 ---
 // Filter chip (docs/04 §10). Selected = aria-pressed="true" (navy fill + check icon).
+// No jump on select (Q92): the check (16 + 8 gap = 24) appears inside the chip's own side padding, so the
+// chip keeps its width and the chips after it stay put. Unselected 28 each side; selected 16 + check + 16.
+// Counts are bracketed, "2025–26 (7)" (Q93), and keep two-digit room for the same reason.
 import Icon from './Icon.astro';
 
 interface Props {
@@ -32,7 +35,7 @@ const { label, count, selected = false, disabled = false, class: className, ...a
     align-items: center;
     gap: var(--wp--preset--spacing--8);
     min-height: 40px;
-    padding-inline: var(--wp--preset--spacing--16);
+    padding-inline: calc(var(--wp--preset--spacing--16) + var(--wp--preset--spacing--12));
     border-radius: var(--wp--custom--radius--full);
     background-color: var(--wp--custom--color--bg--default);
     color: var(--wp--custom--color--text--primary);
@@ -45,10 +48,22 @@ const { label, count, selected = false, disabled = false, class: className, ...a
   .filter-chip__check {
     display: none;
   }
+  /* The count is bracketed (Q93): a bare number after a label that is itself a number ("2025–26 7") read as
+     part of it. Counts can change live (Data list, Q89): tabular figures and room for two digits plus
+     brackets, so 14 → 5 keeps the chip's width */
   .filter-chip__count {
+    min-width: 4ch;
+    font-variant-numeric: tabular-nums;
     color: var(--wp--custom--color--text--secondary);
   }
+  .filter-chip__count::before {
+    content: '(';
+  }
+  .filter-chip__count::after {
+    content: ')';
+  }
   .filter-chip[aria-pressed='true'] {
+    padding-inline: var(--wp--preset--spacing--16);
     background-color: var(--wp--custom--color--action--primary--bg);
     color: var(--wp--custom--color--action--primary--fg);
     box-shadow: none;
@@ -71,5 +86,8 @@ const { label, count, selected = false, disabled = false, class: className, ...a
     cursor: not-allowed;
     color: var(--wp--custom--color--text--disabled);
     box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--subtle);
+  }
+  .filter-chip:disabled .filter-chip__count {
+    color: inherit;
   }
 </style>

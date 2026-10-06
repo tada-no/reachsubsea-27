@@ -73,6 +73,7 @@ If a card fails, change the row's shape at that width (fewer columns, or the car
 - Eyebrows and intros only where they add information.
 - Split media: text and media vertically centred.
 - No orphaned single words in headings at the four widths if a reasonable wrap fixes them.
+- **Read every label as a stranger would (Q93).** Measuring layout does not catch meaning. Read each chip, count, button and caption aloud in every state: a count beside a label that is itself a number ("2025–26 7") reads as one figure, so bracket it; a disabled label and its count share one colour.
 
 ## 5. Page rhythm and consistency
 
@@ -93,6 +94,7 @@ If a card fails, change the row's shape at that width (fewer columns, or the car
 - A sideways-scrolling area is keyboard-reachable: `tabindex="0"`, `role="region"`, an `aria-label` and a visible focus ring.
 - `aria-label` only on elements with a role (landmarks, lists, buttons, links), never on a plain `div` or `span`. Landmarks of one type need different names.
 - Tap targets at least 24px tall.
+- **No layout jump on interaction (Q92).** Tick, select, open, filter or type in every control and measure: nothing outside the thing you touched moves. Reserve space for anything that can appear (a Clear link, a tick, an error line): show and hide it with `visibility`, keep a 44px target inside the line box with negative margins, give live numbers tabular figures and a minimum width, and let a selected state swap padding rather than add width.
 - Run axe-core (WCAG 2.2 AA + best practice) and an HTML validator on the built page: zero violations (Q70).
 
 ## 7. Tokens

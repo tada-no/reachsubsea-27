@@ -186,7 +186,31 @@ function initWipe() {
   });
 }
 
+// Grow (6 Oct 2026): a chart marked [data-grow] gets .is-grown once it is (nearly) all in view, so the rise is
+// seen rather than spent below the fold; its block's CSS rises the bars from the baseline. The hidden state
+// is CSS (html.js), so reduced motion or no observer grows at once.
+function initGrow() {
+  const els = [...document.querySelectorAll<HTMLElement>('[data-grow]')];
+  if (els.length === 0) return;
+  if (reduceMotion || !('IntersectionObserver' in window)) {
+    els.forEach((el) => el.classList.add('is-grown'));
+    return;
+  }
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        entry.target.classList.add('is-grown');
+      });
+    },
+    { rootMargin: '0px 0px -8% 0px', threshold: 0.9 },
+  );
+  els.forEach((el) => observer.observe(el));
+}
+
 initReveal();
 initCountUp();
 initWipe();
+initGrow();
 initPictogramLoops();

@@ -1,0 +1,239 @@
+---
+// Year bars · reach/year-bars (6 Oct 2026, Research & Publications; proposed block, outside the 14-block budget).
+// A count per year as columns beside a short text column: how much a body of work has grown. Text left
+// (cols 1–5), chart right (cols 7–12), bottom-aligned so the body's last line sits level with the year labels
+// (Q87: centred, the two halves floated). The bars fill their columns with a 12px gap so the row reads as one
+// profile, in a 240px chart. Bars are accent, square-based on one hairline baseline with 2px top corners; the
+// count sits just above each bar and the year below. No y axis: every bar carries its count. The chart is a list
+// for assistive tech ("4 publications, 2025"; the full year is always read). Years shorten to ’13 when the chart
+// is under 600px wide, and under 400px every other year is labelled, counting back from the latest so the
+// current year always has its label. Motion (data-grow in motion.ts): the bars grow up from the baseline left to
+// right as the chart enters, each count appearing as its bar lands; reduced motion shows the chart at once.
+// Filter (Q88): with `filterTarget` (a Data list's section id) each column is a button that filters that list
+// to its year and scrolls to it, through a `reach:filter` event, so the two blocks stay independent.
+// The numbers come from the data (never retyped).
+import BlockSection from '../components/BlockSection.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields } from '../lib/types';
+
+interface Props extends BlockFields {
+  eyebrow?: string;
+  title: string;
+  body?: string;
+  /** One entry per year, in order, zeros included. */
+  bars: { year: number; count: number }[];
+  /** What a bar counts, said once for assistive tech: "publications". */
+  unit?: string;
+  /** Section id of a Data list to filter by year when a column is clicked, e.g. "library". */
+  filterTarget?: string;
+}
+
+const { eyebrow, title, body, bars = [], unit = 'items', filterTarget, background, spacing, anchor } = Astro.props;
+const Col = filterTarget ? 'button' : 'span';
+const max = Math.max(1, ...bars.map((b) => b.count));
+const titleId = makeId('year-bars', title);
+---
+
+{
+  bars.length > 0 && (
+    <BlockSection slug="year-bars" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId}>
+      <div class="year-bars__columns">
+        <div class="year-bars__text">
+          {eyebrow && <Eyebrow text={eyebrow} />}
+          <h2 id={titleId} class="text-h2">{title}</h2>
+          {body && <p class="year-bars__body text-body">{body}</p>}
+        </div>
+        <ol class="year-bars__chart" aria-label={`${unit} per year`} style={`--max: ${max}`} data-grow>
+          {bars.map((b, i) => (
+            <li class="year-bars__bar" style={`--n: ${b.count}; --i: ${i}`}>
+              <Col
+                class="year-bars__col"
+                type={filterTarget ? 'button' : undefined}
+                disabled={filterTarget && b.count === 0 ? true : undefined}
+                aria-label={filterTarget ? `${b.year}: ${b.count} ${unit}. Show them in the list below` : undefined}
+                data-filter-target={filterTarget}
+                data-filter-year={filterTarget ? b.year : undefined}
+              >
+                <span class="year-bars__plot">
+                  <span class="year-bars__stack">
+                    <span class="year-bars__count text-caption">{b.count}<span class="visually-hidden"> {unit}, </span></span>
+                    <span class="year-bars__fill" aria-hidden="true" />
+                  </span>
+                </span>
+                <span class="year-bars__year text-caption">
+                  <span class="visually-hidden">{b.year}</span>
+                  <span class="year-bars__year-long" aria-hidden="true">{b.year}</span>
+                  <span class="year-bars__year-short" aria-hidden="true">’{String(b.year).slice(2)}</span>
+                </span>
+              </Col>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style>
+  .year-bars__columns {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    align-items: end;
+    row-gap: var(--wp--preset--spacing--48);
+  }
+  .year-bars__text {
+    grid-column: 1 / span 5;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    min-width: 0;
+  }
+  .year-bars__body {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .year-bars__chart {
+    container-type: inline-size;
+    grid-column: 7 / span 6;
+    display: flex;
+    align-items: stretch;
+    height: calc(var(--wp--preset--spacing--128) + var(--wp--preset--spacing--112));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    min-width: 0;
+  }
+  /* No gap between the columns, so the plots' bottom borders join into one baseline; the bars keep
+     their 12px spacing through the plot's side padding (half each side) */
+  .year-bars__bar {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+  }
+  .year-bars__col {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    justify-items: center;
+    gap: var(--wp--preset--spacing--8);
+  }
+  /* As a filter button: no button chrome; hover darkens the bar and the labels (no fades) */
+  button.year-bars__col {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  button.year-bars__col:disabled {
+    cursor: default;
+  }
+  button.year-bars__col:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+  }
+  button.year-bars__col:hover:not(:disabled) .year-bars__fill {
+    background-color: var(--wp--preset--color--sage-500);
+  }
+  button.year-bars__col:hover:not(:disabled) .year-bars__year,
+  button.year-bars__col:hover:not(:disabled) .year-bars__count {
+    color: var(--wp--custom--color--text--primary);
+  }
+  /* The top padding keeps room for the tallest bar's count */
+  .year-bars__plot {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    justify-self: stretch;
+    padding: var(--wp--preset--spacing--24) calc(var(--wp--preset--spacing--12) / 2) 0;
+    border-bottom: 1px solid var(--wp--custom--color--border--default);
+  }
+  .year-bars__stack {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: calc(var(--n) / var(--max) * 100%);
+    min-height: var(--wp--preset--spacing--4);
+  }
+  .year-bars__count {
+    position: absolute;
+    bottom: 100%;
+    padding-bottom: var(--wp--preset--spacing--4);
+  }
+  .year-bars__count,
+  .year-bars__year {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .year-bars__fill {
+    width: 100%;
+    border-radius: var(--wp--custom--radius--xs) var(--wp--custom--radius--xs) 0 0;
+    background-color: var(--wp--preset--color--sage-400);
+    transform-origin: bottom;
+  }
+  /* Grow (motion.ts initGrow): JS on, the bars wait at the baseline until the chart enters, then rise
+     left to right at half the site stagger; each count fades in as its bar lands */
+  html.js [data-grow] .year-bars__fill {
+    transform: scaleY(0);
+    transition: transform var(--wp--custom--motion--duration-reveal) var(--wp--custom--motion--ease-out);
+    transition-delay: calc(var(--i) * var(--wp--custom--motion--stagger) / 2);
+  }
+  html.js [data-grow] .year-bars__count {
+    opacity: 0;
+    transition: opacity var(--wp--custom--motion--duration-reveal) var(--wp--custom--motion--ease-out);
+    transition-delay: calc(var(--i) * var(--wp--custom--motion--stagger) / 2 + var(--wp--custom--motion--duration-reveal) / 2);
+  }
+  html.js [data-grow].is-grown .year-bars__fill {
+    transform: none;
+  }
+  html.js [data-grow].is-grown .year-bars__count {
+    opacity: 1;
+  }
+  .year-bars__year-short {
+    display: none;
+  }
+  @media (max-width: 899px) {
+    .year-bars__text,
+    .year-bars__chart {
+      grid-column: 1 / -1;
+    }
+  }
+  /* Fourteen full years need about 600px (at 567, 1280 wide, they sat 6px apart); below that they shorten to ’13 */
+  @container (max-width: 599px) {
+    .year-bars__year-long {
+      display: none;
+    }
+    .year-bars__year-short {
+      display: inline;
+    }
+  }
+  /* Under 400px the short years run together (2–5px apart), so every other one shows */
+  @container (max-width: 399px) {
+    .year-bars__bar:nth-last-child(even) .year-bars__year > [aria-hidden] {
+      visibility: hidden;
+    }
+  }
+  @media (max-width: 599px) {
+    .year-bars__plot {
+      padding-inline: calc(var(--wp--preset--spacing--4) / 2);
+    }
+  }
+</style>
+
+<script>
+  // Filter (Q88): a column asks its Data list to show that year, then the page moves to the list
+  document.addEventListener('click', (event) => {
+    const col = (event.target as Element).closest<HTMLElement>('[data-filter-year]');
+    if (!col) return;
+    const target = col.dataset.filterTarget;
+    const year = col.dataset.filterYear;
+    if (!target || !year) return;
+    document.dispatchEvent(new CustomEvent('reach:filter', { detail: { target, facet: 'year', value: year } }));
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById(target)?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+  });
+</script>

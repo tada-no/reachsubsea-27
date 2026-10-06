@@ -10,6 +10,91 @@ _No open questions right now._
 
 ## Answered log
 
+### Q93. Filter chip counts in brackets (6 Oct 2026)
+Context: Ross: "2025–26  7" is confusing; brackets? And why wasn't it caught? Agreed: a bare count after a label that is itself a number reads as part of it. Missed because the counts were checked by measurement (update, no jump), never read as text in chip form; in the rail they sat in their own column.
+- [x] Counts bracketed site-wide (Filter chip): "2025–26 (7)", "Crewed (4)"; right-aligned as a column in the rail; min 4ch so widths still hold
+- [x] Disabled chip: the count takes the label's disabled colour (was darker than its label)
+- [x] docs/08 §4: read every label as a stranger would, in every state
+
+**Answer:** as ticked.
+
+### Q92. No UI jumps on interaction (6 Oct 2026, rule for this site and every site)
+Context: Ross: ticking a filter made the list jump ("Clear all" grew the count line); avoid jumps like this across the site and on every site we build.
+- [x] Clear all: its 44px target overhangs the 24px count line (negative margin), and it is always laid out, shown with `visibility` (was 24 → 44, pushing the filters down 20px)
+- [x] Filter chip (site-wide): the check sits inside the chip's own padding (28 unselected, 16 selected), so ticking keeps the width; counts are tabular with 2ch room. Was +24px per tick and ~9px when a count lost a digit, nudging every chip after it (Data list, Feed grid, Live operations)
+- [x] Measured after: no movement at 1440, 1000 or 375 except the count text itself (sub-pixel)
+- [x] Rule added to docs/08 §6 (checked on every page), and to the global CLAUDE.md for all projects
+
+**Answer:** as ticked.
+
+### Q91. Publications list: space instead of hairlines (6 Oct 2026)
+Context: Ross: "instead of a hairline between each listed, maybe just a bit more space". Agreed for this list only (a reading list); Reports, Documents and Dates are tables and keep their rules.
+- [x] No dividers; papers spaced `stack/lg` (24 → 40), 40 below 600 where the link drops under the byline
+- [x] Filters to list `stack/xl`, so the chips never read as part of the first paper in the stacked layout; the no-match message lost its rule too
+
+**Answer:** as ticked.
+
+### Q90. Library filters: multi-select; search stays in the rail (6 Oct 2026)
+Context: Ross asked whether several filters should be selectable, and whether the search should be full width.
+- [x] Multi-select: OR within a facet (CO2 storage + Seismic), AND across facets; the "All topics" / "All years" rows are gone (nothing ticked = no limit, Clear all resets). In the rail the tick slot is a checkbox; chips below 1100 tick the same way
+- [x] Option counts are each option's own share (search + the other facet), so they hold still while ticking within a facet; 0 = disabled unless ticked
+- [x] A Year bars pick replaces the year ticks with that one year (a jump, not an add)
+- [x] Search stays in the sticky rail (not full width): it stays in reach down the list, a 1312 field would read as an empty bar for short queries, and search + filters + count read as one panel
+
+**Answer:** multi-select, search in the rail.
+
+### Q89. Library rail: a refinement list, not pills (6 Oct 2026)
+Context: Ross: the rail could be narrower, the pills stack, maybe not pills, the count should sit nearer the search; "have a good think of the best UX and UI".
+- [x] Narrow rail: cols 1–3 from 1280 (col 4 as air), cols 1–4 at 1100–1279 (3 cols clipped the search hint at 1100); the list keeps cols 5–12
+- [x] Count right under the search field, with "Clear all" beside it once a search or facet narrows the list
+- [x] Topic before Year (researchers start from the subject; the chart above covers time); "All topics" / "All years" (removed in Q90)
+- [x] Options as a plain list in the rail (Filter chip Layout List): tick + bold for the picked one, no pill or navy fill; a live count per option (search + the other facet), 0 = disabled
+- [x] Below 1100 the same options stay chip rows (now with counts); the search hint shortened to "Title, author or journal" (the icon says search)
+- [x] The rail sticks only on screens 800+ tall, so its last options never hang below the fold
+
+**Answer:** built as ticked.
+
+### Q88. Research & publications library: search, rail, green eyebrows, chart filter (6 Oct 2026)
+Context: Ross asked whether the library is the best design: ticks on the chips, year order vs the chart, green row eyebrows, a search bar. My view given first; he picked all four of the options put to him.
+- [x] Search field above the chips (new component, docs/04 §10b): title, authors, venue, topic, year; accents folded; works with the chips; count "12 of 49 publications"; no-match message with "Clear search and filters"
+- [x] Sticky filter rail from 1100 (search, chips, count in cols 1–4; list cols 5–12). At 900 the rail was 255 wide (hint cut off, four-line titles), so 900–1099 keeps the stacked layout
+- [x] Row eyebrows `text/accent` for every Data list type, matching card eyebrows
+- [x] Year bars columns filter the library: a click picks that year (a removable "2017" chip appears in the Year row) and scrolls to the list; hover darkens the bar
+- [x] Kept: the tick on selected chips (the site-wide Filter chip, and a non-colour selected cue) and newest-first year chips (they filter a newest-first list; the chart reads as a timeline)
+- [ ] Figma: Search field component, Data list Publications rail variant
+
+**Answer:** as ticked.
+
+### Q87. Year bars felt loose: tighter chart (6 Oct 2026)
+Context: Ross: "it feels a bit loose" (taste-skill audit). Chart 160px with 24px bars and 22px gaps beside a taller text column, vertically centred, so nothing lined up and the bars read as a comb; the "Year by year" eyebrow repeated the H2.
+- [x] Chart 240px (tokens 128 + 112), bottom-aligned with the text so the body's last line sits level with the year labels
+- [x] Bars fill their columns with a 12px gap (34px at 1440, 16–23px at 900–1100, 19px with a 4px gap at 375)
+- [x] Eyebrow dropped from the block on this page
+- [x] Tighter chosen over Before after a live compare (dev-only toggle, now removed; `review/year-bars-compare-1440.png`)
+
+**Answer:** Tighter.
+
+### Q86. Research & Publications: hero and year-bars style (6 Oct 2026)
+Context: Ross's first review of the page. Hero copy and image changed on his call; the chart questions put to him with a recommendation.
+- [x] Hero: the PDF's title "The science behind how we work" and its lead (the breadcrumb already says Research & Publications); new photo `hero-publications.jpg` (Adobe Stock 1666853394, the wider crop: paper stack right, library shelves behind the text). The year-bars sentence takes the topics and venues the hero lead used to carry
+- [x] Bars: square base on one hairline baseline, 2px top corners (new token `radius/xs`; the 8px `radius/sm` rounded a 24px bar into a pill). The Figures key swatch (raw 3px) moves onto it
+- [x] Each count sits just above its own bar (was a row along the top of the chart)
+- [x] Motion: the bars grow from the baseline left to right once the chart is in view, each count fading in as its bar lands; reduced motion shows the chart at once
+- [x] No y axis: every bar carries its count, so an axis repeats it
+- [ ] Not taken: taller chart (160 → 200) and a "2026 so far" label for the part year
+- Found in the review: under 560px the full year was `display:none` and the short one `aria-hidden`, so screen readers heard no year; now a hidden full year is always read. Short years sat 2–5px apart at 375, so under 400px every other year is labelled (from 2026 back); full years now need 600px (they sat 6px apart at 1280)
+
+**Answer:** as ticked. Figma: `radius/xs` variable and the Year bars block wait for page approval.
+
+### Q84. Services › Technology & Innovation › Research & Publications (6 Oct 2026)
+Context: the library of Reach's published research, a secondary page under Technology & Innovation. Source: client PDF p9 and the live Selection of Publications page (reachsubsea.no/selection-of-publications/). No question put to Ross; defaults taken from the template.
+- [x] Sections: Hero Photo (ROV on the seabed) · Subnav (Research & Publications active; the PDF shows no active pill, but a lit pill tells people where they are) · Year bars (new, slim: a count per year 2013–2026, the PDF's "year-by-year counts") · Data list Publications (49 real entries, filter chips for year runs and topic, 10 shown then Load more) · Accordion (3 FAQs, drafted) · CTA panel
+- [x] The live site lists **49** publications, the PDF says 48: the live list is used and the count comes from the data, never typed
+- [x] Real data replaces the sample publications in `src/data/documents.ts`; the Investors demo reads it too
+- [ ] Open for Reach: the topic grouping (Gravity & subsidence 25 · CO2 storage 11 · Passive seismic 13) is my draft; bylines carry only the first author's surname as on the live site; the FAQ answers and hero lead are drafted (the PDF has no copy for them); confirm 48 vs 49
+
+**Answer:** built at `/services/technology-innovation/research-publications/`; new block `src/blocks/YearBars.astro` (docs/05 §2.17).
+
 ### Q76. Favicon from the brand icon (22 Sep 2026, deploy sweep)
 Context: the site had no icon link, so browsers asked for /favicon.ico and got a 404. Ross supplied `Reach-icon-600x600.svg` (navy R, sage bars bleeding to both edges). On the full 600 canvas the R is 40% of the square and smudges at 16px; a 478px crop around the R keeps 60px of each bar and reads. Comparison sheet: full canvas and crop, bare and on a navy tile, at 16 / 32 / 64 / 180 on light and dark.
 - [x] Tab icon: the bare mark, 478 crop (`public/favicon.svg`, navy R in light tabs, white in dark; `favicon.ico` 16 + 32 for old browsers). Matches the header logo
