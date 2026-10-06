@@ -2,7 +2,7 @@
 // WP note: in production, Menu link rows come from the `primary` menu; intro/feature come
 // from one ACF options row per section. Here it's typed placeholder data for the static prototype.
 import type { CardField, LinkField } from '../lib/types';
-import { worldPath, worldLabel } from './world';
+import { worldPagePath, worldLabel } from './world';
 
 /** One row in a Mega menu / Site menu / Mobile menu link list. */
 export interface MenuLinkItem {
@@ -234,7 +234,7 @@ export const siteMenu = {
     { date: '15 Oct 2026', title: 'Offshore Technology Conference', place: 'Stavanger', href: '/newsroom/events/' },
     { date: '14 Apr 2027', title: 'Ocean Business 2027', place: 'Southampton', href: '/newsroom/events/' },
   ],
-  world: { label: worldLabel, href: worldPath },
+  world: { label: worldLabel, href: worldPagePath },
 };
 
 export const navSectionById = new Map(navSections.map((section) => [section.id, section]));
@@ -273,6 +273,6 @@ export const popularSearchLinks: NavLink[] = [
   { label: 'Fleet overview', url: '/assets/' },
   { label: 'Reports & presentations', url: '/investors/reports-presentations/' },
   { label: 'Open positions', url: 'https://hr-manager.net/reachsubsea', action: 'external', external: true },
-  { label: 'Explore 3D World', url: worldPath },
+  { label: 'Explore 3D World', url: worldPagePath },
   { label: 'Contact', url: '/contact/' },
 ];

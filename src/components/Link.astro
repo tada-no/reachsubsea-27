@@ -21,7 +21,7 @@ interface Props {
 const {
   label,
   href,
-  action = 'page',
+  action: requestedAction = 'page',
   size = 'medium',
   showIcon = true,
   context,
@@ -39,6 +39,9 @@ const ICONS: Record<LinkAction, string> = {
   anchor: 'arrow-down',
 };
 
+// External means another site: a site path ("/3d-world/", Q96) is a page link even when marked external,
+// so it stays in the tab and keeps the arrow-right icon.
+const action: LinkAction = requestedAction === 'external' && href?.startsWith('/') ? 'page' : requestedAction;
 const iconSize = size === 'small' ? 16 : 20;
 const Tag = href ? 'a' : 'button';
 const isExternal = action === 'external' && Boolean(href);

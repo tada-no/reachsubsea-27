@@ -1,0 +1,137 @@
+---
+// Services › Explore 3D World (6 Oct 2026): the landing page for the interactive 3D World, from the client screens
+// PDF p28–29 ("11 — Services — Explore 3D World") and the Design Reference p13 ("landing page introducing the real
+// interactive 3D exploration tool"). The scene itself is a separate app with its content from WordPress (Q94); this
+// page explains it, and its Launch button and zone cards open it on the in-site /3d-world/ page, under the header (Q96). Kept from the PDF: hero with Launch, How it works,
+// the four zones, FAQ, CTA. Changed: the three cards over the hero's edge (no overlaps, docs/06 §2) become How it
+// works below it; "Best viewed on" becomes the hero's meta row. Cut: the 500+ / 9 / 2 modes stats band (repeats
+// Home and Services) and Related services (the How it works copy links the three lines). Zone names, order and
+// assets follow the world build, not the PDF's draft (src/data/world.ts).
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import SplitMedia from '../../../blocks/SplitMedia.astro';
+import CardGrid from '../../../blocks/CardGrid.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { worldPath, worldPagePath, worldZones, worldZoneUrl } from '../../../data/world';
+import { navSections } from '../../../data/navigation';
+import type { CardField } from '../../../lib/types';
+
+const base = import.meta.env.BASE_URL;
+const services = navSections.find((s) => s.id === 'services')!;
+
+// Not one of the section's pills (Q79): the subnav shows the section with nothing current
+const subnavItems = [
+  { label: 'Overview', href: services.href },
+  ...services.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+const zoneCards: CardField[] = worldZones.map((z) => ({
+  media: 'image-top',
+  surface: 'white',
+  image: { src: `${base}${z.image.src}`, alt: z.image.alt },
+  eyebrow: `Zone ${z.zone}`,
+  title: z.label,
+  description: z.blurb,
+  scope: z.assets,
+  action: { label: 'Fly to this zone', url: worldZoneUrl(z.zone, worldPath), action: 'page', context: z.label },
+}));
+
+// The PDF's three FAQs (p29), FAQ post type, topic 3D World
+const faqItems = [
+  {
+    slug: 'what-is-explore-3d-world',
+    question: 'What is Explore 3D World?',
+    answer:
+      'An interactive 3D environment where you can fly between four working zones and click on vessels, ROVs, platforms and structures to learn more about each one.',
+    open: true,
+  },
+  {
+    slug: 'install-explore-3d-world',
+    question: 'Do I need to install anything to use Explore 3D World?',
+    answer:
+      'No. It runs in your web browser. It loads an 18 MB scene, so it works best on a computer or tablet with a current version of Chrome, Edge, Firefox or Safari. On a phone it may run slowly.',
+  },
+  {
+    slug: 'what-can-i-click-3d-world',
+    question: 'What can I click on inside the 3D world?',
+    answer:
+      'The assets in each zone: vessels, ROVs, platforms and subsea structures, each with its own information panel.',
+  },
+];
+---
+
+<BaseLayout title="Explore 3D World · Reach Subsea" motion>
+  <Header current="services" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Services', href: services.href }, { label: 'Explore 3D World' }]}
+      title="Explore our operations in 3D"
+      lead="Fly between four working zones and click any vessel, ROV or structure to see what it does."
+      image={{ src: `${base}images/world-hero.jpg`, alt: '', focalPoint: { x: 0.6, y: 0.5 } }}
+      meta={[
+        { icon: 'device-desktop', text: 'Best on a computer or tablet' },
+        { icon: 'browser', text: 'Runs in your browser' },
+      ]}
+      actions={[{ label: 'Launch 3D World', url: worldPath }]}
+    />
+
+    <SectionSubnav source="section-pages" label="Services" items={subnavItems} current={worldPagePath} />
+
+    {/* PDF "How it works" card, as steps: the third is the PDF's own closing sentence */}
+    <SplitMedia
+      anchor="how-it-works"
+      background="white"
+      media="numbered-list"
+      title="How it works"
+      body={`<p>The 3D World places you above four working sites. Each is set against a different piece of offshore infrastructure, and shows a different operation carried out by a different mix of vessels and ROVs: our <a href="/services/subsea/">subsea</a>, <a href="/services/survey/">survey</a> and <a href="/services/monitoring/">monitoring</a> work in one place.</p>`}
+      items={[
+        { title: 'Fly between zones', text: 'Use the fly control to move from one zone to the next, or open a zone straight from the cards below.' },
+        { title: 'Click any asset', text: 'Each vessel, ROV and structure opens an info panel with its name and what it does.' },
+        { title: 'See the range we work with', text: 'From crewed DP vessels to uncrewed surface vessels, all carrying ROV and survey spreads.' },
+      ]}
+    />
+
+    <CardGrid
+      anchor="zones"
+      background="tint"
+      sectionHeader={{
+        title: 'Different operations, different vessels and ROVs',
+        intro: 'Each zone is set on a different piece of infrastructure. What sets them apart is the operation, and the vessels and ROVs that carry it out.',
+      }}
+      layout="2-columns"
+      media="image-top"
+      surface="white"
+      cards={zoneCards}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'About our interactive 3D operations environment.',
+        action: { label: 'See all FAQs', url: '/faq/' },
+      }}
+      layout="split"
+      source="faq"
+      topic="3d-world"
+      background="white"
+      items={faqItems}
+    />
+
+    {/* PDF p29 CTA wording */}
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title="Would you like to know more?"
+      text="Reach out to us today."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

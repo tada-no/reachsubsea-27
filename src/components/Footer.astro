@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import Eyebrow from './Eyebrow.astro';
 import { socialLinks, legalLinks } from '../data/navigation';
-import { worldPath } from '../data/world';
+import { worldPagePath } from '../data/world';
 
 interface FooterLink {
   label: string;
@@ -28,7 +28,7 @@ const columns: FooterColumn[] = [
       { label: 'Subsea', href: '/services/subsea/' },
       { label: 'Survey', href: '/services/survey/' },
       { label: 'Monitoring', href: '/services/monitoring/' },
-      { label: 'Explore 3D World', href: worldPath },
+      { label: 'Explore 3D World', href: worldPagePath },
       { label: 'Fleet overview', href: '/assets/' },
       { label: 'Reach Remote', href: '/assets/reach-remote/' },
     ],

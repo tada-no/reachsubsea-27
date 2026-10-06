@@ -22,7 +22,7 @@ Read with: [05-blocks-spec.md](05-blocks-spec.md) (block behaviour) · [04-compo
 2. ~~**Three blocks are too flexible for editors**~~ **Done (Q67, 21 Sep 2026).** Card grid's Bento is now **Card bento** (a `pattern` select; no per-card spans), Split media's Figures and Embed are **Figures** and **Split embed** (its unused Card media was dropped), and Stats band's Results style is **Results band**. Verified no visual change (§4 note).
 3. **Prototype-only code** is mixed into the blocks (image paths through `BASE_URL`, `state` and `sample` review props, GitHub Pages URL hard-coded, typed breadcrumbs). It needs stripping or replacing (§6).
 4. **The 3D World connection is a plain URL only.** The website's docs assume `?embed=1` and `?zone=1–4` exist; the world does not read them, and it has no message channel. The published scene is also two releases behind (§7).
-5. **Missing handoff pieces:** no redirect map, no page specs for the ~20 unbuilt pages beyond the docs/05 §3 block lists, and no decision on who hosts the world. **Language is decided: English only (Q68)**, so fields stay single-language and no translation plugin is needed.
+5. **Missing handoff pieces:** no redirect map, no page specs for the ~20 unbuilt pages beyond the docs/05 §3 block lists, and no named host for the world yet (it stays a separate app reading WordPress over an API, Q94 / §7.1). **Language is decided: English only (Q68)**, so fields stay single-language and no translation plugin is needed.
 
 ---
 
@@ -57,7 +57,7 @@ The header links to about 30 pages that do not exist yet, so link-checking the p
 | `company.ts` | **Options page "Company"** (vision, promise, values) · **Person** CPT (management, board) · **FAQ** CPT (topic Company) · certificates from the Logo strip / Media library | |
 | `navigation.ts` | **WP menus** (primary bar, Site menu, Mobile menu, Footer, legal) + one **options row per section** (intro line, overview link, featured Card) | The bar has 6 links but 7 section panels are defined (Projects and Newsroom live in the Site menu). One menu should drive desktop panels and mobile accordion (docs/06) |
 | `Footer.astro` (inline) | **Options page "Site"**: address, phone, email, social links, legal links | Address, email and four columns are typed inside the component today |
-| `world.ts` | **Options page "3D World"**: scene URL, careers suffix, label, payload size, zone names | See §7. Today hard-coded, with a dev/prod switch |
+| `world.ts` | **Options page "3D World"**: scene URL, careers suffix, label, payload size. Zone names come from the `world_zone` posts (§7.1) | See §7. Today hard-coded, with a dev/prod switch |
 | `card-presets.ts`, `feed-samples.ts` | Not content. **Card presets = one template per post type** in the Feed grid query | Copy in them is placeholder |
 | FAQ topics | **FAQ** CPT + `topic` taxonomy; Accordion queries by topic and outputs `FAQPage` JSON-LD | Only ~13 of ~30 dev FAQs are real (the rest Lorem Ipsum) |
 
@@ -117,7 +117,7 @@ Shared field shapes (`src/lib/types.ts`): **SectionHeader** = eyebrow, title, in
 3. **Fix the single-source breach** (Home bento `750+`) and sweep for others: "An 18 MB scene" is typed on three pages and should be one setting.
 4. **Write the redirect map.** The brief assigned it to us (Q4). It does not exist as a file: redirects are scattered across page header comments and docs/00 (Company, Careers, Subsea). It needs the live and dev URL lists and a crawl, and it decides slugs that `services.ts` and `projects.ts` currently mark as placeholders.
 5. ~~Decide language.~~ **Decided (Q68): English only.**
-6. **Decide who hosts the 3D World** and get it to the embed contract (§7) before the WordPress build reaches the embed block.
+6. **Name the 3D World's host and owner**, get it to the embed contract (§7), and build the content API (§7.1) before the WordPress build reaches the embed block.
 7. **Strip prototype-only code** (§6) as part of the handoff, not after.
 
 ---
@@ -156,7 +156,7 @@ Shared field shapes (`src/lib/types.ts`): **SectionHeader** = eyebrow, title, in
 | `?careers=1` opens "From ship to seabed" | Implemented (it only checks the parameter exists) |
 | The published scene has no careers route yet (docs/00 Q66, `world.ts`) | Out of date: the published `gh-pages` build is **v44** and *does* have `?careers=1`. What is unpublished is v45–v48 ("Fly a survey line", the hoop scoring, sounds): local `main` is 4 commits ahead of origin. The Careers page copy already promises the survey line |
 
-**Where the site links to it** (all resolve to `worldPath` / `worldSceneUrl` in `src/data/world.ts`, currently the absolute URL `https://tada-no.github.io/reach-world/`): every mega menu strip, the Site menu, the Services mobile menu, popular searches, the footer, the Home / Services / Careers embeds, the Subsea hero link, and the in-site `/3d-world/` page. Nothing yet links to the in-site `/3d-world/` page, although the code and a comment say it should.
+**Where the site links to it (Q95–Q96, 6 Oct 2026; `src/data/world.ts`):** menu strips, the Site menu, popular searches, the footer and the Services overview hero go to the landing page `/services/3d-world/` (`worldPagePath`). Everything that opens the world goes to the in-site `/3d-world/` page (`worldPath`): the landing page's Launch and zone cards, the embeds' "Open full screen" and zone links, the service heroes, the Careers banner (`?careers=1`). That page frames the scene (`worldSceneUrl`, the published build) full height under a solid header, with `?embed=1` and `zone` / `careers` passed through. Only the in-place poster embeds load `worldSceneUrl` directly. In WordPress: `/3d-world/` is a page template with the header and no footer, reading the scene URL from the "3D World" options page. It keeps the dev site's current URL, so no redirect is needed.
 
 **What an editor should be able to set** (the Embed block already models most of it): scene URL (one global setting), poster image + alt, poster loop video, title / eyebrow / text, zones on or off, zone names and numbers, the "careers" route as a preset. **Hard-coded today and should become settings:** the world origin, the `?careers=1` suffix, "An 18 MB scene" (typed on three pages), the zone names (copied from the world), the launch and exit labels, the iframe `title` and `allow` attributes (the Embed block and `/3d-world/` page differ: only the page adds `xr-spatial-tracking`), and the launch gating (900px breakpoint, `any-pointer: coarse`, Save-Data).
 
@@ -168,12 +168,57 @@ Shared field shapes (`src/lib/types.ts`): **SectionHeader** = eyebrow, title, in
 - **Third-party runtime dependencies:** three.js 0.160 and its Draco decoder load from `cdn.jsdelivr.net`, and Inter from Google Fonts. Self-hosting would remove both (and the consent question).
 - **Cache-busting:** bump `RELEASE` (currently `v48`) in the HTML on every change to `src/` or `glb/`.
 - **Publishing is manual and personal:** `Publish demo.command` force-builds a `gh-pages` commit and pushes it. The repo (`tada-no/reach-world`) is private, the Pages site is public, and the site currently lives under the `tada-no` GitHub account. It needs a proper owner and host before launch.
-- **Content that needs a developer to change:** the zones and pin copy, the careers stop wording (still marked "Draft text, Reach to confirm") and the HR-Manager URL live in the world's source, not in WordPress.
+- **Content that needs a developer to change (today):** the zones and pin copy, the careers stop wording (still marked "Draft text, Reach to confirm") and the HR-Manager URL live in the world's source, not in WordPress. Q94 moves all of it to WordPress, served over the API below.
 - **Legacy:** the live WordPress `/3d-world/` embeds `world.reachsubsea.com`, a Unity build, which this replaces. It needs a redirect and a decision on the subdomain.
 - **Untested:** iPhone Safari, hybrid touchscreen laptops (they match `any-pointer: coarse` and lose in-place launch), and whether scrolling the page over a launched iframe is trapped by the orbit controls.
 
 **Recommended work in the world repo before the WordPress embed is built:**
-(1) read `?embed=1` and hide the world's own chrome and Full screen button; (2) read `?zone=1–4`; (3) optionally post a `ready` and `exit` message to the parent; (4) publish v48; (5) move it to the final host.
+Superseded by the brief for the 3D World chat, `docs/prompts/3d-world-embed.md` (6 Oct 2026): read `?zone=1–4`; post `reach-world:release-focus` on a final Escape; `target="_top"` for site links; `?embed=1` keeps Full screen; content from the WordPress API (§7.1); real names for "Vessel 1/2"; publish v59; a Reach-owned host that allows framing by reachsubsea.com (`frame-ancestors`); self-host three.js, Draco and Inter.
+
+### 7.1 Content from WordPress over an API (Q94, 6 Oct 2026)
+
+**Decided with the developer:** the world stays a separate static app on its own host. WordPress owns its content and serves it through one read-only REST endpoint. The world fetches it on load.
+
+**Endpoint:** `GET https://www.reachsubsea.com/wp-json/reach/v1/world`. Public, no auth, GET only. One custom route shaped for the world, rather than the core `wp/v2` routes: one request instead of four, and linked posts arrive already resolved.
+
+```json
+{
+  "version": "2026-10-06T12:00:00Z",
+  "zones": [
+    { "slug": "pipelines", "number": 1, "name": "Subsea Infrastructure", "blurb": "…",
+      "service": { "label": "Subsea", "url": "https://www.reachsubsea.com/services/subsea/" } }
+  ],
+  "markers": [
+    { "slug": "vessel", "zone": "pipelines", "name": "Viking Vigor", "sub": "Support vessel",
+      "text": "…", "image": { "url": "…", "alt": "…", "width": 1200, "height": 800 },
+      "link": { "label": "See the fleet", "url": "https://www.reachsubsea.com/assets/#vessels" } }
+  ],
+  "careers": { "stops": [ { "slug": "…", "eyebrow": "…", "title": "…", "text": "…" } ],
+               "vacanciesUrl": "https://hr-manager.net/reachsubsea" },
+  "links": { "contact": "https://www.reachsubsea.com/contact/", "home": "https://www.reachsubsea.com/" }
+}
+```
+
+**WordPress content model**
+
+| Content | WordPress | Fields | Notes |
+|---|---|---|---|
+| Zones | Post type `world_zone` (4 posts) | `slug`, `number` (1–4, the `?zone=` value), `name`, `blurb`, `service` (post link) | Slugs fixed to the world's ids: `pipelines`, `oilfield`, `wind`, `reservoir`. The website's Embed block and any zone cards read the same posts |
+| Markers (pins) | Post type `world_marker` (the dev site already has "3D World markers") | `slug`, `zone` (relationship), `name`, `sub`, `text`, `image`, `link`, optional `asset` (relationship to an Asset post) | When `asset` is set, `name`, `sub` and `image` default from that Asset and the fields override. Vessels have no single pages (Q78), so links go to `/assets/#vessels`, `#rovs` or `#equipment` |
+| Careers route | Repeater on the Careers page, or an options page | `stops[]` (`slug`, `eyebrow`, `title`, `text`), `vacanciesUrl` | Replaces `COPY` and `HR_VACANCIES` in `src/careers.js` |
+| Links | Options page "3D World" | `contact`, `home`, plus the scene URL the website uses | The same options page as §3 |
+
+**Slugs are the contract.** Positions, camera angles and animation stay in the world's code (`HOTSPOTS` and `ZONES` in `reach-ocean-realism.html`), keyed by slug. Today's marker slugs: `vessel`, `surveyor`, `rov` (pipelines); `rr1`, `zeerov1` (oilfield); `drix`, `rr2`, `zeerov2` (wind); `vessel2`, `rr3`, `gwatch`, `dragonet` (reservoir). The world ignores a WordPress marker with no matching slug in its code. A slug in the code with no WordPress post keeps its built-in copy. Make the slug field read-only for editors once set, and say so in its help text.
+
+**What the world does with it:** fetch on load with a short timeout (about 3 s); on failure, a timeout or a missing field, use the built-in copy for that item. Text is plain text (escape it; no HTML from the API). Links open in the same tab when the world is full screen, and with `target="_top"` when it is in a website iframe, so the Reach page replaces the whole tab.
+
+**Server side:**
+- **CORS:** `Access-Control-Allow-Origin` set to the world's origin only (plus `http://localhost:8765` on staging for local work). GET only, no credentials.
+- **Cache:** page-cache the response (WP Engine) and send `Cache-Control: public, max-age=300`; purge it when a zone, marker or the careers route is saved. `version` lets the world spot stale content.
+- **Images:** shown as plain `<img>` in the info panels, so no CORS is needed on uploads. If an image is ever used as a WebGL texture, uploads need `Access-Control-Allow-Origin` too. Serve a medium size (about 800 px wide), not the original.
+- **Not in the API:** nothing private, no drafts (published posts only), no user data.
+
+**Still open:** the world's final host and owner (§7 above). The Explore 3D World landing page (`/services/3d-world/`, Q95) reads the same zones.
 
 ---
 

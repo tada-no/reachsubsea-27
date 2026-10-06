@@ -6,6 +6,7 @@ One file per chat brief. Paste the file's contents as the first message of a new
 |---|---|---|
 | [assets-overview.md](assets-overview.md) | Assets overview (`/assets/`, Fleet overview) | **Next page to build** |
 | [contact.md](contact.md) | Contact (`/contact/`): offices map reusing the fixed dot-matrix map, topic mailboxes, FAQ | Ready to start (written 22 Sep 2026) |
+| [3d-world-embed.md](3d-world-embed.md) | What the website needs from the 3D World (in `reach-world`): `?zone`, Escape handoff, `_top` links, WordPress content, hosting | **Open, 6 Oct 2026** |
 | [careers-3d-world-early-careers.md](careers-3d-world-early-careers.md) | 3D World ideas for trainees (in `reach-world`) | Open, separate project |
 | [about-us.md](about-us.md), [about-us-handoff.md](about-us-handoff.md) | About (`/company/`) | Built. The handoff file is the design record for the Values block |
 | [careers-overview.md](careers-overview.md) | Careers overview (`/careers/`) | Built |

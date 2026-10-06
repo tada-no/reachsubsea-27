@@ -1,39 +1,65 @@
 ---
-// 3D World page (17 Sep 2026): the scene fills the viewport under the site header. Menus and links
-// across the site point here instead of opening the external build in a new tab.
+// 3D World page (17 Sep 2026; Q96, 6 Oct 2026): the scene, framed full height under the site header, like the dev
+// site's Unity world today, so visitors keep the navigation. Every link into the world lands here: the landing page's
+// Launch button and zone cards, the embeds' "Open full screen", the service heroes. The landing page
+// (/services/3d-world/) is the one search engines and phones read; this page is the app.
+// - Solid header that never hides: the page doesn't scroll (no footer), so the header's scroll script leaves it be.
+// - The frame fills what is left of the visible viewport (dvh, so iPhone Safari's toolbars don't crop it).
+// - `?zone=N` and `?careers=1` pass through to the scene, plus `embed=1` (framed by the site).
+// - Keyboard: the scene keeps the keys while you fly. When it has nothing left to close, Escape in the scene posts
+//   `reach-world:release-focus` and focus comes back to the header (notes for the world: docs/prompts/3d-world-embed.md).
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/header/Header.astro';
 import { worldSceneUrl } from '../data/world';
+
+const scene = new URL(worldSceneUrl);
+scene.searchParams.set('embed', '1');
 ---
 
-<BaseLayout title="3D World · Reach Subsea">
+<BaseLayout title="3D World · Reach Subsea" bodyClass="world-page-body">
   <Header />
   <main id="main" class="world-page">
     <h1 class="visually-hidden">Reach Subsea 3D World</h1>
     <iframe
       class="world-page__scene"
-      src={worldSceneUrl}
-      data-world-scene={worldSceneUrl}
+      src={scene.href}
+      data-world-scene={scene.href}
       title="Reach Subsea 3D World"
       allow="fullscreen; xr-spatial-tracking"
-      allowfullscreen
     ></iframe>
   </main>
 </BaseLayout>
 
 <script>
-  // Pass ?zone=N from the page URL through to the scene
   const frame = document.querySelector<HTMLIFrameElement>('[data-world-scene]');
-  const zone = new URLSearchParams(location.search).get('zone');
-  if (frame && zone) {
+  if (frame) {
+    // Pass the world's own parameters from the page URL through to the scene
+    const page = new URLSearchParams(location.search);
     const url = new URL(frame.dataset.worldScene!);
-    url.searchParams.set('zone', zone);
-    frame.src = url.toString();
+    let changed = false;
+    for (const key of ['zone', 'careers']) {
+      const value = page.get(key);
+      if (value !== null) {
+        url.searchParams.set(key, value);
+        changed = true;
+      }
+    }
+    if (changed) frame.src = url.href;
+
+    // Escape handoff: the scene asks the page to take the keyboard back, and focus goes to the header's first link
+    window.addEventListener('message', (event) => {
+      if (event.origin !== url.origin || event.source !== frame.contentWindow) return;
+      if (event.data?.type !== 'reach-world:release-focus') return;
+      document.querySelector<HTMLElement>('[data-site-header] a[href]')?.focus();
+    });
   }
 </script>
 
 <style is:global>
-  /* The header is fixed: start the scene below it, and fill exactly what is left of the viewport */
+  /* The header is fixed: start the scene below it, and fill exactly what is left of the viewport. No page scroll */
+  .world-page-body {
+    overflow: hidden;
+  }
   .world-page {
     padding-top: var(--header-offset, 80px);
     background-color: var(--wp--preset--color--navy-900);

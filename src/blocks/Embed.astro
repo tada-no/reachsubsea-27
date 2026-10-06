@@ -27,6 +27,7 @@ import Pictogram from '../components/Pictogram.astro';
 import MediaToggle from '../components/MediaToggle.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import { makeId } from '../lib/ids';
+import { worldZones, worldZoneUrl } from '../data/world';
 import type { BlockFields, ImageField, SectionHeaderField } from '../lib/types';
 
 export type EmbedType = '3d-world' | 'iframe' | 'map';
@@ -107,18 +108,13 @@ const {
 const frameHeight = { desktop: 480, mobile: 560, ...height };
 const titleId = type !== '3d-world' && sectionHeader?.title ? makeId('embed', sectionHeader.title) : undefined;
 
-// Names and order from the 3D World build itself (reach-world `zones` in reach-ocean-realism.html).
-const defaultZones: Zone[] = [
-  { label: 'Subsea Infrastructure', zone: 1 },
-  { label: 'Oil Field Operations', zone: 2 },
-  { label: 'Offshore Wind & Renewables', zone: 3 },
-  { label: 'Subsea Production & Monitoring', zone: 4 },
-];
+// Names and order from the 3D World build itself, shared with the landing page (src/data/world.ts)
+const defaultZones: Zone[] = worldZones.map(({ label, zone }) => ({ label, zone }));
 const zoneList = zones.length > 0 ? zones : defaultZones;
 // In-site 3D World page (17 Sep 2026): world links stay in the tab
 const worldInSite = fullScreenUrl.startsWith('/');
 const zoneExternal = worldInSite ? {} : { target: '_blank', rel: 'noopener noreferrer' };
-const zoneHref = (zone: number) => `${fullScreenUrl}${fullScreenUrl.includes('?') ? '&' : '?'}zone=${zone}`;
+const zoneHref = (zone: number) => worldZoneUrl(zone, fullScreenUrl);
 
 const providerName = provider?.name ?? 'this provider';
 const providerDomain = provider?.domain ?? '';

@@ -18,7 +18,7 @@ import Accordion from '../../blocks/Accordion.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
 import Dialog from '../../components/Dialog.astro';
 import { pickFigures } from '../../data/key-figures';
-import { worldPath, worldSceneUrl } from '../../data/world';
+import { worldPath, worldPagePath, worldSceneUrl } from '../../data/world';
 import type { CardField } from '../../lib/types';
 import { navSections } from '../../data/navigation';
 import { cardPresets } from '../../data/card-presets';
@@ -162,7 +162,7 @@ const faqItems = [
       image={{ src: `${base}images/usv-drix-wind.jpg`, alt: '', focalPoint: { x: 0.6, y: 0.55 } }}
       actions={[
         { label: 'Talk to our team', url: '/contact/', action: 'page' },
-        { label: 'Explore the 3D World', url: worldPath, action: 'external', type: 'link' },
+        { label: 'Explore the 3D World', url: worldPagePath, action: 'page', type: 'link' },
       ]}
     />
 

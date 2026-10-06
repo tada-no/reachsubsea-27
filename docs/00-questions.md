@@ -18,6 +18,41 @@ Context: Ross asked whether the bar chart was on the blocks review (/blocks/stat
 
 **Answer:** cap at 48 (Recommended option).
 
+### Q96. The 3D World opens framed under the site header (6 Oct 2026)
+Context: Ross and the developer want the world to launch in an iframe with the site header still there, like the dev site's Unity world. Claude agreed, on one condition: the frame gets its own page that doesn't scroll, not a slot inside the landing page, because the world's wheel and trackpad controls fight page scrolling, and a 16:9 slot is small for its panels.
+- [x] `/3d-world/` (the dev site's current URL, so no redirect needed): solid header that never hides, the scene filling the rest of the visible viewport (`dvh`), no footer, no page scroll
+- [x] Every link into the world goes there: the landing page's Launch and zone cards (`?zone=N`), the embeds' "Open full screen" and zone links, the service heroes' "See … in 3D", the Careers banner (`?careers=1`). Same tab throughout. The in-place poster embeds on Services and Careers stay
+- [x] The page passes `zone` and `careers` through and adds `embed=1`
+- [x] Escape handoff: when the scene has nothing left to close it posts `reach-world:release-focus`, and the page moves focus to the header (listener built; the world side is in the notes below)
+- [x] Link: an "external" action pointing at a site path (`/…`) renders as a page link (same tab, arrow-right), so the hero links keep working without per-page edits
+- [x] Notes for the 3D World chat: `docs/prompts/3d-world-embed.md`
+- [ ] Launch in place on the landing page (scroll conflict, too small)
+
+**Answer:** as ticked. Waiting on the world: `?zone`, the Escape message, `_top` links, the WordPress content, publishing v59, and a Reach-owned host that allows framing.
+
+### Q95. Explore 3D World landing page (6 Oct 2026, Services)
+Context: client screens PDF p28–29 draw a Services page for the 3D World: hero with Launch and "Discuss your project", three cards over the hero's edge (How it works, Best viewed on, a photo), four zone cards with DRAFT badges and the PDF's own draft names, the 500+ / 9 / 2 modes stats band, Related services, FAQ, CTA. The Design Reference (p13) calls it a landing page for the real tool. Ross: build it. Built to Claude's lean recommendation.
+- [x] URL `/services/3d-world/`, breadcrumb Home › Services › Explore 3D World; not a Services pill or menu row (Q79 stands)
+- [x] Site-wide entries go to the page: every mega menu strip and the Site menu, the footer, popular searches, the Services overview hero link. The page's Launch button and zone cards open the scene; embeds, service-hero "in 3D" links and the Careers banner still go straight to the scene
+- [x] Hero: one button (Launch 3D World); "Best viewed on" becomes the Meta row; "Discuss your project" dropped (the CTA covers it)
+- [x] How it works below the hero, as Split media Numbered list; its copy links Subsea, Survey and Monitoring (replaces Related services)
+- [x] Four zone cards, 2 columns: the world's names, order and assets (`worldZones` in `src/data/world.ts`, shared with the Embed block), not the PDF's draft names; stills from the world's films
+- [x] Cut: cards over the hero (docs/06 §2), stats band (repeats Home and Services), Related services
+- [x] FAQ: the PDF's three questions; CTA: the PDF's wording
+
+**Answer:** as ticked. **Open, for Reach:** the zone blurbs are the world's DRAFT copy, tightened; the zone links (`?zone=`) and the 18 MB figure depend on the world (docs/09 §7: `?zone` is not read yet). Figma page frame to follow once approved.
+
+### Q94. 3D World: hosted separately, content from WordPress over an API (6 Oct 2026)
+Context: the world's info panels, zone texts, careers route and links are hard-coded in the reach-world source, and much of it repeats what WordPress will hold (Assets, Careers, Contact, Services). Ross asked whether the world should live inside the Reach site; Claude suggested a WordPress plugin on the same domain. Ross then agreed with the WordPress developer: the world stays a separate static app on its own host, and reads its content from the Reach site through an API.
+- [x] Hosting: the world is its own static app on its own host (for example `world.reachsubsea.com`), not a WordPress plugin or theme route
+- [x] Content: editors manage zones, markers (pins), careers stops and links in WordPress; one read-only REST endpoint serves them to the world (contract in docs/09 §7)
+- [x] 3D placement and camera stay in the world's code, matched to WordPress by slug; editors change words, images and links, never coordinates
+- [x] The world keeps its built-in copy as a fallback, so it still opens if the API is slow or down
+- [x] The website's zone names (Embed block, any zone cards) read the same WordPress zones, so the site and the world can't disagree
+- [ ] Inside WordPress: a plugin route at `/3d-world/` with the content inlined (Claude's first suggestion; not chosen)
+
+**Answer:** as ticked. API contract, CORS and caching in docs/09 §7. Still open: the final host and owner. The Explore 3D World landing page followed (Q95).
+
 ### Q93. Filter chip counts in brackets (6 Oct 2026)
 Context: Ross: "2025–26  7" is confusing; brackets? And why wasn't it caught? Agreed: a bare count after a label that is itself a number reads as part of it. Missed because the counts were checked by measurement (update, no jump), never read as text in chip form; in the rail they sat in their own column.
 - [x] Counts bracketed site-wide (Filter chip): "2025–26 (7)", "Crewed (4)"; right-aligned as a column in the rail; min 4ch so widths still hold

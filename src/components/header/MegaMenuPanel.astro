@@ -8,7 +8,7 @@ import Card from '../Card.astro';
 import MenuLink from './MenuLink.astro';
 import Icon from '../Icon.astro';
 import type { NavSection } from '../../data/navigation';
-import { worldPath, worldLabel } from '../../data/world';
+import { worldPagePath, worldLabel } from '../../data/world';
 
 interface Props {
   section: NavSection;
@@ -63,7 +63,7 @@ const { section, open = false } = Astro.props;
   <div class="mega-menu__strip">
     <div class="container mega-menu__strip-row">
       <Link label="Contact us" href="/contact/" size="small" />
-      <a class="menu-world has-surface-navy" href={worldPath}>
+      <a class="menu-world has-surface-navy" href={worldPagePath}>
         <span class="text-button-sm">{worldLabel}</span>
         <Icon name="cube-3d-sphere" size={24} />
       </a>
