@@ -67,7 +67,7 @@ export const navSections: NavSection[] = [
         href: '/services/technology-innovation/',
         children: [{ label: 'Research & Publications', href: '/services/technology-innovation/research-publications/' }],
       },
-      { label: 'Explore 3D World', href: worldPath },
+      { label: 'Explore 3D World', href: worldPagePath },
     ],
     feature: {
       media: 'image-bg',
