@@ -122,7 +122,8 @@ if (rest) parts.push({ html: rest });
       title="Press enquiries"
       text="Our communications team answers questions from the media."
       actions={[
-        { label: 'Email media@reachsubsea.com', url: 'mailto:media@reachsubsea.com' },
+        // A short label: the address as the label wrapped to two lines in the phone panel's button
+        { label: 'Email the media team', url: 'mailto:media@reachsubsea.com' },
         { label: 'Contact us', url: '/contact/', action: 'page' },
       ]}
     />
@@ -171,6 +172,14 @@ if (rest) parts.push({ html: rest });
   /* More news: the date row keeps a Report badge's height, as in the archive (a post can be in both categories) */
   main:has(.news-article) .feed-grid .card__top {
     min-height: 28px;
+  }
+  /* and the summary stops at three lines, as in the archive: the full 240 characters ran a card to nine lines */
+  main:has(.news-article) .feed-grid .card__description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
   }
   .news-article__image img {
     display: block;

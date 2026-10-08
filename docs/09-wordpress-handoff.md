@@ -87,6 +87,7 @@ News is **not a custom post type**: the core `post` type with the core categorie
 6. **Images:** 56 of 112 body images are already 404 on the live site (old imgix CDN = 410), in 28 posts; 14 were found as the original upload. The import drops the dead ones; restore them from a backup if one exists. No featured image has alt text
 7. **Lead paragraph (Q147):** register a "Lead" block style on core/paragraph (`is-style-lead`: Lead size, text/primary) and set it on the first paragraph of a story with 4+ paragraphs when that paragraph is a sentence of 15+ words (after a bare dateline, the next one). The prototype marks it `article-lead`
 8. **Embeds:** webcast iframes (qcnl.tv, companywebcast, royalcast) and one Vimeo stay as Embed blocks behind the consent placeholder; old webcasts may have expired
+9. **Photo tint (Q151):** the featured image and every core/image in a post (not SVGs) take the site's photo tint. A post image can have a caption, so the tint is a layer under the img (figure as a one-cell grid, `::before` behind the img, img `mix-blend-mode: screen`), not the figure's background (base.css, "Story photos")
 
 ---
 

@@ -479,6 +479,24 @@ html.js [data-reveal].is-settled {
   > :is(img, video) {
   mix-blend-mode: screen;
 }
+/* Story photos (8 Oct 2026, News single): the same tint on the featured image and on photos in the body. A figure
+   can hold a caption, so the tint is a layer under the photo only (grid-stacked ::before), not the figure's
+   background. In the body every photo and screenshot takes it (JPEG and PNG; the posts have no transparent logos),
+   SVGs keep their own colours. In WordPress the same rule goes on core/image (figure.wp-block-image) inside a post. */
+:is(.news-article__image, .article figure):has(> img:not([src$='.svg'])) {
+  display: grid;
+  isolation: isolate;
+}
+:is(.news-article__image, .article figure):has(> img:not([src$='.svg']))::before {
+  content: '';
+  grid-area: 1 / 1;
+  border-radius: var(--wp--custom--radius--lg);
+  background-color: var(--wp--custom--color--image-tint);
+}
+:is(.news-article__image, .article figure) > img:not([src$='.svg']) {
+  grid-area: 1 / 1;
+  mix-blend-mode: screen;
+}
 /* Artwork (7 Oct 2026, HSEQ campaign illustration): an illustration keeps its own colours, so the frame opts out
    of the tint and shows it whole on the navy it was drawn for */
 .media-frame--artwork .media-frame__frame {

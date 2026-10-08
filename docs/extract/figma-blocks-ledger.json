@@ -2217,5 +2217,51 @@
       "FAQ group Mobile master shows four items with long default copy; search states (marks, no-match) still only in the Subnav item doc example",
       "Region status Stale instances: plain instances like the raw rows they replace (the earlier Stale instances carry fill overrides)"
     ]
+  },
+  "phase4Newsroom8Oct": {
+    "date": "2026-10-08",
+    "context": "Newsroom and News single (Q145–Q148), built from the 189 imported live posts. Ground truth: src/templates/NewsArchive.astro, src/templates/NewsSingle.astro, src/components/Pagination.astro, src/components/Breadcrumb.astro (endsWithCurrent), src/styles/base.css (.article, story photo tint), src/data/news-posts.json.",
+    "components": {
+      "Pagination item 623:2610 (new, Components / Pagination 623:2597)": "State=Default 623:2602, Hover 623:2604, Current 623:2606, Gap 623:2608. Page#623:0. 44 round target, UI/Label",
+      "Pagination step 623:2619 (new)": "Direction=Previous 623:2611, Next 623:2615. Show label#623:5 (off on phones)",
+      "Pagination 623:2664 (new)": "Breakpoint=Desktop 623:2620 (Previous · 1 … 6 7 8 … 19 · Next), Mobile 623:2644 (1 … 7 … 19, steps without words). On page 1 the Previous step is hidden but keeps its space (opacity 0 in frames, visibility: hidden in code)",
+      "Article header 629:2682 (new, Components / Article 629:2632)": "Breakpoint=Desktop 629:2638 (880), Mobile 629:2664 (343; Layout + Typography modes set to Mobile, so the H2 title resolves to 32). Breadcrumb Ends on=Link instance, Title (Heading/H2), Meta row of two Meta items (calendar date, clock read time)",
+      "Article lead 629:2683 (new)": "core/paragraph block style Lead: Body/Lead, text/primary, 880",
+      "Article quote 629:2685 (new)": "core/quote: 2px border/accent left stroke, padding-left space/24, Quote Body/Lead text/primary, Cite Body/Small text/secondary. Show cite#629:0",
+      "Breadcrumb 93:366": "New variant property Ends on = Current (existing 93:350, 93:362) | Link (Desktop 624:2623, Mobile 624:2635): every item a link in text/secondary; the phone link is the last item",
+      "Card 103:1110": "New variant Media=Image top, Surface=White, Size=Row 624:2639 (cloned from Featured, card property references relinked): image beside text, 50/50 (the Image frame carries the Content frame's side padding so both grow from the same basis), image min height 213 (3:2 of the narrowest wide card, 320); the component is 437 high, the lead's height at 1312"
+    },
+    "pageFrames": {
+      "Newsroom": {
+        "id": "633:22588",
+        "x": 52480,
+        "source": "src/pages/newsroom/index.astro (NewsArchive)",
+        "sections": "Header solid 633:22589 · News archive section 633:22635 (raw template frame, not a block: H1 + intro, three Filter chip instances, lead Card Row 633:22660, List 633:22711 = rows of 4 · 2 · 4 Card instances (four-across titles Heading/H5, wide pair Card Row with H4 titles), Pagination Desktop 633:23348 set to page 1 of 19) · Footer 633:23392"
+      },
+      "News single": {
+        "id": "636:22930",
+        "x": 54120,
+        "source": "src/pages/newsroom/[slug].astro (NewsSingle), story close-to-1000-days-of-offshore-operation-with-nobody-on-board",
+        "sections": "Header solid 636:22931 · News article section 636:22977 (880 column: Article header 636:22979, featured image, body with Article lead 636:23018, image, paragraphs, Article quote 636:23023, H2 as H4) · Feed grid Grid 636:23029 (tint; More news, row 1 cards swapped to Card Image top White, rows 2–4 and Load more off, summaries clamped to 3 lines) · CTA panel 636:23463 (tint; Press enquiries, Email the media team + Contact us) · Footer 636:23499"
+      },
+      "Newsroom · Mobile": {
+        "id": "638:23167",
+        "x": 55760,
+        "sections": "Layout + Typography modes Mobile. Header Mobile · archive section (H1, intro, chip row clipped as a scroll row, lead + 10 Card instances stacked, Pagination Mobile 638:23980 page 1) · Footer Mobile"
+      },
+      "News single · Mobile": {
+        "id": "638:24070",
+        "x": 56335,
+        "sections": "Layout + Typography modes Mobile. Header Mobile · article (Article header Mobile 638:24083, featured image, Article lead 638:24111, image, paragraph, Article quote 638:24115, H2, paragraph) · Feed grid Mobile 638:24120 (tint; More news) · CTA panel Mobile 638:24546 · Footer Mobile"
+      }
+    },
+    "images": "Uploaded from the live posts' featured images (Figma image fills, reuse by hash): deep-cygnus-extension 1f56b583…, pareto-conference 7d604c6c…, 2q-2026 941b9cad…, invitation-2q 5cc26d9c…, viking-reach-sale 92183880…, reach-remote-1-port-call 7468735b…, beacon-offshore 384fc66a…, black-sea-contract 355e0ca1…, 1q-2026 8e673878…, annual-report-2025 1ff5f189…, Reach Remote 1 Port of Aberdeen (body image) e30bc191…. Staging frames deleted. Card photos plain, as on the other page frames (the code screen-tints them over navy)",
+    "gotchas": [
+      "A variant cloned with node.clone() and appended to its set keeps its layers but loses componentPropertyReferences: relink Title/Description/Eyebrow/Badge/Meta/Action to the set's property keys, or setProperties() on its instances silently does nothing.",
+      "Auto-layout children that FILL grow from their base size: a frame with 48 + 48 padding next to an unpadded one ends up 96 wider. Give the unpadded side the same padding (an image frame's fill still covers it) for a true 50/50.",
+      "minHeight cannot be overridden on an instance sublayer ('This property cannot be overridden in an instance: min-size'), and resize() on a card nested inside a block instance (Feed grid row) is ignored without an error.",
+      "Mobile page frames need the Layout and Typography collections set to Mobile (copy explicitVariableModes from a Mobile block such as Feed grid 155:1995); without them padding variables resolve to the desktop 64 and H2 to 48.",
+      "setTextStyleIdAsync needs the full style id from getLocalTextStylesAsync() (it ends in a comma and a version); the bare 'S:<key>' prefix fails silently and leaves the default 12px text."
+    ]
   }
 }
