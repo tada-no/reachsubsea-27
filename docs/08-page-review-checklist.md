@@ -100,6 +100,7 @@ If a card fails, change the row's shape at that width (fewer columns, or the car
 - Tap targets at least 24px tall.
 - **No layout jump on interaction (Q92).** Tick, select, open, filter or type in every control and measure: nothing outside the thing you touched moves. Reserve space for anything that can appear (a Clear link, a tick, an error line): show and hide it with `visibility`, keep a 44px target inside the line box with negative margins, give live numbers tabular figures and a minimum width, and let a selected state swap padding rather than add width.
 - Run axe-core (WCAG 2.2 AA + best practice) and an HTML validator on the built page: zero violations (Q70).
+  - HTML validator: `npx html-validate@9` on `dist/**/index.html` with the `html-validate:standard` preset. Expected: only `no-deprecated-attr` for `scrolling="no"` on the Split embed iframe (Investors, Why invest), kept on purpose (SplitEmbed.astro). The stricter `recommended` preset also flags things that are by design: inline styles (CSS variables, focal points), `role="region"` on accordion and menu panels (WAI-ARIA accordion pattern), and `role="list"` + `aria-label` on focusable scroll rails and lists. Anything else is a real finding (8 Oct 2026, Q143).
 
 ## 7. Tokens
 

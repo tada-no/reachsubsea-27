@@ -45,8 +45,10 @@ const currentHref = current ? `/${current}/` : undefined;
         <Card {...siteMenu.project} headingLevel="h3" />
       </div>
 
+      {/* Plain groups, not labelled sections: as region landmarks they clashed with page blocks of the same name
+          (Home's "Reach Newsroom" feed; html-validate unique-landmark, 8 Oct 2026) */}
       <div class="site-menu__col site-menu__feeds" style="--col-i: 2">
-        <section aria-labelledby={`${id}-news`}>
+        <div class="site-menu__feed">
           <a class="site-menu__feed-title text-eyebrow" id={`${id}-news`} href="/newsroom/">
             Reach Newsroom
             <Icon name="arrow-right" size={16} />
@@ -63,8 +65,8 @@ const currentHref = current ? `/${current}/` : undefined;
               ))
             }
           </ul>
-        </section>
-        <section aria-labelledby={`${id}-events`}>
+        </div>
+        <div class="site-menu__feed">
           <a class="site-menu__feed-title text-eyebrow" id={`${id}-events`} href="/newsroom/events/">
             Events
             <Icon name="arrow-right" size={16} />
@@ -83,7 +85,7 @@ const currentHref = current ? `/${current}/` : undefined;
               ))
             }
           </ul>
-        </section>
+        </div>
       </div>
     </div>
   </div>

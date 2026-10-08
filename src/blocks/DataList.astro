@@ -143,7 +143,7 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
   label={titleId ? undefined : 'Data list'}
   data-type={type}
   data-count={count}
-  id={instanceId}
+  {...(anchor ? {} : { id: instanceId })}
 >
   <div class="data-list__body">
     {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} class="data-list__header" />}
