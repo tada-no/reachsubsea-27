@@ -1,0 +1,139 @@
+---
+// Company › Sustainability (7 Oct 2026). Client PDF p36–37 ("15 — Company — Sustainability") for the page's
+// intent and wording; the dev site's sustainability pages for what we do under each UN goal and the contact; the
+// 2Q 2026 report for the figures (sustainability.ts lists every source). Ross's brief: rethink the PDF's stats
+// bar, lay the ESG cards out wide and stacked, and make the UN goals more interesting (as the dev site does).
+// - Stats bar → Share bars (white, Ross 7 Oct 2026): the one figure that is moving, revenue outside oil & gas
+//   crossing half (39% → 51%), the sentence over two bars beside the ring; then a Stats band Feature (white, joined)
+//   with the three key figures (~750 uncrewed days leads). The PDF's "4 ISO certifications" is dropped
+//   (ISO 31000 cannot be certified; there are three, shown in the strip below).
+// - ESG pillars → Card grid Rows (tint): the header above, then one White card per pillar: pictogram, pillar and
+//   name (H2 size) in cols 1–4; the priority tag, claim (H3 size), copy and proof line in cols 6–12 centred on them.
+// - UN goals → SDG goals (white, Ross 7 Oct 2026): the official tiles, what we do for each under them.
+// - "Read the full picture" folds into the closing CTA panel with the dev site's sustainability contact.
+// Redirects: /company/hseq/sustainability/ and its four dev children (sustainability-introduction,
+// our-un-sustainability-goals, material-sustainability-matters, sponsorship-at-reach-subsea) → this page.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import ShareBars from '../../../blocks/ShareBars.astro';
+import StatsBand from '../../../blocks/StatsBand.astro';
+import CardGrid from '../../../blocks/CardGrid.astro';
+import SdgGoals from '../../../blocks/SdgGoals.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { navSections } from '../../../data/navigation';
+import { pickFigures } from '../../../data/key-figures';
+import { latestResults } from '../../../data/investor-results';
+import { certificates } from '../../../data/company';
+import {
+  sustainabilityIntro,
+  pillarsIntro,
+  pillars,
+  goalsIntro,
+  goals,
+  sustainabilityContact,
+} from '../../../data/sustainability';
+import type { CardField } from '../../../lib/types';
+import { faqsFor, faqHubHref } from '../../../data/faqs';
+
+const base = import.meta.env.BASE_URL;
+const company = navSections.find((s) => s.id === 'company')!;
+const page = company.links.find((l) => l.label === 'Sustainability')!;
+const subnavItems = [
+  { label: 'About', href: company.href },
+  ...company.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+const [before, now] = latestResults.revenueShift;
+const pillarCards: CardField[] = pillars.map((p) => ({
+  pictogram: p.pictogram,
+  title: p.pillar,
+  lead: p.title,
+  leadEyebrow: p.priority,
+  description: p.text,
+  note: p.proof,
+}));
+const certificateTiles: CardField[] = certificates.map((c) => ({
+  media: 'icon',
+  pictogram: 'shield-tick',
+  title: `${c.standard} · ${c.scope}`,
+}));
+const report = latestResults.annualReport;
+---
+
+<BaseLayout title="Sustainability" motion>
+  <Header current="company" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Company', href: company.href }, { label: 'Sustainability' }]}
+      title={sustainabilityIntro.title}
+      lead={sustainabilityIntro.lead}
+      image={{ src: `${base}images/hero-sustainability.jpg`, alt: '', focalPoint: { x: 0.5, y: 0.5 } }}
+    />
+
+    <SectionSubnav source="section-pages" label="Company" items={subnavItems} current={page.href} />
+
+    <ShareBars
+      anchor="in-numbers"
+      background="white"
+      sectionHeader={{ title: 'More than half our revenue now comes from outside oil & gas' }}
+      caption={`${now.label}, up from ${before.value}%`}
+      parts={['Renewables & other', 'Oil & gas']}
+      bars={latestResults.revenueShift}
+    />
+
+    <StatsBand style="feature" background="white" joined animate stats={pickFigures(['uncrewed-days', 'fuel-saving', 'ghg-target'])} />
+
+    <CardGrid
+      anchor="esg"
+      layout="rows"
+      rowStyle="cards"
+      surface="white"
+      media="icon"
+      background="tint"
+      sectionHeader={pillarsIntro}
+      cards={pillarCards}
+    />
+
+    <CardGrid anchor="certificates" layout="strip" eyebrow="Certified management systems" background="white" spacing="sm" cards={certificateTiles} />
+
+    <SdgGoals
+      anchor="global-goals"
+      background="white"
+      sectionHeader={goalsIntro}
+      goals={goals.map((g) => ({ ...g, image: `${base}images/sdg/goal-${g.goal}.png` }))}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about our sustainability priorities and reporting.',
+        action: { label: 'See all FAQs', url: faqHubHref('sustainability') },
+      }}
+      layout="split"
+      source="faq"
+      topic="sustainability"
+      background="tint"
+      items={faqsFor('sustainability')}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title="Read the full picture"
+      text="Our annual & sustainability report sets out our commitments in full."
+      actions={[
+        { label: `${report.label} (PDF)`, url: report.url, action: 'file' },
+      ]}
+      showContact
+      contact={sustainabilityContact}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

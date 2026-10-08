@@ -1,14 +1,20 @@
 ---
 // Figures · reach/figures (docs/05 §2.4b). Split out of Split media on 21 Sep 2026 (Q67): proof figures, 2–4 points,
 // each with its own figure (a value, or a two-part split such as the revenue mix) and a caption.
-//   Layout Sticky: the title spans the top; the figure column (cols 1–5) is sticky and swaps to the point
-//     crossing the middle of the viewport (a clip + rise wipe, never a fade); the points scroll past in
-//     cols 7–12. A split point grows in as a two-part bar. Mobile: no sticky, each point shows its figure inline.
+//   Layout Sticky (pinned pair since 8 Oct 2026, Ross: "each section comes through together"): from 900, with JS,
+//     a band pins under the subnav, as About's Values: the heading on top, then one point at a time, its figure
+//     (cols 1–5) and its title and text (cols 7–12) as one unit. Scroll drives the change: the next point rises in
+//     as the last leaves upward (clip + rise, never a fade), with quiet step ticks under the heading. The ordered
+//     list under the band is the runway and the accessible content; the band's copy is decorative. A split point
+//     grows in as a two-part bar. Below 900 and without JS: the list, each point with its figure inline.
 //   Layout Cards (Why invest, review rounds 3–7, Q61): the value points stack as tint cards (title → body →
 //     proof figure, counting up) in cols 1–7; a split point becomes the navy feature card in cols 8–12 with a
 //     donut that sweeps clockwise. Best on White. Below 1280 the feature card spans the full width.
+//   Layout Grid (8 Oct 2026, Careers › Why work with us, Q135): every point in view, 2 × 2 tiles from 900 (one column
+//     below), each title → text → figure and caption, on subgrid rows so the figures line up across a row.
 // Figures come from the editor per page, but the numbers themselves should be quoted from Key figures / Latest
 // results, never retyped (docs/05 §0).
+import Donut from '../components/Donut.astro';
 import BlockSection from '../components/BlockSection.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import { makeId } from '../lib/ids';
@@ -32,7 +38,7 @@ interface FigurePoint {
 interface Props extends BlockFields {
   eyebrow?: string;
   title: string;
-  layout?: 'sticky' | 'cards';
+  layout?: 'sticky' | 'cards' | 'grid';
   figures: FigurePoint[];
 }
 
@@ -43,10 +49,7 @@ const figureCards = layout === 'cards';
 // Cards: value points stack in the left column; a split point becomes the feature card on the right.
 const valuePoints = figures.filter((p) => !p.split);
 const splitPoint = figures.find((p) => p.split);
-// Donut geometry: r = 100/2π, so the circumference is exactly 100 and dash lengths are percentages.
-const DONUT_R = 15.9155;
-// No gap between arcs (review round 6): gaps made a 100% split read as an incomplete ring.
-const DONUT_GAP = 0;
+// The ring itself is the shared Donut component (7 Oct 2026; geometry and sweep notes there).
 ---
 
 {
@@ -60,7 +63,26 @@ const DONUT_GAP = 0;
   anchor={anchor}
   labelledBy={titleId}
 >
-  {figureCards ? (
+  {layout === 'grid' ? (
+    <div class="figures__stack">
+      <div class="figures__stack-head">
+        {eyebrow && <Eyebrow text={eyebrow} />}
+        <h2 id={titleId} class="figures__heading text-h2">{title}</h2>
+      </div>
+      <ul class="figures__grid">
+        {figures.map((point) => (
+          <li class="figures__tile">
+            <h3 class="text-h4">{point.title}</h3>
+            <p class="figures__text text-body">{point.text}</p>
+            <div class="figures__tile-proof">
+              <p class="figures__value"><span data-count-up>{point.figure}</span></p>
+              <p class="figures__caption text-small">{point.caption}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : figureCards ? (
     <div class="figures__stack">
       <div class="figures__stack-head">
         {eyebrow && <Eyebrow text={eyebrow} />}
@@ -86,30 +108,7 @@ const DONUT_GAP = 0;
             <h3 class="text-h4">{splitPoint.title}</h3>
             <figure class="figures__donut">
               <div class="figures__donut-chart">
-                <svg viewBox="0 0 42 42" aria-hidden="true" focusable="false">
-                  <mask id={`${titleId}-sweep`} maskUnits="userSpaceOnUse" x="0" y="0" width="42" height="42">
-                    <circle class="figures__sweep" cx="21" cy="21" r={DONUT_R} fill="none" stroke="#fff" stroke-width="9" />
-                  </mask>
-                  <g mask={`url(#${titleId}-sweep)`}>
-                  {splitPoint.split.map((part, n) => {
-                    const offset = splitPoint.split!.slice(0, n).reduce((sum, p) => sum + p.value, 0);
-                    return (
-                      <circle
-                        class={`figures__arc figures__arc--${n}`}
-                        cx="21"
-                        cy="21"
-                        r={DONUT_R}
-                        fill="none"
-                        style={`--arc: ${part.value - DONUT_GAP}; --arc-offset: ${-offset}`}
-                      />
-                    );
-                  })}
-                  </g>
-                </svg>
-                <p class="figures__donut-centre">
-                  {splitPoint.period && <strong class="figures__donut-period">{splitPoint.period}</strong>}
-                  <span class="text-small">{splitPoint.caption}</span>
-                </p>
+                <Donut parts={splitPoint.split} lead={splitPoint.period} text={splitPoint.caption} />
               </div>
             </figure>
             {/* Arcs start at 12 o'clock and run clockwise, so the first share sits on the right and
@@ -132,28 +131,40 @@ const DONUT_GAP = 0;
     </div>
   ) : (
     <div class="figures__sticky" data-figures>
-      <div class="figures__sticky-head">
-        {eyebrow && <Eyebrow text={eyebrow} />}
-        <h2 id={titleId} class="figures__heading text-h2">{title}</h2>
-      </div>
-      <div class="figures__stage" aria-hidden="true">
-        {figures.map((point, i) => (
-          <div class:list={['figures__slot', i === 0 && 'is-active']} data-figure-slot={i}>
-            {point.split ? (
-              <div class="figures__split" style={`--split-a: ${point.split[0]?.value ?? 50}%`}>
-                <div class="figures__bar">
-                  {point.split.map((part) => <span class="figures__part">{part.value}%</span>)}
-                </div>
-                <div class="figures__keys text-small">
-                  {point.split.map((part) => <span>{part.label}</span>)}
-                </div>
+      <div class="figures__pin">
+        <div class="figures__sticky-head">
+          {eyebrow && <Eyebrow text={eyebrow} />}
+          <h2 id={titleId} class="figures__heading text-h2">{title}</h2>
+          <ol class="figures__ticks" aria-hidden="true">
+            {figures.map((_, i) => <li class="figures__tick" data-figure-tick={i} />)}
+          </ol>
+        </div>
+        <div class="figures__stage" aria-hidden="true">
+          {figures.map((point, i) => (
+            <div class="figures__slot" data-figure-slot={i} data-state={i === 0 ? 'current' : 'future'}>
+              <div class="figures__slot-figure">
+                {point.split ? (
+                  <div class="figures__split" style={`--split-a: ${point.split[0]?.value ?? 50}%`}>
+                    <div class="figures__bar">
+                      {point.split.map((part) => <span class="figures__part">{part.value}%</span>)}
+                    </div>
+                    <div class="figures__keys text-small">
+                      {point.split.map((part) => <span>{part.label}</span>)}
+                    </div>
+                  </div>
+                ) : (
+                  <p class="figures__value">{point.figure}</p>
+                )}
+                <p class="figures__caption text-body">{point.caption}</p>
               </div>
-            ) : (
-              <p class="figures__value">{point.figure}</p>
-            )}
-            <p class="figures__caption text-body">{point.caption}</p>
-          </div>
-        ))}
+              <div class="figures__slot-text">
+                {point.kicker && <Eyebrow text={point.kicker} as="span" />}
+                <p class="figures__title text-h3">{point.title}</p>
+                <p class="figures__text text-lead">{point.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
       <ol class="figures__points">
         {figures.map((point, i) => (
@@ -260,6 +271,9 @@ const DONUT_GAP = 0;
     grid-column: 8 / span 5;
     display: flex;
     flex-direction: column;
+    /* Children span the card (the base card's grid centring would shrink the labels row to the middle, so
+       the two shares sat 272 apart under a 432 text column; Ross, 7 Oct 2026: they sit at the card's sides) */
+    align-items: stretch;
     /* Heading → ring → body: the heading lines up with the value cards' titles */
     gap: var(--wp--preset--spacing--24);
   }
@@ -289,24 +303,6 @@ const DONUT_GAP = 0;
   }
   .figures__donut-label--start {
     order: -1;
-  }
-  .figures__donut-centre {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--wp--preset--spacing--4);
-    padding: 0 24%;
-    text-align: center;
-    color: var(--wp--custom--color--text--secondary);
-  }
-  .figures__donut-period {
-    font-size: var(--wp--preset--font-size--lead);
-    font-weight: var(--wp--custom--font-weight--bold);
-    line-height: var(--wp--custom--line-height--lead);
-    color: var(--wp--custom--color--text--primary);
   }
   .figures__donut-label {
     display: flex;
@@ -341,39 +337,12 @@ const DONUT_GAP = 0;
   .figures__donut-name {
     color: var(--wp--custom--color--text--secondary);
   }
-  .figures__donut-chart svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-    transform: rotate(-90deg);
-  }
-  /* The arcs sit at their final lengths; one trim-path sweep in a mask draws the whole ring clockwise
-     in a single continuous motion (review round 7). Per-arc draws eased out separately and hitched at
-     the seam where the first slowed as the second began */
-  .figures__arc {
-    stroke-width: 7;
-    stroke-dasharray: var(--arc) calc(100 - var(--arc));
-    stroke-dashoffset: var(--arc-offset);
-  }
-  .figures__sweep {
-    stroke-dasharray: 100 0;
-    transition: stroke-dasharray 1.4s var(--wp--custom--motion--ease-in-out) 0.3s;
-  }
-  html.js .figures__card--feature[data-reveal]:not(.is-revealed) .figures__sweep {
-    stroke-dasharray: 0 100;
-    transition-duration: 0s;
-    transition-delay: 0s;
-  }
-  /* Review round 6: the counterpart is navy/200, a light neutral that makes the sage (the share the
-     point is about, and the chart's only hue) pop. navy/400 read as disabled (the text/disabled token) */
-  .figures__arc--0,
+  /* The counterpart's swatch matches the ring (Donut): navy/100 since 7 Oct 2026 (navy/200 read grey; navy/400
+     read as disabled, the text/disabled token) */
   .figures__swatch--0 {
-    stroke: var(--wp--preset--color--navy-200);
-    background-color: var(--wp--preset--color--navy-200);
+    background-color: var(--wp--preset--color--navy-100);
   }
-  .figures__arc--1,
   .figures__swatch--1 {
-    stroke: var(--wp--preset--color--sage-400);
     background-color: var(--wp--preset--color--sage-400);
   }
   .figures__swatch {
@@ -444,55 +413,79 @@ const DONUT_GAP = 0;
     }
   }
 
-  /* ── Figures ──────────────────────────────────────────────── */
-  .figures__sticky {
+  /* ── Figures · Grid (8 Oct 2026, Careers › Why work with us, Q135) ──────────── */
+  /* Ross: Sticky on a page felt clunky (four points over ~2,000px of scroll, each figure apart from its point).
+     Grid keeps every point and its proof together in one view: 2 × 2 tiles from 900 (one column below), each in
+     Why invest's card order, title → body → proof, the figures on one line across a row. Tiles take
+     `bg/tint` (navy/900 in Navy mode: wells in the band), White on a Tint block. */
+  .figures__grid {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--wp--custom--grid--gutter);
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--wp--custom--grid--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
+  @media (min-width: 900px) {
+    .figures__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  /* Each tile is a subgrid of three rows (title · text · proof), so across a row the titles, texts and figures
+     share lines even when one caption or text runs a line longer */
+  .figures__tile {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: var(--wp--preset--spacing--12);
+    padding: var(--wp--preset--spacing--32);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  @media (min-width: 600px) {
+    .figures__tile {
+      padding: var(--wp--preset--spacing--48);
+    }
+  }
+  .has-surface-tint .figures__tile {
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  .figures__tile .figures__text {
+    max-width: 560px;
+  }
+  .figures__tile-proof {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    padding-top: var(--wp--preset--spacing--32);
+  }
+  .figures__tile .figures__value {
+    font-size: var(--wp--preset--font-size--display);
+    line-height: var(--wp--custom--line-height--display);
+    letter-spacing: var(--wp--custom--letter-spacing--display);
+  }
+
+  /* ── Figures ──────────────────────────────────────────────── */
+  /* Sticky, base (below 900 and without JS): the heading, then the list with each figure inline */
   .figures__sticky-head {
-    grid-column: 1 / span 8;
     display: flex;
     flex-direction: column;
     gap: var(--wp--custom--stack--md);
-    margin-bottom: var(--wp--custom--stack--xl);
+    max-width: 880px;
   }
   .figures__sticky-head .figures__heading {
     text-wrap: balance;
   }
+  .figures__ticks,
   .figures__stage {
-    grid-column: 1 / span 5;
-    position: sticky;
-    top: calc(50svh - 180px);
-    align-self: start;
-    height: 360px;
+    display: none;
   }
-  /* Directional swap (18 Sep 2026): the outgoing figure exits up through a ceiling quickly; the
-     incoming one rises from a floor just behind it with a crisper ease-out, so each change lands as
-     one decisive beat instead of two figures cross-wiping at once. No fades. */
-  .figures__slot {
-    position: absolute;
-    inset: 0;
+  .figures__slot-figure,
+  .figures__slot-text {
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: var(--wp--preset--spacing--16);
-    clip-path: inset(100% 0 0 0);
-    transform: translate3d(0, 48px, 0);
-    transition:
-      clip-path 0.32s var(--wp--custom--motion--ease-in-out),
-      transform 0.32s var(--wp--custom--motion--ease-in-out);
-  }
-  .figures__slot.is-past {
-    clip-path: inset(0 0 100% 0);
-    transform: translate3d(0, -48px, 0);
-  }
-  .figures__slot.is-active {
-    clip-path: inset(0 0 0 0);
-    transform: none;
-    transition-duration: 0.55s;
-    transition-timing-function: var(--wp--custom--motion--ease-out);
-    transition-delay: 0.14s;
   }
   .figures__value {
     color: var(--wp--custom--color--text--accent-display);
@@ -540,7 +533,7 @@ const DONUT_GAP = 0;
     color: var(--wp--preset--color--navy-900);
   }
   /* Grows from an all-oil-&-gas bar to the real split each time the point becomes active */
-  html.js .figures__slot:not(.is-active) .figures__bar {
+  html.js .figures__slot:not([data-state='current']) .figures__bar {
     grid-template-columns: calc(100% - 8px) 1fr;
     transition-duration: 0s;
   }
@@ -552,75 +545,183 @@ const DONUT_GAP = 0;
     color: var(--wp--custom--color--text--secondary);
   }
   .figures__points {
-    grid-column: 7 / span 6;
+    margin: var(--wp--custom--stack--lg) 0 0;
+    padding: 0;
+    list-style: none;
   }
   .figures__point {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: var(--wp--preset--spacing--16);
-    min-height: 400px;
-    padding-block: var(--wp--preset--spacing--48);
+    padding-block: var(--wp--preset--spacing--32);
   }
   .figures__text {
     color: var(--wp--custom--color--text--secondary);
     max-width: 560px;
   }
   .figures__inline {
-    display: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+    margin-bottom: var(--wp--preset--spacing--8);
   }
-  @media (max-width: 899px) {
-    .figures__sticky {
-      display: block;
+  .figures__inline .figures__value {
+    font-size: var(--wp--preset--font-size--display);
+  }
+
+  /* Pinned pair (900 up, JS adds .is-live): the band pins under the subnav for as long as the runway scrolls under
+     it. Band = the viewport below the header and subnav (520 at least); each point owns one run of scroll. */
+  @media (min-width: 900px) {
+    .figures__sticky.is-live {
+      --figures-band: max(520px, calc(100vh - var(--reach-subnav-top, 0px) - 72px));
+      --figures-run: clamp(360px, 55vh, 560px);
     }
-    .figures__stage {
-      display: none;
-    }
-    .figures__point {
-      min-height: 0;
-      padding-block: var(--wp--preset--spacing--32);
-    }
-    .figures__inline {
+    .figures__sticky.is-live .figures__pin {
+      position: sticky;
+      top: calc(var(--reach-subnav-top, 0px) + 72px);
+      height: var(--figures-band);
       display: flex;
       flex-direction: column;
-      gap: var(--wp--preset--spacing--8);
-      margin-bottom: var(--wp--preset--spacing--8);
+      gap: var(--wp--custom--stack--lg);
+      padding-block: var(--wp--preset--spacing--48);
     }
-    .figures__inline .figures__value {
-      font-size: var(--wp--preset--font-size--display);
+    .figures__sticky.is-live .figures__ticks {
+      display: flex;
+      gap: var(--wp--preset--spacing--8);
+      margin: var(--wp--preset--spacing--8) 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .figures__tick {
+      width: var(--wp--preset--spacing--32);
+      height: 3px;
+      border-radius: var(--wp--custom--radius--full);
+      background-color: var(--wp--custom--color--border--subtle);
+      transition: background-color 0.4s var(--wp--custom--motion--ease-out);
+    }
+    .figures__tick.is-current {
+      background-color: var(--wp--custom--color--icon--accent);
+    }
+    .figures__sticky.is-live .figures__stage {
+      display: block;
+      position: relative;
+      flex: 1;
+    }
+    /* One point = one unit: its figure in cols 1–5, its title and text in cols 7–12 */
+    .figures__slot {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--wp--custom--grid--gutter);
+      align-items: center;
+      clip-path: inset(100% 0 0 0);
+      transform: translate3d(0, 48px, 0);
+      transition:
+        clip-path 0.32s var(--wp--custom--motion--ease-in-out),
+        transform 0.32s var(--wp--custom--motion--ease-in-out);
+    }
+    .figures__slot-figure {
+      grid-column: 1 / span 5;
+    }
+    .figures__slot-text {
+      grid-column: 7 / span 6;
+    }
+    /* The outgoing point exits up through a ceiling quickly; the incoming one rises from a floor just behind it
+       with a crisper ease-out, so each change lands as one beat */
+    .figures__slot[data-state='past'] {
+      clip-path: inset(0 0 100% 0);
+      transform: translate3d(0, -48px, 0);
+    }
+    .figures__slot[data-state='current'] {
+      clip-path: inset(0 0 0 0);
+      transform: none;
+      transition-duration: 0.55s;
+      transition-timing-function: var(--wp--custom--motion--ease-out);
+      transition-delay: 0.14s;
+    }
+    /* The runway starts under the band's top and gives every point one run; the last one holds for a run too.
+       Its content is the accessible copy, visually hidden while the band shows it. */
+    .figures__sticky.is-live .figures__points {
+      margin-top: calc(var(--figures-band) * -1);
+      padding-bottom: calc(var(--figures-band) / 2);
+    }
+    .figures__sticky.is-live .figures__point {
+      position: relative;
+      min-height: var(--figures-run);
+      padding: 0;
+    }
+    .figures__sticky.is-live .figures__point > * {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .figures__slot {
+    .figures__slot,
+    .figures__slot[data-state] {
       transform: none;
-    }
-    .figures__sweep {
-      transition-delay: 0s;
     }
   }
 
 </style>
 
 <script>
-  // Figures: the point nearest the middle of the viewport owns the sticky figure.
+  // Figures, Sticky: the pinned pair (8 Oct 2026). The state comes from the scroll position, not an
+  // IntersectionObserver, so a fling can't skip a point (the Values block's lesson, 20 Sep 2026): the point whose top
+  // has passed the middle of the pinned band is current. Live only from 900 with JS; below that the list reads as is.
   document.querySelectorAll<HTMLElement>('[data-figures]').forEach((root) => {
     const slots = [...root.querySelectorAll<HTMLElement>('[data-figure-slot]')];
+    const ticks = [...root.querySelectorAll<HTMLElement>('[data-figure-tick]')];
     const points = [...root.querySelectorAll<HTMLElement>('[data-figure-point]')];
-    if (slots.length === 0 || !('IntersectionObserver' in window)) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const i = Number((entry.target as HTMLElement).dataset.figurePoint);
-          slots.forEach((slot) => {
-            const n = Number(slot.dataset.figureSlot);
-            slot.classList.toggle('is-active', n === i);
-            slot.classList.toggle('is-past', n < i);
-          });
-        });
-      },
-      { rootMargin: '-45% 0px -45% 0px' },
-    );
-    points.forEach((point) => observer.observe(point));
+    const pin = root.querySelector<HTMLElement>('.figures__pin');
+    if (slots.length === 0 || !pin) return;
+    const wide = window.matchMedia('(min-width: 900px)');
+
+    let current = -1;
+    const setState = (i: number) => {
+      if (i === current) return;
+      current = i;
+      slots.forEach((slot, n) => (slot.dataset.state = n < i ? 'past' : n > i ? 'future' : 'current'));
+      ticks.forEach((tick, n) => tick.classList.toggle('is-current', n === i));
+    };
+
+    let tops: number[] = [];
+    let centre = 0;
+    const measure = () => {
+      tops = points.map((point) => point.getBoundingClientRect().top + window.scrollY);
+      centre = parseFloat(getComputedStyle(pin).top) + pin.offsetHeight / 2;
+    };
+    const update = () => {
+      if (!root.classList.contains('is-live')) return;
+      const line = window.scrollY + centre;
+      let i = 0;
+      for (let n = 0; n < tops.length; n++) if (line >= tops[n]) i = n;
+      setState(i);
+    };
+    const setLive = () => {
+      root.classList.toggle('is-live', wide.matches);
+      measure();
+      update();
+    };
+
+    let frame = 0;
+    window.addEventListener('scroll', () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => ((frame = 0), update()));
+    }, { passive: true });
+    let resizing = 0;
+    window.addEventListener('resize', () => {
+      window.clearTimeout(resizing);
+      resizing = window.setTimeout(() => (measure(), update()), 150);
+    });
+    wide.addEventListener('change', setLive);
+    // Late layout shifts (fonts, images above the section) move the runway under the line
+    window.addEventListener('load', () => (measure(), update()));
+    setState(0);
+    setLive();
   });
 </script>

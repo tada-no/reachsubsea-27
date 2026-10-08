@@ -24,6 +24,9 @@ interface Props extends BlockFields {
   align?: 'start' | 'center';
   /** Stats enter one by one and count up from 0 when the band scrolls into view (17 Sep 2026). */
   animate?: boolean;
+  /** Continues the block above on the same ground: no top padding (7 Oct 2026, Sustainability: the key figures
+   * under Share bars). As Card grid and Split media `joined`. */
+  joined?: boolean;
   class?: string;
 }
 
@@ -34,6 +37,7 @@ const {
   stats,
   align,
   animate = false,
+  joined = false,
   background,
   spacing,
   anchor,
@@ -48,8 +52,13 @@ const rest = stats.filter((_, i) => i !== leadIndex);
 const count = stats.length;
 const alignment = align ?? (sectionHeader?.align === 'center' ? 'center' : 'start');
 const titleId = sectionHeader ? makeId('stats', sectionHeader.title) : undefined;
-const rootClass = [`stats-band--${style}`, `stats-band--count-${count}`, animate && 'stats-band--animate', className].filter(Boolean).join(' ');
+const rootClass = [`stats-band--${style}`, `stats-band--count-${count}`, animate && 'stats-band--animate', joined && 'stats-band--joined', className].filter(Boolean).join(' ');
 const STAT_STAGGER = 160;
+// Feature rows: the figures share the width equally, each from its column's start, a rule centred in the gap
+// between (7 Oct 2026, Sustainability then Company). Content-width figures with the spare width in the gaps put
+// the first figure on the left edge, the last on the right and the middle ones floating, so the row had no
+// shared left edge; with two figures half the panel was one gap.
+const rowColumns = rest.map(() => 'minmax(max-content, 1fr)').join(' var(--rule-gap) ');
 ---
 
 {
@@ -75,7 +84,7 @@ const STAT_STAGGER = 160;
               <p class="stats-band__lead-label text-small">{lead.label}</p>
               {lead.note && <p class="stat__note text-small">{lead.note}</p>}
             </div>
-            <ul class="stats-band__rows" style={`grid-template-columns: ${rest.map(() => 'max-content').join(' minmax(var(--rule-gap), 1fr) ')}`}>
+            <ul class="stats-band__rows" style={`grid-template-columns: ${rowColumns}`}>
               {rest.map((stat, i) => (
                 <Fragment>
                 {i > 0 && <li class="stats-band__rule" role="presentation" aria-hidden="true" />}
@@ -114,6 +123,9 @@ const STAT_STAGGER = 160;
 }
 
 <style is:global>
+  .stats-band.stats-band--joined {
+    padding-top: 0;
+  }
   .stats-band__body {
     display: flex;
     flex-direction: column;
@@ -142,6 +154,13 @@ const STAT_STAGGER = 160;
     border-radius: var(--wp--custom--radius--lg);
     background-color: var(--wp--custom--color--bg--default);
     box-shadow: var(--wp--preset--shadow--sm);
+  }
+  /* On a White block the panel's white half needs an edge, as a White card's 1px border/subtle (7 Oct 2026,
+     Sustainability). Inset, so the navy lead covers it on its side. */
+  .stats-band:not(.has-surface-tint):not(.has-surface-navy) .stats-band__feature {
+    box-shadow:
+      inset 0 0 0 1px var(--wp--custom--color--border--subtle),
+      var(--wp--preset--shadow--sm);
   }
   .stats-band__lead {
     /* Grows only when it has the line to itself (stacked) */

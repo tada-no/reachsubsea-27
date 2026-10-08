@@ -29,7 +29,8 @@
     "Search panel": "124:2565",
     "Footer": "125:2893",
     "Media toggle": "365:2366",
-    "Search field": "417:13785"
+    "Search field": "417:13785",
+    "Donut": "437:2408"
   },
   "components": {
     "Logo": {
@@ -373,6 +374,36 @@
         "Filled": "417:13849"
       },
       "notes": "Added 6 Oct 2026 (Q88). Code: src/components/SearchField.astro. 320×48 (instances FILL), padding space/16 / space/4, gap space/8, radius/md, bg/default, 1px border/default (Hover border/strong), Icon/search 20 icon/primary, text Body/Body (placeholder text/secondary, Filled value text/primary), Clear = Icon button Ghost Small with Icon/x, visible on Filled only. Focus: absolute 328×56 ring, 2px border/focus. Placeholder and Value are separate TEXT properties because linked variants share one default."
+    },
+    "Donut": {
+      "id": "437:2425",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "props": [
+        "Lead#437:4",
+        "Text#437:5",
+        "Lead style (Period, Figure)"
+      ],
+      "variantIds": {
+        "Period": "437:2413",
+        "Figure": "437:2419"
+      },
+      "notes": "Added 8 Oct 2026 (Q117, Sustainability). Code: src/components/Donut.astro. Ring stroke 6 (innerRadius 0.683), first arc navy/100, share arc sage/400; centre Lead (Figure: accent-display) over Text, padded 0 26%. Used by Block/Share bars and the Why invest Figures donut."
+    },
+    "SDG goal": {
+      "id": "450:16287",
+      "type": "COMPONENT_SET",
+      "variants": 2,
+      "variantIds": {
+        "Desktop": "450:16248",
+        "Mobile": "450:16286"
+      },
+      "notes": "On the Blocks page beside Blocks / SDG goals (8 Oct 2026). See figma-blocks-ledger componentSweep8Oct."
+    },
+    "Share bar": {
+      "id": "450:17107",
+      "type": "COMPONENT",
+      "notes": "On the Blocks page beside Blocks / Share bars (8 Oct 2026). Props Value, Period."
     }
   },
   "ledgers": {

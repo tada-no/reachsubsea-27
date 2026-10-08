@@ -1,0 +1,158 @@
+---
+// Investors › Governance & general meetings (7 Oct 2026). How Reach Subsea ASA is governed, and every general meeting.
+// Sources (governance.ts lists them in detail): client PDF p46–47 for the page's intent, sections, FAQs and CTA;
+// the live General meetings page for every meeting and file; the dev Corporate Governance page for the dividend
+// and investor relations policies and the governance documents; annual report 2025 p78–84 and the 2026 AGM papers
+// for the committees and the AGM rules. Built as a sibling of Reports & presentations:
+// 1. Meeting archive (white): the meetings come first, as the results do on Reports, because the notice and
+//    minutes are what most visitors come for: the PDF's empty "Notices & minutes" box, filled (its words in the
+//    intro). The newest meeting is the one Navy row, the next AGM a dashed row above it; two years open (Ross: 2024 and older hidden), the rest
+//    under "Earlier meetings". Under the rows, the PDF's AGM / EGM explainer in its own words (two columns; Ross,
+//    7 Oct 2026, Q121: background, so after the papers).
+// 2. Card grid 2 columns (tint, white cards): the PDF's "illustrative" committee cards, now the real structure, two
+//    by two: the Board and the nomination committee (elected by shareholders) over the audit and remuneration
+//    committees (appointed by the Board); the eyebrow says which, each body's size is the meta. Four across left
+//    ~240 of text: titles wrapped unevenly and the meta ran to two lines. Leadership & Board for the names.
+// 3. Split media Documents (navy, as HSEQ's Policies), the PDF's title "Articles & policies": its cards as one list, the
+//    corporate governance statement first. No header action (Ross, 7 Oct 2026: a file link beside a block of file
+//    links felt like too much); the Transparency Act statement dropped to keep 3 × 2 (it has its own page).
+// 4. Split media Spec table, paired (white): the dividend and investor relations policies, which Why invest links
+//    to ("Dividend & IR policy"), as label · value rows side by side, as HSEQ campaigns' golden rules.
+// 5. Accordion Split (tint): the PDF's three FAQs, answered, plus how to take part in a meeting.
+// 6. CTA Panel (tint): the PDF's wording, the investor relations contact.
+// Hero: plain navy Text hero, as the PDF and Q57 (data pages); no photo. Lead: the PDF's, its listing clause cut so it
+// stays within two lines (the listing is in the first FAQ).
+// Redirects: /investors/general-meetings-2/ (live), /investors/results-reporting/general-meetings-2/ and
+// /investors/key-information/corporate-governance/ (dev) → here.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import SectionSubnav from '../../blocks/SectionSubnav.astro';
+import MeetingArchive from '../../blocks/MeetingArchive.astro';
+import CardGrid from '../../blocks/CardGrid.astro';
+import SplitMedia from '../../blocks/SplitMedia.astro';
+import Accordion from '../../blocks/Accordion.astro';
+import CtaBand from '../../blocks/CtaBand.astro';
+import { navSections } from '../../data/navigation';
+import {
+  generalMeetings,
+  meetingGuide,
+  nextGeneralMeeting,
+  governingBodies,
+  dividendPolicy,
+  investorRelationsPolicy,
+  governanceDocuments,
+} from '../../data/governance';
+import { faqsFor, faqHubHref } from '../../data/faqs';
+
+const base = import.meta.env.BASE_URL;
+const investors = navSections.find((s) => s.id === 'investors')!;
+const page = investors.links.find((l) => l.label === 'Governance & meetings')!;
+const subnavItems = [
+  { label: 'Overview', href: investors.href },
+  ...investors.links.map((l) => ({ label: l.label, href: l.href })),
+];
+const firstYear = generalMeetings[generalMeetings.length - 1].date.slice(0, 4);
+---
+
+<BaseLayout title="Governance & general meetings · Investors" motion>
+  <Header current="investors" overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Investors', href: investors.href },
+        { label: page.label },
+      ]}
+      title="Governance & general meetings"
+      lead="Reach Subsea ASA is governed in line with the Norwegian Code of Practice for Corporate Governance, including how shareholders exercise their rights at general meetings."
+    />
+
+    <SectionSubnav source="section-pages" label="Investors" items={subnavItems} current={page.href} />
+
+    <MeetingArchive
+      anchor="general-meetings"
+      background="white"
+      sectionHeader={{
+        title: 'General meetings',
+        intro: `Notices, minutes and supporting papers for every general meeting since ${firstYear}.`,
+        action: { label: 'Financial calendar', url: '/investors/financial-calendar/' },
+      }}
+      guide={meetingGuide}
+      meetings={generalMeetings}
+      next={nextGeneralMeeting}
+      openYears={2}
+    />
+
+    <CardGrid
+      anchor="structure"
+      layout="2-columns"
+      media="none"
+      surface="white"
+      background="tint"
+      sectionHeader={{
+        title: 'How Reach Subsea is governed',
+        intro:
+          'The Board of Directors is responsible for the overall management of Reach Subsea ASA and oversight of executive management, in line with the Norwegian Code of Practice for Corporate Governance.',
+        action: { label: 'Leadership & Board', url: '/company/leadership-board/' },
+      }}
+      cards={governingBodies.map((b) => ({
+        eyebrow: b.eyebrow,
+        title: b.title,
+        description: b.description,
+        meta: [{ icon: 'users', text: b.meta }],
+      }))}
+    />
+
+    <SplitMedia
+      anchor="documents"
+      media="documents"
+      layout="stacked"
+      background="navy"
+      title="Articles & policies"
+      intro="We review how we are governed every year and report on it in the corporate governance statement in our annual report."
+      documents={governanceDocuments.map((d) => ({ label: d.label, url: d.url, action: 'file', context: ' (PDF)' }))}
+    />
+
+    <SplitMedia
+      anchor="policies"
+      layout="stacked"
+      media="spec-table"
+      background="white"
+      title="Dividend & investor relations"
+      intro="We aim to share our profits with shareholders and to keep the market correctly, clearly and promptly informed."
+      pairHeading="Dividend policy"
+      pairSpecs={dividendPolicy}
+      specHeading="Investor relations policy"
+      specs={investorRelationsPolicy}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'About how Reach Subsea is governed and how our general meetings work.',
+        action: { label: 'See all FAQs', url: faqHubHref('governance') },
+      }}
+      layout="split"
+      source="faq"
+      topic="governance"
+      topic="investors"
+      background="tint"
+      items={faqsFor('governance')}
+    />
+
+    <CtaBand
+      style="panel"
+      background="tint"
+      title="Would you like to know more?"
+      text="Questions for our investor relations team? Reach out any time."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact
+      contact={{ label: 'Investor relations', name: 'Arne Joa', role: 'Chief Financial Officer', phone: '+47 474 51 344', email: 'arne.joa@reachsubsea.com' }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

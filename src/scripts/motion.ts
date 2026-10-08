@@ -1,4 +1,4 @@
-// Motion layer (17 Sep 2026): scroll reveal + count-up + pictogram loops. One small vanilla file so
+// Motion layer (17 Sep 2026): scroll reveal + count-up + pictogram loops (+ chart grow, charts before figures). One small vanilla file so
 // it ports to the WordPress theme as-is. Blocks stay untouched: targets are picked by selector here.
 // Purpose of each: reveal = bridges content in as you reach it (staggered so groups read in order);
 // count-up = draws the eye to the key figures once; pictogram loops (18 Sep 2026) = each service
@@ -8,7 +8,12 @@
 const REVEAL_TARGETS = [
   '.section-header',
   '.card-grid__item',
+  '.sdg-goals__goal',
+  '.comparison__labels',
+  '.comparison__column',
+  '.figures__tile',
   '.card-bento__item',
+  '.statement__rail',
   '.feed-grid__item',
   '.stats-band__group',
   '.results-band__group',
@@ -25,6 +30,55 @@ const REVEAL_TARGETS = [
 
 const MAX_STAGGER = 6;
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Charts lead, figures follow (7 Oct 2026, Ross, site-wide): where a chart ([data-grow]: bars, a ring) and counting
+// figures are on screen together, the chart draws first and the figures (their group's rise and the count-up)
+// start as it finishes, so the eye goes to the picture and then the numbers. A figure with no chart in view
+// animates as before. A chart that is in view but not yet grown (it grows once nearly all in view) holds its
+// figures for CHART_WAIT at most, so a half-scrolled chart never leaves them hidden.
+const CHART_LEAD = 1000;
+const CHART_WAIT = 1200;
+const charts = [...document.querySelectorAll<HTMLElement>('[data-grow]')];
+const chartState = new Map(charts.map((c) => [c, { grownAt: 0, waiters: [] as (() => void)[] }]));
+
+function markGrown(chart: HTMLElement) {
+  const state = chartState.get(chart);
+  chart.classList.add('is-grown');
+  if (!state || state.grownAt) return;
+  state.grownAt = performance.now();
+  state.waiters.splice(0).forEach((wake) => wake());
+}
+
+// Measured when asked (observer callbacks have no set order, so a flag kept by one could still be stale)
+function onScreen(el: HTMLElement) {
+  const r = el.getBoundingClientRect();
+  return r.bottom > 0 && r.top < window.innerHeight && r.width > 0;
+}
+
+/** Runs `go` now, or once the charts on screen have had their lead. Figures inside or around a chart wait for nothing. */
+function afterCharts(el: HTMLElement, go: () => void) {
+  if (reduceMotion || el.closest('[data-grow]') || el.querySelector('[data-grow]')) return go();
+  const leading = [...chartState.entries()].filter(([c, s]) => onScreen(c) || (s.grownAt && performance.now() - s.grownAt < CHART_LEAD));
+  if (leading.length === 0) return go();
+  const startAt = () => {
+    const readyAt = Math.max(...leading.map(([, s]) => (s.grownAt || performance.now()) + CHART_LEAD));
+    window.setTimeout(go, Math.max(0, readyAt - performance.now()));
+  };
+  const pending = leading.filter(([, s]) => !s.grownAt);
+  if (pending.length === 0) return startAt();
+  let started = false;
+  const once = () => {
+    if (started || pending.some(([, s]) => !s.grownAt)) return;
+    started = true;
+    startAt();
+  };
+  pending.forEach(([, s]) => s.waiters.push(once));
+  window.setTimeout(() => {
+    if (started) return;
+    started = true;
+    go();
+  }, CHART_WAIT);
+}
 
 function initReveal() {
   const main = document.querySelector('main');
@@ -47,8 +101,13 @@ function initReveal() {
         if (!entry.isIntersecting) return;
         const el = entry.target as HTMLElement;
         observer.unobserve(el);
-        el.classList.add('is-revealed');
-        el.addEventListener('transitionend', () => el.classList.add('is-settled'), { once: true });
+        const reveal = () => {
+          el.classList.add('is-revealed');
+          el.addEventListener('transitionend', () => el.classList.add('is-settled'), { once: true });
+        };
+        // A group of counting figures follows any chart on screen; everything else reveals at once
+        if (el.querySelector('[data-count-up]')) afterCharts(el, reveal);
+        else reveal();
       });
     },
     { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
@@ -94,15 +153,17 @@ function initCountUp() {
         observer.unobserve(entry.target);
         const item = parsed.find((p) => p.el === entry.target);
         if (!item) return;
-        const delay = Number(item.el.dataset.countUpDelay ?? 0);
-        const start = performance.now() + delay;
-        const tick = (now: number) => {
-          const t = Math.min(Math.max((now - start) / DURATION, 0), 1);
-          item.el.textContent = `${item.prefix}${item.format(item.target * easeOutExpo(t))}${item.suffix}`;
-          if (t < 1) requestAnimationFrame(tick);
-          else item.el.textContent = item.final;
-        };
-        requestAnimationFrame(tick);
+        afterCharts(item.el, () => {
+          const delay = Number(item.el.dataset.countUpDelay ?? 0);
+          const start = performance.now() + delay;
+          const tick = (now: number) => {
+            const t = Math.min(Math.max((now - start) / DURATION, 0), 1);
+            item.el.textContent = `${item.prefix}${item.format(item.target * easeOutExpo(t))}${item.suffix}`;
+            if (t < 1) requestAnimationFrame(tick);
+            else item.el.textContent = item.final;
+          };
+          requestAnimationFrame(tick);
+        });
       });
     },
     { threshold: 0.6 },
@@ -186,31 +247,35 @@ function initWipe() {
   });
 }
 
-// Grow (6 Oct 2026): a chart marked [data-grow] gets .is-grown once it is (nearly) all in view, so the rise is
-// seen rather than spent below the fold; its block's CSS rises the bars from the baseline. The hidden state
-// is CSS (html.js), so reduced motion or no observer grows at once.
+// Grow (6 Oct 2026): a chart marked [data-grow] gets .is-grown once it is (nearly) all in view, or at once if it is
+// on screen at load, so the rise is seen rather than spent below the fold; its block's CSS rises the bars from the
+// baseline. The hidden state is CSS (html.js), so reduced motion or no observer grows at once.
 function initGrow() {
-  const els = [...document.querySelectorAll<HTMLElement>('[data-grow]')];
-  if (els.length === 0) return;
+  if (charts.length === 0) return;
   if (reduceMotion || !('IntersectionObserver' in window)) {
-    els.forEach((el) => el.classList.add('is-grown'));
+    charts.forEach(markGrown);
     return;
   }
+  // A chart already on screen when the page loads (e.g. just under the hero) grows straight away, even if it is
+  // only partly in view (Ross, 7 Oct 2026): waiting for 90% left it half-drawn until the reader scrolled. Two
+  // frames first, so its hidden state paints and the growth is seen. Charts further down wait for 90%.
+  const atLoad = charts.filter(onScreen);
+  requestAnimationFrame(() => requestAnimationFrame(() => atLoad.forEach(markGrown)));
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         observer.unobserve(entry.target);
-        entry.target.classList.add('is-grown');
+        markGrown(entry.target as HTMLElement);
       });
     },
     { rootMargin: '0px 0px -8% 0px', threshold: 0.9 },
   );
-  els.forEach((el) => observer.observe(el));
+  charts.filter((el) => !atLoad.includes(el)).forEach((el) => observer.observe(el));
 }
 
+initGrow();
 initReveal();
 initCountUp();
 initWipe();
-initGrow();
 initPictogramLoops();

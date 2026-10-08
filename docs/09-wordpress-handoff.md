@@ -31,9 +31,10 @@ Read with: [05-blocks-spec.md](05-blocks-spec.md) (block behaviour) · [04-compo
 | Status | Pages |
 |---|---|
 | **Built, reviewed** | Home · Services overview · Services › Subsea · Company › About · Investors › Overview · Investors › Why invest · Careers › Overview |
+| **Built, awaiting review** | Investors › Governance & general meetings (7 Oct 2026, Q121; new block Meeting archive, docs/05 §2.24) · FAQ (7 Oct 2026, Q126; every FAQ from the FAQ post type, `src/data/faqs.ts`) |
 | **Built, utility** | `/3d-world/explore/` (full-viewport iframe page) · header and mega menus · footer |
 | **Review routes, not pages** (do not ship) | `/blocks/*` · `/header/*` · `/live-operations-review/` |
-| **Specified in docs/05 §3, not built** | Survey · Monitoring · Technology & Innovation (reuse the Subsea template) · Research & Publications · Assets overview · Asset single · Reach Remote · Reach Remote 3 & 4 · Projects archive · Project single · Leadership & Board · HSEQ · Sustainability · Charter agreements · Reports & presentations · Governance & meetings · Financial calendar · Share information · Life at Reach · Our culture · Why work with us · Newsroom · News single · Events · Press & media · Contact · FAQ · Privacy · Transparency Act · 404 |
+| **Specified in docs/05 §3, not built** | Survey · Monitoring · Technology & Innovation (reuse the Subsea template) · Research & Publications · Assets overview · Asset single · Reach Remote · Reach Remote 3 & 4 · Projects archive · Project single · Leadership & Board · HSEQ · Sustainability · Charter agreements · Reports & presentations · Financial calendar · Share information · Life at Reach · Our culture · Why work with us · Newsroom · News single · Events · Press & media · Contact · FAQ · Privacy · Transparency Act · 404 |
 | **Templates, not blocks** (Phase 4, not built) | Search results · news and project single layouts · archive pagination |
 
 The header links to about 30 pages that do not exist yet, so link-checking the prototype will show many dead links. That is expected.

@@ -1,0 +1,82 @@
+---
+// Investors › Charter agreements (7 Oct 2026, Q125). When each vessel's firm charter ends, and how far its options run.
+// Sources: client PDF p20 / screens p42–43 ("Charter agreement overview": Gantt of firm periods and options, a
+// separate Project charter category for Normand Jarstein, the owned Reach Remote fleet alongside, CTA; no FAQ) and
+// the Q2 2026 report p13–16 for every period, owner and quarterly status (src/data/charters.ts).
+// 1. Charter timeline, chartered (white): long-term and project charters on one axis, grouped Long-term ·
+//    Project, sorted by when the firm period ends. Each row opens for the owner, how far the options run and the
+//    vessel's Q2 2026 status. The PDF's banner and footnotes (corrections, the Taurus fix) are not shown: the
+//    data is now current, and the Viking Reach sale and the Reach Remote 3 & 4 funding sit in their own rows.
+// 2. Charter timeline, owned (white): the Reach Remote fleet as its own graph on the same window, as the PDF's
+//    second chart (Ross, 7 Oct 2026). Same ground as the chart above, so the two read as one pair.
+// 3. CTA Panel (white, the block above): the PDF's heading and line, with the IR contact as the sibling pages.
+// Hero: plain navy Text hero (data page, Q57, Q124). Replaces the v1 plan of a presentation slide image (Q26).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import SectionSubnav from '../../blocks/SectionSubnav.astro';
+import CharterTimeline from '../../blocks/CharterTimeline.astro';
+import CtaBand from '../../blocks/CtaBand.astro';
+import { navSections } from '../../data/navigation';
+import { charterSource } from '../../data/charters';
+
+const base = import.meta.env.BASE_URL;
+const investors = navSections.find((s) => s.id === 'investors')!;
+const page = investors.links.find((l) => l.label === 'Charter agreements')!;
+const subnavItems = [
+  { label: 'Overview', href: investors.href },
+  ...investors.links.map((l) => ({ label: l.label, href: l.href })),
+];
+---
+
+<BaseLayout title="Charter agreements · Investors" motion>
+  <Header current="investors" overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Investors', href: investors.href },
+        { label: page.label },
+      ]}
+      title="Charter agreements"
+      lead="Firm charter periods and options across the chartered fleet, with our own Reach Remote vessels alongside."
+    />
+
+    <SectionSubnav source="section-pages" label="Investors" items={subnavItems} current={page.href} />
+
+    <CharterTimeline
+      anchor="timeline"
+      background="white"
+      sectionHeader={{
+        title: 'Charter periods and options',
+        intro: 'Sorted by when each firm period ends. Open a vessel for its owner, how far its options run and what it did last quarter.',
+        meta: [{ icon: 'file-description', text: `As reported in the ${charterSource.label}, ${charterSource.published}` }],
+        action: { label: 'Fleet overview', url: '/assets/' },
+      }}
+    />
+
+    <CharterTimeline
+      anchor="reach-remote"
+      fleet="owned"
+      background="white"
+      sectionHeader={{
+        title: 'Reach Remote fleet',
+        intro: 'Our uncrewed vessels are owned and operated by Reach Subsea, not chartered, so they sit outside the charter backlog.',
+      }}
+    />
+
+    <CtaBand
+      style="panel"
+      background="white"
+      title="Questions about the fleet or the charter backlog?"
+      text="Our investor relations team is happy to help."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact
+      contact={{ label: 'Investor relations', name: 'Arne Joa', role: 'Chief Financial Officer', phone: '+47 474 51 344', email: 'arne.joa@reachsubsea.com' }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

@@ -87,7 +87,15 @@ export interface CardField {
   eyebrow?: string;
   badge?: BadgeField;
   title: string;
+  /** A short claim between the title and the description, in H4 (7 Oct 2026, Sustainability: each ESG pillar's
+   * priority claim, "Technology choices drive our impact"). For Card grid Rows. */
+  lead?: string;
+  /** A short tag over the lead (7 Oct 2026, Sustainability: the pillar's priority, "Why it matters now"). */
+  leadEyebrow?: string;
   description?: string;
+  /** One closing line after the description, in bold primary text (7 Oct 2026, Sustainability: the pillar's proof
+   * point, "45% GHG emission reduction target by 2030…"). No icon: it finishes the copy, it isn't metadata. */
+  note?: string;
   meta?: MetaField[];
   /** Sub-page links under the text (19 Sep 2026, Services overview: a service line's sub-services).
    * A card with links is not a stretched link: every link is its own target. */

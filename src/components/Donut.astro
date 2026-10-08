@@ -1,0 +1,118 @@
+---
+// Donut (7 Oct 2026, from the Figures block's revenue-mix ring, Why invest, review rounds 5–7): a two-part share
+// as a ring, used by Figures (Why invest) and Share bars (Sustainability) so both draw the same chart.
+// Geometry: r = 100/2π, so the circumference is exactly 100 and dash lengths are percentages. Arcs start at 12
+// o'clock and run clockwise with no gap between them (a gap made a 100% split read as an incomplete ring): the
+// first part, the counterpart, in navy/100; the second, the share the chart is about, in sage/400.
+// Motion: the arcs sit at their final lengths and one trim-path sweep in a mask draws the whole ring clockwise in
+// a single motion once the ring is (nearly) all in view (data-grow, motion.ts). Reduced motion: drawn at once.
+// The centre holds an optional lead (a period, or the share as a figure) and a short line. Decorative: the
+// parent states the values in text.
+import { makeId } from '../lib/ids';
+
+interface Props {
+  /** Two parts in percent, counterpart first, then the share the chart is about. */
+  parts: { label: string; value: number }[];
+  /** Centre, first line: a period ("First half 2026") or the share as a figure ("51%"). */
+  lead?: string;
+  /** `figure` sets the lead as a large figure in text/accent-display; `period` as a bold Lead line. */
+  leadStyle?: 'period' | 'figure';
+  /** Centre, second line (Body/Small). */
+  text?: string;
+  class?: string;
+}
+
+const { parts, lead, leadStyle = 'period', text, class: className } = Astro.props;
+const id = makeId('donut', `${parts.map((p) => p.value).join('-')}-${lead ?? ''}-${text ?? ''}`);
+const R = 15.9155;
+---
+
+<div class:list={['donut', className]} data-grow>
+  <svg viewBox="0 0 42 42" aria-hidden="true" focusable="false">
+    <mask id={`${id}-sweep`} maskUnits="userSpaceOnUse" x="0" y="0" width="42" height="42">
+      <circle class="donut__sweep" cx="21" cy="21" r={R} fill="none" stroke="#fff" stroke-width="9" />
+    </mask>
+    <g mask={`url(#${id}-sweep)`}>
+      {parts.slice(0, 2).map((part, n) => {
+        const offset = parts.slice(0, n).reduce((sum, p) => sum + p.value, 0);
+        return <circle class={`donut__arc donut__arc--${n}`} cx="21" cy="21" r={R} fill="none" style={`--arc: ${part.value}; --arc-offset: ${-offset}`} />;
+      })}
+    </g>
+  </svg>
+  {(lead || text) && (
+    <p class="donut__centre" aria-hidden="true">
+      {lead && <strong class:list={['donut__lead', `donut__lead--${leadStyle}`]}>{lead}</strong>}
+      {text && <span class="text-small">{text}</span>}
+    </p>
+  )}
+</div>
+
+<style is:global>
+  .donut {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+  }
+  .donut svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+  /* 6 of the 42 box (was 7): a wider centre, so its two lines don't crowd the ring (Ross, 7 Oct 2026) */
+  .donut__arc {
+    stroke-width: 6;
+    stroke-dasharray: var(--arc) calc(100 - var(--arc));
+    stroke-dashoffset: var(--arc-offset);
+  }
+  /* Counterpart navy/100: the lightest step of the brand ramp, quiet beside the sage (the share), and clear on a
+     navy card too (Ross, 7 Oct 2026; navy/200 read grey) */
+  .donut__arc--0 {
+    stroke: var(--wp--preset--color--navy-100);
+  }
+  .donut__arc--1 {
+    stroke: var(--wp--preset--color--sage-400);
+  }
+  .donut__sweep {
+    stroke-dasharray: 100 0;
+    transition: stroke-dasharray 1.4s var(--wp--custom--motion--ease-in-out) 0.3s;
+  }
+  html.js .donut[data-grow]:not(.is-grown) .donut__sweep {
+    stroke-dasharray: 0 100;
+    transition-duration: 0s;
+    transition-delay: 0s;
+  }
+  .donut__centre {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wp--preset--spacing--4);
+    margin: 0;
+    padding: 0 26%;
+    text-align: center;
+    text-wrap: balance;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .donut__lead--period {
+    font-size: var(--wp--preset--font-size--lead);
+    font-weight: var(--wp--custom--font-weight--bold);
+    line-height: var(--wp--custom--line-height--lead);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .donut__lead--figure {
+    font-size: var(--wp--preset--font-size--h1);
+    font-weight: var(--wp--custom--font-weight--bold);
+    line-height: var(--wp--custom--line-height--figure);
+    letter-spacing: var(--wp--custom--letter-spacing--h1);
+    font-variant-numeric: tabular-nums lining-nums;
+    color: var(--wp--custom--color--text--accent-display);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .donut__sweep {
+      transition-delay: 0s;
+    }
+  }
+</style>

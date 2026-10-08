@@ -58,7 +58,7 @@ Focus = Default + focus ring. Properties: `Label`, `Show leading icon` (off), `L
 |---|---|---|
 | Page | arrow-right | internal page |
 | External | arrow-up-right | HR-Manager, ir.oms.no, LinkedIn (Q24) |
-| File | download | PDFs; label names the file ("Q2 2026 report (PDF)") |
+| File | download | PDFs; label names the file, then "(PDF)": "Q2 2026 report (PDF)", "Poster (PDF)", "Spec sheet (PDF)". No "Download" verb (the icon says it; Ross, 7 Oct 2026, Q118). Repeated labels carry hidden `context` |
 | Video | player-play | opens the video player |
 | Expand | plus (minus when open) | reveals content in place (the PDF's "reveal"; no flip cards) |
 | Anchor | arrow-down | jumps within the page |
@@ -85,7 +85,7 @@ Replaces the dev `.category-pill` as a label (filters use Filter chip).
 `Size` Large | Medium × `Align` Start | Center = **4**. New pattern (dev has none). Value: `Heading/H1` (Large) | `Heading/H3` (Medium), `text/primary`. Label: `Body/Body` | `Body/Small`, `text/secondary`. Gap `stack/xs`. Optional note (`Show note`, `Body/Caption`, `text/secondary`) for a source or date. Properties `Value` ("500+"), `Label`, `Note`. One stats source per brief §5.3.
 
 ## 10. Filter chip
-`State` Default | Hover | Selected | Focus | Disabled = **5**. Height 40, padding x `space/16` + `space/12` (28), Selected `space/16`, so the 24px check (16 + gap 8) fits inside the chip's own padding and selecting never changes its width (Q92); gap `space/8`, `radius/full`, `UI/Label`. Count: in brackets, "2025–26 (7)" (Q93: a bare count after a numeric label read as part of it), tabular figures, min 4ch, so a live count changing never resizes the chip; Disabled = the count takes the label's `text/disabled`.
+`State` Default | Hover | Selected | Focus | Disabled = **5**. Height 40, padding x `space/16` + `space/12` (28), Selected `space/16`, so the 24px check (16 + gap 8) fits inside the chip's own padding and selecting never changes its width (Q92); check to label `space/8`, label to count `space/4` (a word space, Q142), `radius/full`, `UI/Label`. Count: in brackets, "2025–26 (7)" (Q93: a bare count after a numeric label read as part of it), tabular figures. The chip hugs its content: a hidden copy of the built count (`data-reserve`) shares the count's cell, and a live count only ever falls from it, so the chip never resizes (Q142); Disabled = the count takes the label's `text/disabled`.
 Default: bg `bg/default`, 1px `border/default`, text `text/primary`. Hover: bg `action/outline/bg-hover`, border `border/strong`. Selected: bg `action/primary/bg`, text `action/primary/fg`, check icon 16. Focus: Default + ring. Disabled: border `border/subtle`, text `text/disabled`. Properties `Label`, `Show count`, `Count`. Used in Feed grid filters (service, asset, region, year) and FAQ topic jumps.
 
 **Layout List (Q89, 6 Oct 2026):** in the Data list Publications rail (from 1100) each chip is a plain row instead of a pill: 40 tall, full width, padding x `space/8` pulled back out so labels align with the facet label, `radius/sm` hover bg `action/outline/bg-hover`, no border. The 16px tick slot is drawn as a checkbox (`radius/xs`, 1px `border/strong` inset; Selected = `action/primary/bg` fill with the tick in `action/primary/fg`; Disabled = `border/subtle`), since the options are multi-select (Q90). No fill or bold on the row. Count right-aligned, `text/secondary`, tabular figures. Below 1100 the same buttons are ordinary chips (with counts). *Figma (6 Oct 2026): `Layout` property added to Filter chip (92:337), Chip · List × the five States = 10; List example on the doc frame (417:13747). Chip padding 28 / Selected 16 and the bracketed count default "(12)" applied to the Chip variants.*
@@ -115,6 +115,8 @@ Icon 20 (`icon/accent`) + `Body/Small` `text/secondary`, gap `space/8`, centred.
 | Image top | 3:2, 416 × 280 | 3:2, 864 × 576 |
 | Image bg height | 520 | 520 |
 
+**7 Oct 2026 (Sustainability, Q117): two optional text fields.** `Lead`: a short claim between the title and the description, `Lead` style, `text/primary`. `Note`: one closing line after the description, the description's size in bold `text/primary`, no icon (a proof point that finishes the copy, not metadata). `Lead eyebrow`: a short tag over the lead (Eyebrow; the ESG pillar's priority, "Why it matters now"). Used by Card grid Rows (the ESG pillars); elsewhere leave them empty. Code: lead (with its tag), description and note sit in `.card__copy` (`display: contents`, so nothing changes) so a layout can place them as one unit (Rows centres it on the first column). *Figma to add (two text layers, hidden by default; Description + Note in one auto-layout frame).*
+
 - Frame `radius/lg`, clips content. White = `bg/default` + 1px `border/subtle`; Tint = `bg/tint`; Navy = Navy mode on the variant (`bg/default`). **4–5 Oct 2026 (Assets ROV and vessel grids):** the White card's stroke shows only on a white ground. In a Tint or Navy section it has none; the ground draws its edge and the hairline read as a grey rim. *Figma: add a note on the White variant (no stroke on tint or navy); no new variant.*
 - Image placeholder: fill `bg/disabled` with a 24px photo icon; designers drop images into the `Image` layer. Code: `aspect-ratio: 3/2; object-fit: cover`.
 - Image bg: the image fills the card, an `Overlay` layer in `bg/overlay` (navy 64%) covers it, and content sits at the bottom. Code may use a gradient that ends at the same token.
@@ -137,8 +139,11 @@ Wrapper components `Card preset/<Name>`, each holding one configured Card instan
 | News | Image top · White | date "12 Aug 2026 · 3 min read" / Accent category | — | Page "Read more" |
 | Event | None · Tint | "Conference" / Navy "Upcoming" | calendar dates, map-pin city | External "Event website" |
 | Person | Image top · White | role "Chief Executive Officer" | phone, mail | Expand "Read bio" |
-| Document | None · Tint | "Annual report · 2025" / Neutral "PDF" | file size, date | File "Download report (PDF)" |
+| Document | None · Tint | "Annual report · 2025" / Neutral "PDF" | file size, date | File "Report (PDF)" |
 | Office | None · White | "Head office" | map-pin address, phone, mail | External "Open in Maps" |
+
+## 13b. Donut (7 Oct 2026, Q117)
+A two-part share as a ring, shared by Figures (Why invest's revenue mix) and Share bars (Sustainability), extracted from Figures so both draw the same chart (`src/components/Donut.astro`). Geometry: r = 100/2π, so dash lengths are percentages; stroke 6 in a 42 viewBox (was 7: a wider centre, Ross 7 Oct 2026); arcs from 12 o'clock, clockwise, no gap. Counterpart first in `navy/100` (was navy/200, which read grey; Ross 7 Oct 2026), the share in `sage/400`. One trim-path sweep in a mask draws the ring in a single motion (1.4s, ease-in-out) once it is in view (`data-grow`); reduced motion draws it at once. Centre (optional): `Lead` = a period in bold `Lead` (Why invest, "H1 2026") or a figure at `Heading/H1` size in `text/accent-display` (Sustainability, "51%"); `Text` = one `Body/Small` line, balanced over two lines inside 26% side padding. Decorative (`aria-hidden`): the parent states the values in text. *Figma to add.*
 
 ## 14. Accordion item
 `State` Closed | Open × `Interaction` Default | Hover | Focus = **6**. Boxed, as on dev: width 880 (`container/content`), bg `bg/default`, 1px `border/default` (Hover `border/strong`), `radius/md`, padding `space/24`, gap `stack/sm`. Row: Question `Heading/H5` `text/primary` (fill) + 24px plus/minus in `icon/accent` (the dev sage plus → minus). Answer (Open): `Body/Body` `text/secondary`. Properties `Question`, `Answer`. Code: `.faq-item`, `<button aria-expanded aria-controls>`, grid-rows height transition (dev).

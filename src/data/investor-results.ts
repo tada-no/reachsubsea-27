@@ -13,13 +13,25 @@ export interface ResultsRecord {
   published: string;
   headline: StatField[];
   secondary: StatField[];
-  /** Revenue by segment, percent of the period's revenue. */
+  /** Revenue by segment, percent of revenue, for the latest `revenueShift` period (Why invest's donut). Derived from
+   * `revenueShift`, so the site shows one revenue split (Q117, 7 Oct 2026: the donut had shown 2Q alone, 46%, while
+   * Sustainability showed the first half, 51%). */
   revenueMix: { label: string; value: number }[];
+  /** Renewables & other, percent of revenue, year to date against the same period a year earlier (Sustainability,
+   * 7 Oct 2026). The report's year-to-date paragraph; oil & gas is the rest. Written out, never "H1" (Ross, 7 Oct 2026). */
+  revenueShift: { label: string; value: number }[];
   report: { label: string; url: string; context?: string };
   /** Latest annual report. PLACEHOLDER until the client confirms the title, date and file. */
   annualReport: { label: string; meta: string; url: string; context?: string; published: string };
   next: { label: string; date: string };
 }
+
+// 2Q 2026 report p29: "Oil & Gas revenues constituted 49 % (61 %), while Renewable/Other revenues constituted 51 % (39 %)"
+const revenueShift = [
+  { label: 'First half 2025', value: 39 },
+  { label: 'First half 2026', value: 51 },
+];
+const shiftNow = revenueShift[revenueShift.length - 1];
 
 export const latestResults: ResultsRecord = {
   period: 'Q2 2026',
@@ -37,10 +49,12 @@ export const latestResults: ResultsRecord = {
     { key: 'utilisation', value: '83%', label: 'Fleet utilisation' },
     { key: 'cash', value: '410.4m', label: 'Cash and equivalents' },
   ],
+  // First half 2026 (2Q report p29), not 2Q alone (p28: 54% oil & gas, 46% renewables/other): Ross, 7 Oct 2026, Q117
   revenueMix: [
-    { label: 'Oil & gas', value: 54 },
-    { label: 'Renewables & other', value: 46 },
+    { label: 'Oil & gas', value: 100 - shiftNow.value },
+    { label: 'Renewables & other', value: shiftNow.value },
   ],
+  revenueShift,
   report: { label: 'Q2 2026 report', url: '#', context: 'PDF' },
   annualReport: { label: 'Annual report 2025', meta: 'Annual and sustainability report', url: '#', context: 'PDF', published: '2026-03-26' },
   next: { label: 'Q3 2026 results', date: '2026-11-17' },

@@ -1,0 +1,18 @@
+<svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Figma Pictogram/legal (421:9691), Ross's 2.5 stroke redraw, parts tagged for the loop (the scales tip one way, then the other, and settle level; the page stays still) -->
+<g stroke="currentColor" stroke-width="2.5">
+<path stroke-miterlimit="10" d="M28.7217 25.2729V32.7339H21.252"/>
+<path stroke-linejoin="round" d="M40.4082 76.1479H15.7325V30.7729L26.6577 19.8511H58.0157V36.3072"/>
+<path stroke-miterlimit="10" d="M57.9805 69.5991C52.9942 69.5991 48.6153 72.2143 46.1455 76.1489L69.7891 76.1069C67.3145 72.1957 62.9512 69.5991 57.9805 69.5991Z"/>
+<path stroke-linejoin="round" d="M57.9688 65.4869V41.2495"/>
+<g class="pg-pan pg-pan--left">
+<path stroke-linecap="round" stroke-linejoin="round" d="M49.9942 58.2007C49.9942 61.0435 46.7881 63.3472 42.8321 63.3472C38.8761 63.3472 35.669 61.0435 35.669 58.2007C35.669 55.3579 42.8321 44.5181 42.8321 44.5181C42.8321 44.5181 49.9942 55.3589 49.9942 58.2007Z"/>
+<path stroke-miterlimit="10" d="M36.3496 56.3267H49.3145"/>
+</g>
+<g class="pg-pan pg-pan--right">
+<path stroke-linecap="round" stroke-linejoin="round" d="M80.2675 58.2007C80.2675 61.0435 77.0605 63.3472 73.1034 63.3472C69.1484 63.3472 65.9413 61.0435 65.9413 58.2007C65.9413 55.3579 73.1034 44.5181 73.1034 44.5181C73.1034 44.5181 80.2675 55.3589 80.2675 58.2007Z"/>
+<path stroke-miterlimit="10" d="M66.6231 56.3267H79.586"/>
+</g>
+<path class="pg-beam pg-lead" stroke-linecap="round" stroke-linejoin="round" d="M38.1153 42.2281C38.2149 42.4204 39.7598 45.3228 44.5342 43.6245C47.9981 42.2027 52.336 41.1646 57.9688 41.1646C63.6016 41.1646 67.9375 42.2027 71.4004 43.6245C76.1768 45.3238 77.7217 42.4185 77.8194 42.2281"/>
+</g>
+</svg>

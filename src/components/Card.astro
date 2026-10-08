@@ -26,7 +26,10 @@ const {
   eyebrow,
   badge,
   title,
+  lead,
+  leadEyebrow,
   description,
+  note,
   meta = [],
   links = [],
   scope = [],
@@ -98,7 +101,14 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
       }
       <div class="card__heading">
         <Heading class:list={['card__title', featured ? 'text-h3' : 'text-h4']}>{title}</Heading>
-        {description && <p class:list={['card__description', featured ? 'text-body' : 'text-small']}>{description}</p>}
+        {(lead || description || note) && (
+          <div class="card__copy">
+            {leadEyebrow && (lead || description) && <Eyebrow text={leadEyebrow} class="card__lead-eyebrow" />}
+            {lead && <p class="card__lead text-lead">{lead}</p>}
+            {description && <p class:list={['card__description', featured ? 'text-body' : 'text-small']}>{description}</p>}
+            {note && <p class:list={['card__note', featured ? 'text-body' : 'text-small']}>{note}</p>}
+          </div>
+        )}
       </div>
     </div>
     {
@@ -198,6 +208,12 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
   .card--tint {
     --pg-bg: var(--wp--custom--color--bg--tint);
   }
+  /* A Navy card inside a Navy section (7 Oct 2026, HSEQ campaign, as the poster's cards): raised a step to
+     navy/700 with a subtle edge, so it doesn't vanish into the ground */
+  .has-surface-navy .card--navy {
+    --pg-bg: var(--wp--custom--color--bg--accent-subtle);
+    box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--subtle);
+  }
 
   .card__media {
     position: relative;
@@ -288,6 +304,11 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     flex-direction: column;
     gap: var(--wp--preset--spacing--4);
   }
+  /* Lead (with its tag), description and note: no box of their own (they sit in the heading's stack), so a layout
+     can place them as one unit (Card grid Rows puts it beside the pictogram and title, centred on them) */
+  .card__copy {
+    display: contents;
+  }
   .card--featured .card__heading {
     gap: var(--wp--preset--spacing--4);
   }
@@ -374,6 +395,16 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     max-width: 36rem;
     color: var(--wp--custom--color--text--secondary);
   }
+  .card__lead {
+    margin-top: var(--wp--preset--spacing--4);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .card__note {
+    max-width: 36rem;
+    margin-top: var(--wp--preset--spacing--12);
+    color: var(--wp--custom--color--text--primary);
+    font-weight: var(--wp--custom--font-weight--bold);
+  }
   /* Meta belongs to the title (date, place): 12px under it rather than the full content gap */
   .card__text + .card__meta {
     margin-top: calc(var(--wp--preset--spacing--12) - var(--wp--custom--stack--md));
@@ -384,6 +415,17 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     gap: var(--wp--preset--spacing--8);
   }
   .card__action {
+    margin-top: auto;
+  }
+  /* Text and image-top cards whose description ends on a meta line (Life at Reach places, 8 Oct 2026): the meta sits at the foot,
+     so a description one line longer than its neighbour's doesn't knock it out of line; the text keeps the 12px
+     gap. Not without a description: there the meta is the content (Contact's addresses) and stays under the title */
+  .card--media-none .card__text:has(.card__description):has(+ .card__meta:last-child),
+  .card--media-image-top .card__text:has(.card__description):has(+ .card__meta:last-child) {
+    margin-bottom: calc(var(--wp--preset--spacing--12) - var(--wp--custom--stack--md));
+  }
+  .card--media-none .card__text:has(.card__description) + .card__meta:last-child,
+  .card--media-image-top .card__text:has(.card__description) + .card__meta:last-child {
     margin-top: auto;
   }
   /* Image-top cards in a row: the meta line sits with the action at the foot, so a title that wraps

@@ -1,0 +1,729 @@
+---
+// Charter timeline · reach/charter-timeline (docs/05 §2.26; 7 Oct 2026, Investors › Charter agreements, Q125).
+// `fleet` picks the chart: Chartered (long-term and project charters) or Owned (Reach Remote), each its own graph on
+// the same time window (Ross, 7 Oct 2026: the Reach Remote fleet in a separate graph, as the client PDF had it).
+// The fleet's charter periods on one time axis: one row per vessel, a solid bar for the firm period, a dashed
+// segment per option, a navy bar for vessels Reach owns, a dashed grey bar for vessels still joining. Rows are
+// grouped (Long-term charters · Project charter · Owned vessels) and sorted by when the firm period ends, so the
+// chart reads as a staircase of expiries, which is what investors look for. A Today line runs through every row,
+// with the past washed in tint.
+// Each row is a disclosure: open it for the owner, how far the options run and what the vessel did last quarter
+// (the report's "2Q26 status"), plus a link to its card on Fleet overview. A vessel's `note` (a sale, a delivery
+// date) is visible fine print under its chart, numbered in row order, with the number beside the vessel's name
+// (Ross, 7 Oct 2026: the client PDF's footnotes come back, visible, said once). Vessels with the same note share it. "Show all updates" opens every row.
+// A row deep-links: /investors/charter-agreements/#charter-viking-reach opens and scrolls to it.
+// WordPress: the block has no repeater. It reads the Charter field group on every Asset post (src/data/charters.ts
+// has the field list), so the editor updates a vessel once, on its own post, and the order, groups, bars and
+// period text all follow. Block fields: section header, `startYear` (empty = last year), `years` (default 5).
+// Layout: from 900 the name column takes cols 1–4 and the plot cols 5–12; below 900 the plot runs full width under
+// each name. The year axis docks under the section subnav while the chart scrolls past.
+// No JS: every row is open. Motion: each row's bars grow from the left as the row enters (data-grow, motion.ts).
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Badge from '../components/Badge.astro';
+import Icon from '../components/Icon.astro';
+import Link from '../components/Link.astro';
+import { makeId } from '../lib/ids';
+import { statusBadge } from '../data/assets';
+import { charterRows, charterGroups, charterSource, monthLabel, type CharterRow } from '../data/charters';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  /** Which vessels: Chartered (long-term + project charters) or Owned. */
+  fleet?: 'chartered' | 'owned';
+  /** First year on the axis. Empty = last year, so the window rolls forward on its own. */
+  startYear?: number;
+  /** Years on the axis. */
+  years?: number;
+  /** ISO date that counts as today. Defaults to the build (in WordPress, the request) date. */
+  today?: string;
+}
+
+const { sectionHeader, fleet = 'chartered', startYear: startYearProp, years = 5, today: todayProp, background, spacing, anchor } = Astro.props;
+
+const titleId = sectionHeader ? makeId('charter-timeline', sectionHeader.title) : undefined;
+const rows = charterRows().filter((r) => (fleet === 'owned') === (r.charterType === 'owned'));
+
+// ── Time window ─────────────────────────────────────────────────────────────────────────────────────────
+const todayIso = todayProp ?? new Date().toISOString().slice(0, 10);
+const [ty, tm, td] = todayIso.split('-').map(Number);
+const daysInMonth = new Date(Date.UTC(ty, tm, 0)).getUTCDate();
+const todayMonth = ty * 12 + (tm - 1) + (td - 1) / daysInMonth;
+const startYear = startYearProp ?? ty - 1;
+const ws = startYear * 12;
+const we = ws + years * 12;
+const x = (m: number) => Math.min(1, Math.max(0, (m - ws) / (we - ws)));
+const pct = (n: number) => `${(n * 100).toFixed(3)}%`;
+const todayX = x(todayMonth);
+const axisYears = Array.from({ length: years }, (_, i) => startYear + i);
+
+// ── Bars ────────────────────────────────────────────────────────────────────────────────────────────────
+type Kind = 'firm' | 'option' | 'owned' | 'joining';
+interface Segment { kind: Kind; from: number; to: number; }
+
+function segments(r: CharterRow): Segment[] {
+  if (r.joining) {
+    // Not delivered yet: it can't have joined in the past, so the bar starts today at the earliest
+    const from = Math.max(r.startMonth ?? todayMonth, todayMonth);
+    return [{ kind: 'joining', from, to: we }];
+  }
+  if (r.charterType === 'owned') return [{ kind: 'owned', from: r.startMonth ?? ws, to: we }];
+  if (r.startMonth === undefined || r.firmEndMonth === undefined) return [];
+  const out: Segment[] = [{ kind: 'firm', from: r.startMonth, to: r.firmEndMonth }];
+  let at = r.firmEndMonth;
+  for (const o of r.options ?? []) {
+    out.push({ kind: 'option', from: at, to: at + o });
+    at += o;
+  }
+  return out;
+}
+
+function drawn(r: CharterRow) {
+  return segments(r)
+    .filter((s) => s.to > ws && s.from < we)
+    .map((s, i) => ({
+      ...s,
+      i,
+      left: x(s.from),
+      width: x(s.to) - x(s.from),
+      clipStart: s.from < ws,
+      clipEnd: s.to > we,
+    }));
+}
+
+// Firm periods that end soonest first; then the ones that end later; open-ended (joining) last
+const sortKey = (r: CharterRow) => (r.joining ? Infinity : r.firmEndMonth ?? (r.startMonth ?? 0) + 1e6);
+const groups = charterGroups
+  .map((g) => ({ ...g, rows: rows.filter((r) => r.charterType === g.type).sort((a, b) => sortKey(a) - sortKey(b) || (a.optionEndMonth ?? 0) - (b.optionEndMonth ?? 0)) }))
+  .filter((g) => g.rows.length > 0);
+// One group (the Owned chart): the section header already names it, so no group heading
+const showGroupHeads = groups.length > 1;
+const Group = showGroupHeads ? 'section' : 'div';
+
+// Footnotes: numbered in the order the rows appear; the same text is one note
+const chartId = makeId('charter-notes', sectionHeader?.title ?? fleet);
+const notes: string[] = [];
+const noteOf = new Map<CharterRow, number>();
+for (const g of groups) for (const r of g.rows) {
+  if (!r.note) continue;
+  if (!notes.includes(r.note)) notes.push(r.note);
+  noteOf.set(r, notes.indexOf(r.note) + 1);
+}
+const noteId = (n: number) => `${chartId}-${n}`;
+// Row names sit one level under the group heading, or under the section title when there is none
+const RowHeading = showGroupHeads ? 'h4' : 'h3';
+
+const legend: { kind: Kind; label: string }[] = [
+  { kind: 'firm', label: 'Firm period' },
+  { kind: 'option', label: 'Option' },
+  { kind: 'owned', label: 'Owned' },
+  { kind: 'joining', label: 'Joining the fleet' },
+];
+const used = new Set(rows.flatMap((r) => segments(r).map((s) => s.kind)));
+
+// Fleet overview anchor for the row's link (assets have no single pages, Q77)
+const fleetAnchor = (r: CharterRow) => (r.asset.type === 'usv' ? '/assets/#uncrewed' : '/assets/#vessels');
+---
+
+{
+  rows.length > 0 && (
+    <BlockSection slug="charter-timeline" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId}>
+      {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+
+      <div class="charter-timeline__chart" style={`--today: ${pct(todayX)}; --years: ${years}`} data-charter-chart>
+        <div class="charter-timeline__tools">
+          <ul class="charter-timeline__legend" aria-label="Key">
+            {legend.filter((l) => used.has(l.kind)).map((l) => (
+              <li class="charter-timeline__key text-small">
+                <span class:list={['charter-timeline__swatch', `charter-timeline__seg--${l.kind}`]} aria-hidden="true" />
+                {l.label}
+              </li>
+            ))}
+          </ul>
+          <button type="button" class="charter-timeline__all text-small" aria-pressed="false" data-charter-all>
+            <span class="charter-timeline__all-label" data-when="closed">Show all {charterSource.period} updates</span>
+            <span class="charter-timeline__all-label" data-when="open" aria-hidden="true">Hide all {charterSource.period} updates</span>
+            <Icon name="chevron-down" size={16} class="charter-timeline__all-icon" />
+          </button>
+        </div>
+
+        <div class="charter-timeline__axis" aria-hidden="true">
+          <div class="charter-timeline__plot charter-timeline__axis-plot">
+            <span class="charter-timeline__today-label text-caption" style={`--at: ${pct(todayX)}`}>Today</span>
+            <span class="charter-timeline__years">
+              {axisYears.map((y) => <span class="charter-timeline__year text-caption"><span>{y}</span></span>)}
+            </span>
+          </div>
+        </div>
+
+        {groups.map((g) => {
+          const groupId = makeId('charter-group', g.title);
+          return (
+            <Group class="charter-timeline__group" aria-labelledby={showGroupHeads ? groupId : undefined}>
+              {showGroupHeads && (
+                <div class="charter-timeline__group-head">
+                  <h3 id={groupId} class="charter-timeline__group-title text-eyebrow">{g.title}</h3>
+                  <div class="charter-timeline__plot" aria-hidden="true" />
+                </div>
+              )}
+              <ul class="charter-timeline__rows">
+                {g.rows.map((r) => {
+                  const rowId = `charter-${r.id}`;
+                  const buttonId = `${rowId}-name`;
+                  const panelId = `${rowId}-detail`;
+                  const badge = r.asset.status === 'sale-agreed' ? statusBadge(r.asset) : undefined;
+                  const bars = drawn(r);
+                  const note = noteOf.get(r);
+                  return (
+                    <li id={rowId} class="charter-timeline__row" data-charter-row>
+                      <RowHeading class="charter-timeline__head">
+                        <button type="button" id={buttonId} class="charter-timeline__toggle" aria-expanded="false" aria-controls={panelId} aria-describedby={note ? noteId(note) : undefined} data-charter-toggle>
+                          <Icon name="chevron-down" size={24} class="charter-timeline__chevron" />
+                          <span class="charter-timeline__label">
+                            <span class="charter-timeline__name-line">
+                              <span class="charter-timeline__name text-body">{r.name}{note && <sup class="charter-timeline__mark" aria-hidden="true">{note}</sup>}</span>
+                              {badge && <Badge label={badge.label} tone={badge.tone} class="charter-timeline__badge" />}
+                            </span>
+                            <span class="charter-timeline__period text-small">
+                              {r.period.split(' · ').map((part, i, all) => (
+                                <span class="charter-timeline__part">{part}{i < all.length - 1 && ','}</span>
+                              ))}
+                            </span>
+                          </span>
+                        </button>
+                      </RowHeading>
+                      <div class="charter-timeline__plot" aria-hidden="true">
+                        <span class="charter-timeline__track" data-grow>
+                          {bars.map((s) => (
+                            <span
+                              class:list={['charter-timeline__seg', `charter-timeline__seg--${s.kind}`, s.clipStart && 'is-clip-start', s.clipEnd && 'is-clip-end']}
+                              style={`--left: ${pct(s.left)}; --width: ${pct(s.width)}; --i: ${s.i}`}
+                            />
+                          ))}
+                        </span>
+                      </div>
+                      <div id={panelId} class="charter-timeline__detail">
+                        <div class="charter-timeline__detail-inner">
+                          <div class="charter-timeline__detail-grid">
+                            <dl class="charter-timeline__facts">
+                              {r.asset.owner && (
+                                <div class="charter-timeline__fact">
+                                  <dt class="text-caption">{r.charterType === 'owned' ? 'Owner' : 'Vessel owner'}</dt>
+                                  <dd class="text-small">{r.asset.owner}</dd>
+                                </div>
+                              )}
+                              {r.optionEndMonth !== undefined && (
+                                <div class="charter-timeline__fact">
+                                  <dt class="text-caption">If every option is declared</dt>
+                                  <dd class="text-small">To {monthLabel(r.optionEndMonth, true)}</dd>
+                                </div>
+                              )}
+                            </dl>
+                            <div class="charter-timeline__status">
+                              <p class="charter-timeline__status-title text-caption">{charterSource.period}</p>
+                              {r.quarterStatus.map((s) => <p class="text-small">{s}</p>)}
+                              <Link label="Fleet overview" href={fleetAnchor(r)} size="small" context={`: ${r.name}`} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Group>
+          );
+        })}
+        {notes.length > 0 && (
+          <ol class="charter-timeline__notes text-small" aria-label="Notes">
+            {notes.map((n, i) => (
+              <li id={noteId(i + 1)} class="charter-timeline__footnote">
+                <span class="charter-timeline__footnote-mark" aria-hidden="true">{i + 1}</span>
+                <span>{n}</span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  /* ── Frame: name column cols 1–4, plot cols 5–12 (from 900) ───────────────────────────── */
+  .charter-timeline__chart {
+    --charter-bar: var(--wp--preset--spacing--16);
+    --charter-indent: calc(var(--wp--preset--spacing--24) + var(--wp--preset--spacing--12));
+    display: flex;
+    flex-direction: column;
+    margin-top: var(--wp--custom--stack--xl);
+  }
+  .charter-timeline__axis,
+  .charter-timeline__group-head,
+  .charter-timeline__row {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+  }
+  .charter-timeline__head,
+  .charter-timeline__group-title {
+    grid-column: 1 / span 4;
+    min-width: 0;
+  }
+  .charter-timeline__plot {
+    grid-column: 5 / -1;
+    position: relative;
+    min-width: 0;
+    /* Year lines over the past wash; the Today line is ::after so it sits over the bars */
+    background-image:
+      linear-gradient(to right, var(--wp--custom--color--border--subtle) 1px, transparent 1px),
+      linear-gradient(to right, var(--wp--custom--color--bg--tint) var(--today), transparent var(--today));
+    background-size:
+      calc(100% / var(--years)) 100%,
+      100% 100%;
+    border-right: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .charter-timeline__plot::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: var(--today);
+    width: 2px;
+    margin-left: -1px;
+    background-color: var(--wp--custom--color--icon--primary);
+    z-index: 1;
+  }
+
+  /* ── Key and Show all ───────────────────────────────────────────────────────────────── */
+  .charter-timeline__tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--16) var(--wp--preset--spacing--32);
+    padding-bottom: var(--wp--preset--spacing--24);
+  }
+  .charter-timeline__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--24);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .charter-timeline__key {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .charter-timeline__swatch {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    width: var(--wp--preset--spacing--24);
+    height: var(--wp--preset--spacing--12);
+    border-radius: var(--wp--custom--radius--xs);
+  }
+  /* Both labels share one cell, so the button keeps its width when it switches (Q92) */
+  .charter-timeline__all {
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    column-gap: var(--wp--preset--spacing--4);
+    min-height: var(--wp--preset--spacing--24);
+    padding: 0;
+    border: 0;
+    background: none;
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--primary);
+    cursor: pointer;
+  }
+  .charter-timeline__all-label {
+    grid-area: 1 / 1;
+  }
+  .charter-timeline__all-label[data-when='open'],
+  .charter-timeline__all[aria-pressed='true'] .charter-timeline__all-label[data-when='closed'] {
+    visibility: hidden;
+  }
+  .charter-timeline__all[aria-pressed='true'] .charter-timeline__all-label[data-when='open'] {
+    visibility: visible;
+  }
+  .charter-timeline__all-icon {
+    color: var(--wp--custom--color--icon--accent);
+    transition: transform var(--wp--custom--motion--duration) var(--wp--custom--motion--easing);
+  }
+  .charter-timeline__all[aria-pressed='true'] .charter-timeline__all-icon {
+    transform: rotate(180deg);
+  }
+  .charter-timeline__all:hover .charter-timeline__all-label {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .charter-timeline__all:focus-visible,
+  .charter-timeline__toggle:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+  }
+
+  /* ── Axis: docks under the section subnav while the chart scrolls past ─────────────── */
+  .charter-timeline__axis {
+    position: sticky;
+    top: calc(var(--reach-subnav-top, 0px) + var(--wp--preset--spacing--72));
+    z-index: 2;
+    background-color: var(--wp--custom--color--bg--default);
+    border-bottom: 1px solid var(--wp--custom--color--border--default);
+  }
+  .charter-timeline__axis-plot {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    padding-top: var(--wp--preset--spacing--8);
+  }
+  /* The axis carries the year lines but not the wash: the Today label sits on white */
+  .charter-timeline__axis-plot {
+    background-image: linear-gradient(to right, var(--wp--custom--color--border--default) 1px, transparent 1px);
+    background-size: calc(100% / var(--years)) 100%;
+    border-right-color: var(--wp--custom--color--border--default);
+  }
+  .charter-timeline__today-label {
+    position: relative;
+    left: clamp(0px, var(--at), 100%);
+    align-self: flex-start;
+    translate: -50% 0;
+    padding-inline: var(--wp--preset--spacing--4);
+    background-color: var(--wp--custom--color--bg--default);
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--primary);
+    z-index: 2;
+  }
+  .charter-timeline__years {
+    display: flex;
+  }
+  .charter-timeline__year {
+    flex: 1 1 0;
+    padding: 0 0 var(--wp--preset--spacing--8);
+    text-align: center;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* Over the Today line, so a year it crosses stays readable (on phones the line often falls on one) */
+  .charter-timeline__year > span {
+    position: relative;
+    z-index: 2;
+    padding-inline: var(--wp--preset--spacing--4);
+    background-color: var(--wp--custom--color--bg--default);
+  }
+
+  /* ── Groups ──────────────────────────────────────────────────────────────────────────── */
+  .charter-timeline__group-title {
+    padding: var(--wp--preset--spacing--32) 0 var(--wp--preset--spacing--8);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .charter-timeline__rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* ── Rows: hairlines between rows (the eye tracks name → bar across the gutter) ───── */
+  .charter-timeline__row {
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+    cursor: pointer;
+  }
+  .charter-timeline__group-head + .charter-timeline__rows > .charter-timeline__row:first-child,
+  .charter-timeline__axis + .charter-timeline__group > .charter-timeline__rows > .charter-timeline__row:first-child {
+    border-top-color: transparent;
+  }
+  .charter-timeline__toggle {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--12);
+    width: 100%;
+    min-height: 100%;
+    padding: var(--wp--preset--spacing--16) 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    text-align: left;
+    color: var(--wp--custom--color--text--primary);
+    cursor: pointer;
+  }
+  .charter-timeline__chevron {
+    flex: none;
+    color: var(--wp--custom--color--icon--accent);
+    transition: transform var(--wp--custom--motion--duration) var(--wp--custom--motion--easing);
+  }
+  .charter-timeline__row.is-open .charter-timeline__chevron {
+    transform: rotate(180deg);
+  }
+  .charter-timeline__label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    min-width: 0;
+  }
+  .charter-timeline__name-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--4) var(--wp--preset--spacing--8);
+  }
+  .charter-timeline__name {
+    font-weight: var(--wp--custom--font-weight--bold);
+  }
+  .charter-timeline__badge {
+    min-height: var(--wp--preset--spacing--24);
+  }
+  .charter-timeline__row:hover .charter-timeline__name {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .charter-timeline__period {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.3em;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .charter-timeline__part {
+    white-space: nowrap;
+  }
+
+  /* ── Bars ────────────────────────────────────────────────────────────────────────────── */
+  .charter-timeline__track {
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    height: var(--charter-bar);
+    margin-top: calc(var(--charter-bar) / -2);
+  }
+  .charter-timeline__seg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--left);
+    width: var(--width);
+    border-radius: var(--wp--custom--radius--xs);
+  }
+  /* A 2px gap between firm period and each option, so "2 × 6-month options" reads as two */
+  .charter-timeline__seg.charter-timeline__seg--option {
+    left: calc(var(--left) + 2px);
+    width: calc(var(--width) - 2px);
+  }
+  .charter-timeline__seg.is-clip-start {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+  .charter-timeline__seg.is-clip-end {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .charter-timeline__seg--firm {
+    background-color: var(--wp--preset--color--sage-400);
+  }
+  /* An option is the same charter, less certain: the firm colour, lighter. Dashed is kept for "not in the
+     fleet yet", as the dashed rows on Reports and the Financial calendar */
+  .charter-timeline__seg--option {
+    background-color: var(--wp--preset--color--sage-200);
+  }
+  /* Owned: navy, in its own chart (no charter end to show, so it runs to the edge) */
+  .charter-timeline__seg--owned {
+    background-color: var(--wp--custom--color--icon--primary);
+  }
+  .charter-timeline__seg--joining {
+    background-color: var(--wp--custom--color--bg--default);
+    outline: 1px dashed var(--wp--custom--color--border--strong);
+    outline-offset: -1px;
+  }
+  /* Grow (motion.ts): the bars draw from the left as their row enters, firm period first, then each option */
+  html.js .charter-timeline__track[data-grow] .charter-timeline__seg {
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--wp--custom--motion--duration-reveal) var(--wp--custom--motion--ease-out);
+    transition-delay: calc(var(--i) * var(--wp--custom--motion--stagger) * 3);
+  }
+  html.js .charter-timeline__track[data-grow].is-grown .charter-timeline__seg {
+    transform: none;
+  }
+
+  /* ── Detail: open below the row; aligned to the name (left) and the plot (right) ────── */
+  .charter-timeline__detail {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-rows: 1fr;
+    cursor: auto;
+  }
+  html.js .charter-timeline__detail {
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s ease;
+  }
+  html.js .charter-timeline__row.is-open .charter-timeline__detail {
+    grid-template-rows: 1fr;
+  }
+  .charter-timeline__detail-inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+  html.js .charter-timeline__detail-inner {
+    visibility: hidden;
+    transition: visibility 0s linear 0.35s;
+  }
+  html.js .charter-timeline__row.is-open .charter-timeline__detail-inner {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  .charter-timeline__detail-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    row-gap: var(--wp--preset--spacing--16);
+    padding: 0 0 var(--wp--preset--spacing--24);
+  }
+  .charter-timeline__facts {
+    grid-column: 1 / span 4;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+    margin: 0;
+    padding-left: var(--charter-indent);
+  }
+  .charter-timeline__fact dd {
+    margin: 0;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .charter-timeline__fact dt,
+  .charter-timeline__status-title {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .charter-timeline__status {
+    grid-column: 5 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--8);
+    max-width: 64ch;
+  }
+  .charter-timeline__status p {
+    margin: 0;
+  }
+  /* ── Footnotes: the client PDF's fine print, visible under the chart ──────────────────── */
+  .charter-timeline__mark {
+    margin-left: 0.15em;
+    font-size: var(--wp--preset--font-size--caption);
+    line-height: var(--wp--custom--line-height--tight);
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--accent);
+  }
+  .charter-timeline__notes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+    max-width: var(--wp--style--global--content-size);
+    margin: 0;
+    padding: var(--wp--preset--spacing--24) 0 0;
+    list-style: none;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .charter-timeline__footnote {
+    display: grid;
+    grid-template-columns: var(--wp--preset--spacing--16) minmax(0, 1fr);
+    gap: var(--wp--preset--spacing--4);
+  }
+  .charter-timeline__footnote-mark {
+    font-weight: var(--wp--custom--font-weight--bold);
+    color: var(--wp--custom--color--text--accent);
+  }
+  .charter-timeline__status .link-arrow {
+    margin-top: var(--wp--preset--spacing--4);
+  }
+
+  /* 900–1279: the name column takes 5 columns, so "Mar 2023 – Mar 2027, 2 × 1-year options" stays on one line and
+     every row keeps the same height (the staircase reads by rhythm); the plot keeps 7 (about 120px a year) */
+  @media (min-width: 900px) and (max-width: 1279px) {
+    .charter-timeline__head,
+    .charter-timeline__group-title,
+    .charter-timeline__facts {
+      grid-column: 1 / span 5;
+    }
+    .charter-timeline__plot,
+    .charter-timeline__status {
+      grid-column: 6 / -1;
+    }
+  }
+
+  /* ── Below 900: the plot runs full width under each name ──────────────────────────── */
+  @media (max-width: 899px) {
+    .charter-timeline__head,
+    .charter-timeline__group-title,
+    .charter-timeline__plot,
+    .charter-timeline__facts,
+    .charter-timeline__status {
+      grid-column: 1 / -1;
+    }
+    .charter-timeline__group-head > .charter-timeline__plot {
+      display: none;
+    }
+    /* Chevron top right (Ross, 7 Oct 2026), as the Accordion: the name, period, bar and open detail then share
+       one left edge with the full-width plot. From 900 it stays left, where the right end meets the plot */
+    .charter-timeline__toggle {
+      justify-content: space-between;
+      padding-bottom: var(--wp--preset--spacing--12);
+    }
+    .charter-timeline__chevron {
+      order: 2;
+    }
+    .charter-timeline__label {
+      flex: 1;
+    }
+    .charter-timeline__facts {
+      padding-left: 0;
+    }
+    .charter-timeline__row > .charter-timeline__plot {
+      height: calc(var(--charter-bar) + var(--wp--preset--spacing--8) * 2);
+      margin-bottom: var(--wp--preset--spacing--16);
+    }
+  }
+</style>
+
+<script>
+  // Rows open on a click anywhere in the row (the name is the real button, for keyboards and screen readers).
+  function setOpen(row: Element, open: boolean) {
+    row.classList.toggle('is-open', open);
+    row.querySelector('[data-charter-toggle]')?.setAttribute('aria-expanded', String(open));
+  }
+
+  function syncAll(chart: Element) {
+    const rows = [...chart.querySelectorAll('[data-charter-row]')];
+    const allOpen = rows.every((r) => r.classList.contains('is-open'));
+    const button = chart.querySelector('[data-charter-all]');
+    button?.setAttribute('aria-pressed', String(allOpen));
+    button?.querySelectorAll('[data-when]').forEach((l) => l.toggleAttribute('aria-hidden', (l as HTMLElement).dataset.when !== (allOpen ? 'open' : 'closed')));
+  }
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as Element;
+    const all = target.closest('[data-charter-all]');
+    if (all) {
+      const chart = all.closest('[data-charter-chart]')!;
+      const open = all.getAttribute('aria-pressed') !== 'true';
+      chart.querySelectorAll('[data-charter-row]').forEach((r) => setOpen(r, open));
+      syncAll(chart);
+      return;
+    }
+    const row = target.closest('[data-charter-row]');
+    if (!row || target.closest('a, .charter-timeline__detail')) return;
+    setOpen(row, !row.classList.contains('is-open'));
+    syncAll(row.closest('[data-charter-chart]')!);
+  });
+
+  function openFromHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const row = id ? document.getElementById(id) : null;
+    if (!row?.matches('[data-charter-row]')) return;
+    setOpen(row, true);
+    syncAll(row.closest('[data-charter-chart]')!);
+    row.scrollIntoView({ block: 'center' });
+  }
+  openFromHash();
+  window.addEventListener('hashchange', openFromHash);
+</script>

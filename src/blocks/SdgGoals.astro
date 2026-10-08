@@ -1,0 +1,158 @@
+---
+// SDG goals · reach/sdg-goals (7 Oct 2026, Sustainability; proposed block, outside the 14-block budget). The UN goals
+// a company supports, as the UN's own tiles (official icons, unaltered, UN SDG logo guidelines) with what it does
+// under each (the dev site's "Our UN Sustainability Goals").
+// Second pass (7 Oct 2026, Ross: the tab strip felt cramped and didn't carry over to mobile): no tabs. Every goal
+// is shown at once as an open item on the block's ground (no card: the tiles are already strong blocks): the tile
+// (120, 96 on phones), "Goal N" and the goal's name under it as real text (the tile's own lettering is too small
+// to read and can't be searched), then its 1–4 actions as a ticked list, all on one left edge. Three across from
+// 900, two at 600–899 (an odd last goal spans the row), one on phones; rows `space/64` apart (48 on phones).
+// Items rise in one by one with the page's reveal (motion.ts). Nothing to operate, so nothing can jump.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Icon from '../components/Icon.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+
+interface Goal {
+  goal: number;
+  title: string;
+  /** The UN's official tile for the goal (square). */
+  image: string;
+  actions: string[];
+}
+
+interface Props extends BlockFields {
+  sectionHeader: SectionHeaderField;
+  goals: Goal[];
+}
+
+const { sectionHeader, goals = [], background, spacing, anchor } = Astro.props;
+const titleId = makeId('sdg-goals', sectionHeader.title);
+---
+
+{
+  goals.length > 0 && (
+    <BlockSection slug="sdg-goals" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId}>
+      <div class="block__body">
+        <SectionHeader {...sectionHeader} id={titleId} />
+        <ul class="sdg-goals__list">
+          {goals.map((g) => (
+            <li class="sdg-goals__goal">
+              <div class="sdg-goals__head">
+                <img class="sdg-goals__image" src={g.image} alt="" width="400" height="400" loading="lazy" decoding="async" />
+                <h3 class="sdg-goals__title">
+                  <span class="sdg-goals__number text-eyebrow">Goal {g.goal}</span>
+                  <span class="sdg-goals__name text-h5">{g.title}</span>
+                </h3>
+              </div>
+              <ul class="sdg-goals__actions">
+                {g.actions.map((action) => (
+                  <li class="sdg-goals__action text-small">
+                    <span class="sdg-goals__tick"><Icon name="check" size={20} /></span>
+                    <span>{action}</span>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  /* Open items, no card (Ross, 7 Oct 2026: the tiles are already strong coloured blocks; a card round each was a
+     frame round a frame). Rows sit further apart than columns so each goal reads as its own group. */
+  .sdg-goals__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--wp--preset--spacing--64) var(--wp--custom--grid--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sdg-goals__goal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--24);
+    /* Keep the list off the next column's tile edge */
+    padding-right: var(--wp--preset--spacing--24);
+  }
+
+  /* Head (Ross, 7 Oct 2026: beside the tile it read as disjointed): the tile, then the goal's number and name
+     under it, everything on one left edge with the list */
+  .sdg-goals__head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--24);
+  }
+  .sdg-goals__image {
+    flex: none;
+    display: block;
+    width: 120px;
+    height: 120px;
+    border-radius: var(--wp--custom--radius--sm);
+  }
+  .sdg-goals__title {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    margin: 0;
+  }
+  .sdg-goals__number {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .sdg-goals__name {
+    color: var(--wp--custom--color--text--primary);
+  }
+
+  /* Actions: a ticked list; the tick on the first line of its item (MetaItem rule) */
+  .sdg-goals__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sdg-goals__action {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--12);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .sdg-goals__tick {
+    display: flex;
+    align-items: center;
+    flex: none;
+    height: calc(1em * var(--wp--custom--line-height--body-sm));
+    color: var(--wp--custom--color--icon--accent);
+  }
+
+  @media (max-width: 899px) {
+    .sdg-goals__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    /* An odd last goal spans the row, so two columns never end on a hole */
+    .sdg-goals__goal:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 599px) {
+    .sdg-goals__list {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--wp--preset--spacing--48);
+    }
+    .sdg-goals__goal {
+      gap: var(--wp--preset--spacing--16);
+      padding-right: 0;
+    }
+    .sdg-goals__image {
+      width: 96px;
+      height: 96px;
+    }
+  }
+</style>

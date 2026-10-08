@@ -1,0 +1,423 @@
+---
+// Meeting archive · reach/meeting-archive (7 Oct 2026, Governance & general meetings). Every general meeting with
+// its papers, newest first. Replaces Data list type Documents (§2.7) on this page, as the Results archive replaced
+// type Reports on Reports & presentations: the two pages share one row language.
+// - One row per meeting, as Results archive rows: tint cards on white, Date tile (the meeting day), title
+//   ("Annual general meeting 2026"), the date as meta, then the files in five columns shared down the list
+//   (CSS subgrid): Notice · Minutes · Nomination committee · Remuneration report · one slot for the rarer papers
+//   (Remuneration policy, Appendix to minutes). Notice and Minutes come first because every meeting has them, so
+//   the left columns are full all the way down. A missing file leaves its slot empty.
+// - The newest meeting is the one Navy row ("Latest"). The next annual general meeting sits above it as a dashed
+//   outline ("Next"): with its date and Add to calendar once Reach has confirmed it, greyed with "Date to come"
+//   until then (no calendar link for a date that isn't set, as the Results archive).
+// - The newest `openYears` years are open; the rest sit under a Link Expand ("Earlier meetings, 2012–2022") that
+//   stays where it is and opens the rows below itself, so nothing moves under the pointer. Without JS every row shows.
+// - Every slot holds invisible copies of the labels it can take, so the columns are as wide in the earlier rows as
+//   in the open ones and line up across the two lists.
+// - Optional `guide` after the archive (client PDF p46: the AGM and EGM explained, two columns, H3 titles and Body
+//   copy). Ross, 7 Oct 2026: under the rows, since the papers are the task and the explainer background; at full type
+//   there (it was toned down to H4 / Body small while it sat between the section heading and the rows).
+//   Optional archive head over the rows (`archiveTitle`, `archiveNote`), for when something sits between it and the
+//   section header.
+// Below 1232 (container: 64 padding + 56 tile + the longest title, ~353, + five file columns, ~722, and gaps) a
+// row stacks: tile beside the text, the files on one line (wrapping) under the text, on
+// its left edge.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import DateTile from '../components/DateTile.astro';
+import Link from '../components/Link.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import { makeId } from '../lib/ids';
+import { icsHref } from '../lib/ics';
+import { shortDate } from '../lib/dates';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+import type { GeneralMeeting, MeetingFiles } from '../data/governance';
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  meetings: GeneralMeeting[];
+  /** The next annual general meeting: shown above the latest. */
+  next?: { year: number; date?: string; confirmed?: boolean; usually?: string };
+  /** Years shown open; older meetings sit under "Earlier meetings". */
+  openYears?: number;
+  /** What the meetings are, after the archive: two columns (client PDF p46, AGM · EGM), each an eyebrow, a heading
+   * and a paragraph. */
+  guide?: { eyebrow?: string; title: string; text: string }[];
+  /** An H3 and a short note over the rows (as Report shelf's archive head), e.g. "Notices & minutes". */
+  archiveTitle?: string;
+  archiveNote?: string;
+}
+
+const { sectionHeader, meetings, next, openYears = 4, guide = [], archiveTitle, archiveNote, background = 'white', spacing, anchor } = Astro.props;
+
+const titleId = sectionHeader ? makeId('meeting-archive', sectionHeader.title) : undefined;
+const earlierId = makeId('meeting-archive', 'earlier');
+const archiveId = archiveTitle ? makeId('meeting-archive', archiveTitle) : undefined;
+
+const DAY = 86_400_000;
+const today = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`);
+const daysUntil = (iso: string) => Math.round((Date.parse(`${iso}T00:00:00Z`) - today) / DAY);
+const yearOf = (m: GeneralMeeting) => Number(m.date.slice(0, 4));
+
+const newestYear = meetings.length ? yearOf(meetings[0]) : 0;
+const open = meetings.filter((m) => yearOf(m) > newestYear - openYears);
+const earlier = meetings.filter((m) => yearOf(m) <= newestYear - openYears);
+const latest = meetings[0];
+const showNext = next && (!next.date || daysUntil(next.date) >= 0);
+const nextConfirmed = Boolean(next?.date && next.confirmed);
+
+type SlotKey = keyof MeetingFiles;
+const LABELS: Record<SlotKey, string> = {
+  notice: 'Notice',
+  minutes: 'Minutes',
+  nomination: 'Nomination committee',
+  remunerationReport: 'Remuneration report',
+  remunerationPolicy: 'Remuneration policy',
+  appendix: 'Appendix to minutes',
+};
+// Each slot lists the files it can hold, first match wins
+const SLOTS: SlotKey[][] = [['notice'], ['minutes'], ['nomination'], ['remunerationReport'], ['remunerationPolicy', 'appendix']];
+
+const title = (m: { kind: GeneralMeeting['kind']; year: number }) =>
+  `${m.kind === 'annual' ? 'Annual' : 'Extraordinary'} general meeting ${m.year}`;
+const meetingTitle = (m: GeneralMeeting) => title({ kind: m.kind, year: yearOf(m) });
+const nextTitle = next ? title({ kind: 'annual', year: next.year }) : '';
+---
+
+<BlockSection
+  slug="meeting-archive"
+  root="meeting-archive"
+  background={background}
+  spacing={spacing}
+  anchor={anchor}
+  labelledBy={titleId}
+  label={titleId ? undefined : 'General meetings'}
+  data-meeting-archive
+>
+  <div class="block__body">
+    {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+
+
+    <div class="meeting-archive__archive" role={archiveId ? 'group' : undefined} aria-labelledby={archiveId}>
+    {(archiveTitle || archiveNote) && (
+      <div class="meeting-archive__archive-head">
+        {archiveTitle && <h3 id={archiveId} class="text-h4">{archiveTitle}</h3>}
+        {archiveNote && <p class="meeting-archive__archive-note text-small">{archiveNote}</p>}
+      </div>
+    )}
+    <div class="meeting-archive__main">
+      {
+        [
+          { rows: open, earlierList: false },
+          { rows: earlier, earlierList: true },
+        ].map(({ rows, earlierList }) =>
+          rows.length === 0 && (earlierList || !showNext) ? null : (
+            <Fragment>
+              {earlierList && (
+                <Link
+                  label={`Earlier meetings, ${yearOf(rows[rows.length - 1])}–${yearOf(rows[0])}`}
+                  action="expand"
+                  size="small"
+                  class="meeting-archive__toggle"
+                  aria-controls={earlierId}
+                  data-earlier-toggle
+                />
+              )}
+              <ol class="meeting-archive__rows" id={earlierList ? earlierId : undefined} hidden={earlierList || undefined}>
+                {!earlierList && showNext && next && (
+                  <li class:list={['meeting-row', 'meeting-row--next', !nextConfirmed && 'meeting-row--provisional']}>
+                    <DateTile date={next.date} band={next.date ? undefined : 'TBC'} icon="calendar" class="meeting-row__tile" />
+                    <div class="meeting-row__text">
+                      <p class="meeting-row__kicker text-eyebrow">Next</p>
+                      <h3 class="meeting-row__title text-h5">{nextTitle}</h3>
+                      <p class="meeting-row__meta text-small">
+                        {!next.date && ['Date to come', next.usually].filter(Boolean).join(' · ')}
+                        {next.date && !nextConfirmed && `${shortDate(next.date)} · provisional`}
+                        {next.date && nextConfirmed && (
+                          <Fragment>
+                            {shortDate(next.date)}
+                            {daysUntil(next.date) > 0 && (
+                              <Fragment>
+                                {' · in '}
+                                <span data-countdown={next.date}>
+                                  {daysUntil(next.date) === 1 ? '1 day' : `${daysUntil(next.date)} days`}
+                                </span>
+                              </Fragment>
+                            )}
+                          </Fragment>
+                        )}
+                      </p>
+                    </div>
+                    {nextConfirmed && next.date && (
+                      <div class="meeting-row__links">
+                        <span class="meeting-row__slot meeting-row__slot--wide">
+                          <Link
+                            label="Add to calendar"
+                            href={icsHref(`Reach Subsea ${nextTitle.toLowerCase()}`, next.date)}
+                            action="file"
+                            size="small"
+                            context={nextTitle}
+                            download={`reach-subsea-agm-${next.date}.ics`}
+                          />
+                        </span>
+                      </div>
+                    )}
+                  </li>
+                )}
+                {rows.map((m) => (
+                  <li class:list={['meeting-row', m === latest && 'meeting-row--latest has-surface-navy']}>
+                    <DateTile date={m.date} class="meeting-row__tile" />
+                    <div class="meeting-row__text">
+                      {m === latest && <p class="meeting-row__kicker text-eyebrow">Latest</p>}
+                      <h3 class="meeting-row__title text-h5">{meetingTitle(m)}</h3>
+                      <p class="meeting-row__meta text-small">
+                        <time datetime={m.date}>{shortDate(m.date)}</time>
+                      </p>
+                    </div>
+                    <div class="meeting-row__links">
+                      {SLOTS.map((keys) => {
+                        const key = keys.find((k) => m.files[k]);
+                        return (
+                          <span class:list={['meeting-row__slot', !key && 'meeting-row__slot--empty']}>
+                            {key && (
+                              <Link
+                                label={LABELS[key]}
+                                href={m.files[key]}
+                                action="file"
+                                size="small"
+                                context={`, ${meetingTitle(m)}, PDF`}
+                              />
+                            )}
+                            {keys.map((k) => (
+                              <span class="meeting-row__sizer" aria-hidden="true">
+                                <Link label={LABELS[k]} action="file" size="small" tabindex="-1" />
+                              </span>
+                            ))}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </Fragment>
+          ),
+        )
+      }
+    </div>
+    </div>
+
+    {
+      guide.length > 0 && (
+        <div class="meeting-archive__guide">
+          {guide.map((g) => (
+            <div class="meeting-archive__guide-item">
+              {g.eyebrow && <Eyebrow text={g.eyebrow} />}
+              <h3 class="meeting-archive__guide-title text-h3">{g.title}</h3>
+              <p class="meeting-archive__guide-text text-body">{g.text}</p>
+            </div>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</BlockSection>
+
+<noscript>
+  <style>
+    .meeting-archive__toggle { display: none !important; }
+    .meeting-archive__rows[hidden] { display: grid !important; }
+  </style>
+</noscript>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-meeting-archive] [data-earlier-toggle]').forEach((toggle) => {
+    const list = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+    if (!list) return;
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      toggle.setAttribute('aria-expanded', String(open));
+      list.hidden = !open;
+    });
+  });
+
+  // Countdown ("in 41 days") from the visitor's today, not the build date
+  document.querySelectorAll<HTMLElement>('.meeting-archive [data-countdown]').forEach((el) => {
+    const now = new Date();
+    const days = Math.round((Date.parse(`${el.dataset.countdown}T00:00:00Z`) - Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())) / 86_400_000);
+    if (days > 0) el.textContent = days === 1 ? '1 day' : `${days} days`;
+  });
+</script>
+
+<style is:global>
+  /* What the meetings are: two columns from 900 (the 12-column grid's halves, gutter apart), stacked below */
+  .meeting-archive__guide {
+    display: grid;
+    gap: var(--wp--custom--stack--lg) var(--wp--custom--grid--gutter);
+  }
+  .meeting-archive__guide-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xs);
+  }
+  .meeting-archive__guide-title {
+    text-wrap: balance;
+  }
+  .meeting-archive__guide-text {
+    color: var(--wp--custom--color--text--secondary);
+    text-wrap: pretty;
+  }
+  /* Side by side, each column flows on its own, as the PDF: at H3 the EGM heading wraps, and shared rows (subgrid,
+     tried 7 Oct 2026) left an empty line above the AGM paragraph, which read worse than paragraphs starting apart */
+  @media (min-width: 900px) {
+    .meeting-archive__guide {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+  /* The archive head (as Report shelf's): H3 and note, then the rows */
+  .meeting-archive__archive {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+  }
+  .meeting-archive__archive-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xs);
+  }
+  .meeting-archive__archive-note {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .meeting-archive__main {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+  }
+  /* The toggle sits between the two lists: 12 above it (the row gap) and 12 below it, from its 44px target */
+  .meeting-archive__toggle {
+    align-self: flex-start;
+  }
+
+  /* ── Rows (as the Results archive's) ──────────────────────── */
+  .meeting-archive__rows {
+    display: grid;
+    gap: var(--wp--preset--spacing--12);
+  }
+  .meeting-archive__rows[hidden] {
+    display: none;
+  }
+  /* Narrow (base): tile beside the text; the files under the text, on its left edge, wrapping (Ross, 7 Oct 2026:
+     from the card's edge they sat under the tile, apart from the meeting they belong to) */
+  .meeting-row {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    column-gap: var(--wp--preset--spacing--16);
+    align-items: center;
+    /* Bottom: 24 less the 12 the links' 44px targets add below their labels */
+    padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--16) var(--wp--preset--spacing--12);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  /* The latest meeting: the one Navy row */
+  .meeting-row--latest {
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  /* The next meeting: a dashed outline and no fill, a slot rather than a document. Until Reach confirms the date it
+     is greyed (text and Date tile stepped down, as the Results archive's provisional quarters) */
+  .meeting-row--next {
+    background-color: transparent;
+    outline: 1px dashed var(--wp--custom--color--border--strong);
+    outline-offset: -1px;
+  }
+  .meeting-row--provisional {
+    --wp--custom--color--text--primary: var(--wp--custom--color--text--secondary);
+    color: var(--wp--custom--color--text--primary);
+    padding-bottom: var(--wp--preset--spacing--24);
+  }
+  .meeting-row--provisional .meeting-row__tile {
+    border-color: var(--wp--custom--color--border--default);
+  }
+  .meeting-row--provisional .date-tile__band {
+    background-color: var(--wp--custom--color--bg--disabled);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .meeting-row--provisional .date-tile__body {
+    color: var(--wp--custom--color--border--strong);
+  }
+  .meeting-row__tile {
+    align-self: start;
+  }
+  .meeting-row__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    min-width: 0;
+  }
+  .meeting-row__kicker {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .meeting-row__meta {
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .meeting-row__links {
+    grid-column: 2 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--wp--preset--spacing--16);
+    /* The 44px targets add 12 above the labels: with 4 more, the visible gap to the tile is 16 */
+    margin-top: var(--wp--preset--spacing--4);
+  }
+  .meeting-row__slot {
+    display: inline-grid;
+  }
+  .meeting-row__slot > * {
+    grid-area: 1 / 1;
+  }
+  .meeting-row__slot--empty,
+  .meeting-row__sizer {
+    display: none;
+  }
+  /* Phones: the text column is too narrow for the files to wrap evenly (two on a line, then one), so one per line */
+  @container (max-width: 479px) {
+    .meeting-row__links {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  /* Wide: one line per meeting; the files in five columns shared down the list (subgrid). Each slot keeps
+     invisible copies of the labels it can take, so the open and the earlier list have the same columns. */
+  @container (min-width: 1232px) {
+    .meeting-archive__rows {
+      /* max-content edge tracks: a subgrid's padding is added to its first and last tracks */
+      grid-template-columns: max-content minmax(0, 1fr) repeat(5, max-content);
+      column-gap: var(--wp--preset--spacing--16);
+    }
+    .meeting-archive__rows > .meeting-row {
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      /* A subgrid's own gap overrides the list's: restate 16 */
+      column-gap: var(--wp--preset--spacing--16);
+      padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--32);
+    }
+    .meeting-row__tile {
+      align-self: center;
+    }
+    .meeting-row__links {
+      display: contents;
+    }
+    .meeting-row__slot--empty {
+      display: inline-grid;
+    }
+    .meeting-row__sizer {
+      display: block;
+      visibility: hidden;
+    }
+    .meeting-row__slot--wide {
+      grid-column: 3 / -1;
+    }
+  }
+</style>

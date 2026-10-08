@@ -11,6 +11,9 @@
 // reference): one row of light tiles, each a looping line pictogram beside a short label, on
 // bg/accent-subtle. Eyebrow above; no section header, no actions. 2×2 below 1200; one compact
 // row per industry below 600.
+// Rows (7 Oct 2026, Sustainability: the ESG pillars, long copy that reads badly in three narrow columns): the
+// Section header full width, then one open row per item (no card box): pictogram, title and lead in cols 1–4, the
+// description and note in cols 6–12 (30/70, as Accordion Split), centred on the first column. Fifth pass (Q117).
 // No cards → render nothing (docs/05 §0).
 import BlockSection from '../components/BlockSection.astro';
 import SectionHeader from '../components/SectionHeader.astro';
@@ -21,9 +24,22 @@ import type { BlockFields, CardField, SectionHeaderField } from '../lib/types';
 
 interface Props extends BlockFields {
   sectionHeader?: SectionHeaderField;
-  layout?: '2-columns' | '3-columns' | '4-columns' | 'featured-first' | 'strip';
+  layout?: '2-columns' | '3-columns' | '4-columns' | 'featured-first' | 'strip' | 'rows';
+  /** Rows only: `open` rows on the block's ground, or each row in a `cards` box of the given surface (Tint on White, as
+   *  Why invest's value cards). */
+  rowStyle?: 'open' | 'cards';
+  /** Rows + cards only: the last row as a navy feature with its own layout (copy left as one column, pictogram
+   *  right), for a closing item that is not one of the set: Our culture's "Never leave anyone behind" after
+   *  Learn · Teach · Reach (Ross, 8 Oct 2026). */
+  featureLast?: boolean;
+  /** Rows + cards only: every row in the feature's mirrored layout (tag, title and copy as one column on the left,
+   *  pictogram on the right), on its own surface; the feature row stays navy (Ross, 8 Oct 2026, Our culture). */
+  mirrored?: boolean;
   /** Strip: a short label above the tiles, in the container (the strip has no section header). */
   eyebrow?: string;
+  /** The section's accessible name when it has no section header (7 Oct 2026, HSEQ campaign steps: the cards
+   * continue the block above, so a visible heading would only repeat it). */
+  ariaLabel?: string;
   /** Eyebrow auto-fills 01, 02, 03… (generated here, in the template, not a CSS counter — see report). */
   numbered?: boolean;
   /** One card look for the whole grid. */
@@ -38,11 +54,15 @@ interface Props extends BlockFields {
 const {
   sectionHeader,
   layout = '3-columns',
+  rowStyle = 'open',
+  featureLast = false,
+  mirrored = false,
   numbered = false,
   media = 'icon',
   surface = 'white',
   cards = [],
   eyebrow,
+  ariaLabel,
   joined = false,
   background,
   spacing,
@@ -53,11 +73,12 @@ const hasCards = cards.length > 0;
 const widePanels = media === 'pictogram-panel' && (layout === '2-columns' || layout === 'featured-first');
 const resolvedLayout = widePanels ? '2-columns' : layout;
 const featuredFirst = resolvedLayout === 'featured-first';
+const rows = resolvedLayout === 'rows';
 const strip = resolvedLayout === 'strip';
 const titleId = sectionHeader?.title ? makeId('card-grid', sectionHeader.title) : undefined;
 const pad = (n: number) => String(n).padStart(2, '0');
 // Pictogram cards open up into hairline-separated rows on phones (see the CSS below)
-const openRows = media === 'icon' || media === 'pictogram-panel';
+const openRows = (media === 'icon' || media === 'pictogram-panel') && layout !== 'rows';
 // Three pictogram-panel cards with lists (Services overview): at 768–1199 one column of side-by-side cards
 // (panel beside the text), where three narrow columns squashed the lists (Ross, 5 Oct 2026)
 const trioPanels = media === 'pictogram-panel' && cards.length === 3;
@@ -78,7 +99,7 @@ const trioText = media === 'none' && cards.length === 3;
       spacing={spacing}
       anchor={anchor}
       labelledBy={titleId}
-      label={titleId ? undefined : eyebrow ?? 'Card grid'}
+      label={titleId ? undefined : ariaLabel ?? eyebrow ?? 'Card grid'}
     >
       {strip ? (
         <div class="block__body card-grid__strip">
@@ -95,18 +116,21 @@ const trioText = media === 'none' && cards.length === 3;
       ) : (
       <div class="block__body">
         {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
-        <ul class:list={['card-grid__list', `card-grid__list--${resolvedLayout}`, openRows && 'card-grid__list--open', widePanels && 'card-grid__list--wide', trioPanels && 'card-grid__list--trio-panels', trioText && 'card-grid__list--trio-text']}>
-          {cards.map((card, i) => (
-            <li class="card-grid__item">
+        <ul class:list={['card-grid__list', `card-grid__list--${resolvedLayout}`, openRows && 'card-grid__list--open', layout === 'rows' && rowStyle === 'cards' && 'card-grid__list--row-cards', widePanels && 'card-grid__list--wide', trioPanels && 'card-grid__list--trio-panels', trioText && 'card-grid__list--trio-text']}>
+          {cards.map((card, i) => {
+            const feature = featureLast && rows && rowStyle === 'cards' && i === cards.length - 1;
+            return (
+            <li class:list={['card-grid__item', feature && 'card-grid__item--feature', (feature || (mirrored && rows && rowStyle === 'cards')) && 'card-grid__item--mirrored']}>
               <Card
                 {...card}
                 media={media}
-                surface={surface}
-                size={widePanels || (featuredFirst && i === 0) ? 'featured' : 'default'}
+                surface={feature ? 'navy' : surface}
+                size={widePanels || rows || (featuredFirst && i === 0) ? 'featured' : 'default'}
                 eyebrow={numbered ? pad(i + 1) : card.eyebrow}
               />
             </li>
-          ))}
+            );
+          })}
         </ul>
       </div>
       )}
@@ -147,6 +171,215 @@ const trioText = media === 'none' && cards.length === 3;
   }
   .card-grid__list--4-columns .card-grid__item {
     grid-column: span 3;
+  }
+  /* Rows (7 Oct 2026, Ross, Sustainability's ESG pillars): the Section header full width above, then one row per
+     item, open or in a card (`rowStyle`). From 900 each row splits on the 12-column grid, 30/70 as Accordion Split:
+     the pictogram (200, the Services overview size) and the title (H2 size) in cols 1–4; the copy (the lead's tag,
+     the lead at H3 size, the description, the note) in cols 6–12, centred as one unit on the first column. Below
+     900 one stack in that order. */
+  .card-grid__list--rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--64);
+  }
+  .card-grid__list--rows .card {
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  /* No card edge: the row is open */
+  .card-grid__list--rows .card::after {
+    display: none;
+  }
+  .card-grid__list--rows .card__content {
+    gap: 0;
+    padding: 0;
+  }
+  .card-grid__list--rows :is(.card__text, .card__heading) {
+    display: contents;
+  }
+  /* Row cards (Ross, 7 Oct 2026: tighter than open rows): each row in its own box, gutter apart, the same split
+     inside. Tint cards on a White block, as Why invest's value cards. */
+  .card-grid__list--row-cards {
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .card-grid__list--row-cards .card {
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--pg-bg);
+  }
+  .card-grid__list--row-cards .card__content {
+    padding: var(--wp--preset--spacing--32) var(--wp--preset--spacing--24);
+  }
+  @media (min-width: 600px) {
+    .card-grid__list--row-cards .card__content {
+      padding: var(--wp--preset--spacing--48);
+    }
+  }
+  /* 80 from 1200 (Ross, 8 Oct 2026): at full width the card carries a 200 pictogram and an H2 word, and 48 read
+     tight. Below 1200 the copy column is already near its narrowest, so it keeps 48 */
+  @media (min-width: 1200px) {
+    .card-grid__list--row-cards .card__content {
+      padding: var(--wp--preset--spacing--80);
+    }
+  }
+  /* The pictogram at the Services overview's service-line size (Ross, 7 Oct 2026): 200 from 1200, 160 at
+     768–1199, 96 below, as the pictogram panels there */
+  .card-grid__list--rows .card__pictogram {
+    width: 96px;
+    height: 96px;
+  }
+  @media (min-width: 768px) {
+    .card-grid__list--rows .card__pictogram {
+      width: 160px;
+      height: 160px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .card-grid__list--rows .card__pictogram {
+      width: 200px;
+      height: 200px;
+    }
+  }
+  /* Type (Ross, 7 Oct 2026, sixth pass): the pillar at H2 size beside its pictogram; on the copy side its claim as
+     a large heading (H3 size) under its tag, then the description and the proof line */
+  .card-grid__list--rows .card__title {
+    margin-top: var(--wp--preset--spacing--24);
+    font-size: var(--wp--preset--font-size--h2);
+    line-height: var(--wp--custom--line-height--h2);
+    letter-spacing: var(--wp--custom--letter-spacing--h2);
+  }
+  .card-grid__list--rows .card__lead-eyebrow {
+    margin: var(--wp--preset--spacing--24) 0 0;
+  }
+  .card-grid__list--rows .card__lead {
+    margin-top: var(--wp--preset--spacing--24);
+    font-size: var(--wp--preset--font-size--h3);
+    font-weight: var(--wp--custom--font-weight--bold);
+    line-height: var(--wp--custom--line-height--h3);
+    letter-spacing: var(--wp--custom--letter-spacing--h3);
+  }
+  .card-grid__list--rows .card__lead-eyebrow + .card__lead {
+    margin-top: var(--wp--preset--spacing--8);
+  }
+  /* A tag straight over the description, no claim between (Our culture values, Ross 8 Oct 2026) */
+  .card-grid__list--rows .card__lead-eyebrow + .card__description {
+    margin-top: var(--wp--preset--spacing--8);
+  }
+  .card-grid__list--rows .card__description {
+    max-width: none;
+    margin-top: var(--wp--preset--spacing--16);
+  }
+  .card-grid__list--rows .card__note {
+    max-width: none;
+    margin-top: var(--wp--preset--spacing--24);
+  }
+  @media (min-width: 900px) {
+    /* The pictogram and the pillar in cols 1–4; the copy (tag, claim, description, proof) in cols 6–12 as one unit,
+       centred on them. The two flexible rows top and bottom take the difference, so the shorter side centres on
+       the taller one and each side keeps its own spacing. */
+    .card-grid__list--rows .card__content {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-template-rows: 1fr auto auto 1fr;
+      column-gap: var(--wp--custom--grid--gutter);
+    }
+    .card-grid__list--rows :is(.card__pictogram, .card__top, .card__title) {
+      grid-column: 1 / span 4;
+    }
+    .card-grid__list--rows .card__pictogram {
+      grid-row: 2;
+    }
+    .card-grid__list--rows .card__title {
+      grid-row: 3;
+    }
+    .card-grid__list--rows .card__copy {
+      grid-column: 6 / span 7;
+      grid-row: 1 / -1;
+      align-self: center;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-grid__list--rows .card__copy > :first-child {
+      margin-top: 0;
+    }
+  }
+  /* Mirrored rows (the featureLast row, or every row with `mirrored`): the tag, title and copy run as one column on
+     the left (cols 1–7), the pictogram sits on the right (cols 9–12), centred on the text. The feature row is also
+     navy, so the closing item reads apart from the set */
+  @media (min-width: 900px) {
+    /* Rows: tag, title, then the lead, description and note, each on its own row (the copy box opens up so its tag
+       can sit over the title, as a Section header reads; Ross, 8 Oct 2026, Our culture) */
+    .card-grid__item--mirrored .card__content {
+      grid-template-rows: 1fr repeat(5, auto) 1fr;
+    }
+    .card-grid__list--rows .card-grid__item--mirrored .card__pictogram {
+      grid-column: 9 / span 4;
+      grid-row: 1 / -1;
+      align-self: center;
+      justify-self: end;
+    }
+    .card-grid__list--rows .card-grid__item--mirrored .card__copy {
+      display: contents;
+    }
+    .card-grid__list--rows .card-grid__item--mirrored :is(.card__lead-eyebrow, .card__title, .card__lead, .card__description, .card__note) {
+      grid-column: 1 / span 7;
+    }
+    .card-grid__list--rows .card-grid__item--mirrored .card__lead-eyebrow {
+      grid-row: 2;
+      margin: 0 0 var(--wp--preset--spacing--8);
+    }
+    .card-grid__list--rows .card-grid__item--mirrored .card__title {
+      grid-row: 3;
+      margin-top: 0;
+    }
+    .card-grid__list--rows .card-grid__item--mirrored .card__lead {
+      grid-row: 4;
+    }
+    .card-grid__list--rows .card-grid__item--mirrored .card__description {
+      grid-row: 5;
+      margin-top: var(--wp--preset--spacing--16);
+    }
+    .card-grid__list--rows .card-grid__item--mirrored .card__note {
+      grid-row: 6;
+    }
+  }
+  /* Mirrored rows below 900 stack as the others, but keep their own order: the tag over the title (it sits in the
+     heading's stack, so `order` lifts it) */
+  @media (max-width: 899px) {
+    .card-grid__list--rows .card-grid__item--mirrored .card__pictogram {
+      order: -2;
+    }
+    .card-grid__list--rows .card-grid__item--mirrored .card__lead-eyebrow {
+      order: -1;
+      margin: var(--wp--preset--spacing--24) 0 var(--wp--preset--spacing--4);
+    }
+    .card-grid__list--rows .card-grid__item--mirrored .card__title {
+      margin-top: 0;
+    }
+    /* 16 under the title, as from 900 */
+    .card-grid__list--rows .card-grid__item--mirrored .card__description {
+      margin-top: var(--wp--preset--spacing--16);
+    }
+  }
+  /* 900–1199: the pillar at H2 size outgrows four columns ("Environmental"), so the first column takes five and
+     the copy starts a gutter after it */
+  @media (min-width: 900px) and (max-width: 1199px) {
+    .card-grid__list--rows :is(.card__pictogram, .card__top, .card__title) {
+      grid-column: 1 / span 5;
+    }
+    .card-grid__list--rows .card__copy {
+      grid-column: 6 / span 7;
+    }
+  }
+  @media (min-width: 1200px) {
+    .card-grid__list--rows:not(.card-grid__list--row-cards) {
+      gap: var(--wp--preset--spacing--96);
+    }
+  }
+  @media (max-width: 599px) {
+    .card-grid__list--rows:not(.card-grid__list--row-cards) {
+      gap: var(--wp--preset--spacing--48);
+    }
   }
   .card-grid__list--featured-first .card-grid__item {
     grid-column: span 4;
@@ -295,7 +528,8 @@ const trioText = media === 'none' && cards.length === 3;
     }
   }
   @media (min-width: 768px) and (max-width: 1199px) {
-    .card-grid .card-grid__list--3-columns.card-grid__list--trio-text {
+    /* :has() matches the three-card one-column rule above, which otherwise out-ranked this at 768–899 */
+    .card-grid .card-grid__list--3-columns.card-grid__list--trio-text:has(> :nth-child(3):last-child) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .card-grid .card-grid__list--trio-text .card-grid__item:last-child {
@@ -406,6 +640,37 @@ const trioText = media === 'none' && cards.length === 3;
     .card-grid__tile .pictogram {
       width: 48px;
       height: 48px;
+    }
+  }
+
+  /* Tablet open rows (Ross, 7 Oct 2026: on the HSEQ campaign the stacked icon left each row a narrow column with
+     empty width beside it): where pictogram cards are one column of open rows, 600–767 and a trio at 768–899,
+     the 96 pictogram sits beside the text, top-aligned, so the row uses the width (as Checklist grid). The body
+     (normally display: contents) becomes the second column so title, list and action stay together. */
+  @media (min-width: 600px) and (max-width: 767px) {
+    .card-grid:not(.has-surface-navy) .card-grid__list--open .card--media-icon .card__content {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      column-gap: var(--wp--preset--spacing--32);
+      align-items: start;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open .card--media-icon .card__body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--wp--custom--stack--md);
+    }
+  }
+  @media (min-width: 768px) and (max-width: 899px) {
+    .card-grid:not(.has-surface-navy) .card-grid__list--open:has(> :nth-child(3):last-child) .card--media-icon .card__content {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      column-gap: var(--wp--preset--spacing--32);
+      align-items: start;
+    }
+    .card-grid:not(.has-surface-navy) .card-grid__list--open:has(> :nth-child(3):last-child) .card--media-icon .card__body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--wp--custom--stack--md);
     }
   }
 </style>

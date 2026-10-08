@@ -1,0 +1,424 @@
+---
+// FAQ index · reach/faq-index (docs/05 §2.27, 8 Oct 2026, Q141). The FAQ page's body: every FAQ group in one
+// block, on one ground, beside a sticky rail. Replaces the six Accordion Split blocks, whose left column held only
+// the group heading beside 3–16 questions (Ross: "could make better use of the 1 col").
+//   Rail (cols 1–3 from 1280, 1–4 at 1100–1279; sticky on screens tall enough to hold it): Search field (its ✕
+//     clears it, as does Esc), the count, then the topics as a vertical list of Subnav item pills with counts; the
+//     group in view is marked (aria-current="location"), as the Section subnav's scroll-spy.
+//   Groups (cols 5–12): one per FAQ group, anchored by its id (`/faq/#careers` from "See all FAQs"), Section header
+//     (title, action) over its Accordion items.
+//   Below 1100 the rail's search sits above the groups and the topic list is dropped: the page's Section subnav
+//     (In-page, `hideOnDesktop`) carries the topics there, so they appear once at every width.
+// Search filters as you type over question and answer (accents folded, every word must match): groups with no
+// match hide, topic counts follow the matches (a topic with none is greyed), the count reads "5 of 67 questions",
+// matches are marked, and an item matched only in its answer opens so the reason shows. Clearing restores the open
+// state from before the search. The field never moves: the rail is sticky, and on narrow screens it sits above
+// everything that changes. FAQPage JSON-LD stays with the page (one for every group).
+// In WordPress: the FAQ post type by parent `faq_topic` term, as the Accordion's FAQ source (src/data/faqs.ts).
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import AccordionItem from '../components/AccordionItem.astro';
+import SearchField from '../components/SearchField.astro';
+import SubnavItem from '../components/SubnavItem.astro';
+import Link from '../components/Link.astro';
+import type { BlockFields } from '../lib/types';
+
+interface FaqItem {
+  question: string;
+  answer: string;
+  slug: string;
+  open?: boolean;
+}
+
+interface FaqIndexGroup {
+  id: string;
+  label: string;
+  title: string;
+  action?: { label: string; url: string };
+  items: FaqItem[];
+}
+
+interface Props extends BlockFields {
+  groups: FaqIndexGroup[];
+  /** Read by screen readers for the block (the page's h1 is its visible heading). */
+  label?: string;
+}
+
+const { groups, label = 'All questions', background, spacing } = Astro.props;
+
+const total = groups.reduce((n, g) => n + g.items.length, 0);
+const plural = (n: number) => `${n} question${n === 1 ? '' : 's'}`;
+---
+
+{
+  total > 0 && (
+    <BlockSection slug="faq-index" root="faq-index" background={background} spacing={spacing} label={label} data-faq-index>
+      <div class="faq-index__columns">
+        <div class="faq-index__rail">
+          <div class="faq-index__search">
+            <SearchField id="faq-index-search" label="Search FAQs" placeholder="Search questions" />
+            <p class="faq-index__count text-small" aria-live="polite" data-faq-count data-total={total}>
+              {plural(total)}
+            </p>
+          </div>
+          <nav class="faq-index__topics" aria-label="FAQ topics">
+            {groups.map((group) => (
+              <SubnavItem
+                label={group.label}
+                count={group.items.length}
+                href={`#${group.id}`}
+                data-faq-topic={group.id}
+              />
+            ))}
+          </nav>
+        </div>
+
+        <div class="faq-index__groups" data-faq-groups>
+          {groups.map((group) => (
+            <section id={group.id} class="faq-index__group" aria-labelledby={`${group.id}-title`} data-faq-group>
+              <SectionHeader title={group.title} action={group.action} id={`${group.id}-title`} />
+              <div class="faq-index__list">
+                {group.items.map((item) => (
+                  <AccordionItem
+                    question={item.question}
+                    answer={item.answer}
+                    open={item.open}
+                    id={`faq-${item.slug}`}
+                  />
+                ))}
+              </div>
+            </section>
+          ))}
+          <div class="faq-index__no-match" data-faq-empty hidden>
+            <p class="text-body">
+              No questions match “<span data-faq-query />”.
+            </p>
+            <Link label="Clear search" showIcon={false} size="small" data-faq-reset />
+          </div>
+        </div>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .faq-index__columns {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
+  }
+  .faq-index__rail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+    min-width: 0;
+  }
+  .faq-index__search {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+    max-width: var(--wp--style--global--content-size);
+  }
+  .faq-index__count {
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  /* Topics: the Section subnav carries them below 1100 */
+  .faq-index__topics {
+    display: none;
+  }
+
+  .faq-index__groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--section--md);
+    min-width: 0;
+  }
+  .faq-index__group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+  }
+  /* "See all FAQs" lands the group level with the rail's top */
+  @media (min-width: 1100px) {
+    main .faq-index__group {
+      scroll-margin-top: calc(var(--wp--preset--spacing--72) + var(--wp--preset--spacing--32));
+    }
+  }
+  .faq-index__group[hidden],
+  .faq-index .faq-item[hidden] {
+    display: none;
+  }
+  .faq-index__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--16);
+    max-width: var(--wp--style--global--content-size);
+  }
+  .faq-index__no-match {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .faq-index__no-match[hidden] {
+    display: none;
+  }
+  /* Search matches: the accent-subtle ground with an accent underline, text colour and weight unchanged, so the
+     marked words keep full contrast and nothing re-wraps as you type */
+  .faq-index mark {
+    background-color: var(--wp--custom--color--bg--accent-subtle);
+    color: inherit;
+    box-shadow: inset 0 -2px 0 var(--wp--custom--color--border--accent);
+  }
+
+  @media (min-width: 1100px) {
+    .faq-index__columns {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--wp--custom--grid--gutter);
+      align-items: start;
+    }
+    .faq-index__rail {
+      grid-column: 1 / span 4;
+    }
+    .faq-index__groups {
+      grid-column: 5 / -1;
+    }
+    .faq-index__list {
+      max-width: none;
+    }
+    .faq-index__topics {
+      display: flex;
+      flex-direction: column;
+      gap: var(--wp--preset--spacing--4);
+    }
+    /* Subnav item, vertical: the pill fills the rail, edges on the search field's, label left (on the search
+       icon's line), count right */
+    .faq-index__topics .subnav-item {
+      justify-content: space-between;
+      gap: var(--wp--preset--spacing--16);
+    }
+    .faq-index__topics .subnav-item:not([aria-current]) .subnav-item__count {
+      color: var(--wp--custom--color--text--secondary);
+    }
+    .faq-index__topics .subnav-item[aria-disabled='true'] .subnav-item__count {
+      color: inherit;
+    }
+  }
+  /* Sticks clear of the scrolled header (72) whether it is showing or not, so the field never moves while you type
+     (a search that scrolls up brings the header back); only on screens tall enough to hold the whole rail */
+  @media (min-width: 1100px) and (min-height: 640px) {
+    .faq-index__rail {
+      position: sticky;
+      top: calc(var(--wp--preset--spacing--72) + var(--wp--preset--spacing--32));
+    }
+  }
+  /* From 1280 the rail narrows to cols 1–3 and col 4 becomes air (as the Publications rail) */
+  @media (min-width: 1280px) {
+    .faq-index__rail {
+      grid-column: 1 / span 3;
+    }
+  }
+</style>
+
+<script>
+  // FAQ index (docs/05 §2.27): search over questions and answers, topic counts, and the rail's scroll-spy.
+  const fold = (s: string) =>
+    s
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+  const plural = (n: number) => `${n} question${n === 1 ? '' : 's'}`;
+  // The rail's sticky top (72 + 32): results and jumped-to groups line up with it
+  const OFFSET = 104;
+  const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  function setOpen(item: HTMLElement, open: boolean) {
+    item.classList.toggle('is-open', open);
+    item.querySelector('[data-accordion-trigger]')?.setAttribute('aria-expanded', String(open));
+  }
+
+  // Marks every term in an element's text. Each text node is rebuilt from its own original, so marking again
+  // (the next keystroke) or clearing never stacks marks. Folded matching on the original text: folding drops
+  // combining marks only, so a precomposed character (å) keeps its index and length.
+  function mark(el: Element, terms: string[]) {
+    el.querySelectorAll('mark').forEach((m) => m.replaceWith(...Array.from(m.childNodes)));
+    el.normalize();
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes: Text[] = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+    if (terms.length === 0) return;
+    const pattern = new RegExp(terms.map(escape).join('|'), 'g');
+    nodes.forEach((node) => {
+      const text = node.data;
+      const folded = fold(text);
+      if (folded.length !== text.length) return; // decomposed input: skip marking rather than mis-mark
+      const parts: (string | HTMLElement)[] = [];
+      let last = 0;
+      for (const match of folded.matchAll(pattern)) {
+        const start = match.index ?? 0;
+        if (match[0].length === 0) continue;
+        parts.push(text.slice(last, start));
+        const m = document.createElement('mark');
+        m.textContent = text.slice(start, start + match[0].length);
+        parts.push(m);
+        last = start + match[0].length;
+      }
+      if (parts.length === 0) return;
+      parts.push(text.slice(last));
+      node.replaceWith(...parts.filter((p) => p !== ''));
+    });
+  }
+
+  function initFaqIndex(root: HTMLElement) {
+    const field = root.querySelector<HTMLInputElement>('[data-search-field]');
+    const clearButton = root.querySelector<HTMLElement>('[data-search-clear]');
+    const countEl = root.querySelector<HTMLElement>('[data-faq-count]');
+    const empty = root.querySelector<HTMLElement>('[data-faq-empty]');
+    const queryEl = root.querySelector<HTMLElement>('[data-faq-query]');
+    const groupsEl = root.querySelector<HTMLElement>('[data-faq-groups]');
+    const groups = Array.from(root.querySelectorAll<HTMLElement>('[data-faq-group]'));
+    const topics = Array.from(root.querySelectorAll<HTMLElement>('[data-faq-topic]'));
+    const items = Array.from(root.querySelectorAll<HTMLElement>('[data-accordion-item]'));
+    const pagePills = new Map(
+      Array.from(document.querySelectorAll<HTMLElement>('[data-subnav] [data-subnav-target]')).map((pill) => [pill.dataset.subnavTarget!, pill]),
+    );
+    const total = Number(countEl?.dataset.total || items.length);
+    if (!field || !groupsEl) return;
+
+    // Folded question and answer text, read once (answers are plain text)
+    const text = new Map(
+      items.map((item) => [
+        item,
+        {
+          q: fold(item.querySelector('.faq-item__title')?.textContent ?? ''),
+          a: fold(item.querySelector('.faq-item__answer-content')?.textContent ?? ''),
+        },
+      ]),
+    );
+
+    // Open state before a search, restored when it is cleared
+    let saved: Map<HTMLElement, boolean> | null = null;
+
+    function apply() {
+      const query = field!.value.trim();
+      const terms = fold(query).split(/\s+/).filter(Boolean);
+      const searching = terms.length > 0;
+      if (searching && !saved) saved = new Map(items.map((item) => [item, item.classList.contains('is-open')]));
+
+      let matched = 0;
+      groups.forEach((group, g) => {
+        let inGroup = 0;
+        group.querySelectorAll<HTMLElement>('[data-accordion-item]').forEach((item) => {
+          const { q, a } = text.get(item)!;
+          const hit = terms.every((t) => q.includes(t) || a.includes(t));
+          item.hidden = !hit;
+          mark(item.querySelector('.faq-item__title')!, hit ? terms : []);
+          mark(item.querySelector('.faq-item__answer-content')!, hit ? terms : []);
+          if (hit) inGroup += 1;
+          // Matched in the answer only: open it so the reason shows
+          if (searching && hit && !terms.every((t) => q.includes(t))) setOpen(item, true);
+        });
+        group.hidden = inGroup === 0;
+        matched += inGroup;
+        const count = topics[g]?.querySelector('.subnav-item__count');
+        if (count) count.textContent = String(inGroup);
+        // The rail's topic and, below 1100, the page's Section subnav pill for the same group
+        [topics[g], pagePills.get(group.id)].forEach((pill) => {
+          if (!pill) return;
+          if (inGroup === 0) {
+            pill.setAttribute('aria-disabled', 'true');
+            pill.setAttribute('tabindex', '-1');
+          } else {
+            pill.removeAttribute('aria-disabled');
+            pill.removeAttribute('tabindex');
+          }
+        });
+      });
+
+      if (!searching && saved) {
+        saved.forEach((open, item) => setOpen(item, open));
+        saved = null;
+      }
+      if (countEl) countEl.textContent = matched === total ? plural(total) : `${matched} of ${plural(total)}`;
+      if (empty) empty.hidden = matched > 0;
+      // The page subnav's own scroll-spy only moves on scroll: if the group it marks just hid, mark the first shown
+      const current = Array.from(pagePills.values()).find((pill) => pill.hasAttribute('aria-current'));
+      const firstShown = groups.find((group) => !group.hidden);
+      if (current?.getAttribute('aria-disabled') === 'true' && firstShown) {
+        current.removeAttribute('aria-current');
+        pagePills.get(firstShown.id)?.setAttribute('aria-current', 'location');
+      }
+      if (queryEl) queryEl.textContent = query;
+      clearButton?.toggleAttribute('hidden', field!.value === '');
+
+      // Searching from deep in the list: bring the results' top level with the rail (which stays put)
+      const top = groupsEl!.getBoundingClientRect().top;
+      if (top < OFFSET) window.scrollTo({ top: Math.max(0, top + window.scrollY - OFFSET), behavior: 'auto' });
+      spy();
+    }
+
+    function reset() {
+      field!.value = '';
+      apply();
+      field!.focus();
+    }
+
+    field.addEventListener('input', apply);
+    field.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && field.value) {
+        event.preventDefault();
+        reset();
+      }
+    });
+    clearButton?.addEventListener('click', reset);
+    root.querySelectorAll('[data-faq-reset]').forEach((el) => el.addEventListener('click', reset));
+
+    // Scroll-spy: the last shown group whose top has passed 30% of the viewport, else the first shown
+    function spy() {
+      if (topics.length === 0) return;
+      const line = window.innerHeight * 0.3;
+      let active = -1;
+      groups.forEach((group, g) => {
+        if (group.hidden) return;
+        if (active === -1 || group.getBoundingClientRect().top <= line) active = g;
+      });
+      topics.forEach((topic, g) => {
+        if (g === active) topic.setAttribute('aria-current', 'location');
+        else topic.removeAttribute('aria-current');
+      });
+    }
+    let ticking = false;
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          spy();
+          ticking = false;
+        });
+      },
+      { passive: true },
+    );
+    spy();
+
+    // Topic jumps: the group's heading lands level with the rail's top (clear of the header either way); URL and
+    // focus follow as a native jump would
+    topics.forEach((topic) =>
+      topic.addEventListener('click', (event) => {
+        const target = document.getElementById(topic.dataset.faqTopic ?? '');
+        if (!target) return;
+        event.preventDefault();
+        const top = target.getBoundingClientRect().top + window.scrollY - OFFSET;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
+        history.pushState(null, '', `#${target.id}`);
+        if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+        target.focus({ preventScroll: true });
+      }),
+    );
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-faq-index]').forEach(initFaqIndex);
+</script>

@@ -589,6 +589,46 @@
       "examples": {
         "Research & Publications on White": "417:14016"
       }
+    },
+    "Date list": {
+      "id": "425:7752",
+      "type": "COMPONENT_SET",
+      "variants": 4,
+      "axes": "Show (Upcoming, Past) × Breakpoint (Desktop, Mobile)",
+      "variantIds": {
+        "Upcoming Desktop": "425:7356",
+        "Past Desktop": "425:7441",
+        "Upcoming Mobile": "425:7560",
+        "Past Mobile": "425:7643"
+      },
+      "docFrame": "424:14186 (Blocks / Date list, Blocks page x -10768, under Year bars)",
+      "parts": {
+        "Date row": {
+          "set": "424:14319",
+          "axes": "State (Next, Later, TBC, Published) × Breakpoint (Desktop, Mobile)",
+          "variantIds": {
+            "Next Desktop": "424:14191",
+            "Later Desktop": "424:14207",
+            "TBC Desktop": "424:14223",
+            "Published Desktop": "424:14235",
+            "Next Mobile": "424:14257",
+            "Later Mobile": "424:14272",
+            "TBC Mobile": "424:14287",
+            "Published Mobile": "424:14299"
+          },
+          "keys": {
+            "Show kicker": "Show kicker#424:27 (default false)",
+            "Title": "Title#424:28",
+            "Meta": "Meta#424:29"
+          },
+          "layers": "Desktop 1312: Date tile · Text (Kicker UI/Eyebrow text/accent, Title Heading/H5, Meta Body/Small text/secondary; gap space/4) FILL · Links (Slot 118 + Slot 111, gap space/16; one Link for Next/Later; hidden for TBC). Padding space/24 × space/32, gap space/16, radius/lg. Mobile 327: tile beside Text, Links (wrap, paddingTop space/4) inside Text; padding 24/16/12 (24 for TBC).",
+          "states": "Next = bg/default in Navy mode (explicit Color mode 7:2) · Later = no fill, 1px border/strong dashed [3,3] inside · TBC = Later + Date tile Type=TBC + title text/secondary · Published = bg/tint (set bg/default on tint sections)"
+        }
+      },
+      "notes": "Built 7 Oct 2026 from src/blocks/DateList.astro with the Financial calendar data. TEXT/BOOLEAN defaults are set-wide, so variants all read 'Q3 2026 results / 17 Nov 2026'; set Title, Meta and Show kicker per instance, and the nested Date tile Month/Day and Link labels (Label#68:0). Countdown, the build-time upcoming/past split and the subgrid columns are code; the 118/111 slot widths stand in for the columns.",
+      "examples": {
+        "Financial calendar page frame": "426:12608 (Upcoming), 426:12689 (Past)"
+      }
     }
   },
   "components": {
@@ -1358,6 +1398,185 @@
       "Year bars grow-in and hover; columns filtering the list (reach:filter)",
       "Live facet counts, disabled options at 0, single-year chip from the chart",
       "Sticky rail (1100+ wide and 800+ tall)"
+    ]
+  },
+  "phase4FinancialCalendar7Oct": {
+    "date": "2026-10-07",
+    "context": "Financial calendar page (Q122) pushed to Figma at Ross's request. New Date tile variant, Date row part, Block/Date list, and the page frame.",
+    "components": {
+      "Date tile": "Type=TBC variant 424:14179 added to set 293:2318 (border/default edge, bg/disabled band, text/secondary 'TBC' (unlinked from File type), Icon/calendar 26:56 in border/strong); set widened to 280"
+    },
+    "blocks": {
+      "Block/Date list": "425:7752 (see blocks['Date list'])",
+      "Date row": "424:14319"
+    },
+    "pageFrame": {
+      "id": "426:12486",
+      "name": "Financial calendar",
+      "x": 16400,
+      "height": 3466,
+      "source": "src/pages/investors/financial-calendar.astro",
+      "sections": {
+        "Header (Desktop overlay, Navy mode, bg/default fill)": "426:12487",
+        "Page hero Text Desktop (Navy mode; breadcrumb Home › Investors › Financial calendar)": "426:12533",
+        "Section subnav (Financial calendar active)": "426:12593",
+        "Date list Upcoming": "426:12608",
+        "Date list Past on tint": "426:12689",
+        "CTA panel (cloned from Why invest 349:11580; Contact us, IR contact card)": "426:12806",
+        "Footer": "426:12828"
+      }
+    },
+    "gaps": [
+      "Subnav component still has 6 items: Share information (7th) missing, as on the Overview frame",
+      "Share information page frame not built (page coded 7 Oct, Q123)",
+      "Results archive and Meeting archive (Reports, Governance) are not in Figma; Date row is the shared row they could reuse"
+    ]
+  },
+  "phase4Sustainability8Oct": {
+    "date": "2026-10-08",
+    "context": "Sustainability page (Q117) pushed to Figma at Ross's request: Donut component, Share bars and SDG goals blocks, Card grid Rows variants, Stats band Feature Count=3, Figures donut recoloured, and the page frame.",
+    "components": {
+      "Donut": "set 437:2425 on Components (doc frame 437:2408); Lead style=Period 437:2413, Figure 437:2419"
+    },
+    "blocks": {
+      "Block/Share bars": "set 438:7773 (doc 438:7702): Breakpoint=Desktop 438:7707 (heading + bars cols 1–7, ring cols 9–12 at 400), Mobile 438:7741 (Layout/Typography mobile modes). Track 48 navy/100, share sage/400, period under each bar, names over both ends",
+      "Block/SDG goals": "set 439:8088 (doc 439:7722): Desktop 439:7727, Mobile 439:7909; 18 UN tiles uploaded into Tile/goal-N; action rows FILL with check icon 24:50",
+      "Card grid Rows": "added to set 148:1288: Layout=Rows, Breakpoint=Desktop 440:7786; Mobile 440:7852. White cards (radius/lg) on bg/tint; pictogram + pillar name (H2) in cols 1–4, priority eyebrow + claim (H3) + copy + proof in cols 6–12 centred",
+      "Stats band Feature Count=3": "added to set 169:2557: Count=3, Style=Feature, Breakpoint=Desktop 440:15137; Panel 440:15139 with 1px border/subtle inside stroke (White ground). Count=5 253:4781 rows made equal (Row FILL)",
+      "Figures donut": "doc 314:6177 arcs and swatches navy/100, innerRadius 0.683 (315:6208, 315:6209, 315:6222, 315:6249, 315:6250, 315:6263); Why invest frame donut 348:3047, 348:3048, 348:3061",
+      "Stats band Feature Count=3 Mobile": "added to set 169:2557: Count=3, Style=Feature, Breakpoint=Mobile 444:7852 (Layout/Typography mobile modes): navy lead full width over two figures side by side (H3 values, labels wrap, no rule), padding space/24",
+      "Stats band Feature panels": "Panel padding removed on Count=5 (253:4783) and Count=3 Desktop (440:15139): the navy lead runs to the panel edge, as .stats-band__feature in code",
+      "Accordion Mobile fix": "Block/Accordion Split Mobile 174:5319 and Stacked Mobile 174:5286: items were FIXED 880 wide in a 327 list; now FILL",
+      "Card grid Rows section header": "Section header in 440:7786 / 440:7853 linked to Show section header#148:0 (as the other layouts)"
+    },
+    "pageFrame": {
+      "id": "441:6601",
+      "name": "Sustainability",
+      "x": 18040,
+      "height": 7026,
+      "source": "src/pages/company/sustainability/index.astro",
+      "sections": {
+        "Header": "441:6602",
+        "Page hero Photo (no eyebrow; breadcrumb Home › Company › Sustainability; hero-sustainability.jpg)": "441:6648",
+        "Section subnav (Sustainability active)": "441:6715",
+        "Share bars Desktop (White)": "441:6728",
+        "Stats band Feature Count=3 (White, joined: top padding 0)": "441:6768",
+        "Card grid Rows Desktop, ESG pillars (Tint)": "441:6783",
+        "Card grid strip, certified management systems (White)": "441:6885",
+        "SDG goals Desktop (White)": "441:6897",
+        "Accordion Split, sustainability FAQ (Tint)": "441:7108",
+        "CTA panel on Tint (cloned from Why invest 349:11580; Read the full picture, Annual report 2025 (PDF), Sustainability contact)": "441:7137",
+        "Footer": "441:7167"
+      }
+    },
+    "gaps": [
+      "Certificates strip is still a detached frame (no Layout=Strip variant)",
+      "CTA panel is a detached frame on every page (Block/CTA band has no Panel Mobile variant)",
+      "Subnav Mobile cannot show the scrolled state: the active Sustainability pill sits past the right edge"
+    ],
+    "pageFrameMobile": {
+      "id": "445:7129",
+      "name": "Sustainability · Mobile",
+      "x": 19680,
+      "width": 375,
+      "note": "Frame carries Layout 7:6 / Typography 7:8 mobile modes",
+      "sections": {
+        "Header Mobile": "445:7130",
+        "Page hero Photo Mobile (back link ‹ Company)": "445:7141",
+        "Section subnav Mobile (Sustainability active)": "445:7210",
+        "Share bars Mobile": "445:7221",
+        "Stats band Feature Count=3 Mobile (joined)": "445:7259",
+        "Card grid Rows Mobile, ESG pillars (Tint)": "445:7274",
+        "Certificates strip, stacked (detached frame)": "445:7376",
+        "SDG goals Mobile": "445:7392",
+        "Accordion Split Mobile, sustainability FAQ (Tint; 4th item hidden)": "446:7646",
+        "CTA panel, stacked; Footer ground frame 445:16056 under its lower half (Navy theme), as the site": "445:7683",
+        "Footer Mobile": "445:7705"
+      }
+    }
+  },
+  "componentSweep8Oct": {
+    "date": "2026-10-08",
+    "context": "Ross: repeated cards/tiles/rows must be components or instances of base elements, never raw frame copies (CLAUDE.md rule). First pass of the sweep; also tidied set/frame overlaps on Components and Blocks. Second and third passes the same day: pages swapped to block instances, then every raw repeated unit inside blocks and the site menu componentised; overlap audit clean on Components, Blocks and Pages.",
+    "components": {
+      "Card 103:1110": "Size=Row: White 448:15934, Tint 448:15954; Size=Row mobile: White 448:15974, Tint 448:15994 (props Lead#448:0, Note#448:31, Show lead#448:62, Show note#448:93; lead eyebrow = exposed Eyebrow driven by Show eyebrow#104:210). Size=Strip 450:17259 / Strip mobile 450:17265 (Surface=Accent, bg/accent-subtle icon tile)",
+      "Stat 90:284": "Size=Feature, Align=Start 450:17098: H2 value, Small label, gap space/4",
+      "Footer 125:3011": "Desktop and Mobile ground bg/default → bg/tint (navy/900 in Navy), as .site-footer in code",
+      "Card 103:1110 Row update": "Desktop Row 448:15934 / 448:15954 padding space/80 all round (Ross, 8 Oct; 600–1199 stays 48 in code). All Row variants: Copy (gap space/8) = Lead eyebrow + Body (gap space/16: Lead on Show lead, Text) so the eyebrow shows without a lead (Q138)",
+      "Figure card 455:17942 (new)": "Desktop 455:17933, Mobile 455:17941; Title#455:0, Text#455:3, Value#455:6, Caption#455:9",
+      "Chart label 455:17948 (new)": "Value#455:12, Text#455:13 (Figures donut labels)",
+      "Menu link 119:1055": "New Level=Large, State=Default 470:18137 (site menu big link: Label + arrow + Note); prop Note added to the set",
+      "Menu post 470:18190 (new)": "Site menu Newsroom item: Meta, Title. 10 instances in Site menu panel 122:2417 (Desktop and 1200)",
+      "Card 103:1110 layout": "Row variants re-stacked in one column under the rest (White and Tint Row overlapped)"
+    },
+    "blocks": {
+      "Card grid 148:1288": "Rows Desktop 440:7786 / Mobile 440:7852 rebuilt from Card Row instances + hidden 4th (Show 4th row#448:176). New Layout=Strip Desktop 450:17384 / Mobile 450:17423 from Card Strip instances (4th tile on Show 4th row); exposed Eyebrow",
+      "CTA band 179:5432": "Style=Panel Desktop 246:9087 rebuilt as the navy panel (contact card = Eyebrow + name + role + 2 Meta items; Footer ground navy/900 under the lower half); new Style=Panel Mobile 448:16598. Props Contact name#448:212, Contact role#448:218",
+      "SDG goal 450:16287 (new)": "Desktop 450:16248, Mobile 450:16286: tile (image per instance), Number = Eyebrow, Name#450:6, Actions = 4 Meta items (check icon, gap space/12) with Show action 2/3/4 (#450:9, #450:0, #450:3). Block/SDG goals Desktop 439:7727 and Mobile 439:7909 rebuilt from 18 instances",
+      "Share bar 450:17107 (new)": "Value / Period props; Share hugs its value, bar length via the Share frame right padding. Share bars 438:7707 / 438:7741 rebuilt from 4 instances",
+      "Stats band 169:2557": "Feature rows in Count=5 253:4781, Count=3 Desktop 440:15137 and Mobile 444:7852 are Stat instances (Feature; Mobile with H3 value)",
+      "Accordion 175:2673": "Mobile items FILL (were FIXED 880)",
+      "Card grid 148:1288 (pass 2)": "Show second row#454:33 on 2/3/4 columns; Pictogram panel variants bound to Card props",
+      "Figures 314:6177": "Show 3rd card#455:29, Chart title#455:34, Chart text#455:39; Cards variants use Donut + Chart label instances",
+      "Split media": "Position=Stacked variant 455:18154",
+      "Embed zone 457:8412 (new)": "Number, Name; 12 instances in Block/Embed",
+      "Social post 457:8485 (new)": "Name, Age, Text, Foot; 4 instances in Social feed",
+      "Region status 457:8661 (new)": "Name, Area; 6 instances in Live operations Live/Stale (stale = colour overrides)",
+      "Figure point 457:8823 (new)": "Desktop 457:8814, Mobile 457:8822; Title, Text; Figures Sticky",
+      "Timeline event 461:8616 (new)": "State=Done/Latest/Next/Upcoming x Label=Above/Below (461:8566-461:8615); Title#461:0, Date#461:9; 8 instances on the Track, placed at the event x",
+      "Year bar 461:8677 (new)": "Desktop 461:8670, Mobile 461:8676; Count#461:18, Year#461:21; Fill height overridden per year; 28 instances",
+      "Map marker 461:8989 (new)": "Type=Office/Cluster/Presence x Label=Left/Right (461:8971, 461:8975, 461:8979, 461:8985), auto-layout so left labels grow leftwards, 10px gap as DotMap; Label#461:24, Count#461:29; 6 instances in Offices map",
+      "Report quarter 465:8744 (new)": "Desktop 465:8737, Mobile 465:8743; Date#465:0 (desktop), Quarter#465:3 (mobile), Show action 1-3; 18 instances (empty quarters: actions off, Date '-')",
+      "Meeting row 465:9033 (new)": "Desktop 465:9025, Mobile 465:9032; Year, Name, Date, Show action 3/4; 7 instances",
+      "Publication row 465:9447 (new)": "Eyebrow, Title, Byline; 7 instances",
+      "Result item 465:9591 (new)": "Label, Value, Text, Show arrow-up-right; 8 instances in Results band",
+      "Result row 465:9694 (new)": "Label, Value; 8 instances",
+      "Lifecycle phase 465:9815 (new)": "State=Default/Open x Desktop/Mobile; Index, Phase, Label, Task 1-3; 10 instances (Focus)",
+      "Lifecycle step 465:10053 (new)": "Index, Label; 5 instances (Grid desktop)",
+      "Lifecycle cell 465:10203 (new)": "State=On/Off (mobile); Label; 12 instances",
+      "Lifecycle line 472:9242 (new)": "Pictogram + name over 4 Lifecycle cells; Text#472:6; 3 instances (Grid mobile)",
+      "Calendar row 472:9156 (new)": "Desktop 472:9150, Mobile 472:9155; Date#472:0, Event#472:3, Add to calendar link; 10 instances in Data list Dates",
+      "Values step 472:9363 (new)": "Word#472:7, Text#472:8; 6 instances in Block/Values mobile (Value and Payoff)"
+    },
+    "pages": {
+      "CTA panels → Panel instances": "Careers 449:16778, Why invest 449:16810, Services overview 449:16842, Subsea 449:16874, Research & Publications 449:16906, Financial calendar 449:16938, Sustainability 449:16970, Sustainability · Mobile 449:17002",
+      "Strips → Card grid Strip instances": "About 450:17424, Subsea 450:17441, Sustainability 450:17465, Sustainability · Mobile 450:17482",
+      "Detached blocks swapped (pass 2)": "Services overview 454:18572 (+ mobile 454:18750), Subsea 454:17078, Contact 454:17413 and FAQ 454:18917, Investors bento 455:17775, Careers bento 455:9320, Why invest Figures 455:18091 and Split media 455:18171"
+    },
+    "remaining": [
+      "Left as is on purpose: footer link lists (single styled text layers), doc example groups (label + instance), layout rows that only hold instances (Reports year rows, mega menu columns, mobile menu links), icon/pictogram library tiles",
+      "Not in Figma yet: Services overview scope lists"
+    ]
+  },
+  "phase4OurCulture8Oct": {
+    "date": "2026-10-08",
+    "context": "Our culture page frame (Q127) and the components it needed (Q138). Desktop only.",
+    "page": {
+      "Pages / Our culture 454:17974": "x 21320 on Pages 250:22, 1440 wide. Sections: Header 454:17975, Page hero (Text, navy) 454:18021, Section subnav 454:18079, Card grid Rows mirrored 454:18090, Card grid 2 columns image top 454:18243, Split media numbered list 454:18354, Accordion split 454:18397 (tint), CTA panel 454:18423 (tint ground), Footer 454:18457"
+    },
+    "components": {
+      "Card 103:1110": "Size=Row mirrored: Tint 454:8340, Navy 454:8354 (copy cols 1-7, pictogram cols 9-12; Title, Pictogram, Lead, Description, Note, Lead eyebrow props re-linked). The set is now 8296 tall; doc frame 103:446 examples start at 8744",
+      "Card 103:1110 action pin": "Default/Featured variants of Media None, Icon, Pictogram panel, Image top: the action sits at the card's foot when the card is stretched (None/Image top: Content Fill + space between; Icon/Pictogram panel: Text group Fill). Stat unchanged"
+    },
+    "blocks": {
+      "Split media": "Show 5th item#454:13 (Numbered list), item clones 454:16762, 454:16767, 454:16772, 454:16777",
+      "Accordion 175:2673": "Layout=Split Desktop: Accordion items Fill (were fixed 880 in a 640 list; overflowed in Careers 302:8748 too)"
+    },
+    "housekeeping": "Components page: Card presets 112:672 and the 12 frames below it moved down 1128 to clear the taller Card doc frame (200 gap). Pages and Blocks: no overlaps. A loose Card instance 435:16283 sits at x -1465 beside the Card doc frame, left alone.",
+    "gaps": [
+      "No Our culture mobile frame",
+      "No Row mirrored mobile variant",
+      "Statement Quotes carousel (Q137) not in Figma"
+    ]
+  },
+  "phase4FilterChipHug8Oct": {
+    "date": "2026-10-08",
+    "context": "Q142: filter chip count a word space from its label; chip hugs its content.",
+    "components": {
+      "Filter chip 92:337": "Layout=Chip variants: gap space/8 -> space/4 (label to count); Check wrapped in 'Check slot' (padding-right space/4, so check to label stays 8): Default 473:2480, Hover 473:2482, Selected 473:2484, Focus 473:2485, Disabled 473:2487. Strokes no longer in layout (code draws the border as an inset shadow), so Default and Selected are the same width (was 2px apart). Count text already hugged. List layout unchanged"
+    },
+    "codeOnly": [
+      "The hidden copy of the built count that holds each chip's width as live counts fall (data-reserve)"
     ]
   }
 }

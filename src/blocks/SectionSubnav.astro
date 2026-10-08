@@ -27,14 +27,16 @@ interface Props {
   items: SubnavLink[];
   /** Current page href — Section pages only. */
   current?: string;
+  /** Hidden from 1100, where a block's own rail lists the same anchors (FAQ index, Q141). */
+  hideOnDesktop?: boolean;
 }
 
-const { source, label, items, current } = Astro.props;
+const { source, label, items, current, hideOnDesktop = false } = Astro.props;
 ---
 
 {
   items.length > 0 && (
-    <nav class="wp-block-reach-subnav subnav has-surface-light" aria-label={`${label} section`} data-subnav data-subnav-source={source}>
+    <nav class:list={['wp-block-reach-subnav subnav has-surface-light', hideOnDesktop && 'subnav--hide-desktop']} aria-label={`${label} section`} data-subnav data-subnav-source={source}>
       <div class="subnav__row container">
         {items.map((item) => (
           <SubnavItem
@@ -100,6 +102,11 @@ const { source, label, items, current } = Astro.props;
   }
   .subnav-item {
     flex: none;
+  }
+  @media (min-width: 1100px) {
+    .subnav--hide-desktop {
+      display: none;
+    }
   }
 </style>
 
@@ -207,13 +214,15 @@ const { source, label, items, current } = Astro.props;
     let docked = false;
     const update = () => {
       const top = parseFloat(getComputedStyle(nav).top) || 0;
-      const next = sentinel.getBoundingClientRect().bottom <= top + 1;
+      // A hidden bar (hideOnDesktop) never docks, or the header would drop its shadow for it
+      const next = nav.getClientRects().length > 0 && sentinel.getBoundingClientRect().bottom <= top + 1;
       if (next === docked) return;
       docked = next;
       nav.classList.toggle('is-docked', docked);
       document.documentElement.classList.toggle('has-docked-subnav', docked);
     };
     window.addEventListener('scroll', () => requestAnimationFrame(update), { passive: true });
+    window.addEventListener('resize', () => requestAnimationFrame(update));
     update();
   });
 </script>

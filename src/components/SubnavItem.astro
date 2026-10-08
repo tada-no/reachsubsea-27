@@ -1,15 +1,18 @@
 ---
 // Subnav item pill (docs/04 §15). Also the tab look inside blocks (Data list, role="tab").
 // Active = .is-active, aria-current (page/location) or aria-selected="true".
+// Count (8 Oct 2026, FAQ index rail, Q141): bracketed as the Filter chip's (Q93), tabular so a live count keeps
+// the pill's width.
 interface Props {
   label: string;
+  count?: number | string;
   href?: string;
   active?: boolean;
   class?: string;
   [attr: string]: unknown;
 }
 
-const { label, href, active = false, class: className, ...attrs } = Astro.props;
+const { label, count, href, active = false, class: className, ...attrs } = Astro.props;
 const Tag = href ? 'a' : 'button';
 ---
 
@@ -19,7 +22,8 @@ const Tag = href ? 'a' : 'button';
   type={href ? undefined : 'button'}
   {...attrs}
 >
-  {label}
+  {count === undefined ? label : <span class="subnav-item__label">{label}</span>}
+  {count !== undefined && <span class="subnav-item__count">{count}</span>}
 </Tag>
 
 <style is:global>
@@ -35,6 +39,22 @@ const Tag = href ? 'a' : 'button';
     transition:
       background-color var(--wp--custom--motion--duration) var(--wp--custom--motion--easing),
       color var(--wp--custom--motion--duration) var(--wp--custom--motion--easing);
+  }
+  .subnav-item__count {
+    min-width: 4ch;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .subnav-item__count::before {
+    content: '(';
+  }
+  .subnav-item__count::after {
+    content: ')';
+  }
+  /* Nothing behind it right now (FAQ index search, Q141): greyed and not clickable */
+  .subnav-item[aria-disabled='true'] {
+    color: var(--wp--custom--color--text--disabled);
+    pointer-events: none;
   }
   .subnav-item.is-active,
   .subnav-item[aria-current='page'],

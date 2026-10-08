@@ -10,6 +10,366 @@ _No open questions right now._
 
 ## Answered log
 
+### Q142. Filter chips: a word space before the count (8 Oct 2026)
+Context: Ross, on the Research & publications chips: "don't think we need these big gaps on the pills, just a space is good".
+- [x] Filter chip: the count sits a word space (4) after its label instead of the 8 gap, so "2025–26 (7)" reads as one phrase. The tick keeps its 8 (now a margin on the tick), so selecting still doesn't move anything (Q92). Applies wherever chips are used (Data list, Feed grid, FAQ, Live operations)
+- [x] Follow-up (Ross: "weird spacing"): the count's two-digit slot was centred (the button centres its text), so a one-digit count had spare room both sides and the gap still looked wide. Now start-aligned: the label and count sit together and the spare room (about one digit) falls at the pill's end
+- [x] Checked at 788 and 375: chips the same position and width before and after selecting, no sideways scroll; at 1440 the side-panel checklist rows are unchanged (tick to label 8, counts in a right-aligned column)
+- [x] Then (Ross: "fix the chip so it hugs the content"): no fixed two-digit slot. The count holds a hidden copy of the count it is built with in the same grid cell; Data list counts are each option's share of that, so they only fall and the chip keeps its width. The single-year chip (from the chart) holds its year's full count, set when picked. Every chip now has 28 both sides (16 when selected); about 6–16 narrower than before
+- [x] Checked at 1067 · 1440 · 375: even padding on every chip; topic and year picks that take counts from 14 to 1 move nothing (positions and widths measured before and after); the chart-picked year 2017 stays 111 wide as its count falls from 6 to 1; the 1440 side panel unchanged, counts still in a right-aligned column; Home's Live operations chips (fixed counts) hug; no sideways scroll
+- [x] Figma: Filter chip 92:337, Chip variants: label to count space/4, the check in a Check slot so it keeps 8; strokes out of layout, so Default and Selected match (they were 2px apart)
+
+### Q141. FAQ page: one sticky rail with search, beside every group (8 Oct 2026)
+Context: Ross: the FAQ page "could make better use of the 1 col". Each of the six Accordion Split blocks held only its group heading on the left, beside 3–16 questions (Services ran 1,870px at 1440), and the six white / tint bands broke one list of 67 questions into six.
+- [x] New block **FAQ index** (docs/05 §2.27): a sticky rail (cols 1–3) with Search questions, the count, and the six topics as vertical Subnav item pills with counts and the group in view marked; every group beside it (cols 5–12) on one White ground, Section header over its items. Recommended and chosen
+- [ ] Keep the six Split blocks, the left column filled with an intro and count per topic · [ ] Questions in two columns across the full width (opening one would push the column down)
+- [x] Search filter (Ross: yes): over question and answer, accents folded; groups with no match hide, topic counts follow (empty topics greyed, on the phone bar too), matches marked, an item matched only in its answer opens; clearing restores the open state. The field never moves (the rail sits clear of the header whether it shows or not; checked keystroke by keystroke at 1440 and 375)
+- [x] The duplicate "Clear" link next to the count dropped: the field's ✕ (and Esc) clear it, "Clear search" in the no-match message
+- [x] Below 1100: search and count above the groups, topics in the page's Section subnav (new `hideOnDesktop`, so they show once at every width)
+- [x] Subnav item gains an optional bracketed count and a disabled look (`aria-disabled`)
+- [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll, rail and list aligned, scroll-spy follows, token audit clean
+- [ ] Figma after approval: FAQ index block, Subnav item vertical with count + Disabled state, FAQ page frame
+
+### Q140. The fourth value: "Leave no one behind", and no numbers on the overview (8 Oct 2026)
+Context: Ross, on the Careers overview's four value cards (Learn · Teach · Reach · Never leave anyone behind, numbered 01–04): should the fourth go navy as on Our culture? Answered no: in an equal row of four a navy card reads as "selected", against the numbering. Instead the numbers go, and a shorter wording.
+- [x] The 01–04 numbers dropped from the four cards (Careers overview, `numbered` off)
+- [x] "Leave no one behind" (Ross): the live site's "never leave anyone behind", shortened and verb-led like Learn · Teach · Reach. Changed in careers.ts (overview card), culture.ts (Our culture row) and the Our culture values FAQ ("Alongside them, we leave no one behind.")
+- [ ] No one left behind · [ ] Keep Never leave anyone behind
+- [ ] **TO CONFIRM with Reach:** the shortened wording of their stated value. Also the dev site's Life at Reach sentence, now "leaving no one behind" (Life at Reach hero lead, Careers overview's Life at Reach card; Ross)
+- [x] Checked at 1440 and 375: titles in place (the fourth still wraps to two lines in the 4-column card at 1440), no sideways scroll
+
+### Q139. Careers overview: Who thrives beside its heading; Trainees in two paragraphs (8 Oct 2026)
+Context: Ross, on the Careers overview: the Trainees copy "looks bitty, remove bold and tidy to 1 (max 2) para"; then Who thrives "could this be in col2?", with Figma 435:17585 (heading left, one paragraph right).
+- [x] Trainees: two plain paragraphs (the commitment; then the offshore and onshore tracks together), no bold lead-ins, the client's wording kept; "rooted in our belief…" left out
+- [x] Split media gets a new Layout **Beside**: eyebrow on top, the heading in cols 1–6, one paragraph in cols 7–12 top-aligned with the heading's first line, no media; below 900 the paragraph follows the heading. Who thrives uses it, its two paragraphs joined into one (the live copy, unchanged). Wide stays for Our story and Why work with us
+- [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll; body top level with the heading top (140 / 140 at 1440)
+- [ ] Figma after approval: Split media Layout=Beside variant (the 435:17585 frame as the reference)
+
+### Q138. Row cards: padding, and tags on the Our culture values (8 Oct 2026)
+Context: Ross, on the Card grid Rows cards (Sustainability, Our culture): more padding; then, on Our culture, the "In practice" line did not need to be bold or its own paragraph, and the cards should carry eyebrows.
+- [x] Row cards: 80 all round from 1200 (Ross: first 64, then 80 top and bottom, then the sides to match); 48 at 600–1199 (the copy column is near its narrowest there), 32 × 24 on phones. Copy column at 1440: 659 (was 696)
+- [x] Our culture values: the "In practice" example joins the value statement in one paragraph at body weight (the `note` is no longer used there)
+- [x] A tag over each value's copy, from the live /careers/ values sentence: New and relevant insight · Sharing knowledge · Having ambitions · Our commitment. Card now shows `leadEyebrow` with a description alone (it needed a `lead` before); in the navy feature row (Q131) the tag sits over the title
+- [x] Checked at 1440 · 1200 · 1100 · 375 on Our culture and Sustainability: no sideways scroll; Sustainability unchanged but for the padding
+- [x] Every Our culture row in the navy row's mirrored layout (Ross: "the navy card layout works best"): tag, title and copy as one column in cols 1–7, the pictogram on the right in cols 9–12; Learn · Teach · Reach on Tint cards, the last row still Navy. New Card grid option `mirrored` (rows + cards); the layout CSS now keys on `card-grid__item--mirrored`, which the feature row also carries. Below 900 the rows stack (pictogram, tag, title, copy). Checked at 1440 · 1000 · 800 · 375, no sideways scroll. Sustainability unchanged
+- [x] Figma: Desktop Row variants at 80 padding; Card Size=Row mirrored in Tint 454:8340 and Navy 454:8354 (copy left, pictogram right), used in the Our culture frame. No mobile mirrored variant yet (the Row mobile variants stack the same way)
+- [x] Figma, found while building the frame: Accordion Split's items were fixed at 880 in a 640 list and ran off the frame edge (Careers too); now Fill. Card Default/Featured: the action pins to the foot as in code (`margin-top: auto`), so actions line up across a row of unequal copy; Stat cards unchanged
+
+### Q137. Life at Reach: quotes as a carousel of cards (8 Oct 2026)
+Context: Ross, after the split version (Q136): "not working either, lets think more standard, no icon, then eyebrow, head, then carousel of quote cards".
+- [x] Statement › Quotes is now a carousel: the Section header (eyebrow, H2) with arrow buttons at its far end, then a rail of quote cards that starts on the container's left edge and runs off the right edge (scroll-snap, the Social feed's mechanics). Cards: Tint on White, 560 wide (82vw on phones), quote in Lead with hung curly quotes, name and role at the foot so they line up along the rail. Arrows page one card and disable at either end (fine pointers; touch swipes; the rail takes keyboard focus). No autoplay
+- [x] Follow-up (Ross: more padding, some green in the text): card padding 48 (32 on phones); the curly quote marks in accent-display, bold; the role line in text/accent, as the Profiles grid's roles (5.5:1 on the tint card)
+- [x] Three Latin **placeholder** quotes added (Ross), interleaved with the real three so the carousel has six cards; flagged `placeholder: true` in `quotes.ts`. **Replace before launch** with employee quotes from Reach
+- [x] Position bars, touch only (Ross): one short bar per card under the rail, the current one green, following the card at the rail's start (the last at the far end). Shown on `(hover: none), (pointer: coarse)`, where the arrows are hidden; not tappable (swipe moves the cards), aria-hidden. In the markup from first paint, so nothing shifts. Checked on an emulated phone (bars track all six cards, arrows hidden) and at 1440 (bars hidden, arrows shown)
+- [x] The `needed-quote` pictogram is dropped (no icon), and the block moves from Navy to White (white · tint · white · tint down the page)
+- [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll on the page, names level, next/prev scroll and disable at the ends
+- [ ] Figma after approval: Statement › Quotes carousel variant
+
+### Q136. Life at Reach: the quotes as a split, one quote leading (8 Oct 2026)
+Context: Ross asked to rethink "In their own words" (Statement Quotes, Q130): three equal columns of loose text on navy read as a generic testimonial strip, ended raggedly (one quote two lines longer), and the "Icon needed" box floated above the eyebrow. Two of the three quotes are press lines about Reach Remote and innovation, not working life.
+- [x] Header left, quotes right (Ross): pictogram, eyebrow and H2 in cols 1–4; quotes in cols 6–12, as Card grid Rows. The first quote leads at H3 size; the other two follow as a pair, two across once the quotes column is 560 wide (container query: a quote never drops under 260), names on a shared row. Below 900 the header stacks over the quotes; on phones the pair stacks too
+- [ ] Lead quote full width, the pair below
+- [x] Bjørg Mathisen Døving's "time of my life" leads (the most personal); Bjarte Christiansen and Jostein Alendal follow (Ross). Still TO CONFIRM with Reach: press quotes on Careers, and real crew or trainee quotes to replace them
+- [ ] Drop the CEO quote · [ ] Keep the order
+- [x] Curly quotes added, the opening one hung outside the text edge (the bold lead otherwise read as a second heading)
+- [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll, names aligned in the pair, reveal works (`.statement__quotes-item` unchanged in motion.ts); axe 0 violations on the section
+- [ ] Figma: the Statement Quotes style is not in Figma yet
+
+### Q135. Why work with us: the four reasons as a grid (8 Oct 2026)
+Context: Ross: the four-reason block (Figures Sticky, the Figma frame `316:6184`) "still feels clunky and not the best UX or UI": make it smoother and more contained. Even as the Q132 pinned pair it took 2,586px of scroll at 1440 to read four short points, one at a time.
+- [x] New Figures layout **Grid**: the heading, then the four points as 2 × 2 tiles from 900 (one column below), each in Why invest's card order (title → text → figure and caption) so every figure sits with its point. Tiles are subgrids of three rows, so titles, texts and figures share lines across a row. Tiles on `bg/tint` (navy/900 in the Navy band; White on Tint); figures at Display, sage on navy, counting up once; tiles rise in with the page reveal. No pinning, no scroll-driven state. 1,224px at 1440 (was 2,586)
+- [ ] Keep the pinned pair (Q132): Sticky stays in the block for other pages
+- [x] Checked at 1440 · 1100 · 920 · 800 · 375: figures level across each row, no sideways scroll, axe 0 violations. Before/after: `review/why-work-reasons-before-after.png`
+- [ ] Figma after approval: Figures Grid variant (Desktop, Mobile)
+
+### Q134. Why work with us: offshore and onshore as a comparison (8 Oct 2026)
+Context: Ross: the two path cards "look badly laid out". They repeated every label, their rows didn't line up across the two cards, and all the copy was small type.
+- [x] New block **Comparison** (`reach/comparison`, outside the 14-block budget): the labels said once in their own column (cols 1–2), the two options in cols 3–7 and 8–12, each heading with an H3 and its lead; the labels column and both options are subgrids of the same rows, so each row is as tall as its longest value and one rule runs across all three. Values in Body, labels in Body/Small medium, secondary. Hairlines only between label · value rows (the site rule). Below 900: one stack per option, each label over its value. DOM reads option by option with its own `<dl>` (the shared labels column is aria-hidden)
+- [x] The dev labels that differed become one shared label each: Key assets / Key tech → "Assets and tech", Core roles / Core departments → "Roles and teams"
+- [x] Q128's Card grid spec-row rules (one column below 900, label over value under 480) removed: nothing else used them
+- [x] Checked at 1440 · 1100 · 920 · 800 · 375: rows aligned across the three columns at 900+, no sideways scroll, axe 0 violations
+- [ ] Figma after approval: `Block/Comparison` (Desktop, Mobile)
+
+### Q133. Two-column text: a wider gap (8 Oct 2026)
+Context: Ross: does the gutter on the 2-col text block feel tight? (Split media Wide: Why work with us, About › Our story, Careers › Who thrives.) It was one gutter (32 at 1440) between two ~90-character columns.
+- [x] Yes: the two paragraphs now sit on the 12-column grid, cols 1–5 and 7–11. Gap 144 at 1440 (112 at 1100, 94 at 900), lines ~65–70 characters; stacked below 900 as before. All three pages pick it up (checked 1440 · 1100 · 900 · 800 · 375, no sideways scroll)
+- [ ] Figma after approval: Split media Wide body columns
+
+### Q132. Why work with us: each reason comes through as one unit (8 Oct 2026)
+Context: Ross, on the Figures block (Sticky): can the transitions be worked through better, so each section comes through together? The figure was pinned on the left while the points scrolled past on the right with 400px gaps, so the figure sat beside empty space or the next point for much of the scroll.
+- [x] Pinned pair (Ross): from 900 with JS, a band pins under the subnav (the viewport below header and subnav, 520 at least) with the heading and four quiet step ticks on top; each point's figure (cols 1–5) and title and text (cols 7–12) swap as one unit, the next rising in as the last leaves (clip + rise, no fade). State from the scroll position, as the Values block, so a fling can't skip a point. The list stays as the runway and the accessible copy; below 900 and without JS it reads as the list with figures inline
+- [ ] Paired rows, no pinning
+- [ ] Keep it, tighten it
+- [x] Checked at 1440 (each of the four states, then the release), 1000 and 375: no sideways scroll, no console errors. Figures › Cards (Why invest) unchanged
+- [ ] Figma after approval: update the Figures Sticky variant notes
+
+### Q131. Our culture: the fourth value set apart (8 Oct 2026)
+Context: Ross, on the Our culture values: "Never leave anyone behind" should feel different to the three cards above, maybe in purple and a different layout.
+- [x] Card grid Rows gains `featureLast` (row cards only): the last row is a Navy card and mirrored, the title and copy as one column in cols 1–7 and the pictogram on the right in cols 9–12, centred on the text. Below 900 it stacks as the others, on navy. On Our culture only (Ross)
+- [x] Checked at 1440 · 1000 · 375: no sideways scroll
+- [ ] Figma after approval: the feature row as a Card grid Rows variant
+
+### Q130. Life at Reach: a collection of quotes (8 Oct 2026)
+Context: Ross: one quote is not enough, make it a collection; he will supply an animated quote pictogram, used once on the block, not per quote.
+- [x] Equal row of quotes (Ross): pictogram, Section header ("In their own words" · "What it is like to work here", the PDF's), then three quotes, three across from 900, stacked below. Lead text, name and role on a shared subgrid row so the names line up at every width (measured 950–1440)
+- [ ] Featured + row
+- [ ] One at a time
+- [x] Christiansen, Døving, Alendal (Ross), verbatim from the live news posts (2024); Døving's cut short with "…"; Christiansen's role shortened to "Technical Manager, formerly Offshore Manager"
+- [ ] Christiansen and Døving only
+- [ ] All four (adds the COO)
+- [x] Built as Statement › style **Quotes** (new), fed by `src/data/quotes.ts` (the Quote post type: quote, name, role, source, topics). The quote items reveal on scroll with the others (`motion.ts`)
+- [ ] **Needed:** Ross's animated quote pictogram; `needed-quote` placeholder until then
+- [ ] Figma after approval: Statement › Quotes variant
+
+### Q129. Life at Reach built, first pass (8 Oct 2026)
+Context: Ross: make a start on Life at Reach. Sources: client PDF "23 — Careers — Life at Reach" (screen p51: people-photo hero, two photo cards over it, three quotes marked illustrative, the overview's stats band, three FAQs, "Ready to find out more?"); dev /careers/why-work-with-us/life-at-reach/ (three sentences); a survey of every live and dev post, page and media item for people content (almost none: no rotation pattern, no staff events, no crew or trainee voices; a few named staff quotes in press posts). Our culture (Q127) already holds the values, HSEQ and the control-room photo, Why work with us (Q128) the offshore and onshore roles, so this page is the places and the people.
+- [x] Quotes: one real press quote, Bjarte Christiansen (Technical Manager, six years as Offshore Manager; live news 9 Apr 2024), as Statement Quote on navy, eyebrow "In their own words" (Ross). **To confirm with Reach:** reuse of a press quote on Careers; crew or trainee quotes to replace it
+- [ ] Labelled placeholder slot
+- [ ] No quotes for now
+- [x] Hero: the Careers overview's calm sea (Ross); the people photo moves to the intro (new `team-lounge-open-day.jpg`, live media from the 2024 open day)
+- [ ] The PDF's lounge photo
+- [ ] Navy text hero
+- [x] Where people are based: figures only, in the places cards (8 offices in 4 countries), no offices map (Ross)
+- [ ] The offices map, as on Contact
+- [x] The PDF's stats band cut: the overview's, word for word (Ross)
+- [ ] Keep it
+- [x] Built: Hero Photo (dev's opening sentence as lead, 2 lines at 900–1000) · Subnav · Split media Image ("Expect to be inspired and challenged": the rest of the dev copy) (white) · Card grid 4 cols, image-top cards, one meta line each ("From the quayside to the seabed": On board · In a control room · At headquarters · In the workshop; vessel and office counts from key-figures.ts; four live-media photos used nowhere else on the site: crew on deck at a mobilisation, the remote control room, a desk by the harbour window from the 2023 office shoot, the electronics workshop; Ross asked for photos over text cards) (tint) · Statement Quote (navy) · Accordion Split, new FAQ topic `life-at-reach`, the PDF's three questions (tint) · CTA Panel, the PDF's wording + recruiter (tint). Copy: `src/data/life-at-reach.ts`
+- [x] Card fix: a text or image-top card whose description ends on a meta line now pins the meta to the card foot, so rows keep their meta level when descriptions differ by a line (measured 375–1600). Cards with no description (Contact's office cards) keep the meta under the title (checked)
+- [ ] **To confirm with Reach:** the Husøy technical base (being built in April 2024) and where the workshop photo was taken (Sep 2023 series, unlabelled); rotation patterns (not published anywhere)
+- [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll, one h1, card meta level in every row 375–1600
+- [ ] docs/05 §3 row and Figma page frame after approval (no new components or tokens)
+
+### Q128. Why work with us built, first pass (8 Oct 2026)
+Context: Ross: start the Why work with us page. Sources: client PDF "25 — Careers — Why Work With Us" (screen p55, Design Reference p27: hero, three "reasons to join" cards over the hero, four "Support to grow" benefit tiles flagged illustrative, three FAQs, "Ready to find out more?"); dev /careers/why-work-with-us/ leaves (Everything Within Reach, Career growth, Sustainability in work, Meet our people) and /careers/explore-your-path/ (Offshore, Onshore, Graduates & students). The live site has one Careers page, used by the overview. Outline put to Ross, four questions, all on the recommended option:
+- [x] Benefits: the PDF's tiles left out; the real package is listed as open with the client (a block is added when it arrives)
+- [ ] Labelled placeholder · [ ] Only the sourced tiles
+- [x] Hero Photo: `project-trinidad-inspection.jpg` (platform at sunset on the right, calm sky and sea, echoes the PDF's platform; unused elsewhere)
+- [ ] Deep Cygnus · [ ] Ask the client for a new one
+- [x] Reasons as **Figures Sticky on navy** (first use on a page; Why invest uses the Cards layout of the same block): the PDF's three reasons + the dev's Sustainability in work, each with a proof figure from key-figures (100% trainees offered a role · ~750 uncrewed days · 90% fuel saving · 500+ people)
+- [ ] Figures Cards as Why invest · [ ] Card grid 4 columns numbered
+- [x] FAQs: new topic `why-work` under Careers in `faqs.ts`, the PDF's three questions (figures from key-figures; the trainee answer in the live site's wording)
+- [ ] Add to the Careers topic · [ ] No FAQ
+- [x] Not repeated from the siblings: the values copy, Trainees, open positions and the 3D World (overview); the comfort-zone paragraph and the operations-centre photo (Our culture). The PDF's second hero button (Life at Reach) dropped: the subnav links it
+- [x] Intro: Split media Wide without an image ("Everything within Reach": the dev innovators paragraph and Career growth, one per column; heading cut to the sentence's first clause, the full one ran to six lines at 375)
+- [x] Offshore and onshore: first built as Card grid 2 columns with spec rows; replaced by the Comparison block (Q134)
+- [ ] **To confirm with Reach:** the benefits package; the graduates intake year (dev says "2026 intake", dropped); "500+ people across nine countries" (PDF) became "8 offices in 4 countries" (nine is where Reach has worked)
+- [x] Redirects to this page: dev /careers/why-work-with-us/{everything-within-reach, career-growth, sustainability-in-work, meet-our-people}/ and /careers/explore-your-path/{offshore-careers, onshore-careers, graduates-students}/
+- [x] Checked at 1440 · 1220 · 1100 · 1000 · 920 · 800 · 620 · 375: no sideways scroll, one h1, path cards equal height with facts ≤3 lines, sticky figures swap per point
+- [ ] After approval: docs/05 §3 row, Figma page frame (+ the Card grid tablet / phone spec-row frames)
+
+### Q127. Our culture built, first pass (8 Oct 2026)
+Context: Ross: start the Our Culture page. Sources: client PDF "24 — Careers — Our Culture" (screens p53–54, Design Reference p26: hero, Learn · Teach · Reach cards each with an "In practice" line, Our people + Safety & quality, the five HOP principles, three FAQs, "Want to be part of it?"); live /careers/ (the comfort-zone paragraph and the fourth value). The dev page and the dev People leaves are empty. No question put to Ross; defaults below, for review.
+- [x] Hero Text on navy, as the PDF's gradient hero (the calm-sea photo already heads Careers and About); lead one sentence, the PDF's "Learn. Teach. Reach. Within Reach —" opener cut
+- [x] Values as Card grid Rows, row cards (Sustainability's pattern): pictogram and value, then About's value statement (company.ts, not retyped) and the PDF's "In practice" line as the proof line. Never leave anyone behind added as a fourth row, as on the Careers overview; its practice line names the Stop the Job policy and the 2021 "We are one team" campaign (both real, hseq.ts)
+- [x] Our people + Safety & quality as two photo cards (2 cols, white on tint): new photo `team-operations-centre.jpg` (live site, "Operations Engineer Geir Clement Wagen"), and the HSEQ hero deck photo, each linking on (Our offices, HSEQ)
+- [x] HOP as Split media Numbered list beside the intro (docs/03: "5-up → numbered list"), the PDF's wording
+- [x] FAQs: new topic `culture` under Careers in `faqs.ts`, the PDF's three questions; the Code of Conduct answer points to HSEQ, where the policy is published (the PDF said Sustainability)
+- [x] CTA Panel: the PDF's wording, View vacancies (HR-Manager), the named recruiter, as the Careers overview
+- [ ] **To confirm with Reach:** the HOP copy (the PDF notes it is the industry-standard five principles, not a Reach programme); "A team across nine countries" became "four countries" (nine is where Reach has worked, the offices are in four)
+- [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll, card actions aligned, one h1, axe 0 violations; the three FAQs also list on /faq/ under Careers
+- [x] Figma: page frame 454:17974 on Pages (desktop only; no mobile frame yet). Needed two component additions after all: a mirrored Card Row (Q138) and Split media Show 5th item (the HOP list has five)
+
+### Q126. FAQ page, and FAQs as one post type (7 Oct 2026)
+Context: Ross: build the FAQ page, gather every FAQ made so far, and set them up as a post type so the move to WordPress is smooth. There were 58 FAQs on 19 pages: 7 sets in data files, 12 typed inline in pages; three questions repeated across pages (offices ×3, R&D ×2, published research ×2), and seven answers said "above" or "on this page". Client PDF Design Reference p30 / screens p61–62: hero, jump chips, five groups of four drafted questions, "Still have a question?" CTA.
+- [x] The FAQ page holds every FAQ, each once, grouped as the main navigation: General (Home, Contact, Explore 3D World) · Services · Assets · Company · Investors · Careers, so each page's "See all FAQs" lands on a group that holds its questions (Ross)
+- [ ] The PDF's curated four per group (about 20)
+- [x] Duplicates merged into one post tagged to several pages; the seven "above / on this page" answers name the page instead, so every answer reads right on its page and on the FAQ page (Ross). Home's "Where does Reach Subsea operate?" (typed offices list) is now the shared, data-built "Where does Reach Subsea have offices?"
+- [ ] Keep page copies as they are
+- [x] The PDF's extra drafted questions (dividend policy, outside oil & gas, trainee programme…) are not added now: they come with the pages still to build (Ross)
+- [x] `src/data/faqs.ts` is the FAQ post type: `faqs` (slug, question, answer, topics; list order = `menu_order`), `faqTopics` (the hierarchical `faq_topic` taxonomy: six parent terms = the FAQ page's groups and their overview pages, child terms = the other pages), `faqsFor(topic)` for a page, `faqGroupsForHub()` for the FAQ page (each FAQ under its primary topic's group), `faqHubHref(topic)` → `/faq/#<group>`. Answers that quote figures, people or lists are still built from the data files. All 19 pages now ask for their topic; each page's questions, order and open item are unchanged (checked)
+- [x] Built `/faq/`: Hero Text on navy (PDF title, lead "Answers to what we are asked most, organised by topic.") · Subnav In-page (six groups) · Accordion Split × 6, white / tint in turn, first item open in each · CTA Panel (tint, the PDF's "Still have a question?"). One FAQPage JSON-LD for the page (new Accordion `structuredData` switch, off on the FAQ page); Services group title "Services & technology" (the PDF's longer title broke over three lines)
+- [x] Fix found on the way: a Split accordion's sticky header slid under a docked Section subnav when the header came back on scroll-up (Services, the service pages, now the FAQ page). It now docks below the subnav (measured: 24 clear, header hidden and shown)
+- [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll, chips scroll sideways on phones, `#faq-{slug}` and `#<group>` deep links open and clear the subnav; axe 0 violations
+- [ ] Figma after approval: FAQ page frame (no new components)
+
+**Answer:** every FAQ, grouped; merged and reworded; new questions with their pages.
+
+### Q125. Charter agreements built as a live chart (7 Oct 2026)
+Context: Ross: next the charter agreements page, with lots of care for the UI and UX, thought through so the client can add the data in WordPress neatly and easily. Sources: client PDF p20 / screens p42–43 (two Gantts 2025–2029, five bar styles, Normand Jarstein as a Project charter, the owned Reach Remote fleet in a second chart, banner and footnotes, CTA, no FAQ) and the Q2 2026 report p13–16 (every period, owner and the "2Q26 status" line per vessel). No question put to Ross yet; defaults from the sibling Investors pages.
+- [x] Reverses Q26 (presentation slide as an image): a chart drawn from structured data, so a charter change is one edit in WordPress and the page can't go stale against the report
+- [x] Where the data lives: fields on the **Asset** post (Charter field group: type, start, firm end, options repeater in months, quarter status, note), not a repeater on the page; the block has no data fields and queries the posts. Period wording ("Apr 2022 – Apr 2027, 2 × 1-year options") is generated, never typed. Prototype: `src/data/charters.ts` (joined to assets.ts by slug, so the other chat's assets.ts was not touched)
+- [x] One chart on one time axis, not the PDF's two: Long-term charters · Project charter · Owned vessels as groups, so every bar is comparable. Rows sorted by when the firm period ends, so it reads as a staircase of expiries (what investors look for); newbuilds last
+- [x] Four bar styles, not five: firm period sage-400; each option its own lighter segment (sage-200) with a 2px gap, so "2 × 6-month options" reads as two; Owned a 4px navy rule (a shape, not a fifth colour; it has no end to show); Joining the fleet a dashed outline (the "not yet" dash from Reports and the Financial calendar), starting today at the earliest since a newbuild can't have joined in the past. Project charter is a group heading, not a bar style
+- [x] Today line through every row, the past washed in tint; the axis rolls (last year + 4) and docks under the subnav while the chart scrolls
+- [x] Each row opens (whole row clickable, the name is the button): vessel owner, "If every option is declared: to April 2028", the Q2 2026 status, a note (Viking Reach sale; Reach Remote 3 & 4 EU funding), Fleet overview link. "Show all Q2 2026 updates" opens every row. Rows deep-link (`#charter-viking-reach`). No JS: all open
+- [x] PDF banner, footnotes and the Olympic Taurus correction note dropped (the data is now current); Viking Reach carries the Assets "Sale agreed" badge
+- [x] Text hero on navy (Q124), CTA panel with the PDF's heading and the IR contact, on white (the block above)
+- [x] Measured: rows all 86px at 1100 (name column 5 of 12 between 900 and 1279 so the period stays on one line); opening rows and Show all move nothing sideways; the Show all button keeps its width when its label changes; no sideways scroll at 375. axe: 0 violations, rows closed and open. html-validate: same as the Financial calendar (no block-level findings). Build passes
+- [x] Ross: point the Investors overview card here. The bento's one-pager card is now "Fleet · Charter agreements", no PDF badge, "See the charter timeline" → this page
+- [x] Ross: the Reach Remote fleet in a separate graph. Charter timeline gains `fleet` (Chartered · Owned); the page has two, both white, same time window: the charters (Long-term · Project groups), then "Reach Remote fleet" (the PDF's point: owned and operated, so outside the charter backlog). With one group the chart has no group heading and the rows are `h3`. Owned is a full navy bar again in its own chart (the 4px rule was only to keep it quiet beside the charters); its row reads "In operation"
+- [x] Ross: the "Today" key entry dropped; the axis labels the line. Each chart's key lists only the styles it uses
+- [x] Ross: Reach Remote 1, 2, 3 and 4 as separate rows (each with its own Q2 2026 status, deep links `#charter-reach-remote-1` …). charters.ts rows take a `unit` (index into the pair asset's `unitNames`); WordPress: one Asset post per vessel (docs/09 §3)
+- [x] Ross: what happened to the PDF's small print? Most was cut or hidden in the rows, and real facts were lost. Restored as visible numbered footnotes under each chart (Ross chose this over keeping them in the rows), the number beside the vessel's name, each fact said once (no longer in the open row): Viking Reach (MoA 4 Aug 2026, close Q4 2026, more than NOK 200m liquidity, gains about NOK 70m, the bar shows the charter before the sale), Viking Vigor (delivery second half of 2026), Normand Jarstein (Black Sea and Mediterranean campaign, a project charter as in the presentation), Reach Remote 3 and 4 (EU Innovation Fund, no delivery date, bar marks the build; one note shared by both rows). All from the Q2 report (p3, p12, p54); the PDF's ~NOK 65m gain is replaced by the report's ~NOK 70m. Not restored: the banner's Olympic Taurus correction and the † Taurus footnote (internal editing notes)
+- [ ] The PDF linked a "Reach Remote 3 & 4 build & EU funding report"; add the link to the note once that page exists (`/assets/reach-remote/3-4/`, not built)
+- [x] Ross: below 900 the chevron moves to the row's top right, as the Accordion, so name, period, bar and open detail share one left edge (measured: all at 24, chevron's right edge on the plot's at 351, 375 wide). From 900 it stays left, where the name column's right end meets the plot
+- [x] Ross: what happened to the project charter pattern? The PDF marked Normand Jarstein three ways (navy striped bar and lighter striped option, a key entry, a PROJECT CHARTER badge) plus a divider label. Kept: the divider, as the "Project charter" group heading, and footnote 3. Ross chose the group heading only (over restoring a striped bar, or a live comparison): its firm period and option work like the long-term charters', so the same styles keep them comparable; navy means Owned on this page; stripes would read close to the dashed "joining" style. If Reach (Jorunn's Sep 2026 correction) asks for the striped bar, it is a new segment kind in CharterTimeline plus a key entry
+- [ ] assets.ts keeps its verbatim `charter` strings for the Assets cards; once approved, the cards should read the generated text from charters.ts so the period exists once (another chat's file)
+- [ ] Ask Reach: Offshore Surveyor's "1 year option + x 6 months option" (how many 6-month options; drawn as one); the firm periods for Viking Vigor and NB76 once signed; whether a vessel's quarterly status may be published as is
+- [ ] Figma after approval: Block/Charter timeline, Bar/Charter segment, page frame
+
+- [x] Ross: stay truer to the client PDF and include its AGM / EGM explainer. Asked: (1) where → **opens the meetings section** (recommended; meetings stay first): "General meetings" header, the PDF's two columns in its words (no em dash, no AGM/EGM abbreviations), then "Notices & minutes" over the archive; (2) how far → **PDF headings and lead** (recommended): "Articles & policies", "Notices & minutes", the PDF's hero lead with its listing clause cut (three lines → two; the listing is in the first FAQ). No extra eyebrows. The explainer's paragraphs share rows with each other (subgrid), level at 900–1440. Toned down (Ross): titles H4 size, copy Body/Small, now one line each from 1200 and level at every width. Then moved under the rows (Ross: "could even be moved under the calendar lists"; agreed, the papers are the task, the explainer background). With nothing between the section header and the rows, the "Notices & minutes" subheading went (two headings for one list); its wording is now the section intro. Under the rows it went back to full type (H3 titles, Body copy; Ross); the shared-row alignment removed, since at H3 it left an empty line above the AGM paragraph. EGM heading shortened to "Called between annual meetings" (Ross). Open rows cut to Next, 2026 and 2025 (Ross: hide 2024 and the 2023 meetings); "Earlier meetings, 2012–2024"
+
+**Answer:** awaiting Ross's review.
+
+### Q124. One hero image across the Investors pages? (7 Oct 2026)
+Context: Ross: shall we use the Investors overview's hero image across all the sub pages? The section had three photos (Overview calm horizon, Why invest wind farm, Reports Go Electra) and three navy text heroes (Governance, Financial calendar, Share information). Also Ross asked to make the Financial calendar's three "Date to come" rows compact, then to undo it (reverted, no change).
+- [x] Rule by page type: Overview and Why invest keep their own photos; every data page (Reports, Governance, Financial calendar, Share information) uses the navy Text hero (Q57). Reports drops Go Electra, which was busier than the calm-hero rule anyway (Q120) (Ross)
+- [ ] The Overview photo on all seven pages
+- [ ] The Overview photo on the four data pages
+
+**Answer:** rule by page type.
+
+### Q123. Keep the Share information pill? (7 Oct 2026)
+Context: Ross: do we still need a share info pill? The 20 largest shareholders and the announcements are on Reports & presentations, and Overview and Why invest show the share chart (cropped), but six links pointed to `/investors/share-information/`, which wasn't built. The full OMS share page also has the profit calculator, returns against the index, last trades, order depth and company facts (ISIN, shares issued), which no other page shows.
+- [x] Keep, live data only: the full OMS share page; shareholders and announcements stay on Reports (Ross)
+- [ ] Keep, and move the shareholders and announcements there (Reports documents only)
+- [ ] Drop the pill and page, re-point the six links
+- [x] Built: Hero Text · Subnav · Embed Iframe (the OMS standard page) · CTA Panel. OMS switches to one column below ~838 wide, so the frame is 2352 tall at 900–960 (page CSS), 1792 above
+- [ ] Reports' "20 largest shareholders" block has no anchor, so this page can't link straight to it (another chat's file)
+
+**Answer:** keep, live data only.
+
+### Q122. Financial calendar built (7 Oct 2026)
+Context: Ross: start to build the financial calendar page. Sources: client PDF p48 (Design reference 21: hero, a short list of upcoming dates with Confirmed / Estimated pills, CTA, no FAQ) and the live Financial calendar (reachsubsea.no/investors/financial-calendar/, read 7 Oct 2026), which has every 2026 date and Q4 2026 on 16 Feb 2027. No question put to Ross yet; defaults from the sibling Investors pages.
+- [x] Real dates in `investor-calendar.ts` with a `confirmed` flag: Q4 2025 13 Feb · annual report 2025 30 Apr · Q1 5 May · AGM 28 May · Q2 18 Aug · Q3 17 Nov 2026 · Q4 2026 16 Feb 2027 (was the placeholder 11 Feb). The 2027 annual report, Q1 and AGM stay placeholders (`confirmed: false`); the page shows them as "Date to come", never their date
+- [x] A new **Date list** block (docs/05 §2.25) in the Results / Meeting archive row language, used twice: Key dates (upcoming; Next on Navy, as the page's main task, with countdown and Add to calendar; later dates dashed) and Earlier dates (this year's past dates with the files each produced, so the calendar also answers "where's that report?")
+- [x] "Add all confirmed dates to your calendar": one .ics with every confirmed upcoming date
+- [ ] The Investors overview Track still draws the three 2027 placeholder dates (AR 26 · Q1 27 · AGM). Hide unconfirmed markers there too? (not this page's file)
+- [ ] Reports & presentations: Q4 2026 now reads "16 Feb 2027 · provisional"; it should be confirmed. reports.ts `CONFIRMED_DATES` could read `confirmed` from investor-calendar.ts (another chat's uncommitted file, not edited)
+- [ ] The live calendar says Q4 2025 on 13 Feb 2026; reports.ts has published 12 Feb (upload date). Calendar date used here
+- [ ] Ask Reach: the 2027 dates (annual report, Q1, AGM), and whether results days have a fixed time/webcast to show in the rows
+- [ ] DateList, ResultsArchive and MeetingArchive each carry a copy of the row CSS; fold them into one shared Row part once the three pages are approved
+- [x] Figma (Ross: update Figma for the page): Date tile Type=TBC, Date row part, Block/Date list, page frame 426:12486 (ledger phase4FinancialCalendar7Oct)
+
+**Answer:** pushed to Figma.
+
+### Q121. Governance & general meetings built (7 Oct 2026)
+Context: Ross: start the page, thinking about balance and layout and what the other pages taught today. Sources: client PDF p46–47 (committee cards marked illustrative, empty archive), the live General meetings page (20 meetings, 2012–2026), the dev Corporate Governance page (governance, IR and dividend policies, articles, remuneration policy), annual report 2025 p78–84 and the 2026 AGM papers.
+- [x] Built as a sibling of Reports & presentations: the meetings first, because the notice and minutes are what most visitors come for; a new **Meeting archive** block in the Results archive's row language (Navy Latest, dashed Next, files in aligned columns) rather than Data list type Documents (another generation of table)
+- [x] Next AGM 2027: no date yet (the live financial calendar stops at Q4 2026), so greyed "Date to come · usually late May", no calendar link; it switches to date, countdown and Add to calendar when `nextGeneralMeeting.date` is set and confirmed
+- [x] Ross: the files should align with the text. Stacked rows (below a 1232 container, ~1360 viewport; at 1080 the titles squeezed to two lines at 1255) now start the files on the title's left edge, not under the date tile; below 480 one per line (measured: title and first file at the same x at 1100, 800, 375)
+- [x] Four years open, 2012–2022 under "Earlier meetings" (the Data list spec's archive toggle); the toggle stays put and opens below itself
+- [x] Real structure instead of the PDF's illustrative cards: Board (5, elected each year from 2026), nomination committee (Geir Flæsen, Rune Lande, Didrik Leikvang, re-elected to 2028), audit and remuneration committees (3 Board members each), 2 × 2 so the rows read "elected by shareholders" over "appointed by the Board"
+- [x] Ross asked where the policy rows came from: sourced row by row in governance.ts. Two rows overstated their source and were corrected: "Excludes" → "Adjusted for" (the policy says adjusted, not excluded) and "Open to all, with webcasts" → "Open, in person or online" (the annual report says open physical or digital presentations; there are no webcasts for the last three quarters)
+- [x] Dividend and IR policies kept on this page (Why invest links here for them), as two Spec-row lists side by side (the HSEQ campaigns pattern), values cut to one line
+- [x] Governance documents as HSEQ's Policies block on navy. Ross: the statement as a header action beside a block of file links felt like too much, so it is the first file in the list, no action; the Transparency Act statement dropped to keep 3 × 2 (it has its own page, linked from the footer)
+- [ ] Ask Reach: the 29 May 2017 AGM minutes (the live link opens the Feb 2017 EGM notice); the 2012 "General Meeting" files are both EGMs (28 Nov, 18 Dec 2012), listed as such; an English articles of association; the 2027 AGM date
+- [ ] Why invest's "Dividend & IR policy" link could point to `/investors/governance-meetings/#policies` (not edited: another chat's uncommitted file)
+- [ ] investor-calendar.ts has a placeholder AGM 27 May 2027 (not this page's file)
+
+**Answer:** awaiting Ross's review.
+
+### Q120. Reports & presentations built fresh (7 Oct 2026)
+Context: Ross: build the page fresh in the new design system, from the client PDF (p44–45) and a good look at the dev site, thinking hard about the UX. Dev: 4 tabs (Quarterly · Annual · Sustainability · Misc), a Latest card per tab, a year × quarter grid of 15px icon links, data to Q2 2025 (with two misplaced 2023 cells). PDF: accordion by year, chip list, four document cards, a hand-typed top-5 shareholder table and visible accuracy notes. Live site: the full archive to Q2 2026, which is the data used.
+- [x] Covers: downloaded the 18 annual and sustainability report PDFs (Ross, yes) and rendered page 1 of each into `public/images/reports/`; PDFs deleted. Since the fourth pass only 2023–2025 are used
+- [x] Three blocks, one per kind of document, each shaped by how it is used: **Results archive** (year tabs, one row per quarter, labelled links in aligned columns), **Report shelf** (annual reports as covers, sustainability reports beside them), **File list** (ten other documents as dated rows). New blocks rather than editing Data list or Media gallery, which have another chat's uncommitted changes
+- [x] No separate Latest card: the current year opens first, so the latest results and the next date (with Add to calendar) are the first thing under the hero. The current year always shows four quarters (later ones in outline with their Financial calendar date), so every year is the same height and a tab switch never moves the page
+- [x] Second pass (Ross: Q3 took all the attention, it should be the latest): Latest Q2 is the one Navy row; Q3 Next and Q4 are dashed outlines with no fill, Q4 greyed. Why invest's report cards keep Next on Navy: each page weights its own main task
+- [x] Third pass (Ross: why no Add to calendar on Q4 2026; a hover on the wide bar?): Add to calendar only for dates Reach has confirmed (`CONFIRMED_DATES` in reports.ts); Q4 2026 is our placeholder, so it reads "11 Feb 2027 · provisional", greyed, no calendar link. No row hover: a row holds 2–3 separate files, so it would promise a click that doesn't exist; each link has its own hover
+- [x] Fourth pass (Ross): Feb 11 tile fainter (an outline tile, since navy-400 failed contrast at 2.96:1); 2012–2020 quarterly rows: year column 80 at desktop so Q1 clears the year; annual reports: only 2025–2023 as covers, 2012–2022 as compact rows (Report · ESEF · Sustainability report, the standalone sustainability reports beside their years; the 15 older cover images deleted); Other documents: date and title were 4px apart (a subgrid quirk: each row's gap overrode the list's), now 32
+- [x] Real publication dates (webcast day, or the file's upload date from 2023 on); none shown where unknown. Webcast and file links only where a file exists
+- [x] Largest shareholders not hand-typed. Banner, footnotes and reference-data badge dropped
+- [x] Fifth pass (Ross: the 20 largest shareholders and the announcements block were missing): both back, live from OMS, after Other documents. I had dropped them because Share information (Q27) has the list and Newsweb was in the closing panel; that broke our rule that a hub page keeps the PDF's key content. Embed Iframe, sized to each component's measured content height per breakpoint; the closing panel's action is now Contact us (Newsweb has its own block); the shareholders FAQ points to this page
+- [x] Embed Iframe (Ross: careful with the rounded corners, the white frame on tint): the provider page now sits 16 inside the frame, so OMS's table rules no longer run into the corners; new Tablet height (600–899) and Bleed on mobile (edge to edge under 600, since the shareholder table needs 375). docs/05 §2.13
+- [ ] Between 600 and 899 the announcements frame can show up to ~100px of white under the last row: the OMS list gets shorter as it widens, and a fixed height must fit the narrowest width. Ask OMS whether the components can post their height (auto-resize), which would remove this on every page
+- [x] FAQ: the PDF's three plus "What is the ESEF file?", since the shelf labels it
+- [ ] Ask Reach: webcast links for Q4 2025, Q1 2026 and Q2 2026 (none on the live site); the Q1 2021 report (the live "Report" link opens the presentation)
+- [ ] Placeholder dates to fix at source (not this page's files): Annual report 2025 was published 30 Apr 2026 (investor-results.ts says 26 Mar); Q1 2026 on 5 May 2026 (investor-calendar.ts says 24 Apr); Q4 2026 (11 Feb 2027) is still a placeholder
+- [ ] Hero: Go Electra, as in the PDF; it is busier than our calm-hero rule (harbour town behind). Swap if Ross prefers
+
+**Answer:** as ticked.
+
+### Q119. Uncrewed days figure; Sustainability share bars (7 Oct 2026)
+Context: Ross on the Sustainability "Revenue outside oil & gas" panel: should it be in a box, is the data factual, could it be displayed nicer.
+- [x] Revenue split checked: Q2 2026 report p29, first half 2026 Renewable/Other 51 % (39 %); correct. (Q2 alone 46 % (42 %), p28.)
+- [x] "750+ uncrewed operational days, per quarter" was wrong: two Reach Remote vessels can't log more than ~182 days a quarter, and the Q2 report (p18) gives "~750 uncrewed operations days" with no period. Now **~750 · Uncrewed operational days to date** (placeholder wording until Reach confirms), from `key-figures.ts` on all six pages; Home and Why invest no longer hard-code it
+- [ ] Ask Reach: is ~750 a running total, and since when? Source for the 90 % fuel saving (not in the Q2 report)
+- [x] Why invest donut: the two shares sit at the card's left and right edges at 1280+ and on phones (the base card's grid centring had shrunk the labels row to the middle). At 768–1279 they stay side by side under the text
+- [x] No "H1"/"H2" shorthand in copy: "first half of 2026", "second half of 2026"; the ring centre reads "First half 2026" (Ross: what does H1 mean?). Quarters always "Q2 2026" (Ross): Technology & Innovation's "2Q 2026 report" and the Fleet register demo's "3Q 2026" changed (the Assets badges already read "Joining 2026")
+- [x] Share bars redesign (no box, the 50 % line as the story, one label per bar, no legend, the three figures split out): Ross chose to brief the Sustainability chat rather than edit its uncommitted page here
+
+**Answer:** as ticked.
+
+### Q118. HSEQ campaigns rebuilt from the poster (7 Oct 2026; renumbered from a clashing Q117)
+Context: Ross: the campaigns page looked messy; write the poster's content out on the page, the first section a text/media block (ref/REA26 2842.110 Q2 HSEQ Manual handling V3.pdf), and make every poster a PDF. Then a review round (Ross: "tell me what's wrong… use taste and impeccable… think about the repetition, eg Stop, think, lift"; a better illustration supplied).
+- [x] Order follows the poster: intro (Split media Image, Ross's square worker illustration as `artwork`, shown whole, no tint) · Stop · Think · Lift safe as three white icon cards (shield-stop, brain, shield-tick; the poster's questions as Card `scope`) · The golden rules beside Offshore risks · archive · CTA. One run on Tint, the two blocks under the intro `joined` (Ross: the blocks felt disconnected)
+- [x] Review round: "Stop / think / lift" said four times (title, slogan, step H2, CTA). Kept once in the title and once as the card titles: the steps' H2 dropped (`ariaLabel`), the CTA slogan dropped for the poster's feedback line
+- [x] Review round: duplicate CTAs. The intro carries Campaign poster (PDF) only; the CTA carries Send us your feedback only. The sources line sits as fine print under the 1-in-3 figure it supports
+- [x] Review round: tablet. Pictogram card rows at 600–767 (and a trio at 768–899) put the 96 pictogram beside the text instead of over a narrow column; applies to every open icon-card row (Home's services too)
+- [x] The golden rules: the sage panel with a "20 kg" display figure felt wrong (Ross). Now Spec rows like Offshore risks, condition → action: Max limit 20 kg · Every lift: Never routine · In doubt: Stop · Need help: Always ask (the poster's four rules, split into label and value). The `bg/accent` and `text/on-accent` tokens and Split media `panel`/`figure` were removed
+- [x] Archive: a poster opens its PDF in a new tab (the browser's viewer) with a Poster (PDF) link under the title, no lightbox (Ross). Originals: Q2 2026 and Q1–Q3 2021. **Placeholder** PDFs made from the poster images for the other 18 (`public/files/hseq/placeholder/`); ask Reach for the originals
+- [x] Feedback address hseq@reachsubsea.com (the poster's; dev had .no)
+- [x] brain and shield-stop: Ross's 2.5 stroke redraws (Figma 421:9718, 421:9717), looped in shield-tick's family: Stop's cross rewinds and redraws, the sign shakes "no", the shield breathes; Think's folds rewind and redraw in three waves top to bottom
+- [x] File links follow one convention site-wide (Ross: "Download (PDF)" had crept in): the document's name then "(PDF)", no "Download" verb. Renamed: Download report (PDF) → Report (PDF) ×4, Download (PDF) → One-pager (PDF), Download spec sheet (PDF) → Spec sheet (PDF), Download the poster (PDF) → Campaign poster (PDF) / Life-Saving Rules poster (PDF), archive "Download" → Poster (PDF). Figma: Document card and Spec link defaults to rename on approval
+- [ ] Waiting on Reach: the 18 poster PDFs
+- New: Split media `artwork`, `joined`, `pairSpecs`/`pairHeading`, `titleHidden`; Card grid `ariaLabel` and tablet icon rows; Card Navy inside a Navy section raised to navy/700; Media gallery poster `file`. Figma variants to add on approval
+
+**Answer:** as ticked.
+
+### Q117. Sustainability page: stats, ESG layout, UN goals (7 Oct 2026)
+Context: client PDF p36–37 ("15 — Company — Sustainability"), dev `/company/hseq/sustainability/` and its four children, 2Q 2026 report. Ross: start the page; rethink the stats bar; ESG cards "at 2 cols, each one stacked"; make the UN goals more interesting, as the dev site does. Claude built its recommendation for each; taste calls put to Ross after the first look.
+- [x] Stats bar → new **Share bars** block (§2.19). The PDF's four figures were unrelated, with long labels, and one was wrong. The one figure that is moving leads: revenue outside oil & gas, first half 2025 → 2026, 39% → 51% (2Q report p29), as two 100% bars with a 50% tick, beside three Key figures (750+ uncrewed days per quarter, up to 90% fuel saving, 45% GHG cut targeted by 2030, new key `ghg-target`). The PDF's 41% (full year 2025) is replaced by the latest year-to-date pair
+- [x] Dropped "4 ISO management-system certifications" and the ISO 31000:2018 tile: ISO 31000 is a guideline standard that cannot be certified, and live HSEQ lists three. The certificates show as About's strip (three)
+- [x] ESG pillars → Card grid **Rows**: one wide white card per pillar on tint, PDF wording, priority badge, the PDF's proof line as the card's meta (icon on its first line); the card splits into claim (cols 1–5) and copy (cols 7–12) from an 880 card. Read as "each card in two columns, stacked", not "header left, cards right"
+- [x] UN goals → new **SDG goals** block (§2.20): the UN's official tiles (from the dev media library, 400px) as tabs, the dev site's actions for each goal under them (typos fixed). Measured: switching goals moves nothing at 1400 · 1100 · 800 · 375; keyboard arrows/Home/End; axe clean
+- [x] "Read the full picture" folds into the closing CTA panel (no second navy band): Annual report 2025 (the Latest results record, file still `#`), Policies & Code of Conduct → HSEQ, and the dev site's sustainability contact (CFO Arne Joa, from `people.ts`)
+- [x] FAQs: the PDF's first two answers only pointed at the page ("See this page for…"); they now answer (the goal list built from the data)
+- [x] Copy: "529 employees" → the site's 500+ (key figure); em dashes swapped for commas
+- [ ] For Reach: "a Board with 43% female representation" (PDF) and dev's "Group Management 20% women" are left out. 43% is 3 of 7 and the current Board has five (`people.ts`); ask for current figures. Also confirm "18% of our workforce is women today" and the 45% GHG target's base year
+- [x] ESG pictograms (Ross, 7 Oct 2026: his 2.5 stroke redraws, Figma 421:9631 `globe-hand`, 421:9647 `handshake`, 421:9691 `legal`): Environmental, Social, Governance, 96 above each card's eyebrow (Card grid Rows takes icon media). Loops (3.2s, movement and trim only): the hand lifts the globe while its land redraws west then east; the handshake keeps its clasp-and-shake loop (the redraw replaced the 22 Sep trace, so Contact's Sales card gets it too); the scales tip one way, then the other, and settle, each pan moving with its end of the beam
+- [x] Dev extras (Ross): Sponsorship becomes a child page (`/company/sustainability/sponsorship/`, to build) with a teaser card on the hub; Material Sustainability Matters (double materiality, ESRS) folds into the hub's ESG intro
+- [x] Hero title (Ross): keep the PDF's wording (3 lines at 1440, 5 at 375); the lead is already one sentence
+- [x] ESG cards, second pass (Ross: "very unbalanced"; the claim, badge and proof crowded the left and the copy sat alone on the right). Ross suggested the pillar as the heading, the priority as the eyebrow and the claim over the copy; Claude agreed, with the priority over the claim, since it describes the claim ("Our biggest lever" → technology choices), not the pillar. Now: the pillar in H2 size top-left and the 128 pictogram on the card's foot (cols 1–5); eyebrow (priority, no pill), the claim in H4, the copy, then the proof line in bold, no icon (cols 7–12). Stacked: pictogram, pillar, eyebrow, claim, copy, proof. Card gains two optional fields for this, `lead` and `note` (docs/04 §13). Governance's copy no longer repeats the ISO 27001 line that the proof now states straight after it
+- [x] ESG cards, third pass (Ross: still unbalanced, and a pictogram on a card's foot had no precedent). Splitting a wide card in two leaves one side half empty whatever goes where: the content is one heading pair and ~80 words of copy. So the block splits instead, as Accordion Split on the same page: the Section header in cols 1–5, sticky under the subnav (cols 1–4 at 900–1199), and the three cards stacked one per row in cols 7–12 (6–12), each a plain icon card in one column: 96 pictogram, eyebrow (priority), title (pillar, H3), lead (the claim, `Lead` style), copy at ~60ch, then the proof line in bold. Below 900 the header sits above. The second pass's H2-size title and foot pictogram are gone. Pending: the Material Sustainability Matters text (double materiality, ESRS) can join the sticky header's intro
+- [x] ESG cards, fourth pass (Ross: the sticky left column did no work; Claude agreed, since the header is three short lines and nothing changes beside it, the same lesson as Q106 on Leadership). Now as Leadership's board rows: header full width above, one open row per pillar (no card box), the pictogram on a square tint tile where the portrait sits (200; a fifth of the container from 1320; 160 below 1200; 112/96 beside the heading on phones), beside one text column: priority, pillar (H3), claim (Lead), copy (max 44rem), proof line in bold. The section moves to white (the tiles carry the tint), so it alternates with the Share bars above
+- [x] Share bars, second pass (Ross's review): no panel, the block on tint; the heading is the story ("More than half our revenue now comes from outside oil & gas"); 51% said once as the big figure with "First half 2026, up from 39%"; slim 32px bars with only the share marked (its percentage inside, its name once over the bars, no legend), the rest a quiet track, the 50% tick the line the 2026 bar crosses; the three figures (~750 uncrewed days to date, from the other chat's key-figures fix, up to 90% fuel saving, 45% GHG target) in their own row below, rules between
+- [x] Share bars, third pass (Ross): the text column (sentence heading, 51%, "First half 2026, up from 39%") in cols 1–5 and the bars in cols 7–12 on its bottom line; the 50% marker dropped (the heading and the figure already say "more than half"; the bars show the change); the three figures move to a **Stats band Feature** under it (`joined`, new option: no top padding), ~750 uncrewed days leading in navy. No donut here: Why invest already has one for the same measure
+- [x] One revenue split site-wide (Ross): the 2Q report gives 2Q alone (p28: 54% oil & gas / 46% renewables & other) and the first half (p29: 49% / 51%). Why invest's donut showed 2Q, so a reader saw 46% there and "more than half" here. Both now use the first half: `revenueMix` is derived from `revenueShift`, the donut centre reads "H1 2026", and its text says "more than half of revenue: 51% in H1 2026, up from 39% in H1 2025"
+- [x] ESG order (Ross: "Why it matters now" above "Governance" didn't read): the PDF's priority labels are dropped, since they describe the claim, not the pillar, and the claim already carries the priority. Each row reads pillar → claim → copy → proof
+- [x] SDG goals, second pass (Ross: cramped, and the tabs didn't carry over to mobile): no tabs. Nine white cards on tint, each the UN tile beside "Goal N" and the goal's name as text, then the ticked actions; three across from 900, two at 600–899 (the odd last one spans), one on phones
+- [x] Share bars, fourth pass (Ross): the heading across the top on two lines; the bars in the left column and the 51% as a ring in the right (the Why invest donut, now a shared **Donut** component that Figures uses too), "First half 2026, up from 39%" in its centre
+- [x] Stats band Feature gap (Ross: "why such a big gap?"): figures were content-width with the spare width in the gaps, so two figures beside the lead left half the panel empty and pushed the last to the edge. With two figures they now share the width equally, a rule between (Tech & Innovation's band gets the same fix; three or more figures unchanged)
+- [x] ESG rows, fifth pass (Ross): pictogram, pillar and claim in cols 1–5; copy and proof line in cols 7–12, starting level with the pillar heading; no tile, no card
+- [x] SDG cards (Ross: disjointed beside the tile): tile 120 (96 on phones), "Goal N" and the name under it, all on one left edge with the list
+- [x] SDG goals without cards (Ross): the tiles are already strong coloured blocks, so the white cards were a frame round a frame. Open items on tint, rows `space/64` apart (48 on phones)
+- [x] Share bars fifth pass (Ross): the heading with the bars right under it in cols 1–7, the ring beside the pair in cols 9–12 (the bars had sat low under the full-width heading)
+- [x] ESG rows: pictograms at the Services overview's service-line size (200 / 160 / 96), the copy starting level with the title (Ross)
+- [x] Stats band Feature rows: figures in equal columns, each left-aligned after its rule, at every count (Ross, Company: the middle figure floated and the last sat on the right edge)
+- [x] Share bars sixth pass (Ross): the block on white (the Stats band keeps tint, no longer joined); bars 48 tall on the heading's left edge, periods under them, "Oil & gas" named over the right end; ring up to 400 with a thinner stroke (6) so the centre text has room; bars and ring side by side from 600
+- [x] Counterpart colour (oil & gas) in the bars and ring: **navy/100** (Ross; navy/200 read grey; brand navy would compete with the sage and vanish on Why invest's navy card). Comparison: review/sustainability-share-bars-colours.png
+- [x] ESG rows split 30/70 (Ross): cols 1–4 | 6–12, the Accordion Split pattern (was 1–5 | 7–12). Comparison: review/sustainability-esg-ratios.png
+- [x] ESG rows: the copy (body and proof line) centred on the whole first column (pictogram, title, claim), not level with the title (Ross: the top right sat empty). Card wraps description and note in `.card__copy` (`display: contents` unless a layout places it)
+- [x] ESG rows in cards (Ross: tighten them up): Rows `rowStyle="cards"`, a Tint card per pillar on White (Why invest's value-card pattern), gutter apart instead of 96. Comparison: review/sustainability-esg-cards-vs-open.png
+- [x] ESG cards, sixth pass (Ross): the pillar at H2 size beside its pictogram; the copy side opens with the PDF's priority tag ("Our biggest lever", "Our first priority", "Why it matters now") over the claim at H3 size, then the copy and proof line. The tag sits over the claim, not the pillar (that order read wrongly). Comparison: review/sustainability-esg-claim-right.png
+- [x] Backgrounds rebalanced (Ross): Share bars White · Stats band White, joined (white half edged) · ESG White cards on Tint · certificates White · SDG goals White · FAQ Tint · CTA panel Tint
+- [x] CTA panel ground bug (Ross spotted it on Sustainability): the panel's `background` must equal the block above it. 9 pages were wrong (3D World, Assets, Tech & Innovation, Research & publications, Monitoring, HSEQ, HSEQ campaigns, Life-saving rules, Sustainability); all fixed, all 17 panel pages checked. Added to docs/08
+- [x] Site-wide motion rule (Ross): charts lead, figures follow. Where a chart ([data-grow]) and counting figures share the screen, the chart draws first and the figures rise and count 1s later (held 1.2s at most for a half-visible chart); motion.ts `afterCharts`
+- [x] Charts on screen at load draw at once (Ross), even if only partly in view (they waited for 90%, so a chart just under the hero sat half-drawn until a scroll). Further down the 90% rule stays
+- [x] Closing CTA (Ross: two actions plus a contact is too much): only the annual report button stays; Policies & Code of Conduct dropped
+
+**Answer:** as ticked; the Reach items stay open.
+
+### Q116. One hero height across the site (7 Oct 2026)
+Context: Ross: make every hero but Home the same height. Photo heroes already shared `clamp(640px, 47.2vw, 800px)`; the HSEQ child pages' Text heroes were content-height (as short as 343).
+- [x] Text hero takes the Photo hero's height and layout from 900: crumbs at the same place (120 at 1440), title stack 96 from the bottom, 680 tall at 1440. Measured equal on HSEQ, Life-Saving Rules, Campaigns and Why invest at 1440, 1100 and 900
+- [x] Below 900 Photo heroes are content-height (their photo band sits above the text: 532–772 at 375, 634–803 at 800), so an exact match would need empty space; the Text hero gets a floor of `min(140vw, 640px)` instead (525 at 375, 640 at 600–899)
+- [x] Home's video hero is unchanged
+- [x] A Navy Text hero uses the Photo hero's `navy/900` ground, not the block Navy, so heroes with and without a photo match (Ross)
+
+**Answer:** as ticked.
+
+### Q115. HSEQ: one hub and two child pages, hero, figures, campaign archive (6 Oct 2026)
+Context: client PDF p34–35 (one page: hero with six cards over it, certification chips, three related documents, FAQ, CTA); dev splits HSEQ into six child pages (Introduction, Standards, Policies & Code of Conduct, Campaigns, Life Saving Rules, Transparency Act); live `/hseq/` is one long page. Claude proposed one page; Ross: two, since the Life-Saving Rules are a lot for one page and the current campaign can be featured on its own page with the poster archive below, as dev does. Claude agreed for those two only: Standards and Policies would be thin lists on their own.
+- [x] `/company/hseq/` hub + `/company/hseq/life-saving-rules/` + `/company/hseq/campaigns/`. The hub keeps a teaser of each (the nine IOGP icons linking to each rule; a campaign card). Transparency Act stays the legal page `/transparency-act/`
+- [x] Hero: the dev HSEQ Standards deck photo (open deck, one crew member, big sky). Portrait 768 × 1024, so it is soft at 1440: ask Reach for a landscape original
+- [x] No HSEQ figures from the quarterly report (LTIs, spills, ROV uptime): they date the page and belong in Investors
+- [x] Campaigns: the full poster archive (22 posters, 2021 to 2026) as a year × quarter gallery, three years shown, "Show all years" for the rest; the newest campaign (Q2 2026 "Stop & think before lifting") featured above it with its poster copy as page text
+- [x] Child pages use the Text hero on navy under the overlay header (Q57's plain navy Text hero; Ross, 7 Oct 2026, after a first white build). The CTA panel keeps only Contact us: "Back to HSEQ" went, since the breadcrumb and subnav already lead back
+- [x] How we operate (Ross, 7 Oct 2026): a one-column header like Standards, the live intro trimmed to one sentence, then the six areas as icon cards (3 × 2, tint cards on white; 2 × 3 below 1200). Library pictograms: `planner` (Risk management), `life-ring` (Safety), `teach-people` (Employee involvement), `leaf-hand` (Environment), `fingerprint` (Security), `goals` (Quality). Ross redrew all six as 2.5 strokes (Figma 421:9572–9576, 421:9590); each loops once (3.2s): the play drawn towards the target, the ring thrown and bobbing, knowledge passed across and back, the seedling lifted and swaying, the frame closing on a print that redraws from the core, the arrow drawn back and striking
+- [x] Page-wide patterns (Ross, 7 Oct 2026): every full-width block heads with the Section header (stacked Split media too: Lead intro, link at the far end); hairlines only where they help (Spec rows, Accordion, the ISO tiles beside the registrations), none on the policy list
+
+**Answer:** as ticked.
+
 ### Q114. Mobile menu: the 3D World as the desktop menu strip (6 Oct 2026)
 Context: Ross: the Explore 3D World entry could be more of a button in the footer and the mobile menu. Claude: yes for the mobile menu, as the desktop menu strip (Q113's plain row undersold it, and the earlier button floated among mixed links); no for the footer, where a button would be the one loud thing in four quiet link columns.
 - [x] Mobile menu: after the Contact row, a full-bleed `bg/tint` strip (`space/16` padding, `stack/md` above) holding the navy 3D World button at full width, label left, cube icon right: the same button as every Mega menu and the Site menu. The 3D World row goes
