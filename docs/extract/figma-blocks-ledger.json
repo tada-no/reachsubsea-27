@@ -1611,5 +1611,53 @@
       "CTA band Panel without a contact stacks the button under the text in Figma (Home and FAQ); the code puts it at the right. Master fix left for a CTA pass",
       "Search states (matches marked, no-match message, Disabled topics) shown only in the Subnav item doc example, not as a block variant"
     ]
+  },
+  "sweep8OctReports": {
+    "date": "2026-10-08",
+    "context": "Figma sweep batch 1 (8 Oct 2026): the text/on-accent-subtle token (Q143) and the Reports & presentations page (Q120): three new blocks, their parts and the page frame. Ground truth: src/pages/investors/reports-presentations.astro, src/blocks/ResultsArchive.astro, ReportShelf.astro, FileList.astro, src/data/reports.ts, the production build at 1440 and 375.",
+    "variables": {
+      "text/on-accent-subtle": "VariableID:480:22 (Color 7:23; Light alias sage/600 7:44, Navy alias sage/200 7:40; scope TEXT_FILL; WEB var(--wp--custom--color--text--on-accent-subtle))"
+    },
+    "components": {
+      "Badge 87:249": "Tone=Accent 87:233: Label 87:236 fill and the Icon glyph stroke (I87:234;26:151) rebound text/accent → text/on-accent-subtle (see figma-components-ledger.json)",
+      "Results row 484:9566 (new)": "State=Latest/Next/Provisional/Published × Breakpoint: Latest Desktop 484:9413, Mobile 484:9439; Next Desktop 484:9463, Mobile 484:9479; Provisional Desktop 484:9495, Mobile 484:9505; Published Desktop 484:9516, Mobile 484:9542. Props Kicker#484:0, Show kicker#484:9, Title#484:18, Meta#484:27, Show report#484:36, Show presentation#484:45, Show webcast#484:54 (default off). Built from Date tile 293:2307 and Link Small (File / External). Desktop 1312: tile · Text (Kicker UI/Eyebrow text/accent, Title Heading/H5, Meta Body/Small) FILL · Links: three fixed slots 71 / 112 / 85 (a hidden link keeps its slot; Next = one wide slot with Add to calendar); padding space/24 × space/32, gap space/16, radius/lg. Mobile 327 (Layout/Typography Mobile): tile beside text, links under both from the card edge (gap space/12, wrap); padding 24/16/12/16 (Provisional 24 bottom). Latest = bg/default in Navy mode; Next and Provisional = 1px border/strong dashed [3,3], no fill; Provisional title text/secondary, Date tile overridden to an outline (border/default edge, bg/disabled band, text/secondary month, day border/strong); Published = bg/tint. In doc frame 484:9396",
+      "Year row 485:9546 (new)": "Layout=Quarters/Files × Breakpoint: Quarters Desktop 485:9470, Quarters Mobile 485:9492, Files Desktop 485:9514, Files Mobile 485:9531. Props Year#485:0, Show link 1#485:5, Show link 2#485:10, Show link 3#485:15, Show link 4#485:20 (Quarters only). Year Heading/H5, width bound to space/80 (Desktop) / space/56 (Mobile). Quarters: four FILL slots Q1–Q4, gap space/24 (Mobile 16), padding space/8 × space/32 (Mobile 4 × 24), bg/tint. Files: fixed slots Report 71 · ESEF 59 · Sustainability report 164, gap space/32, padding space/8 × space/32, bg/default; Mobile links wrap (gap space/16) and hidden links drop out. Shared by Results archive (report-only years) and Report shelf (earlier years). In doc frame 484:9396",
+      "Shelf item 490:10086 (new)": "Single component: Cover (image fill over bg/disabled, 1px border/subtle, radius/md, aspect ratio locked 16:9) · Caption (paddingTop stack/sm): Year Heading/H5 · Links (Report, ESEF). Props Year#490:0, Show ESEF#490:1. Cover images uploaded from public/images/reports/ (hashes 2025 0b9de1af…, 2024 72d49473…, 2023 8ce96e97…), set per instance. In doc frame 490:10081",
+      "File row 492:10454 (new)": "Desktop 492:10426, Mobile 492:10440. Props Date#492:0, Title#492:3, Show link 2#492:6 (default off), Show rule#492:9. Desktop 1312: Date UI/Label text/secondary (fixed 84) · Title Body/Body FILL · Slot 1 (Link Small File, 112) · Slot 2 (Link Small External Webcast, 85), gap space/32, padding space/4 × 0. Mobile 327: Text (Date over Title, space/4) then Links (space/24, wrap); padding 16/0/4/0. Rule = absolute 1px border/subtle rectangle at the top (Show rule). In doc frame 492:10421"
+    },
+    "blocks": {
+      "Block/Results archive": "set 486:10207 on doc frame Blocks / Results archive 484:9396 (x -10768, y -5020, under FAQ index): Panel=Year Desktop 486:9500, Panel=Report-only Desktop 486:9619, Panel=Year Mobile 486:9856, Panel=Report-only Mobile 486:9972. Section header (action Financial calendar) · Main (stack/md): Tabs (Subnav item Horizontal, space/8, wrap; Active = open tab) · Year: four Results row instances for 2026 (Q4 Provisional, Q3 Next, Q2 Latest, Q1 Published), space/12 · Report-only: note + Year row Quarters 2020–2012 (two columns on Desktop, grid/gutter; 2012 Q4 only). White ground, padding section/md × grid/margin, gap stack/xl; Mobile with Layout/Typography Mobile modes",
+      "Block/Report shelf": "set 490:10568 on doc frame Blocks / Report shelf 490:10081 (x -10768, y -1090): Desktop 490:10099, Mobile 490:10345. Tint ground. Section header · Covers (3 Shelf item instances, grid/gutter; Mobile: 2025 full width, 2024 and 2023 side by side) · Archive (stack/md): H4 2012–2022 + Body/Small note (stack/xs), Year row Files 2022–2012 (two columns on Desktop, 6 + 5; one on Mobile)",
+      "Block/File list": "set 492:10759 on doc frame Blocks / File list 492:10421 (x -10768, y 1807): Desktop 492:10455, Mobile 492:10607. White ground. Section header · ten File row instances (gap 0, first without rule and paddingTop space/0)"
+    },
+    "pageFrames": [
+      {
+        "id": "494:10132",
+        "name": "Reports & presentations",
+        "x": 24600,
+        "height": 6896,
+        "source": "src/pages/investors/reports-presentations.astro",
+        "sections": {
+          "Header (cloned from Financial calendar: Desktop overlay, Navy mode, bg/default fill)": "494:10133",
+          "Page hero Text, navy (breadcrumb Home › Investors › Reports & presentations; the page's lead)": "494:10179",
+          "Section subnav (Reports & presentations active)": "494:10249",
+          "Results archive, Panel Year 2026 (white)": "494:10270",
+          "Report shelf (tint)": "494:10497",
+          "File list, Other documents (white)": "494:10875",
+          "Embed Iframe Loaded, 20 largest shareholders (tint, frame 800 high, action Share information)": "494:11110",
+          "Embed Iframe Loaded, Stock exchange announcements (white, frame 504 high, action External: All announcements on Newsweb)": "494:11127",
+          "Accordion Split, the four reports FAQs (tint, first open, action See all FAQs)": "494:11144",
+          "CTA panel Looking for something specific? (Contact us, IR contact; cloned from Financial calendar 449:16938)": "494:11188",
+          "Footer": "494:11222"
+        }
+      }
+    ],
+    "gaps": [
+      "Results archive years 2021–2025 not drawn as variants: they are the same Results row Published / Latest instances; the Report-only variant is shorter than the Year variant (in code every panel shares one grid cell, so the block keeps the tallest year's height)",
+      "Shelf item: the code pulls the links 8 up under the year (margin calc(4 − 12)); Figma has no negative token, so the link labels sit 12 lower. File row Mobile: title to link label 12 (code 8) for the same reason",
+      "Embed frames are placeholders for the live OMS components (provider label + code height); Subnav still has 6 items (Share information missing), as on Financial calendar",
+      "Results row / File row / Year row TEXT defaults are set-wide: set Title, Meta, Kicker, Year per instance; Date tile Month/Day and link labels are per-instance overrides",
+      "No mobile page frame (Q143 scope: block Mobile variants only)"
+    ]
   }
 }

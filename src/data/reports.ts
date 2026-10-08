@@ -104,11 +104,9 @@ export const nextRelease = nextMatch
   ? { year: Number(nextMatch[2]), quarter: Number(nextMatch[1]) as Quarter, date: latestResults.next.date }
   : undefined;
 
-/** Results dates Reach has published. Only these get Add to calendar; any other calendar date shows as
- * provisional. PLACEHOLDER: add each date here once it is in Reach's published financial calendar. */
-const CONFIRMED_DATES = new Set([latestResults.next.date]);
-
-/** Later results dates from the investor calendar ("Q4 2026 results" → 2027-02-11), for the quarters still to come. */
+/** Later results dates from the investor calendar ("Q4 2026 results" → 2027-02-16), for the quarters still to come.
+ * `confirmed` comes from the calendar itself (one source with the Financial calendar, 8 Oct 2026, Q143): only dates
+ * Reach has published get Add to calendar, the rest show as provisional. */
 export const upcomingReleases = investorCalendar
   .map((m) => ({ m, match: m.title.match(/^Q([1-4]) (\d{4}) results$/) }))
   .filter(({ match }) => match)
@@ -116,7 +114,7 @@ export const upcomingReleases = investorCalendar
     year: Number(match![2]),
     quarter: Number(match![1]) as Quarter,
     date: m.isoDate,
-    confirmed: CONFIRMED_DATES.has(m.isoDate),
+    confirmed: m.confirmed,
   }));
 
 export interface ReportCover {

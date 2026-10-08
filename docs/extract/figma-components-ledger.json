@@ -84,7 +84,8 @@
         "Show icon",
         "Icon",
         "Tone"
-      ]
+      ],
+      "notes8Oct": "8 Oct 2026 (Q143, sweep batch 1): new colour variable text/on-accent-subtle VariableID:480:22 in Color 7:23 (Light alias sage/600 7:44, Navy alias sage/200 7:40; scope TEXT_FILL; WEB var(--wp--custom--color--text--on-accent-subtle)), as --wp--custom--color--text--on-accent-subtle in tokens.css. Tone=Accent 87:233: Label 87:236 fill and the Icon glyph stroke (I87:234;26:151, the hidden circle-check instance) rebound from text/accent to it, so the badge reads about 6:1 on navy in Navy mode. Other accent text unchanged."
     },
     "Eyebrow": {
       "id": "89:268",
