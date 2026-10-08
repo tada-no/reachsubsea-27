@@ -1,0 +1,112 @@
+---
+// Locator map (8 Oct 2026, Q150, Project single): where one place is, in the world. Real coastlines as solid land
+// (sage) on navy-tint water, one pin in the middle; no tiles, no cookies, no script. Ross preferred a "simple stylised actual
+// map" to the dot matrix at this size; the brand dot map stays for maps you explore (Projects archive, Live
+// operations, offices).
+//
+// Natural Earth 1:110m land (world-atlas), the scale it is drawn for, in Web Mercator: a square 150° of longitude
+// wide, centred on the place and clipped to the square, so a page carries ~15 KB of path. The square is cut to the
+// tile's shape (`slice`), which keeps the place, and the pin, at the centre on any ratio.
+// For WordPress: the same d3-geo code runs in the browser from the post's lat/lon, or the SVG is cached when the
+// post is saved (docs/05 Project single).
+import { geoMercator, geoPath } from 'd3-geo';
+import { feature } from 'topojson-client';
+import land110 from 'world-atlas/land-110m.json';
+
+interface Props {
+  lon: number;
+  lat: number;
+  /** The place, for the map's text alternative ("Map showing …"). */
+  name: string;
+  class?: string;
+}
+
+const { lon, lat, name, class: className } = Astro.props;
+
+const SIZE = 600;
+const SPAN = 150; // degrees of longitude across the square
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const land = feature(land110 as any, (land110 as any).objects.land) as any;
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+const projection = geoMercator()
+  .scale(SIZE / ((SPAN * Math.PI) / 180))
+  .center([lon, lat])
+  .translate([SIZE / 2, SIZE / 2])
+  .clipExtent([
+    [0, 0],
+    [SIZE, SIZE],
+  ]);
+const d = geoPath(projection).digits(1)(land) ?? '';
+---
+
+<figure class:list={['locator-map', className]} role="img" aria-label={`Map showing ${name}.`}>
+  <svg class="locator-map__land" viewBox={`0 0 ${SIZE} ${SIZE}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+    <path d={d} />
+  </svg>
+  <span class="locator-map__pulse" aria-hidden="true"></span>
+  <span class="locator-map__pin" aria-hidden="true"></span>
+</figure>
+
+<style>
+  .locator-map {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 2 / 1;
+    margin: 0;
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  .locator-map__land {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: var(--wp--preset--color--sage-200);
+  }
+  /* The place: a navy dot ringed by the ground, then a sage ring, so it reads on land and on sea */
+  .locator-map__pin {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--wp--preset--spacing--12);
+    height: var(--wp--preset--spacing--12);
+    translate: -50% -50%;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--text--primary);
+    box-shadow:
+      0 0 0 3px var(--wp--custom--color--bg--tint),
+      0 0 0 5px var(--wp--custom--color--border--accent);
+  }
+  /* The pin pulses as the live map's pins do (DotMap "dot-map-pulse": same ring, timing and easing), from the size
+     of its outer ring; still under reduced motion */
+  .locator-map__pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--wp--preset--spacing--24);
+    height: var(--wp--preset--spacing--24);
+    margin: calc(var(--wp--preset--spacing--24) / -2) 0 0 calc(var(--wp--preset--spacing--24) / -2);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--border--accent);
+    opacity: 0;
+    animation: locator-map-pulse 3.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  }
+  @keyframes locator-map-pulse {
+    0% {
+      opacity: 0.55;
+      transform: scale(1);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(2.8);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .locator-map__pulse {
+      animation: none;
+    }
+  }
+</style>

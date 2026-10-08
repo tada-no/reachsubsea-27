@@ -1,0 +1,339 @@
+---
+// Project single template (8 Oct 2026, Q149): WordPress single-project.php. Modelled on the quarterly reports'
+// featured projects (4Q 2025 p20–21 full pages, 2Q 2025 p19, the 2Q 2026 cards p12 and p23): title, lead and story,
+// the project photo with the key facts beside it, a location map, the figures, and an "Operational spotlight" on the
+// technology. All of it is Project fields (src/data/projects.ts); a field left out renders nothing, so a report card
+// with no figures or spotlight still makes a whole page.
+// Light article header, as the News single (Q146): a project photo is rarely calm enough for the Photo hero, and
+// singles start the story within the first screen. The breadcrumb ends on Projects, the title is the H1 under it
+// (as the News single, Q148). Section landing pages keep the hero.
+//
+// Desktop: a main column (1–7), photo · story, and a side column (9–12) of sage panels, key facts · location map
+// (Locator map: solid land, one pin) · spotlight, as the report's right-hand column (the U864 spread has its map there). Every photo fills the main column (Ross, 8 Oct 2026, Q150): the ones
+// under 1240 wide are enlarged until Reach sends the originals (listed in Q150), and a photo taller than 3:2 is
+// cropped to 3:2 at its focal point.
+// Under 1200 the two columns become one centred 880 column: head · photo · facts beside the map (stacked on phones) ·
+// story · spotlight.
+// Then: figures (Stats band Feature) · related projects (same place, then work type, then service) · contact.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/header/Header.astro';
+import Footer from '../components/Footer.astro';
+import BlockSection from '../components/BlockSection.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import SpecRow from '../components/SpecRow.astro';
+import Link from '../components/Link.astro';
+import LocatorMap from '../components/LocatorMap.astro';
+import StatsBand from '../blocks/StatsBand.astro';
+import FeedGrid from '../blocks/FeedGrid.astro';
+import CtaBand from '../blocks/CtaBand.astro';
+import { projectCard, relatedProjects, spotlights, type ProjectRef } from '../data/projects';
+import { serviceLines } from '../data/services';
+
+interface Props {
+  project: ProjectRef;
+}
+
+const { project } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const line = serviceLines.find((l) => l.id === project.service)!;
+const spotlight = project.spotlight && spotlights[project.spotlight];
+const { image, place } = project;
+/** Taller than 3:2: cropped to 3:2 at the focal point, so the photo never pushes the story down. */
+const tall = (image.height ?? 0) / (image.width ?? 1) > 2 / 3;
+const objectPosition = image.focalPoint ? `object-position: ${image.focalPoint.x * 100}% ${image.focalPoint.y * 100}%` : undefined;
+
+// A vessel links to its asset: the Reach Remote page for the uncrewed fleet, the fleet section of Assets otherwise
+const vesselHref = (name: string) => (name.startsWith('Reach Remote') ? '/assets/reach-remote/' : '/assets/#vessels');
+const facts = [
+  { label: 'Client', value: project.client },
+  { label: 'Location', value: project.field },
+  { label: 'Period', value: project.period },
+  { label: 'Water depth', value: project.waterDepth },
+].filter((f): f is { label: string; value: string } => Boolean(f.value));
+
+const related = relatedProjects(project).map((p) => projectCard(p, 'tint'));
+---
+
+<BaseLayout title={`${project.title} · Reach Subsea`} motion>
+  <Header current="projects" />
+  <main id="main">
+    <BlockSection slug="project-single" root="project-single" background="white" labelledBy="project-single-title">
+      <article class="project-single__layout">
+        <header class="project-single__head">
+          <Breadcrumb items={[{ label: 'Home', href: base }, { label: 'Projects', href: '/projects/' }]} endsWithCurrent={false} />
+          <div class="project-single__heading">
+            <Eyebrow text={`${line.short} · ${project.work}`} />
+            <h1 id="project-single-title" class="project-single__title text-h2">{project.title}</h1>
+            {project.lead && <p class="project-single__lead text-lead">{project.lead}</p>}
+          </div>
+        </header>
+
+        <div class="project-single__main">
+          <figure class:list={['project-single__image', tall && 'project-single__image--tall']}>
+            <img src={image.src} alt={image.alt} width={image.width ?? 1240} height={image.height ?? 820} style={objectPosition} decoding="async" fetchpriority="high" />
+            {image.caption && <figcaption class="project-single__caption text-caption">{image.caption}</figcaption>}
+          </figure>
+          {
+            project.story && (
+              <div class="project-single__story prose">
+                {project.story.map((p) => <p>{p}</p>)}
+              </div>
+            )
+          }
+        </div>
+
+        <div class="project-single__side">
+          <section class="project-single__panel project-single__facts" aria-labelledby="project-facts-title">
+            <h2 id="project-facts-title" class="visually-hidden">Key facts</h2>
+            <dl class="project-single__facts-list">
+              {
+                project.vessels && (
+                  <SpecRow label={project.vessels.length > 1 ? 'Vessels' : 'Vessel'} stacked>
+                    <span class="project-single__vessels">
+                      {project.vessels.map((v) => <a href={vesselHref(v)}>{v}</a>)}
+                    </span>
+                  </SpecRow>
+                )
+              }
+              {facts.map((f) => <SpecRow label={f.label} value={f.value} stacked />)}
+              <SpecRow label="Service" value={line.short} href={line.href} stacked />
+            </dl>
+          </section>
+          {
+            place && (
+              <section class="project-single__location" aria-labelledby="project-location-title">
+                <h2 id="project-location-title" class="visually-hidden">Location</h2>
+                <LocatorMap class="project-single__map" lon={place.lon} lat={place.lat} name={place.name} />
+              </section>
+            )
+          }
+          {
+            spotlight && (
+              <section class="project-single__panel project-single__spotlight" aria-labelledby="project-spotlight-title">
+                <Eyebrow text="Operational spotlight" />
+                <h2 id="project-spotlight-title" class="project-single__spotlight-title text-h5">{spotlight.title}</h2>
+                <p class="project-single__spotlight-text text-small">{spotlight.text}</p>
+                <Link label={spotlight.link.label} href={spotlight.link.url} size="small" />
+              </section>
+            )
+          }
+        </div>
+      </article>
+    </BlockSection>
+
+    {
+      project.stats && project.stats.length >= 3 && (
+        <StatsBand anchor="figures" style="feature" background="tint" animate sectionHeader={{ title: 'The campaign in figures' }} stats={project.stats} />
+      )
+    }
+
+    {
+      related.length > 0 && (
+        <FeedGrid
+          anchor="related"
+          source="projects"
+          scope={{ related: true, excludeCurrent: true }}
+          columns={3}
+          background="white"
+          sectionHeader={{ title: 'Related projects', action: { label: 'All projects', url: '/projects/' } }}
+          items={related}
+          showLoadMore={false}
+        />
+      )
+    }
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="white"
+      title="Planning a similar campaign?"
+      text="Tell us about the field, and we will propose the vessel, equipment and team."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact={Boolean(line.contact)}
+      contact={line.contact && { label: line.title, ...line.contact }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style is:global>
+  /* Opens under the fixed solid header, as the News single: clear the bar (72 / 96), then a short gap */
+  .project-single {
+    padding-top: calc(72px + var(--wp--custom--stack--xl));
+  }
+  /* Phones and tablets: one column; the two column wrappers dissolve so their parts take the reading order */
+  .project-single__layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+  }
+  .project-single__main,
+  .project-single__side {
+    display: contents;
+  }
+  .project-single__head {
+    order: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+  }
+  .project-single__image {
+    order: 1;
+  }
+  .project-single__facts {
+    order: 2;
+  }
+  .project-single__location {
+    order: 3;
+  }
+  .project-single__story {
+    order: 4;
+  }
+  .project-single__spotlight {
+    order: 5;
+  }
+  /* Phones: the story follows the key facts, the map after it, so the reading starts within a screen of the photo */
+  @media (max-width: 599px) {
+    .project-single__story {
+      order: 3;
+    }
+    .project-single__location {
+      order: 4;
+    }
+  }
+  .project-single__heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+  }
+  .project-single__title,
+  .project-single__lead {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .project-single__image {
+    display: grid;
+    row-gap: var(--wp--preset--spacing--8);
+    isolation: isolate;
+  }
+  .project-single__image img {
+    display: block;
+    grid-area: 1 / 1;
+    width: 100%;
+    height: auto;
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--disabled);
+  }
+  /* The Reach photo grade (base.css "Photo tint", Q151): the photo screen-blended over navy, as the News single's
+     story photos. The tint is a layer under the photo only, so the caption stays on white; SVGs keep their colours */
+  .project-single__image:has(> img:not([src$='.svg']))::before {
+    content: '';
+    grid-area: 1 / 1;
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--image-tint);
+  }
+  .project-single__image > img:not([src$='.svg']) {
+    mix-blend-mode: screen;
+  }
+  .project-single__image--tall img {
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+  }
+  .project-single__caption {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* The map as a sage tile, as the report's: the label halo matches the tile */
+
+  /* Key facts and the spotlight: the site's navy-tint panel (Ross, 8 Oct 2026, replacing the report's sage-50), so
+     sage stays the accent: the labels, the map's land and the pin's ring */
+  .project-single__panel {
+    padding: var(--wp--custom--stack--lg);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  /* Two vessels share one row, one per line */
+  .project-single__vessels {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--4);
+  }
+  /* Key facts: stacked Spec rows (label over value), as the reports */
+  .project-single__facts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+  }
+  .project-single__spotlight {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--12);
+  }
+  .project-single__spotlight-title {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .project-single__spotlight-text {
+    color: var(--wp--custom--color--text--secondary);
+  }
+
+  /* Tablet: one centred column at the reading measure, as the News single, so photo, panels and text share both
+     edges; the key facts and the map share a row under the photo (Ross, 8 Oct 2026), the map as tall as the facts */
+  @media (min-width: 600px) and (max-width: 1199px) {
+    .project-single__layout {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-width: var(--wp--style--global--content-size);
+      margin-inline: auto;
+    }
+    .project-single__layout > *,
+    .project-single__main > *,
+    .project-single__side > * {
+      grid-column: 1 / -1;
+    }
+    .project-single__side > .project-single__facts {
+      grid-column: 1;
+    }
+    /* A project with no place keeps the facts full width */
+    .project-single__side:not(:has(.project-single__location)) > .project-single__facts {
+      grid-column: 1 / -1;
+    }
+    .project-single__side > .project-single__location {
+      grid-column: 2;
+      display: flex;
+    }
+    .project-single__location .project-single__map {
+      flex: 1;
+      aspect-ratio: auto;
+    }
+  }
+
+  /* Desktop: the report's spread, main column 1–7 and the side column 9–12 */
+  @media (min-width: 1200px) {
+    .project-single {
+      padding-top: calc(96px + var(--wp--custom--stack--xl));
+    }
+    .project-single__layout {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--wp--custom--grid--gutter);
+      row-gap: var(--wp--custom--stack--lg);
+    }
+    .project-single__head {
+      grid-column: 1 / span 8;
+    }
+    .project-single__main,
+    .project-single__side {
+      display: flex;
+      flex-direction: column;
+      gap: var(--wp--custom--stack--lg);
+      align-self: start;
+    }
+    .project-single__main {
+      grid-column: 1 / span 7;
+    }
+    .project-single__side {
+      grid-column: 9 / span 4;
+    }
+  }
+</style>

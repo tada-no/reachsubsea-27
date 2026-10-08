@@ -1,0 +1,490 @@
+---
+// Projects archive template (8 Oct 2026, Q150): WordPress archive-project.php (/projects/). Not a block: the query
+// fills it. Every Project, newest first (undated last), filtered in place by service.
+// Built to feel unlike the Newsroom (Ross: "think about the UI… a bit different to the Newsroom"). News is about
+// when, so the Newsroom leads with its newest story and dates every card. Projects are about where and what, so this
+// page leads with where: the title and intro sit beside the brand dot map with a pin per place, the service chips
+// head the list, and the cards carry work type, year and place instead of a date and an excerpt. Chips filter the map and the grid
+// together (?service=, the Projects menu's links); a pin opens its place's projects on the map; hovering a card
+// lights its pin, and a pin lights its cards.
+// Header as the Newsroom archive (Q148): no Page hero, title and intro on white under the solid header, no
+// breadcrumb at depth 2.
+//
+// Without JS: every card shows, the map is the static poster, the chips do nothing (the menu's ?service= links
+// still land on the full list). WP: the same chips as a FacetWP facet or ?service= query var.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/header/Header.astro';
+import Footer from '../components/Footer.astro';
+import BlockSection from '../components/BlockSection.astro';
+import Card from '../components/Card.astro';
+import FilterChip from '../components/FilterChip.astro';
+import DotMap from '../components/DotMap.astro';
+import Button from '../components/Button.astro';
+import Icon from '../components/Icon.astro';
+import IconButton from '../components/IconButton.astro';
+import CtaBand from '../blocks/CtaBand.astro';
+import { projects, projectCard, type ProjectRef } from '../data/projects';
+import { serviceLines } from '../data/services';
+import type { DotMapPoint } from '../lib/dot-map-client';
+
+/** Cards shown before "Show more", and per click. */
+const PAGE = 12;
+
+const list = [...projects].sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+const lines = serviceLines.filter((l) => list.some((p) => p.service === l.id));
+const chips = [
+  { value: '', label: 'All', count: list.length },
+  ...lines.map((l) => ({ value: l.id, label: l.short, count: list.filter((p) => p.service === l.id).length })),
+];
+
+// One pin per place: projects at the same place share it (Ormen Lange has three)
+const placeId = (p: ProjectRef) => (p.place ? `place-${p.place.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : '');
+const places = new Map<string, { id: string; name: string; lat: number; lon: number; projects: ProjectRef[] }>();
+for (const p of list) {
+  if (!p.place) continue;
+  const id = placeId(p);
+  if (!places.has(id)) places.set(id, { id, ...p.place, projects: [] });
+  places.get(id)!.projects.push(p);
+}
+const points: DotMapPoint[] = [...places.values()].map((pl) => ({ id: pl.id, name: pl.name, lat: pl.lat, lon: pl.lon, count: pl.projects.length }));
+const summary = `Map of ${places.size} project locations, among them ${[...places.values()]
+  .slice(0, 6)
+  .map((pl) => pl.name)
+  .join(', ')}. Every project is in the list below.`;
+const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
+---
+
+<BaseLayout title="Projects · Reach Subsea" motion>
+  <Header current="projects" />
+  <main id="main">
+    <BlockSection slug="projects-archive" root="projects-archive" background="white" labelledBy="projects-archive-title" data-projects-archive data-page={PAGE}>
+      <div class="block__body">
+        <div class="projects-archive__top">
+          <div class="projects-archive__intro">
+            <h1 id="projects-archive-title" class="projects-archive__title text-h2">Projects</h1>
+            <p class="projects-archive__lead text-lead">
+              Subsea, survey and monitoring work from the North Sea to Western Australia, with crewed vessels and the uncrewed Reach Remote.
+            </p>
+          </div>
+
+          <div class="projects-archive__stage">
+            <DotMap class="projects-archive__map" points={points} summary={summary} labels data-projects-archive-map="" />
+            <button type="button" class="projects-archive__all text-button-sm" data-projects-archive-all hidden>
+              <Icon name="arrow-back-up" size={18} />
+              All places
+            </button>
+            {/* A place's projects, pinned to the map when its marker is clicked (hidden until then) */}
+            {
+              [...places.values()].map((pl) => (
+                <div class="projects-archive__popup has-surface-light" data-place-popup={pl.id} tabindex="-1" hidden>
+                  <p class="projects-archive__popup-kicker text-eyebrow" data-place-count>
+                    {plural(pl.projects.length)}
+                  </p>
+                  <p class="projects-archive__popup-title text-h5">{pl.name}</p>
+                  <ul class="projects-archive__popup-list">
+                    {pl.projects.map((p) => (
+                      <li data-service={p.service}>
+                        <a class="projects-archive__popup-link text-small" href={p.url}>
+                          {p.title}
+                          {p.year && <span class="projects-archive__popup-year"> · {p.year}</span>}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                  <IconButton icon="x" label={`Close ${pl.name}`} variant="ghost" size="small" class="projects-archive__popup-close" data-place-popup-close="" />
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="projects-archive__results">
+          <h2 class="visually-hidden">Project list</h2>
+          {/* One row of chips for the map and the list (Q150): beside the intro they wrapped at 1440 */}
+          <div class="projects-archive__chips scroll-row" role="group" aria-label="Filter projects by service">
+            {chips.map((c) => <FilterChip label={c.label} count={c.count} selected={c.value === ''} data-value={c.value} />)}
+          </div>
+          <ul class="projects-archive__grid">
+            {
+              list.map((p) => (
+                <li class="projects-archive__cell" data-service={p.service} data-place={placeId(p) || undefined}>
+                  <Card {...projectCard(p, 'tint')} headingLevel="h3" />
+                </li>
+              ))
+            }
+          </ul>
+          <div class="projects-archive__more">
+            <Button label="Show more projects" variant="outline" type="button" data-projects-archive-more hidden />
+          </div>
+          <p class="visually-hidden" aria-live="polite" data-projects-archive-announce></p>
+        </div>
+      </div>
+    </BlockSection>
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="white"
+      title="Have a project in mind?"
+      text="Tell us about the work, and we will propose the vessel, equipment and team."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+    />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<script>
+  import { createDotMap } from '../lib/dot-map-client';
+
+  function initProjectsArchive(root: HTMLElement) {
+    const page = Number(root.dataset.page) || 12;
+    const figure = root.querySelector<HTMLElement>('[data-projects-archive-map]')!;
+    const stage = figure.parentElement!;
+    const chips = [...root.querySelectorAll<HTMLButtonElement>('.projects-archive__chips .filter-chip')];
+    const cells = [...root.querySelectorAll<HTMLElement>('.projects-archive__cell')];
+    const more = root.querySelector<HTMLElement>('[data-projects-archive-more]')!;
+    const allButton = root.querySelector<HTMLButtonElement>('[data-projects-archive-all]')!;
+    const announce = root.querySelector<HTMLElement>('[data-projects-archive-announce]');
+    const say = (text: string) => announce && (announce.textContent = text);
+    const popupFor = (id: string) => root.querySelector<HTMLElement>(`[data-place-popup="${id}"]`);
+    const phone = window.matchMedia('(max-width: 599px)');
+    const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
+
+    const known = new Set(chips.map((c) => c.dataset.value ?? ''));
+    const fromUrl = new URLSearchParams(location.search).get('service') ?? '';
+    let service = known.has(fromUrl) ? fromUrl : '';
+    let shown = page;
+    let openId: string | null = null;
+
+    const matches = (el: HTMLElement) => !service || el.dataset.service === service;
+    /** Projects at a place that pass the filter: the pin's count, 0 hides it. */
+    const countAt = (id: string) => cells.filter((c) => c.dataset.place === id && matches(c)).length;
+
+    const dotMap = createDotMap(figure, {
+      maxZoom: 6,
+      fitMaxZoom: 5,
+      clusterMaxZoom: 5,
+      clusterClick: 'fit',
+      clusterRadius: 40,
+      showCount: 'always',
+      clusterLabel: (_points, n) => plural(n),
+      countOf: countAt,
+      announce: say,
+      onSelect: (id) => open(openId === id ? null : id),
+      onHover: (ids, on) => cells.forEach((c) => c.dataset.place && ids.includes(c.dataset.place) && c.classList.toggle('is-hover', on)),
+      onView: (home) => {
+        allButton.hidden = home;
+      },
+    });
+
+    function render() {
+      const hits = cells.filter(matches);
+      cells.forEach((c) => (c.hidden = true));
+      hits.forEach((c, i) => (c.hidden = i >= shown));
+      more.hidden = hits.length <= shown;
+      chips.forEach((c) => c.setAttribute('aria-pressed', String((c.dataset.value ?? '') === service)));
+      // Each place's list on the map keeps only the projects that pass
+      root.querySelectorAll<HTMLElement>('[data-place-popup]').forEach((popup) => {
+        const items = [...popup.querySelectorAll<HTMLElement>('li')];
+        items.forEach((li) => (li.hidden = !matches(li)));
+        const n = items.filter((li) => !li.hidden).length;
+        popup.querySelector('[data-place-count]')!.textContent = plural(n);
+      });
+      dotMap.refresh();
+      return hits.length;
+    }
+
+    /** One place open at a time, pinned above its marker (docked along the map's foot on phones). */
+    function open(id: string | null) {
+      if (openId) {
+        const was = popupFor(openId);
+        if (was?.classList.contains('is-docked')) {
+          was.classList.remove('is-docked');
+          was.hidden = true;
+        } else dotMap.hideOverlay();
+        cells.forEach((c) => c.classList.remove('is-active'));
+      }
+      openId = id;
+      dotMap.setActive(id);
+      if (!id) return;
+      const popup = popupFor(id)!;
+      if (phone.matches) {
+        popup.classList.add('is-docked');
+        popup.hidden = false;
+      } else dotMap.showOverlay(id, popup);
+      cells.forEach((c) => c.classList.toggle('is-active', c.dataset.place === id && !c.hidden));
+      popup.focus({ preventScroll: true });
+      say(`${popup.querySelector('.projects-archive__popup-title')?.textContent ?? ''}: ${popup.querySelector('[data-place-count]')?.textContent ?? ''} shown on the map`);
+    }
+
+    root.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const chip = target.closest<HTMLButtonElement>('.projects-archive__chips .filter-chip');
+      if (chip) {
+        service = chip.dataset.value ?? '';
+        shown = page;
+        open(null);
+        const url = new URL(location.href);
+        if (service) url.searchParams.set('service', service);
+        else url.searchParams.delete('service');
+        history.replaceState(null, '', url);
+        const n = render();
+        say(`${plural(n)}${service ? `, ${chip.querySelector('.filter-chip__label')?.textContent}` : ''}`);
+        return;
+      }
+      if (target.closest('[data-projects-archive-more]')) {
+        const from = shown;
+        shown += page;
+        render();
+        // Focus the first new card's link, so keyboard users carry on where the list grew
+        cells.filter(matches)[from]?.querySelector<HTMLElement>('a')?.focus();
+        return;
+      }
+      if (target.closest('[data-place-popup-close]')) open(null);
+      else if (stage.contains(target) && openId && !target.closest('.dot-map__marker, .projects-archive__popup, [data-projects-archive-all]')) open(null);
+    });
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && openId) open(null);
+    });
+    allButton.addEventListener('click', () => {
+      open(null);
+      dotMap.fitHome();
+      say('Map showing all places');
+    });
+
+    // A card lights its pin
+    cells.forEach((cell) => {
+      const id = cell.dataset.place;
+      if (!id) return;
+      const hover = (on: boolean) => dotMap.setHover(on ? [id] : []);
+      cell.addEventListener('pointerenter', () => hover(true));
+      cell.addEventListener('pointerleave', () => hover(false));
+      cell.addEventListener('focusin', () => hover(true));
+      cell.addEventListener('focusout', () => hover(false));
+    });
+
+    render();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-projects-archive]').forEach(initProjectsArchive);
+</script>
+
+<style is:global>
+  /* Opens the page under the fixed solid header, as the Newsroom archive: clear the bar (72 / 96), then a short gap */
+  .projects-archive {
+    padding-top: calc(72px + var(--wp--custom--stack--xl));
+  }
+  .projects-archive__top {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+  }
+  .projects-archive__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+    max-width: var(--wp--style--global--content-size);
+  }
+  .projects-archive__title,
+  .projects-archive__lead {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .projects-archive__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--8);
+  }
+
+  /* ── Map ──────────────────────────────────────────────── */
+  .projects-archive__stage {
+    position: relative;
+  }
+  /* "All places": outline button look, top right of the map, only while zoomed in (as Offices map) */
+  .projects-archive__all {
+    position: absolute;
+    top: var(--wp--preset--spacing--16);
+    right: var(--wp--preset--spacing--16);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    height: 40px;
+    padding-inline: var(--wp--preset--spacing--16);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--bg--default);
+    color: var(--wp--custom--color--action--outline--fg);
+    box-shadow: inset 0 0 0 2px var(--wp--custom--color--action--outline--border);
+    transition: background-color 160ms var(--wp--custom--motion--easing);
+  }
+  .projects-archive__all:hover {
+    background-color: var(--wp--custom--color--action--outline--bg-hover);
+  }
+  .projects-archive__all:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+  }
+  .projects-archive__all[hidden] {
+    display: none;
+  }
+
+  /* A place's projects on the map: a small white panel above the pin, as the Offices map's address card */
+  .projects-archive__popup {
+    position: relative;
+    display: grid;
+    gap: var(--wp--preset--spacing--4);
+    width: max-content;
+    max-width: 320px;
+    padding: var(--wp--preset--spacing--24);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--default);
+    color: var(--wp--custom--color--text--primary);
+    box-shadow:
+      var(--wp--preset--shadow--md),
+      0 0 0 1px var(--wp--custom--color--border--subtle);
+    text-align: start;
+    font-family: var(--wp--preset--font-family--inter);
+  }
+  .projects-archive__popup[hidden] {
+    display: none;
+  }
+  .projects-archive__popup:focus {
+    outline: none;
+  }
+  .projects-archive__popup::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    width: 12px;
+    height: 12px;
+    translate: -50% 0;
+    rotate: 45deg;
+    background-color: inherit;
+    box-shadow: 1px 1px 0 0 var(--wp--custom--color--border--subtle);
+  }
+  .projects-archive__popup-kicker,
+  .projects-archive__popup-title {
+    margin: 0;
+    padding-inline-end: var(--wp--preset--spacing--32);
+  }
+  .projects-archive__popup-kicker {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .projects-archive__popup-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--wp--preset--spacing--8);
+    margin-top: var(--wp--preset--spacing--8);
+  }
+  .projects-archive__popup-list li[hidden] {
+    display: none;
+  }
+  .projects-archive__popup-link {
+    color: var(--wp--custom--color--text--primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .projects-archive__popup-link:hover {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .projects-archive__popup-year {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .projects-archive__popup-close {
+    position: absolute;
+    top: var(--wp--preset--spacing--12);
+    right: var(--wp--preset--spacing--12);
+  }
+
+  /* ── Cards ────────────────────────────────────────────── */
+  .projects-archive__results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+  }
+  .projects-archive__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .projects-archive__cell {
+    display: grid;
+    border-radius: var(--wp--custom--radius--lg);
+    transition: box-shadow 200ms var(--wp--custom--motion--easing);
+  }
+  .projects-archive__cell[hidden] {
+    display: none;
+  }
+  /* The map lights its cards: a pin hovered, or its place open on the map */
+  .projects-archive__cell.is-hover {
+    box-shadow: 0 0 0 2px var(--wp--custom--color--border--strong);
+  }
+  .projects-archive__cell.is-active {
+    box-shadow: 0 0 0 2px var(--wp--custom--color--border--accent);
+  }
+  .projects-archive__more {
+    display: flex;
+    justify-content: center;
+  }
+  .projects-archive__more:has([hidden]) {
+    display: none;
+  }
+
+  @media (max-width: 1199px) {
+    .projects-archive__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 767px) {
+    .projects-archive__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 599px) {
+    .projects-archive__chips {
+      flex-wrap: nowrap;
+    }
+    .projects-archive__map {
+      /* Edge to edge on phones (DotMap sets the 5:4 frame), as the Offices map */
+      margin-inline: calc(-1 * var(--wp--preset--spacing--16));
+      border-radius: 0;
+    }
+    .projects-archive__all {
+      right: 0;
+    }
+    .projects-archive__popup.is-docked {
+      position: absolute;
+      inset: auto var(--wp--preset--spacing--16) var(--wp--preset--spacing--16) var(--wp--preset--spacing--16);
+      z-index: 2;
+      width: auto;
+      max-width: none;
+    }
+    .projects-archive__popup.is-docked::after {
+      display: none;
+    }
+  }
+
+  /* Desktop: the intro and chips beside the map, the map the larger part (where the work is) */
+  @media (min-width: 1200px) {
+    .projects-archive {
+      padding-top: calc(96px + var(--wp--custom--stack--xl));
+    }
+    .projects-archive__top {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--wp--custom--grid--gutter);
+      align-items: center;
+    }
+    .projects-archive__intro {
+      grid-column: 1 / span 5;
+    }
+    .projects-archive__stage {
+      grid-column: 6 / span 7;
+    }
+  }
+</style>

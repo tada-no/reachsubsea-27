@@ -1,0 +1,14 @@
+---
+// Project single (/projects/<slug>/, Q149, Q150): one page per project with a story, at the project's `url` (a dev
+// project keeps its live slug). Template: src/templates/ProjectSingle.astro.
+import ProjectSingle from '../../templates/ProjectSingle.astro';
+import { projectSingles, type ProjectRef } from '../../data/projects';
+
+export function getStaticPaths() {
+  return projectSingles.map((project) => ({ params: { slug: project.url.split('/').filter(Boolean).pop()! }, props: { project } }));
+}
+
+const { project } = Astro.props as { project: ProjectRef };
+---
+
+<ProjectSingle project={project} />

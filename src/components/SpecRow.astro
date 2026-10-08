@@ -1,19 +1,27 @@
 ---
 // Spec row (docs/05 §1 "Spec row", docs/04 §0). One row of a spec table: label and value share the
 // row equally (1fr 1fr) at every width, so values like "140 t AHC" never crush down. Place several
-// inside a <dl> (Split media's Spec table media).
+// inside a <dl> (Split media's Spec table media). `href` links the value (8 Oct 2026, Project single: the vessel
+// opens its asset page). `stacked` (8 Oct 2026, Q150, the reports' key facts): the label over its value, for a
+// narrow column where a 50/50 split wraps every long value. A default slot replaces
+// `value` (several links in one row: a project's two vessels).
 interface Props {
   label: string;
-  value: string;
+  value?: string;
+  href?: string;
+  stacked?: boolean;
   class?: string;
 }
 
-const { label, value, class: className } = Astro.props;
+const { label, value, href, stacked = false, class: className } = Astro.props;
+const hasSlot = Astro.slots.has('default');
 ---
 
-<div class:list={['spec-row', className]}>
-  <dt class="spec-row__label text-small">{label}</dt>
-  <dd class="spec-row__value text-small">{value}</dd>
+<div class:list={['spec-row', stacked && 'spec-row--stacked', className]}>
+  <dt class:list={['spec-row__label', stacked ? 'text-label' : 'text-small']}>{label}</dt>
+  <dd class:list={['spec-row__value', stacked ? 'text-body' : 'text-small']}>
+    {hasSlot ? <slot /> : href ? <a href={href}>{value}</a> : value}
+  </dd>
 </div>
 
 <style is:global>
@@ -29,5 +37,27 @@ const { label, value, class: className } = Astro.props;
   }
   .spec-row__value {
     color: var(--wp--custom--color--text--primary);
+  }
+  /* Stacked: a small sage label over its value, no rules; space alone groups each pair (Ross, 8 Oct 2026: the
+     report's rule under every label read as fussy). text/accent, not the report's paler sage, for contrast */
+  .spec-row--stacked {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--wp--preset--spacing--4);
+    padding-block: 0;
+    border-bottom: 0;
+  }
+  .spec-row--stacked .spec-row__label {
+    color: var(--wp--custom--color--text--accent);
+  }
+  /* A linked value: a quiet underline that firms up on hover, as Meta item links */
+  .spec-row__value a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--wp--custom--color--border--default);
+    text-underline-offset: 0.2em;
+  }
+  .spec-row__value a:hover {
+    color: var(--wp--custom--color--text--accent);
+    text-decoration-color: currentColor;
   }
 </style>
