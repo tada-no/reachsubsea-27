@@ -270,7 +270,27 @@ a {
 /* ── Article: a post's core blocks (8 Oct 2026, Newsroom single, Q145) ──
    What the live posts use, after scripts/import-news.mjs: Paragraph, Heading (all one level), Quote with cite,
    Image with caption, Embed (webcast and video iframes), Table, Separator, a two-up gallery, and File/Buttons rows
-   (rendered as Link components). In WordPress this is theme.json for the post content. */
+   (rendered as Link components). In WordPress this is theme.json for the post content.
+   Rhythm (Q153, after a taste + impeccable review): paragraphs 16 apart; lists step out to stack--md; the lead, photos,
+   quotes, tables and embeds to stack--lg; a heading opens a section at stack--xl and binds to what follows (8).
+   Running text stops at the prose measure (720, ~72 characters); photos, tables and embeds keep the 880 column, on
+   the same left edge. */
+.prose.article > :not(figure) {
+  max-inline-size: var(--wp--custom--measure--prose);
+}
+.prose.article > :first-child {
+  margin-top: 0;
+}
+.prose.article > :last-child {
+  margin-bottom: 0;
+}
+/* A long address (webcast links) breaks rather than running out of the column on phones */
+.article a {
+  overflow-wrap: anywhere;
+}
+.article > :is(ul, ol) {
+  margin-block: var(--wp--custom--stack--md);
+}
 /* Lead (Q147): the opening paragraph of a longer story, Lead size in navy against the grey body. Navy, not the
    accent green: green is the label colour (the category eyebrow sits just above) and a paragraph of it reads as a callout */
 .prose.article .article-lead {
@@ -279,27 +299,30 @@ a {
   line-height: var(--wp--custom--line-height--lead);
 }
 .article .article-lead + * {
-  margin-top: var(--wp--custom--stack--md);
+  margin-top: var(--wp--custom--stack--lg);
 }
 .article h2 {
-  margin-top: var(--wp--custom--stack--lg);
+  margin-top: var(--wp--custom--stack--xl);
   color: var(--wp--custom--color--text--primary);
   font-size: var(--wp--preset--font-size--h4);
   line-height: var(--wp--custom--line-height--h4);
   font-weight: var(--wp--custom--font-weight--bold);
 }
-.article h2 + * {
+.prose.article h2 + * {
   margin-top: var(--wp--preset--spacing--8);
 }
 .article blockquote {
-  margin-block: var(--wp--custom--stack--md);
+  margin-block: var(--wp--custom--stack--lg);
   padding-left: var(--wp--preset--spacing--24);
   border-left: 2px solid var(--wp--custom--color--border--accent);
 }
+/* Quotes at Body size in medium navy (Q153): the lead keeps the large size to itself. A story can quote someone
+   eight times; at Lead size they read as a run of callouts and the opener lost its rank */
 .article blockquote p {
   color: var(--wp--custom--color--text--primary);
-  font-size: var(--wp--preset--font-size--lead);
-  line-height: var(--wp--custom--line-height--lead);
+  font-size: var(--wp--preset--font-size--body);
+  line-height: var(--wp--custom--line-height--body);
+  font-weight: var(--wp--custom--font-weight--medium);
 }
 .article blockquote > * + * {
   margin-top: var(--wp--preset--spacing--8);
@@ -313,7 +336,7 @@ a {
   font-style: normal;
 }
 .article figure {
-  margin-block: var(--wp--custom--stack--md);
+  margin-block: var(--wp--custom--stack--lg);
 }
 .article figure img {
   display: block;
@@ -374,6 +397,31 @@ a {
   margin-block: var(--wp--custom--stack--md);
   padding-left: 0;
   list-style: none;
+}
+/* Press boilerplate (Q153): contacts, About Reach Subsea and the disclosure notice close a release in Body small,
+   grey, after a section's gap: it belongs to the release but isn't the story. Its labels in navy */
+.prose.article .article-boilerplate {
+  margin-top: var(--wp--custom--stack--xl);
+  color: var(--wp--custom--color--text--secondary);
+}
+.article .article-boilerplate > :is(p, h2, ul) {
+  font-size: var(--wp--preset--font-size--body-sm);
+  line-height: var(--wp--custom--line-height--body-sm);
+}
+.prose.article .article-boilerplate > * + * {
+  margin-top: var(--wp--preset--spacing--12);
+}
+/* Its labels: a heading, or a paragraph that is only bold ("For more information please contact:") */
+.prose.article .article-boilerplate > :is(h2, p:has(> strong:only-child)) {
+  margin-top: var(--wp--preset--spacing--24);
+  color: var(--wp--custom--color--text--primary);
+  font-weight: var(--wp--custom--font-weight--bold);
+}
+.prose.article .article-boilerplate > :is(h2, p:has(> strong:only-child)):first-child {
+  margin-top: 0;
+}
+.prose.article .article-boilerplate > :is(h2, p:has(> strong:only-child)) + * {
+  margin-top: var(--wp--preset--spacing--4);
 }
 .article .article__links a {
   text-decoration: none;

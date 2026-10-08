@@ -8,6 +8,7 @@
 // Usage: node scripts/import-news.mjs   (re-run any time; the output is rebuilt from scratch)
 import fs from 'node:fs';
 import { parse, ELEMENT_NODE, TEXT_NODE } from 'ultrahtml';
+import { cleanStory } from './news-cleanup.mjs';
 
 const SITE = 'https://reachsubsea.no';
 const OUT = new URL('../src/data/news-posts.json', import.meta.url);
@@ -356,6 +357,10 @@ for (const p of posts) {
 
 // Newest first; undated posts last, in the old site's order (higher id = later)
 posts.sort((a, b) => (a.dateSource === 'undated') - (b.dateSource === 'undated') || b.date.localeCompare(a.date) || b.id - a.id);
+
+// Second pass (Q153): markers, <br> runs, labels, the press boilerplate (scripts/news-cleanup.mjs)
+report.cleanup = {};
+for (const p of posts) p.content = cleanStory(p.content, report.cleanup);
 
 fs.writeFileSync(OUT, `${JSON.stringify(posts, null, 1)}\n`);
 const csv = ['old_url,new_url', ...posts.map((p) => `${p.oldUrl},/newsroom/${p.slug}/`), `${SITE}/news/,/newsroom/`, `${SITE}/category/news/,/newsroom/category/news/`, `${SITE}/category/reports/,/newsroom/category/reports/`];

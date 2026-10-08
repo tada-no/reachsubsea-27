@@ -18,6 +18,18 @@ Context: Ross asked whether stories with long titles should have a trimmed bread
 
 **Answer:** as ticked.
 
+### Q153. News single: spacing and measure after a taste + impeccable review (8 Oct 2026)
+Context: Ross asked for a taste and impeccable run over the stories, "maybe the spacing could look better". The critique (28/40, `.impeccable/critique/`) found: lines of 85–97 characters at 1440; photos, quotes and lists only 8px further out than paragraphs (and the same 16 on phones); quotes styled exactly like the lead; imported leftovers (-ENDS-, press boilerplate as body text, labels typed as paragraphs, email hard wraps) breaking the rhythm; 192px from the story's end to More news. Ross: all five fixes, text 720 with photos at 880, no results-release layout for now.
+- [x] Measure: running text stops at 720 (`--wp--custom--measure--prose`, Figma `container/prose`, ~72 characters); photos, tables and embeds keep 880, one left edge
+- [x] Rhythm: paragraphs stack--sm · lists stack--md · lead, photos, quotes, tables, embeds stack--lg · a heading opens at stack--xl, 8 to its text. Breadcrumb to title stack--md (it floated). Story end: section padding sm, no margin on the last block
+- [x] Quotes in Body, medium, navy, with the green rule; the lead keeps Lead size to itself
+- [x] Import clean-up (`scripts/news-cleanup.mjs`, run by the import and on its own): "-ENDS-" markers go (30); email hard wraps joined (427) and paragraphs run together with line breaks split (95); labels typed as paragraphs become headings (30: "2Q 2026 highlights", "Quarterly presentation"); whole sentences typed as headings become paragraphs (10); the press boilerplate closes a release small and grey (84 posts); a "please contact:" left with nothing under it goes
+- [x] Long links (webcast addresses) wrap on phones
+- [x] Figma: `container/prose` variable, Article quote and lead at 720, new Article boilerplate component, Article header gap, News single frames in the new rhythm
+- [ ] Later: a results-release layout (key figures, report as a button) with the Investors pages
+
+**Answer:** as ticked.
+
 ### Q152. News single: no bold in the lead paragraph (8 Oct 2026)
 Context: nine live posts set their opening paragraph in bold: five bold the whole paragraph (the Pareto conference story among them), four bold only the dateline ("Haugesund, 9 May 2023:"). Set larger and navy as the lead (Q147), the bold made it heavier than every other story. Ross: "yes, strip the bold from lead paragraphs".
 - [x] The import drops `<strong>` inside the lead paragraph (both kinds), so every lead reads the same. Bold elsewhere in a post stays

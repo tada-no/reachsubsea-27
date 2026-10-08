@@ -2263,5 +2263,24 @@
       "Mobile page frames need the Layout and Typography collections set to Mobile (copy explicitVariableModes from a Mobile block such as Feed grid 155:1995); without them padding variables resolve to the desktop 64 and H2 to 48.",
       "setTextStyleIdAsync needs the full style id from getLocalTextStylesAsync() (it ends in a comma and a version); the bare 'S:<key>' prefix fails silently and leaves the default 12px text."
     ]
+  },
+  "phase4NewsroomRhythm8Oct": {
+    "date": "2026-10-08",
+    "context": "News single spacing and measure after a taste + impeccable critique (Q153). Ground truth: src/styles/base.css (.article rhythm, measure, quote, .article-boilerplate), src/styles/tokens.css (--wp--custom--measure--prose), src/templates/NewsSingle.astro, scripts/news-cleanup.mjs.",
+    "variables": {
+      "container/prose VariableID:642:22 (new, Layout collection)": "720 in both modes: running text in a story; photos, tables and embeds keep container/content 880"
+    },
+    "components": {
+      "Article boilerplate 642:35346 (new, Components / Article 629:2632)": "Press boilerplate closing a release: Contact / About / Notice groups (Body/Small text/secondary, labels bold text/primary, 4 to their text, groups 24 apart), width container/prose. Show about#, Show notice# booleans",
+      "Article quote 629:2685": "Quote now Body/Body Medium text/primary (was Lead), width container/prose",
+      "Article lead 629:2683": "Width container/prose; stack/lg before the next block",
+      "Article header 629:2682": "Gap breadcrumb → heading stack/md (was stack/lg), both variants"
+    },
+    "pageFrames": {
+      "News single 636:22930 / News single · Mobile 638:24070": "Body restructured into the new rhythm: Article lead · Image (paddingTop stack/lg) · Paragraphs (stack/lg above, stack/sm apart) · Quote (stack/lg) · Section (stack/xl above, 8 to its text). Text at container/prose on desktop; article section bottom padding section/sm"
+    },
+    "gotchas": [
+      "Auto layout has one gap per frame: a rhythm with different steps (lead → stack/lg, heading → stack/xl, heading → text 8) is built from wrapper frames with bound paddingTop, not spacer rectangles"
+    ]
   }
 }

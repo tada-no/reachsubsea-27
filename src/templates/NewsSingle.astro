@@ -41,25 +41,34 @@ const linksIn = (html: string) =>
     label: label.replace(/<[^>]+>/g, '').trim(),
     action: actionFor(href),
   }));
-const parts: Part[] = [];
-let rest = post.content;
 const ROW = /<p class="article-file">[\s\S]*?<\/p>|<ul class="article-links">[\s\S]*?<\/ul>/;
-for (let m = rest.match(ROW); m; m = rest.match(ROW)) {
-  if (m.index) parts.push({ html: rest.slice(0, m.index) });
-  const links = linksIn(m[0]);
-  // Consecutive download rows read as one list
-  const prev = parts[parts.length - 1];
-  if (prev && 'links' in prev) prev.links.push(...links);
-  else parts.push({ links });
-  rest = rest.slice(m.index! + m[0].length).trimStart();
-}
-if (rest) parts.push({ html: rest });
+const split = (html: string) => {
+  const parts: Part[] = [];
+  let rest = html;
+  for (let m = rest.match(ROW); m; m = rest.match(ROW)) {
+    if (m.index) parts.push({ html: rest.slice(0, m.index) });
+    const links = linksIn(m[0]);
+    // Consecutive download rows read as one list
+    const prev = parts[parts.length - 1];
+    if (prev && 'links' in prev) prev.links.push(...links);
+    else parts.push({ links });
+    rest = rest.slice(m.index! + m[0].length).trimStart();
+  }
+  if (rest) parts.push({ html: rest });
+  return parts;
+};
+// The press boilerplate (contacts, About Reach Subsea, the disclosure notice; scripts/news-cleanup.mjs) closes the
+// story, set small and apart from it
+const BOILERPLATE = '<div class="article-boilerplate">';
+const [story, boilerplate] = post.content.split(BOILERPLATE);
+const parts = split(story);
+const endParts = boilerplate ? split(boilerplate.replace(/<\/div>\s*$/, '')) : [];
 ---
 
 <BaseLayout title={`${post.title} · Reach Newsroom`} motion>
   <Header current="newsroom" />
   <main id="main">
-    <BlockSection slug="news-article" root="news-article" background="white" labelledBy="news-article-title">
+    <BlockSection slug="news-article" root="news-article" background="white" spacing="sm" labelledBy="news-article-title">
       <article class="news-article__column">
         <header class="news-article__header">
           <Breadcrumb
@@ -101,6 +110,25 @@ if (rest) parts.push({ html: rest });
               </ul>
             ),
           )}
+          {
+            endParts.length > 0 && (
+              <div class="article-boilerplate">
+                {endParts.map((part) =>
+                  'html' in part ? (
+                    <Fragment set:html={part.html} />
+                  ) : (
+                    <ul class="article__links">
+                      {part.links.map((l) => (
+                        <li>
+                          <Link label={l.label} href={l.href} action={l.action} size="small" />
+                        </li>
+                      ))}
+                    </ul>
+                  ),
+                )}
+              </div>
+            )
+          }
         </div>
       </article>
     </BlockSection>
@@ -142,10 +170,12 @@ if (rest) parts.push({ html: rest });
       padding-top: calc(96px + var(--wp--custom--stack--xl));
     }
   }
+  /* The breadcrumb sits closer to the title than the title block to the photo (24 against 40), so it reads as the
+     title's, not floating between the two (Q153) */
   .news-article__header {
     display: flex;
     flex-direction: column;
-    gap: var(--wp--custom--stack--lg);
+    gap: var(--wp--custom--stack--md);
   }
   .news-article__heading {
     display: flex;
