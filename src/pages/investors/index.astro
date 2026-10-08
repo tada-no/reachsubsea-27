@@ -5,7 +5,7 @@
 // The page is the hub, so it answers "what's new and what's next" and hands the case to Why invest:
 // Investor year track (the PDF's Latest report + Upcoming event, on one time axis, over the same three
 // Report cards as Why invest: annual · latest · next) · Q2 at a glance
-// bento (headline figures + the charter one-pager) · Investor news · FAQ · CTA panel with IR contact
+// bento (headline figures + the Charter agreements card) · Investor news · FAQ · CTA panel with IR contact
 // and Newsweb. Added back 19 Sep 2026 (user review): the CEO letter (PDF quote + a 53 s clip from the
 // Q4 2025 webcast, qcnl.tv, 1:30–2:23) and the live share graph (same OMS embed as Why invest).
 // Still cut: the Highlights tabs (no Annual or Sustainability figures to put behind them; the bento is
@@ -40,7 +40,7 @@ const fig = (key: string) => r.headline.find((s) => s.key === key)!;
 const longDate = (iso: string) =>
   new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
-// Bento on 12 columns: the case (6×2) beside three headline figures and the charter one-pager (3×1 each).
+// Bento on 12 columns: the case (6×2) beside three headline figures and the Charter agreements card (3×1 each).
 const glanceCards: CardField[] = [
   {
     media: 'image-bg',
@@ -68,15 +68,16 @@ const glanceCards: CardField[] = [
     statValue: `${fig('pipeline').value}${fig('pipeline').suffix}`,
     title: 'NOK tender pipeline in active opportunities',
   },
-  // White, like the stat cards: a tint card on the tint section loses its edge
+  // White, like the stat cards: a tint card on the tint section loses its edge. Points to the Charter agreements
+  // page (Q125), whose live chart replaces the one-pager PDF the client PDF linked here
   cardPresets.document({
     surface: 'white',
-    eyebrow: 'One-pager',
-    badge: { label: 'PDF', tone: 'neutral' },
-    title: 'Charter agreement overview',
-    description: 'Fixed charter periods and options across the fleet, year by year.',
+    eyebrow: 'Fleet',
+    badge: undefined,
+    title: 'Charter agreements',
+    description: 'When each vessel’s firm charter ends, and how far its options run.',
     meta: [],
-    action: { label: 'Download (PDF)', url: '#', action: 'file' },
+    action: { label: 'See the charter timeline', url: '/investors/charter-agreements/', action: 'page' },
   }),
 ];
 
