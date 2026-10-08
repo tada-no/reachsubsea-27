@@ -1,0 +1,105 @@
+---
+// Careers › Why work with us (8 Oct 2026, Q128). Client PDF "25 — Careers — Why Work With Us" (Full Resolution
+// screen p55, Design Reference p27) for the structure and wording; the dev site's Why work with us and Explore your
+// path pages for the intro, career growth, sustainability and the offshore / onshore facts. Built for a candidate
+// deciding whether Reach is the right place to grow: the attitude · four reasons, each with its proof figure ·
+// what offshore and onshore work involve · FAQ · a way in.
+// Copy: src/data/why-work.ts (figures from key-figures.ts). FAQs: faqs.ts, topic Why work with us.
+// The PDF's reasons cards overlapped the hero: they are the Figures block below it (navy, Grid: all four reasons
+// and their figures in one view, Q135; the pinned Sticky took ~2,600px of scroll). Its benefits tiles are
+// illustrative and left out until Reach supplies the real package (Q128).
+// Redirects: dev /careers/why-work-with-us/everything-within-reach/, …/career-growth/, …/sustainability-in-work/,
+// …/meet-our-people/ and /careers/explore-your-path/offshore-careers/, …/onshore-careers/, …/graduates-students/
+// → this page (the overview's note sent Explore your path to /careers/; its offshore / onshore content lives here).
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import SplitMedia from '../../../blocks/SplitMedia.astro';
+import Figures from '../../../blocks/Figures.astro';
+import Comparison from '../../../blocks/Comparison.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { navSections } from '../../../data/navigation';
+import { hrManager, recruiter } from '../../../data/careers';
+import { whyWorkHero, whyWorkIntro, whyWorkReasons, whyWorkPaths, whyWorkCta } from '../../../data/why-work';
+import { faqsFor, faqHubHref } from '../../../data/faqs';
+
+const base = import.meta.env.BASE_URL;
+const careers = navSections.find((s) => s.id === 'careers')!;
+const page = careers.links.find((l) => l.href === '/careers/why-work-with-us/')!;
+const subnavItems = [
+  { label: 'Overview', href: careers.href },
+  ...careers.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+---
+
+<BaseLayout title="Why work with us · Careers · Reach Subsea" motion>
+  <Header current="careers" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Careers', href: careers.href },
+        { label: page.label },
+      ]}
+      title={whyWorkHero.title}
+      lead={whyWorkHero.lead}
+      image={{ src: `${base}images/project-trinidad-inspection.jpg`, alt: '', focalPoint: { x: 0.6, y: 0.45 } }}
+      actions={[{ label: 'Open positions', url: hrManager.vacancies, action: 'external' }]}
+    />
+
+    <SectionSubnav source="section-pages" label="Careers" items={subnavItems} current={page.href} />
+
+    <SplitMedia
+      anchor="everything-within-reach"
+      layout="wide"
+      background="white"
+      eyebrow={whyWorkIntro.eyebrow}
+      title={whyWorkIntro.title}
+      body={whyWorkIntro.body.map((p) => `<p>${p}</p>`).join('')}
+    />
+
+    <Figures anchor="reasons" layout="grid" background="navy" title={whyWorkReasons.title} figures={whyWorkReasons.points} />
+
+    <Comparison
+      anchor="your-path"
+      background="white"
+      sectionHeader={{ eyebrow: whyWorkPaths.eyebrow, title: whyWorkPaths.title, intro: whyWorkPaths.intro }}
+      options={whyWorkPaths.options}
+      rows={whyWorkPaths.rows}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about joining Reach Subsea.',
+        action: { label: 'See all FAQs', url: faqHubHref('why-work') },
+      }}
+      layout="split"
+      source="faq"
+      topic="why-work"
+      background="tint"
+      items={faqsFor('why-work')}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title={whyWorkCta.title}
+      text={whyWorkCta.text}
+      actions={[
+        { label: 'Go to Candidate Portal', url: hrManager.vacancies, action: 'external' },
+        { label: 'Register for new openings', url: hrManager.register, action: 'external', type: 'link' },
+      ]}
+      showContact
+      contact={recruiter}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,167 @@
+---
+// Comparison · reach/comparison (8 Oct 2026, Careers › Why work with us, Q134; outside the 14-block budget).
+// Two options side by side on the same points, so the eye reads across a row: offshore vs onshore careers.
+// Ross (8 Oct 2026): as two text cards with label · value rows, the labels repeated in both cards, the rows didn't
+// line up and every word was small type. Now each label is said once, in its own column, and the rows align.
+//
+// From 900: a 12-column grid. The labels column (cols 1–2) and each option (5 columns each for two) are subgrids of
+// the same rows, so a row is as tall as its longest value and the rule above it runs across every column. Each
+// option heads with an H3 and a one-line lead. Below 900: one stack per option, each label over its value.
+// The DOM reads option by option (an article each, its own <dl>), so a screen reader hears every value with its
+// label; the shared labels column is decorative there (aria-hidden) and the per-option labels are hidden visually.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+
+interface ComparisonOption {
+  title: string;
+  lead?: string;
+}
+
+interface ComparisonRow {
+  label: string;
+  /** One value per option, in the options' order. */
+  values: string[];
+}
+
+interface Props extends BlockFields {
+  sectionHeader: SectionHeaderField;
+  options: ComparisonOption[];
+  rows: ComparisonRow[];
+}
+
+const { sectionHeader, options = [], rows = [], background, spacing, anchor } = Astro.props;
+const titleId = makeId('comparison', sectionHeader.title);
+---
+
+{
+  options.length > 0 && rows.length > 0 && (
+    <BlockSection slug="comparison" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId}>
+      <div class="block__body">
+        <SectionHeader {...sectionHeader} id={titleId} />
+        <div class="comparison__grid" style={`--comparison-rows: ${rows.length}; --comparison-options: ${options.length}`}>
+          <div class="comparison__labels" aria-hidden="true">
+            <span class="comparison__corner" />
+            {rows.map((row) => <span class="comparison__label text-small">{row.label}</span>)}
+          </div>
+          {options.map((option, i) => (
+            <article class="comparison__column">
+              <div class="comparison__head">
+                <h3 class="comparison__title text-h3">{option.title}</h3>
+                {option.lead && <p class="comparison__lead text-body">{option.lead}</p>}
+              </div>
+              <dl class="comparison__rows">
+                {rows.map((row) => (
+                  <div class="comparison__row">
+                    <dt class="comparison__dt text-small">{row.label}</dt>
+                    <dd class="comparison__value text-body">{row.values[i]}</dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
+          ))}
+        </div>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  /* ── Phones and tablets (below 900): one stack per option, label over value ── */
+  .comparison__grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--64);
+  }
+  .comparison__labels {
+    display: none;
+  }
+  .comparison__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+    padding-bottom: var(--wp--preset--spacing--24);
+  }
+  .comparison__title {
+    margin: 0;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .comparison__lead {
+    margin: 0;
+    color: var(--wp--custom--color--text--secondary);
+    max-width: 560px;
+  }
+  .comparison__rows {
+    margin: 0;
+  }
+  .comparison__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    padding-block: var(--wp--preset--spacing--16);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .comparison__dt,
+  .comparison__label {
+    color: var(--wp--custom--color--text--secondary);
+    font-weight: var(--wp--custom--font-weight--medium);
+  }
+  .comparison__value {
+    margin: 0;
+    color: var(--wp--custom--color--text--primary);
+  }
+
+  /* ── From 900: one grid, the labels said once on the left, the rows aligned across the options ── */
+  @media (min-width: 900px) {
+    .comparison__grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-template-rows: auto repeat(var(--comparison-rows), auto);
+      /* No row gap: the cells' padding and rules space the rows (the stack's 64 gap is for phones) */
+      gap: 0 var(--wp--custom--grid--gutter);
+    }
+    .comparison__labels,
+    .comparison__column {
+      position: relative;
+      display: grid;
+      grid-row: 1 / -1;
+      grid-template-rows: subgrid;
+    }
+    .comparison__labels {
+      grid-column: 1 / span 2;
+    }
+    /* Two options, 5 columns each */
+    .comparison__column:nth-of-type(1) {
+      grid-column: 3 / span 5;
+    }
+    .comparison__column:nth-of-type(2) {
+      grid-column: 8 / span 5;
+    }
+    .comparison__head {
+      padding-bottom: var(--wp--preset--spacing--32);
+    }
+    .comparison__rows,
+    .comparison__row {
+      display: contents;
+    }
+    /* Each cell carries the row's rule, so the line runs across the labels and both options */
+    .comparison__label,
+    .comparison__value {
+      padding-block: var(--wp--preset--spacing--24);
+      border-top: 1px solid var(--wp--custom--color--border--subtle);
+    }
+    .comparison__value {
+      padding-right: var(--wp--preset--spacing--24);
+    }
+    /* The option's own labels stay for screen readers; the shared column shows them */
+    .comparison__dt {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+</style>
