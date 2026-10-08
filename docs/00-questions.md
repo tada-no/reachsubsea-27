@@ -334,7 +334,7 @@ Context: Ross: the campaigns page looked messy; write the poster's content out o
 - [x] brain and shield-stop: Ross's 2.5 stroke redraws (Figma 421:9718, 421:9717), looped in shield-tick's family: Stop's cross rewinds and redraws, the sign shakes "no", the shield breathes; Think's folds rewind and redraw in three waves top to bottom
 - [x] File links follow one convention site-wide (Ross: "Download (PDF)" had crept in): the document's name then "(PDF)", no "Download" verb. Renamed: Download report (PDF) → Report (PDF) ×4, Download (PDF) → One-pager (PDF), Download spec sheet (PDF) → Spec sheet (PDF), Download the poster (PDF) → Campaign poster (PDF) / Life-Saving Rules poster (PDF), archive "Download" → Poster (PDF). Figma: Document card and Spec link defaults to rename on approval
 - [ ] Waiting on Reach: the 18 poster PDFs
-- New: Split media `artwork`, `joined`, `pairSpecs`/`pairHeading`, `titleHidden`; Card grid `ariaLabel` and tablet icon rows; Card Navy inside a Navy section raised to navy/700; Media gallery poster `file`. Figma variants to add on approval
+- New: Split media `artwork`, `joined`, `pairSpecs`/`pairHeading`, `titleHidden`; Card grid `ariaLabel` and tablet icon rows; Card Navy inside a Navy section raised to navy/700; Media gallery poster `file`. Figma variants to add on approval. Figma (8 Oct 2026): Media gallery Posters 553:14115 / 553:14320; `artwork`, `joined`, `pairSpecs`/`pairHeading` and `titleHidden` drawn as instance overrides in the HSEQ campaigns frame 558:16363 (no new variants needed)
 
 **Answer:** as ticked.
 
@@ -399,6 +399,7 @@ Context: client PDF p34–35 (one page: hero with six cards over it, certificati
 - [x] Child pages use the Text hero on navy under the overlay header (Q57's plain navy Text hero; Ross, 7 Oct 2026, after a first white build). The CTA panel keeps only Contact us: "Back to HSEQ" went, since the breadcrumb and subnav already lead back
 - [x] How we operate (Ross, 7 Oct 2026): a one-column header like Standards, the live intro trimmed to one sentence, then the six areas as icon cards (3 × 2, tint cards on white; 2 × 3 below 1200). Library pictograms: `planner` (Risk management), `life-ring` (Safety), `teach-people` (Employee involvement), `leaf-hand` (Environment), `fingerprint` (Security), `goals` (Quality). Ross redrew all six as 2.5 strokes (Figma 421:9572–9576, 421:9590); each loops once (3.2s): the play drawn towards the target, the ring thrown and bobbing, knowledge passed across and back, the seedling lifted and swaying, the frame closing on a print that redraws from the core, the arrow drawn back and striking
 - [x] Page-wide patterns (Ross, 7 Oct 2026): every full-width block heads with the Section header (stacked Split media too: Lead intro, link at the far end); hairlines only where they help (Spec rows, Accordion, the ISO tiles beside the registrations), none on the policy list
+- [x] Figma (8 Oct 2026): `Block/Checklist grid` 545:14226 (Full Desktop 545:12342 / Mobile 545:13284, Compact Desktop 545:12936 / Mobile 545:13875), the nine IOGP icons as Rule icon components 543:24581–543:24589, Checklist item 544:12342, Checklist link 544:12373; page frames HSEQ 555:14272 (Policies list with the Code of Conduct, twelve files), Life-Saving Rules 557:15336, HSEQ campaigns 558:16363. New variants: Split media Tiles and spec Stacked 551:15971 / 551:16051 (Pictogram tile 551:2544), Media gallery Posters 553:14115 / 553:14320. Ledger key sweep8OctCompany
 
 **Answer:** as ticked.
 
@@ -491,6 +492,7 @@ Context: Client PDF p32–33 (Design reference p15): hero, five executives with 
 - [ ] Portrait grid with bios on expand · [ ] Cards as in the PDF
 - [x] Show the executives' direct phone and email, flagged to confirm with Reach
 - [ ] Leave them off
+- [x] Figma (8 Oct 2026): `Block/Profiles` 542:12318 (Grid Desktop 542:11990 / Mobile 542:12155, Rows Desktop 542:12077 / Mobile 542:12242), parts Profile tile 541:12013 and Profile row 541:12039, real portraits; page frame Leadership & Board 548:13802. Ledger key sweep8OctCompany
 
 **Answer:** as ticked. Claude's calls on the way: one `people.ts` (People post type) feeds this page and About's management table; FAQ answers are built from it (the PDF's "See this page for the full current Board…" pointed at itself); the hero lead is cut to two lines and the Euronext listing stays as the board intro; contact cards keep three columns down to 900 and become compact rows below 768 (Card grid `contacts`, set automatically when image-top cards carry only name, role and meta); the board header sits beside the rows from 1200 and stacks below; hero `hero-leadership.jpg` is *Northern Maria* with the sea extended left so the vessel sits right of the title. To confirm with Reach: every phone and email, Hilde Drønen's year on the board, "MKOLD AS" (live) vs "MMOLD AS" (PDF).
 

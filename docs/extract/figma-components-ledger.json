@@ -30,7 +30,8 @@
     "Footer": "125:2893",
     "Media toggle": "365:2366",
     "Search field": "417:13785",
-    "Donut": "437:2408"
+    "Donut": "437:2408",
+    "Pictogram tile": "551:2517"
   },
   "components": {
     "Logo": {
@@ -408,6 +409,22 @@
       "id": "450:17107",
       "type": "COMPONENT",
       "notes": "On the Blocks page beside Blocks / Share bars (8 Oct 2026). Props Value, Period."
+    },
+    "Pictogram tile": {
+      "id": "551:2544",
+      "type": "COMPONENT_SET",
+      "variants": {
+        "Breakpoint=Desktop": "551:2522",
+        "Breakpoint=Mobile": "551:2533"
+      },
+      "props": [
+        "Title#551:0",
+        "Text#551:3",
+        "Pictogram#551:6 (INSTANCE_SWAP)",
+        "Show link#551:9",
+        "Show rule#551:12"
+      ],
+      "notes": "Added 8 Oct 2026 (sweep8OctCompany) for Split media tiles (HSEQ ISO certificates). Doc frame Components / Pictogram tile 551:2517 at (0, 58353). Pictogram 64 (Mobile 48) beside Title Heading/H5, Text Body/Small text/secondary and an exposed Link (File Medium 'Certificate (PDF)'); padding space/24 top and bottom (Mobile 16), gap space/24 (Mobile 16), body gap space/4; Rule = absolute 1px border/subtle at the top. Code src/components/PictogramTile.astro."
     }
   },
   "ledgers": {

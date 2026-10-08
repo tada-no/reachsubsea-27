@@ -1768,5 +1768,110 @@
       "Sustainability 441:6601 / Mobile 445:7129": "Sponsorship teaser Split media Image Start added under SDG goals: Desktop 532:14196, Mobile 532:24697 (tint, photo, eyebrow Sponsorship, link Our sponsorship policy); Accordion and CTA panel grounds now white"
     },
     "gotchas": "Cloning a variant into its set (Image Start → Beside) dropped the text/visibility property references on moved layers: rebind after restructuring. Nested Card instances inside a Card grid row would not grow after a size override: rebuild the block instance, set Card Content and Card to HUG, then equalise with Content bottom padding. figma.skipInvisibleInstanceChildren hides invisible instance layers from findOne: set it false before showing them again."
+  },
+  "sweep8OctCompany": {
+    "date": "2026-10-08",
+    "context": "Figma sweep batch 3 (8 Oct 2026): Company section. Block/Profiles and the Leadership & Board frame (Q103–Q111); Block/Checklist grid (Q115–Q119, new docs/05 §2.28); page frames HSEQ, Life-Saving Rules, HSEQ campaigns; About frame brought in line with /company/ after 67c9290 (Our story in one paragraph). Ground truth: src/pages/company/{index,leadership-board/index}.astro, src/pages/company/hseq/{index,life-saving-rules,campaigns}.astro, src/blocks/Profiles.astro, ChecklistGrid.astro, SplitMedia.astro, MediaGallery.astro, src/components/PictogramTile.astro, src/data/{people,hseq,company,key-figures,faqs}.ts; production build at 1440 and 375.",
+    "images": "Uploaded from public/images (Figma image fills, reused by hash): people/*.jpg ×10 (jostein b0b475b5…, bard c371e115…, arne 9298c2c1…, inge 4a8978b0…, audun 7266cec4…, rachid 27e1261d…, espen 9c3d2f37…, martha 8b430ce0…, arvid 5d8b881b…, hilde f9e8a518…), hero-leadership 3bf98f44…, hero-hseq b48eec64…, vessel-olympic-zeus dd1f9b58…, hseq/campaigns/2026-q2-illustration ffe25b48…, and the ten posters 2024 Q1–2026 Q2 shown in the archive. The 2021–2023 posters were uploaded to staging but are not placed (the frame shows three years), so Figma no longer holds them.",
+    "components": {
+      "Profile tile 541:12013 (new, Blocks / Profiles)": "Breakpoint=Desktop 541:11979, Mobile 541:11996. Props Name#541:0, Role#541:3, Show phone#541:6, Show email#541:9; Phone and Email are exposed Meta item instances (Icon/phone, Icon/mail). Portrait frame: image fill over bg/disabled, radius/md, Desktop FILL with aspect locked 1:1 (236.8 in the five-across grid), Mobile 96 beside the text, centred. Name Heading/H5, Role Body/Small text/accent; gaps space/24 · space/12 · space/4 · space/8 (Mobile row gap space/16)",
+      "Profile row 541:12039 (new, Blocks / Profiles)": "Breakpoint=Desktop 541:12014, Mobile 541:12027. Props Name#541:12, Meta#541:15, Bio#541:18, Show meta#541:21; Role is an exposed Badge (Neutral; swap to Accent for the chair). Desktop: Portrait 236.8 (one Grid tile) beside Text (Head: Name Heading/H4 + Badge, wrap, gap space/12 × space/8; Meta Body/Small text/secondary space/4 under; Bio Body/Body text/secondary, 704 measure, space/12 under), gap grid/gutter. Mobile: 96 portrait beside Head, Meta and Bio full width under (space/16, then space/8)",
+      "Rule icon/<slug> 543:24581–543:24589 (new, Blocks / Checklist grid › Rule icons 543:24580)": "bypassing-safety-controls 543:24581, confined-space 543:24582, driving 543:24583, energy-isolation 543:24584, hot-work 543:24585, line-of-fire 543:24586, safe-mechanical-lifting 543:24587, work-authorisation 543:24588, working-at-height 543:24589. 96 × 96, imported from public/images/hseq/life-saving-rules/1–9.svg (class styles inlined, then upload_assets SVG import); the Artwork frame scales with the instance (64, 80, 96 all used). IOGP artwork colours kept as drawn (raw navy/white, not tokens), as for photos and the SDG tiles",
+      "Checklist item 544:12342 (new)": "Breakpoint=Desktop 544:12258 (416), Mobile 544:12300 (327). Props Title#544:0, Rule#544:3, Icon#544:6 (INSTANCE_SWAP, a Rule icon), Show point 3#544:9, Show point 4#544:12, Show point 5#544:15, Show point 6#544:18; Point 1–6 are exposed List item 519:2513 instances. White card bg/default, radius/lg, padding space/32 (Mobile 24), gap stack/md; Head gap stack/xs. Rule: Body tokens (size/body, line-height/body, family/sans) at weight/medium, text/primary: no Body medium text style exists, so the style is detached and every typography property is variable-bound",
+      "Checklist link 544:12373 (new)": "Breakpoint=Desktop 544:12343 (117.3, icon 80, gap stack/sm), Mobile 544:12358 (98.3, icon 64, gap stack/xs). Props Title#544:21, Icon#544:24 (INSTANCE_SWAP). Title UI/Label text/primary centred",
+      "Pictogram tile 551:2544 (new, Components page)": "See figma-components-ledger.json. Used by Split media Tiles and spec",
+      "Poster 553:13717 (new, Blocks / Media gallery)": "Single component, 248 wide. Props Quarter#553:0, Title#553:1, Show link#553:2. Tile (stack/sm): Frame 5:7 (aspect locked, image fill over bg/disabled, 1px border/subtle inside, radius/md) · Text (stack/xs): Quarter UI/Label text/accent, Title Body/Small text/primary · Link Small File 'Poster (PDF)'",
+      "Poster year 553:13815 (new, Blocks / Media gallery)": "Breakpoint=Desktop 553:13727 (Year Heading/H4 192 wide = cols 1–2, then four 248 slots, grid/gutter), Mobile 553:13770 (Year over a 2 × 2 grid, rows space/32, Show second row#553:6). Props Year#553:3; Q1–Q4 are exposed Poster instances (hide a missing quarter; on Desktop the slot keeps its place)",
+      "Split media 166:2339": "New variants Media=Tiles and spec, Position=Stacked, Text=Heading: Desktop 551:15971, Mobile 551:16051 (cloned from Spec table Stacked; Title/Body/Show eyebrow/Show actions rebound; Start = H5 'ISO certificates' + three Pictogram tiles, the first without rule and paddingTop space/12; End = H5 'Supplier registrations' + five Spec rows). New BOOLEAN Show documents 7–12#551:29: six more Document slots in Documents Stacked (Desktop 511:11845, two per column; Mobile 511:11938). New BOOLEAN Show image#546:0: Wide media 546:23526 (1312 × 562, 21:9, radius/xl, bg/disabled + Icon/photo) in Media=Wide 302:4980. Fixed: Body text in the Stacked variants 511:11845, 511:11890, 511:11938, 511:11981 was fixed height (textAutoResize NONE, the copy was clipped) → HEIGHT; variants re-spaced so none overlap",
+      "Media gallery 192:3618": "New variants Type=Posters: Desktop 553:14115, Mobile 553:14320 (cloned from Photos; Section header and More rebound to Show section header#192:0 / Show more#192:5). Section header 'Campaign archive' + intro, Years (space/48): Poster year 2026 (Q1, Q2; Q3/Q4 hidden), 2025, 2024 with the real posters, More: Link Expand 'Show all years'"
+    },
+    "blocks": {
+      "Block/Profiles": "set 542:12318 on doc frame Blocks / Profiles 541:11974 (x -10768, y 13861, under Charter timeline): Layout=Grid Desktop 542:11990 (white; Section header 'Meet our management team'; five Profile tiles, grid/gutter), Layout=Rows Desktop 542:12077 (tint; Section header eyebrow Corporate governance, Board of Directors, intro, action Governance & meetings; five Profile rows, space/96 apart; Rachid's badge Accent), Grid Mobile 542:12155 (tiles space/24 apart), Rows Mobile 542:12242 (rows space/48). Padding section/md × grid/margin, gap stack/xl; Mobile with Layout/Typography Mobile modes. No dialog or expanded state: the code shows every bio open (Dialog 133:259 not needed)",
+      "Block/Checklist grid": "set 545:14226 on doc frame Blocks / Checklist grid 543:24575 (x -10768, y 18365): Layout=Full Desktop 545:12342 (tint; three rows of three Checklist items, shorter cards FILL to the tallest), Layout=Compact Desktop 545:12936 (white; nine Checklist links, grid/gutter), Full Mobile 545:13284 (one column), Compact Mobile 545:13875 (3 × 3, gap space/16, rows space/24). BOOLEAN Show section header#545:0 (Life-Saving Rules turns it off). Content: the nine IOGP rules from src/data/hseq.ts"
+    },
+    "pageFrames": [
+      {
+        "id": "548:13802",
+        "name": "Leadership & Board",
+        "x": 34440,
+        "height": 4911,
+        "source": "src/pages/company/leadership-board/index.astro",
+        "sections": {
+          "Header (Desktop overlay, Navy mode, bg/default fill)": "548:13803",
+          "Page hero Photo (hero-leadership.jpg; breadcrumb Home › Company › Leadership & Board; no eyebrow)": "548:13804",
+          "Section subnav (Company, Leadership & Board active)": "548:13805",
+          "Profiles Grid, Meet our management team (white)": "548:14142",
+          "Profiles Rows, Board of Directors (tint)": "548:14306",
+          "Accordion Split, leadership FAQs (white)": "548:13811",
+          "CTA band Band, Talk to us (Contact us, Investor relations)": "548:13812",
+          "Footer": "548:13813"
+        }
+      },
+      {
+        "id": "555:14272",
+        "name": "HSEQ",
+        "x": 36080,
+        "height": 6488,
+        "source": "src/pages/company/hseq/index.astro",
+        "sections": {
+          "Header": "555:14273",
+          "Page hero Photo (hero-hseq.jpg; Home › Company › HSEQ)": "555:14274",
+          "Section subnav (HSEQ active)": "555:14275",
+          "Card grid 3 columns + second row, How we operate (white; six Card Icon/Tint, library pictograms planner, life-ring, teach-people, leaf-hand, fingerprint, goals; cards HUG, shorter ones FILL)": "555:14707",
+          "Split media Tiles and spec Stacked, Standards & certification (tint)": "555:15487",
+          "Checklist grid Compact, Life-Saving Rules teaser (white)": "555:15603",
+          "Split media Documents Stacked, Policies & Code of Conduct (navy; Show documents 7–12: Code of Conduct 2025 first, then the eleven policies, newspaper order)": "555:29033",
+          "Card grid 3 columns, Campaigns, reporting and transparency (tint; three Card None/White with eyebrow and action: All HSEQ campaigns, Report a concern (External), Read our statement)": "555:29098",
+          "Accordion Split, HSEQ FAQs (white)": "555:14278",
+          "CTA panel, Would you like to know more? Reach out to us today. (HSEQ contact, white)": "555:29554",
+          "Footer": "555:14280"
+        }
+      },
+      {
+        "id": "557:15336",
+        "name": "Life-Saving Rules",
+        "x": 37720,
+        "height": 3242,
+        "source": "src/pages/company/hseq/life-saving-rules.astro",
+        "sections": {
+          "Header (cloned from Sponsorship, bg/default fill added)": "557:15337",
+          "Page hero Text, navy (eyebrow IOGP; Home › Company › HSEQ › Life-Saving Rules; Button 'Life-Saving Rules poster (PDF)')": "557:15338",
+          "Section subnav (HSEQ active)": "557:15339",
+          "Checklist grid Full, the nine rules (tint, Show section header off)": "557:16058",
+          "CTA panel, Would you like to know more? (HSEQ contact, tint)": "557:17050",
+          "Footer": "557:15344"
+        }
+      },
+      {
+        "id": "558:16363",
+        "name": "HSEQ campaigns",
+        "x": 39360,
+        "height": 4926,
+        "source": "src/pages/company/hseq/campaigns.astro",
+        "sections": {
+          "Header": "558:16364",
+          "Page hero Text, navy (Home › Company › HSEQ › HSEQ campaigns)": "558:16365",
+          "Section subnav (HSEQ active)": "558:16366",
+          "Split media Image, Q2 2026 campaign (tint; the worker illustration as artwork; eyebrow Q2 2026 campaign · Safety first; Link File Campaign poster (PDF))": "558:17141",
+          "Card grid 3 columns, Stop · Think · Lift safe (tint, joined: paddingTop space/0, no header; Card Icon/White with Show scope, three List items, pictograms shield-stop, brain, shield-tick)": "558:17166",
+          "Split media Spec table Stacked paired, The golden rules + Offshore risks (tint, joined, Text hidden = titleHidden)": "558:17698",
+          "Media gallery Posters, Campaign archive (white, 2026–2024, Show all years)": "558:17745",
+          "CTA panel, Still think it’s just a quick lift? (Send us your feedback, HSEQ contact, white)": "558:16368",
+          "Footer": "558:16369"
+        }
+      }
+    ],
+    "aboutFrame": "About 351:3194 matched to /company/ (67c9290): Our story 351:3306 now one paragraph (Body set, the second Body hidden; paragraph 640 wide) with Show image on and the Olympic Zeus photo in the 21:9 Wide media, as the code; Stats band 351:3315 now the code's four figures (500+ People offshore and onshore · 2008 Established · 8 Offices · 4 Countries with an office; the 5th stat hidden; it showed fleet, countries reached and ROV systems); management Spec rows 352:11721 in the code's order (CEO, CCO, CFO, COO, CTO); FAQ 'Where does Reach Subsea have offices?' answer updated to the code's. Frame height 4425 → 5023",
+    "housekeeping": "Blocks page: Blocks / Embed, Blocks / Lifecycle and their parts (457:8412, 465:9815, 465:10053, 465:10203, 472:9242) moved down 1853 in total to clear the grown Split media doc frame (it already overlapped Embed by ~400 before this batch); Blocks / Results band 321:6312 with Result item 465:9591 and Result row 465:9694 moved down 3964 under the grown Media gallery doc frame. Asset staging frame deleted. Overlap audit clean on Blocks and Pages; repeated-structure scan empty on every new doc frame, variant and page frame. New page-frame headers (Leadership, HSEQ, Life-Saving Rules, campaigns) get the bg/default fill in Navy mode (the Sponsorship clone had none, so the overlay header read white on white)",
+    "gaps": [
+      "Profiles: no 768–1319 layouts drawn (Grid 3 + 2, Rows 160/200 portraits); Desktop and Mobile only",
+      "Checklist grid: the 600–1199 Full layout (icon beside the text, commitments in two newspaper columns) and Compact tablet row (icon beside the title) are not drawn; hover states not drawn",
+      "Checklist item Rule text has no text style (Body at weight/medium is not a style in the file); bound to the typography variables instead",
+      "HSEQ campaigns: the Split media body is one TEXT layer, so the bold 'It’s never “just a quick lift.”…' and the small sources line are plain body copy",
+      "HSEQ campaigns: the 2021–2023 posters are not in Figma (only the three shown years); the Poster image fill is centred, the code anchors the poster to its top",
+      "Split media Wide paragraph: 640 (the variant's column) where the code uses cols 1–5 (528); the About title wraps one word later than the code",
+      "Production build at :4322 predates fe3eaa1 for HSEQ (shows the Code of Conduct as a header action); the frame follows the source (twelve files, no action)",
+      "No mobile page frames (block Mobile variants only)"
+    ]
   }
 }
