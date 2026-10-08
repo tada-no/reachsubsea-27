@@ -1741,5 +1741,32 @@
       "Embed Iframe (Reports & presentations): its frames are still 480 high, though phase sweep8OctReports lists 800 / 504; the Share information instance sets 1792 through the frame's padding",
       "No mobile page frames (block Mobile variants only)"
     ]
+  },
+  "phase4SponsorshipTransparency8Oct": {
+    "date": "2026-10-08",
+    "context": "Sponsorship and Transparency Act pages (Q144) pushed to Figma at Ross's request, plus the Sustainability hub's Sponsorship teaser. Ground truth: src/pages/company/sustainability/sponsorship/index.astro, src/pages/transparency-act.astro, src/pages/company/sustainability/index.astro.",
+    "components": {
+      "List item": "519:2513 on Components (under Meta item): 6px icon/accent dot on the first line's centre (Marker 6 wide, line-height tall) beside Body/Small text/secondary; TEXT property Text#519:0. Code: Card scope (.card__scope li)",
+      "Card 103:1110": "New properties Show scope#519:1 (BOOLEAN, off) and Show 4th scope item#519:40 (BOOLEAN, on). A Scope frame (space/8 gap, four List item instances) sits in Text group under Heading in Media=None, Surface=White, Size=Default 103:451 (scope 519:2607) and Media=Icon, Surface=White, Size=Default 103:638 (scope 519:2624)"
+    },
+    "blocks": {
+      "Block/Split media 166:2339": "Media=Beside added (Ross's reference frame 435:17585): Position=Start, Breakpoint=Desktop 520:11966 (eyebrow on top, then Row: Title H2 640 beside Copy FILL = Body + Actions, gap grid/gutter), Breakpoint=Mobile 520:11979 (stacked). Title/Body/Show eyebrow/Show actions bound"
+    },
+    "pageFrames": {
+      "Sponsorship": {
+        "id": "523:13260",
+        "x": 31160,
+        "source": "src/pages/company/sustainability/sponsorship/index.astro",
+        "sections": "Header overlay · Page hero Text 523:13790 (breadcrumb Home › Company › Sustainability › Sponsorship) · Subnav (Sustainability active) 523:13263 · Split media Image End 523:13808 (stacked-hands photo, image hash 984ff6ab50e21918ae2e3890710911d34f53f3c9) · Card grid 3 columns 527:13561 (tint; three Card None/White with Show scope, top row hidden, equal heights by Content bottom padding) · Split media Numbered list End 523:13889 · CTA panel 523:13270 (tint; Sponsorship Committee, email only) · Footer"
+      },
+      "Transparency Act": {
+        "id": "528:13561",
+        "x": 32800,
+        "source": "src/pages/transparency-act.astro",
+        "sections": "Header overlay · Page hero Text 528:13563 (eyebrow Statement, June 2026; breadcrumb Home › Transparency Act) · no subnav · Split media Beside 528:13899 · Card grid 3 columns 528:13566 (tint; Section header action Transparency Act statement (PDF)) · CTA panel 528:13568 (white; HSEQ contact) · Footer"
+      },
+      "Sustainability 441:6601 / Mobile 445:7129": "Sponsorship teaser Split media Image Start added under SDG goals: Desktop 532:14196, Mobile 532:24697 (tint, photo, eyebrow Sponsorship, link Our sponsorship policy); Accordion and CTA panel grounds now white"
+    },
+    "gotchas": "Cloning a variant into its set (Image Start → Beside) dropped the text/visibility property references on moved layers: rebind after restructuring. Nested Card instances inside a Card grid row would not grow after a size override: rebuild the block instance, set Card Content and Card to HUG, then equalise with Content bottom padding. figma.skipInvisibleInstanceChildren hides invisible instance layers from findOne: set it false before showing them again."
   }
 }

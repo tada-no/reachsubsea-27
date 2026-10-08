@@ -21,6 +21,8 @@ Context: Ross asked to add the dev site's Transparency Act and Sponsorship pages
 - [ ] For Reach: the live statement calls the Act "also known as the Transparency in Supply Chains Act" and frames it around trafficking and modern slavery. Norway's Transparency Act (Åpenhetsloven) covers fundamental human rights and decent working conditions, and the Transparency in Supply Chains Act is a Californian law. Kept as published until Reach or their counsel confirm
 - [x] Sponsorship photo (Ross offered `assets/Sponsorship.jpg`, stacked hands from above, as the hero): Claude advised against it as a hero (busy, subject filling the centre, no calm area for the title; child pages use the navy Text hero). Ross: in the intro block instead. Split media Image beside "More than support" (`public/images/sponsorship.jpg`, 1600 wide)
 
+- [x] Figma (Ross: update Figma for both pages): page frames Sponsorship 523:13260 and Transparency Act 528:13561; Sustainability Desktop/Mobile gain the teaser (532:14196, 532:24697), FAQ and CTA on white. New: List item 519:2513 and Card's Show scope list; Split media Media=Beside variant (520:11966 / 520:11979). Ledger key phase4SponsorshipTransparency8Oct. HSEQ frame left to the site-sweep chat
+
 **Answer:** as ticked; open items pending.
 
 ### Q143. Full-site sweep: image trios, the accent badge on navy, Figma scope (8 Oct 2026)
