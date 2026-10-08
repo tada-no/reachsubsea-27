@@ -3,14 +3,29 @@
 // Statement: Eyebrow + H2, centred, max 880, optional Link. Quote: 40px quote icon, H3 quote text,
 // then attribution (56px round photo + name + role), left-aligned in an 880 column centred in the
 // container. The block has no visible title, so BlockSection gets `label` instead of `labelledBy`.
+// Quotes (8 Oct 2026, Life at Reach, Q130, Q137): a collection from the Quote post type (src/data/quotes.ts). The
+// Section header (eyebrow, H2) with arrow buttons at its far end, then a carousel of quote cards: a rail that starts
+// on the container's left edge and runs off the right edge of the viewport (scroll-snap, as the Social feed), each
+// card a Tint box with the quote in Lead (curly quotes from CSS, the opening one hung) and the name and role at its
+// foot, so the names line up along the rail. Arrows page by one card on fine pointers; touch swipes; the rail is
+// focusable for keyboard scrolling. No autoplay. (Ross, 8 Oct 2026: the pictogram and the split layout both went.)
 import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import IconButton from '../components/IconButton.astro';
+import { makeId } from '../lib/ids';
 import Eyebrow from '../components/Eyebrow.astro';
 import Link from '../components/Link.astro';
 import Icon from '../components/Icon.astro';
-import type { BlockFields, ImageField, LinkField } from '../lib/types';
+import type { BlockFields, ImageField, LinkField, SectionHeaderField } from '../lib/types';
+
+interface QuoteItem {
+  quote: string;
+  name: string;
+  role?: string;
+}
 
 interface Props extends BlockFields {
-  style?: 'statement' | 'quote';
+  style?: 'statement' | 'quote' | 'quotes';
   eyebrow?: string;
   /** Statement only. */
   statement?: string;
@@ -20,6 +35,9 @@ interface Props extends BlockFields {
   name?: string;
   role?: string;
   photo?: ImageField;
+  /** Quotes only: the block's header and the quotes (2 or more). */
+  sectionHeader?: SectionHeaderField;
+  quotes?: QuoteItem[];
 }
 
 const {
@@ -31,13 +49,17 @@ const {
   name,
   role,
   photo,
+  sectionHeader,
+  quotes = [],
   background,
   spacing,
   anchor,
 } = Astro.props;
 
 const isQuote = style === 'quote';
+const isQuotes = style === 'quotes';
 const label = isQuote ? (quote || 'Quote') : statement || eyebrow || 'Statement';
+const titleId = isQuotes && sectionHeader ? makeId('statement', sectionHeader.title) : undefined;
 const fp = photo?.focalPoint;
 const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : undefined;
 ---
@@ -49,8 +71,44 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
   background={background}
   spacing={spacing}
   anchor={anchor}
-  label={label}
+  label={titleId ? undefined : label}
+  labelledBy={titleId}
+  bleed={isQuotes}
 >
+  {
+    isQuotes ? (
+      quotes.length > 0 && (
+        <div class="statement__carousel">
+          <div class="container statement__carousel-head">
+            {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+            <div class="statement__arrows" data-quotes-arrows hidden>
+              <IconButton icon="arrow-left" label="Previous quote" variant="outline" size="small" data-quotes-prev />
+              <IconButton icon="arrow-right" label="Next quote" variant="outline" size="small" data-quotes-next />
+            </div>
+          </div>
+          <ul class="statement__rail" data-quotes-rail tabindex="0" role="list" aria-label="Quotes">
+            {quotes.map((q) => (
+              <li class="statement__quotes-item">
+                <figure class="statement__quotes-figure">
+                  <blockquote class="statement__quotes-text text-lead">{q.quote}</blockquote>
+                  <figcaption class="statement__person">
+                    <span class="statement__name text-label">{q.name}</span>
+                    {q.role && <span class="statement__role text-small">{q.role}</span>}
+                  </figcaption>
+                </figure>
+              </li>
+            ))}
+          </ul>
+          {/* Position on touch screens, where the arrows are hidden: one bar per card, the current one green. Not
+              tappable (swipe moves the cards); decorative, the list already says how many items it holds. */}
+          <div class="container">
+            <ol class="statement__ticks" aria-hidden="true">
+              {quotes.map((_, i) => <li class:list={['statement__tick', i === 0 && 'is-current']} data-quotes-tick={i} />)}
+            </ol>
+          </div>
+        </div>
+      )
+    ) : (
   <div class="statement__inner">
     {
       isQuote ? (
@@ -94,6 +152,8 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
       )
     }
   </div>
+    )
+  }
 </BlockSection>
 
 <style is:global>
@@ -165,4 +225,156 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
   .statement__role {
     color: var(--wp--custom--color--text--secondary);
   }
+
+  /* Quotes: the Section header with the arrows at its far end, then the rail */
+  .statement--quotes {
+    overflow: hidden;
+  }
+  .statement__carousel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--wp--custom--stack--sm) var(--wp--custom--grid--gutter);
+    margin-bottom: var(--wp--custom--stack--xl);
+  }
+  .statement__arrows {
+    display: flex;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .statement__arrows[hidden] {
+    display: none;
+  }
+  /* The rail starts on the container's left edge and bleeds off the right edge of the viewport */
+  .statement__rail {
+    --rail-inset: max(
+      var(--wp--style--root--padding-left),
+      calc((100vw - var(--wp--style--global--wide-size)) / 2)
+    );
+    display: flex;
+    gap: var(--wp--custom--grid--gutter);
+    margin: 0;
+    padding: 0 var(--rail-inset);
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--rail-inset);
+    scrollbar-width: none;
+  }
+  .statement__rail::-webkit-scrollbar {
+    display: none;
+  }
+  .statement__rail:focus-visible {
+    outline-offset: -2px;
+  }
+  /* Touch only (Ross, 8 Oct 2026): the arrows carry it on fine pointers. Present from first paint, so nothing shifts */
+  .statement__ticks {
+    display: none;
+    gap: var(--wp--preset--spacing--8);
+    margin: var(--wp--preset--spacing--24) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (hover: none), (pointer: coarse) {
+    .statement__ticks {
+      display: flex;
+    }
+  }
+  .statement__tick {
+    width: var(--wp--preset--spacing--24);
+    height: 3px;
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--border--subtle);
+    transition: background-color 0.3s var(--wp--custom--motion--ease-out);
+  }
+  .statement__tick.is-current {
+    background-color: var(--wp--custom--color--icon--accent);
+  }
+  /* 560: two cards and a clear peek of the next at 1440, about 60 characters a line */
+  .statement__quotes-item {
+    flex: none;
+    width: min(560px, 82vw);
+    scroll-snap-align: start;
+  }
+  .statement__quotes-figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--32);
+    height: 100%;
+    margin: 0;
+    padding: var(--wp--preset--spacing--48);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  /* Curly quotes, the opening one hung outside the text edge so the lines align */
+  .statement__quotes-text {
+    margin: 0;
+    color: var(--wp--custom--color--text--primary);
+    quotes: '\201C' '\201D';
+    text-indent: -0.42em;
+  }
+  /* The quote marks and the role carry the green (Ross, 8 Oct 2026): marks in accent-display, the role in
+     text/accent as the Profiles grid's roles */
+  .statement__quotes-text::before {
+    content: open-quote;
+  }
+  .statement__quotes-text::after {
+    content: close-quote;
+  }
+  .statement__quotes-text::before,
+  .statement__quotes-text::after {
+    color: var(--wp--custom--color--text--accent-display);
+    font-weight: var(--wp--custom--font-weight--bold);
+  }
+  .statement__quotes-figure .statement__role {
+    color: var(--wp--custom--color--text--accent);
+  }
+  /* Name and role at the card's foot, so they line up along the rail */
+  .statement__quotes-figure .statement__person {
+    margin-top: auto;
+  }
+  @media (max-width: 599px) {
+    .statement__quotes-figure {
+      padding: var(--wp--preset--spacing--32);
+    }
+  }
 </style>
+
+<script>
+  // Quotes carousel: the bars follow the card at the rail's start (touch screens show them); the arrows page the
+  // rail by one card and disable at either end (fine pointers only; touch swipes, the focused rail takes arrow keys).
+  document.querySelectorAll<HTMLElement>('.statement--quotes').forEach((root) => {
+    const rail = root.querySelector<HTMLElement>('[data-quotes-rail]');
+    const arrows = root.querySelector<HTMLElement>('[data-quotes-arrows]');
+    const prev = root.querySelector<HTMLButtonElement>('[data-quotes-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-quotes-next]');
+    if (!rail || !arrows || !prev || !next) return;
+    const items = [...rail.querySelectorAll<HTMLElement>('.statement__quotes-item')];
+    const ticks = [...root.querySelectorAll<HTMLElement>('[data-quotes-tick]')];
+    const step = () => (items.length > 1 ? items[1].offsetLeft - items[0].offsetLeft : rail.clientWidth);
+    // The card at the rail's start is current; at the far end (where the last cards can't reach the start), the last
+    const markTick = () => {
+      const atEnd = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4;
+      const i = atEnd ? items.length - 1 : Math.round(rail.scrollLeft / step());
+      ticks.forEach((tick, n) => tick.classList.toggle('is-current', n === i));
+    };
+    let frame = 0;
+    rail.addEventListener('scroll', () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => ((frame = 0), markTick()));
+    }, { passive: true });
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    arrows.hidden = false;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const page = (dir: 1 | -1) => rail.scrollBy({ left: dir * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
+    const sync = () => {
+      prev.disabled = rail.scrollLeft <= 4;
+      next.disabled = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4;
+    };
+    prev.addEventListener('click', () => page(-1));
+    next.addEventListener('click', () => page(1));
+    rail.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    sync();
+  });
+</script>

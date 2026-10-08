@@ -1,0 +1,122 @@
+---
+// Careers › Life at Reach (8 Oct 2026, Q129). Client PDF "23 — Careers — Life at Reach" (Full Resolution screen
+// p51) for the structure; the dev site's Life at Reach page, the live site's news and events and the dev Careers FAQ
+// for the copy. Built for a candidate picturing the job: what it feels like · where the working day happens · one
+// colleagues in their own words · FAQ · a way in. Our culture holds the values and HSEQ, Why work with us the roles and
+// reasons, the overview the figures and trainees: this page is the places and the people.
+// Copy: src/data/life-at-reach.ts (figures from key-figures.ts, offices from contact.ts). FAQs: faqs.ts, topic
+// Life at Reach.
+// Hero: the Careers overview's calm sea (Q129: the PDF's lounge photo is busy, people fill the frame); the people
+// photo moves to the intro. The PDF's photo cards over the hero, illustrative quotes and stats band are left out.
+// Redirect: dev /careers/why-work-with-us/life-at-reach/ → this page.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import SplitMedia from '../../../blocks/SplitMedia.astro';
+import CardGrid from '../../../blocks/CardGrid.astro';
+import Statement from '../../../blocks/Statement.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { navSections } from '../../../data/navigation';
+import { hrManager, recruiter } from '../../../data/careers';
+import { lifeHero, lifeIntro, lifePlaces, lifeQuotes, lifeCta } from '../../../data/life-at-reach';
+import type { CardField } from '../../../lib/types';
+import { faqsFor, faqHubHref } from '../../../data/faqs';
+
+const base = import.meta.env.BASE_URL;
+const careers = navSections.find((s) => s.id === 'careers')!;
+const page = careers.links.find((l) => l.href === '/careers/life-at-reach/')!;
+const subnavItems = [
+  { label: 'Overview', href: careers.href },
+  ...careers.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+const placeCards: CardField[] = lifePlaces.places.map((p) => ({
+  media: 'image-top',
+  surface: 'white',
+  image: { src: `${base}images/${p.image.file}`, alt: p.image.alt, focalPoint: p.image.focalPoint },
+  title: p.title,
+  description: p.text,
+  meta: [p.meta],
+}));
+---
+
+<BaseLayout title="Life at Reach · Careers · Reach Subsea" motion>
+  <Header current="careers" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Careers', href: careers.href },
+        { label: page.label },
+      ]}
+      title={lifeHero.title}
+      lead={lifeHero.lead}
+      image={{ src: `${base}images/ocean-horizon-calm.jpg`, alt: '', focalPoint: { x: 0.5, y: 0.5 } }}
+      actions={[{ label: 'Open positions', url: hrManager.vacancies, action: 'external' }]}
+    />
+
+    <SectionSubnav source="section-pages" label="Careers" items={subnavItems} current={page.href} />
+
+    <SplitMedia
+      anchor="more-than-a-job"
+      media="image"
+      position="end"
+      background="white"
+      eyebrow={lifeIntro.eyebrow}
+      title={lifeIntro.title}
+      body={lifeIntro.body.map((p) => `<p>${p}</p>`).join('')}
+      image={{ src: `${base}images/${lifeIntro.image.file}`, alt: lifeIntro.image.alt, focalPoint: lifeIntro.image.focalPoint }}
+    />
+
+    <CardGrid
+      anchor="where-you-work"
+      layout="4-columns"
+      media="image-top"
+      surface="white"
+      background="tint"
+      sectionHeader={{ eyebrow: lifePlaces.eyebrow, title: lifePlaces.title }}
+      cards={placeCards}
+    />
+
+    <Statement
+      anchor="in-their-own-words"
+      style="quotes"
+      background="white"
+      sectionHeader={{ eyebrow: lifeQuotes.eyebrow, title: lifeQuotes.title }}
+      quotes={lifeQuotes.quotes}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about everyday life at Reach Subsea.',
+        action: { label: 'See all FAQs', url: faqHubHref('life-at-reach') },
+      }}
+      layout="split"
+      source="faq"
+      topic="life-at-reach"
+      background="tint"
+      items={faqsFor('life-at-reach')}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title={lifeCta.title}
+      text={lifeCta.text}
+      actions={[
+        { label: 'Go to Candidate Portal', url: hrManager.vacancies, action: 'external' },
+        { label: 'Register for new openings', url: hrManager.register, action: 'external', type: 'link' },
+      ]}
+      showContact
+      contact={recruiter}
+    />
+  </main>
+  <Footer />
+</BaseLayout>
