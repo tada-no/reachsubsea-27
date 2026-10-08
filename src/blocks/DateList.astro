@@ -1,0 +1,276 @@
+---
+// Date list · reach/date-list (7 Oct 2026, Financial calendar). Investor dates as rows, in the Results archive and
+// Meeting archive's row language, so the three Investors lists read as one family. Replaces Data list type Dates
+// (§2.7, a table).
+// - `show="upcoming"`: dates from today on, soonest first. The first dated one is the one Navy row ("Next", with a
+//   countdown): the date most visitors come for. Later dates are dashed outlines (to come, as on Reports): confirmed
+//   ones keep their colours and get Add to calendar; a date Reach hasn't published yet is greyed with a TBC tile and
+//   "Date to come", with no calendar link, so a placeholder never lands in an investor's calendar. Under the rows,
+//   one link adds every confirmed date at once.
+// - `show="past"`: dates before today, newest first, each with the files it produced (Report · Presentation ·
+//   Webcast, Annual report · ESEF, Notice · Minutes) in fixed columns shared down the list (CSS subgrid).
+//   The newest is kicked "Latest". A column no row uses isn't drawn.
+// Rows are tint cards on white, white cards on tint. No row hover: a row holds separate files.
+// Below 720 (container) a row stacks: tile beside the text, the links under the text.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import DateTile from '../components/DateTile.astro';
+import Link from '../components/Link.astro';
+import { makeId } from '../lib/ids';
+import { icsHref, icsAllHref } from '../lib/ics';
+import { shortDate } from '../lib/dates';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+import { DATE_SLOTS, type DateRow } from '../data/financial-calendar';
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  rows: DateRow[];
+  show: 'upcoming' | 'past';
+}
+
+const { sectionHeader, rows, show, background = 'white', spacing, anchor } = Astro.props;
+
+const titleId = sectionHeader ? makeId('date-list', sectionHeader.title) : undefined;
+
+const DAY = 86_400_000;
+const todayIso = new Date().toISOString().slice(0, 10);
+const daysUntil = (iso: string) => Math.round((Date.parse(`${iso}T00:00:00Z`) - Date.parse(`${todayIso}T00:00:00Z`)) / DAY);
+const inDays = (n: number) => (n === 1 ? '1 day' : `${n} days`);
+
+const list =
+  show === 'upcoming'
+    ? rows.filter((r) => !r.isoDate || r.isoDate >= todayIso)
+    : rows.filter((r) => r.isoDate && r.isoDate < todayIso).reverse();
+const flagged = show === 'upcoming' ? list.find((r) => r.isoDate) : list[0];
+const confirmed = list.filter((r) => r.isoDate);
+
+// Past: only the file columns some row uses
+const slots = show === 'past' ? DATE_SLOTS.map((_, i) => i).filter((i) => list.some((r) => r.files.some((f) => f.slot === i))) : [];
+const columns = show === 'past' ? slots.length : 1;
+---
+
+<BlockSection
+  slug="date-list"
+  root="date-list"
+  background={background}
+  spacing={spacing}
+  anchor={anchor}
+  labelledBy={titleId}
+  label={titleId ? undefined : show === 'upcoming' ? 'Upcoming dates' : 'Earlier dates'}
+  data-date-list
+>
+  <div class="block__body">
+    {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+
+    <div class:list={['date-list__main', background === 'tint' && 'date-list__main--on-tint']}>
+      <ol class="date-list__rows" style={`--date-list-columns: ${columns}`}>
+        {list.map((r) => {
+          const next = show === 'upcoming' && r === flagged;
+          const days = r.isoDate ? daysUntil(r.isoDate) : 0;
+          return (
+            <li
+              class:list={[
+                'date-row',
+                next && 'date-row--next has-surface-navy',
+                show === 'upcoming' && !next && 'date-row--later',
+                !r.isoDate && 'date-row--provisional',
+              ]}
+            >
+              <DateTile date={r.isoDate} band={r.isoDate ? undefined : 'TBC'} icon="calendar" class="date-row__tile" />
+              <div class="date-row__text">
+                {r === flagged && <p class="date-row__kicker text-eyebrow">{show === 'upcoming' ? 'Next' : 'Latest'}</p>}
+                <h3 class="date-row__title text-h5">{r.title}</h3>
+                <p class="date-row__meta text-small">
+                  {!r.isoDate && ['Date to come', r.usually].filter(Boolean).join(' · ')}
+                  {r.isoDate && <time datetime={r.isoDate}>{shortDate(r.isoDate)}</time>}
+                  {r.isoDate && show === 'upcoming' && days > 0 && (
+                    <Fragment>
+                      {' · in '}
+                      <span data-countdown={r.isoDate}>{inDays(days)}</span>
+                    </Fragment>
+                  )}
+                  {r.isoDate && show === 'upcoming' && days === 0 && ' · today'}
+                </p>
+              </div>
+              {show === 'upcoming' && r.isoDate && (
+                <div class="date-row__links">
+                  <span class="date-row__slot">
+                    <Link
+                      label="Add to calendar"
+                      href={icsHref(`Reach Subsea ${r.title}`, r.isoDate)}
+                      action="file"
+                      size="small"
+                      context={`, ${r.title}`}
+                      download={`reach-subsea-${r.isoDate}.ics`}
+                    />
+                  </span>
+                </div>
+              )}
+              {show === 'past' && (
+                <div class="date-row__links">
+                  {slots.map((i) => {
+                    const f = r.files.find((x) => x.slot === i);
+                    return (
+                      <span class:list={['date-row__slot', !f && 'date-row__slot--empty']}>
+                        {f && <Link label={f.label} href={f.url} action={f.label === 'Webcast' ? 'external' : 'file'} size="small" context={`, ${r.title}${f.label === 'Webcast' ? '' : f.label === 'ESEF' ? ', ZIP' : ', PDF'}`} />}
+                        {DATE_SLOTS[i].map((label) => (
+                          <span class="date-row__sizer" aria-hidden="true">
+                            <Link label={label} action={label === 'Webcast' ? 'external' : 'file'} size="small" tabindex="-1" />
+                          </span>
+                        ))}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+
+      {
+        show === 'upcoming' && confirmed.length > 1 && (
+          <Link
+            label="Add all confirmed dates to your calendar"
+            href={icsAllHref(confirmed.map((r) => ({ summary: `Reach Subsea ${r.title}`, isoDate: r.isoDate! })))}
+            action="file"
+            size="small"
+            class="date-list__all"
+            download="reach-subsea-financial-calendar.ics"
+          />
+        )
+      }
+    </div>
+  </div>
+</BlockSection>
+
+<script>
+  // Countdown ("in 41 days") from the visitor's today, not the build date
+  document.querySelectorAll<HTMLElement>('.date-list [data-countdown]').forEach((el) => {
+    const now = new Date();
+    const days = Math.round((Date.parse(`${el.dataset.countdown}T00:00:00Z`) - Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())) / 86_400_000);
+    if (days > 0) el.textContent = days === 1 ? '1 day' : `${days} days`;
+  });
+</script>
+
+<style is:global>
+  .date-list__main {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+  }
+  .date-list__all {
+    align-self: flex-start;
+  }
+
+  /* ── Rows (as the Results and Meeting archives') ──────────── */
+  .date-list__rows {
+    display: grid;
+    gap: var(--wp--preset--spacing--12);
+  }
+  /* Narrow (base): tile beside the text; the links under the text, on its left edge */
+  .date-row {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    column-gap: var(--wp--preset--spacing--16);
+    align-items: center;
+    /* Bottom: 24 less the 12 the links' 44px targets add below their labels */
+    padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--16) var(--wp--preset--spacing--12);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  .date-list__main--on-tint .date-row {
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  /* The next date: the one Navy row */
+  .date-list__main .date-row--next {
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  /* Later dates: a dashed outline and no fill, slots rather than documents (drawn inside the edge) */
+  .date-list__main .date-row--later {
+    background-color: transparent;
+    outline: 1px dashed var(--wp--custom--color--border--strong);
+    outline-offset: -1px;
+  }
+  /* No date yet: greyed, as the Results archive's provisional quarters */
+  .date-row--provisional {
+    --wp--custom--color--text--primary: var(--wp--custom--color--text--secondary);
+    color: var(--wp--custom--color--text--primary);
+    padding-bottom: var(--wp--preset--spacing--24);
+  }
+  .date-row--provisional .date-row__tile {
+    border-color: var(--wp--custom--color--border--default);
+  }
+  .date-row--provisional .date-tile__band {
+    background-color: var(--wp--custom--color--bg--disabled);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .date-row--provisional .date-tile__body {
+    color: var(--wp--custom--color--border--strong);
+  }
+  .date-row__tile {
+    align-self: start;
+  }
+  .date-row__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    min-width: 0;
+  }
+  .date-row__kicker {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .date-row__meta {
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .date-row__links {
+    grid-column: 2 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--wp--preset--spacing--16);
+    /* The 44px targets add 12 above the labels: with 4 more, the visible gap to the text is 16 */
+    margin-top: var(--wp--preset--spacing--4);
+  }
+  .date-row__slot {
+    display: inline-grid;
+  }
+  .date-row__slot > * {
+    grid-area: 1 / 1;
+  }
+  .date-row__slot--empty,
+  .date-row__sizer {
+    display: none;
+  }
+
+  /* Wide: one line per date; the links in columns shared down the list (subgrid). Each slot keeps invisible copies
+     of the labels it can take, so a column is as wide on every row. */
+  @container (min-width: 720px) {
+    .date-list__rows {
+      /* max-content edge tracks: a subgrid's padding is added to its first and last tracks */
+      grid-template-columns: max-content minmax(0, 1fr) repeat(var(--date-list-columns), max-content);
+      column-gap: var(--wp--preset--spacing--16);
+    }
+    .date-list__rows > .date-row {
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      /* A subgrid's own gap overrides the list's: restate 16 */
+      column-gap: var(--wp--preset--spacing--16);
+      padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--32);
+    }
+    .date-row__tile {
+      align-self: center;
+    }
+    .date-row__links {
+      display: contents;
+    }
+    .date-row__slot--empty {
+      display: inline-grid;
+    }
+    .date-row__sizer {
+      display: block;
+      visibility: hidden;
+    }
+  }
+</style>

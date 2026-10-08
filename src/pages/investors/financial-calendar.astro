@@ -1,0 +1,82 @@
+---
+// Investors › Financial calendar (7 Oct 2026). When Reach Subsea ASA reports and meets its shareholders.
+// Sources: client PDF p48 (Design reference 21: hero, a short list of upcoming dates, CTA; no FAQ) and the live
+// Financial calendar (reachsubsea.no/investors/financial-calendar/, read 7 Oct 2026) for every date.
+// 1. Date list, upcoming (white): the PDF's "Key dates". The next date is the one Navy row with a countdown and
+//    Add to calendar; later confirmed dates as dashed rows with Add to calendar; dates Reach hasn't published yet
+//    greyed as "Date to come" (the PDF's "Estimated" pills and estimated dates are not shown, docs/03).
+// 2. Date list, past (tint): the year's earlier dates, each with what it produced (report, presentation, minutes),
+//    so the calendar also answers "where is that report?". Reports & presentations for the full archive.
+// 3. CTA Panel (tint): the PDF's wording and the IR contact, as Governance & meetings.
+// Hero: plain navy Text hero, as the PDF and Q57 (data pages); no photo.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import SectionSubnav from '../../blocks/SectionSubnav.astro';
+import DateList from '../../blocks/DateList.astro';
+import CtaBand from '../../blocks/CtaBand.astro';
+import { navSections } from '../../data/navigation';
+import { financialCalendar } from '../../data/financial-calendar';
+
+const base = import.meta.env.BASE_URL;
+const investors = navSections.find((s) => s.id === 'investors')!;
+const page = investors.links.find((l) => l.label === 'Financial calendar')!;
+const subnavItems = [
+  { label: 'Overview', href: investors.href },
+  ...investors.links.map((l) => ({ label: l.label, href: l.href })),
+];
+---
+
+<BaseLayout title="Financial calendar · Investors" motion>
+  <Header current="investors" overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Investors', href: investors.href },
+        { label: page.label },
+      ]}
+      title="Financial calendar"
+      lead="Key dates for Reach Subsea ASA's financial reporting and shareholder events."
+    />
+
+    <SectionSubnav source="section-pages" label="Investors" items={subnavItems} current={page.href} />
+
+    <DateList
+      anchor="key-dates"
+      show="upcoming"
+      background="white"
+      sectionHeader={{
+        title: 'Key dates',
+        intro: 'The results and general meetings Reach Subsea has announced. Dates still to be set appear here once they are announced.',
+      }}
+      rows={financialCalendar}
+    />
+
+    <DateList
+      anchor="earlier"
+      show="past"
+      background="tint"
+      sectionHeader={{
+        title: 'Earlier dates',
+        intro: 'This year so far, with the reports and papers each date produced.',
+        action: { label: 'Reports & presentations', url: '/investors/reports-presentations/' },
+      }}
+      rows={financialCalendar}
+    />
+
+    <CtaBand
+      style="panel"
+      background="tint"
+      title="Would you like to know more?"
+      text="Questions for our investor relations team? Reach out any time."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact
+      contact={{ label: 'Investor relations', name: 'Arne Joa', role: 'Chief Financial Officer', phone: '+47 474 51 344', email: 'arne.joa@reachsubsea.com' }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

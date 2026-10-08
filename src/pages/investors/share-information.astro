@@ -1,0 +1,85 @@
+---
+// Investors › Share information (7 Oct 2026, Q27, Q123). The live market data for the REACH share in one place:
+// the full Oslo Market Solutions share page (quote, chart, profit calculator, returns against the index, last trades,
+// order depth, company facts). Overview and Why invest show its top part cropped, with "Full share information"
+// linking here. The 20 largest shareholders and the stock exchange announcements stay on Reports & presentations
+// (Ross, 7 Oct 2026), so this page holds only what isn't anywhere else.
+// 1. Embed Iframe Loaded, Bleed on mobile (white): the OMS standard page, sized to its content height.
+// 2. CTA Panel (tint): the IR contact, as the other Investors pages.
+// Hero: plain navy Text hero, as the other data pages (Q57). Not in the client PDF (its subnav has no Share
+// information); the live and dev sites each have one. Redirects: the dev site's /investors/key-information/
+// share-information/, /largest-shareholders/ and /news-web/ → here (the last two could go to Reports instead).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import SectionSubnav from '../../blocks/SectionSubnav.astro';
+import Embed from '../../blocks/Embed.astro';
+import CtaBand from '../../blocks/CtaBand.astro';
+import { navSections } from '../../data/navigation';
+
+const base = import.meta.env.BASE_URL;
+const investors = navSections.find((s) => s.id === 'investors')!;
+const page = investors.links.find((l) => l.label === 'Share information')!;
+const subnavItems = [
+  { label: 'Overview', href: investors.href },
+  ...investors.links.map((l) => ({ label: l.label, href: l.href })),
+];
+---
+
+<BaseLayout title="Share information · Investors" motion>
+  <Header current="investors" overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Investors', href: investors.href },
+        { label: page.label },
+      ]}
+      title="Share information"
+      lead="Reach Subsea ASA is listed on Euronext Oslo Børs under the ticker REACH. Price, trading and key facts, live."
+    />
+
+    <SectionSubnav source="section-pages" label="Investors" items={subnavItems} current={page.href} />
+
+    <Embed
+      anchor="share"
+      type="iframe"
+      state="loaded"
+      background="white"
+      sectionHeader={{
+        title: 'The REACH share',
+        intro: 'Quote, chart, returns and trading from Oslo Børs, with a profit calculator and the company facts.',
+      }}
+      provider={{ name: 'Oslo Market Solutions', domain: 'ir.oms.no' }}
+      url="https://ir.oms.no/component/standardPage?token=reach_std&lang=en"
+      iframeTitle="The Reach Subsea share, live from Oslo Market Solutions"
+      height={{ desktop: 1792, tablet: 2440, mobile: 2640 }}
+      bleedMobile
+    />
+
+    <CtaBand
+      style="panel"
+      background="tint"
+      title="Would you like to know more?"
+      text="Questions for our investor relations team? Reach out any time."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact
+      contact={{ label: 'Investor relations', name: 'Arne Joa', role: 'Chief Financial Officer', phone: '+47 474 51 344', email: 'arne.joa@reachsubsea.com' }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* The OMS page switches to its one-column layout below ~838 wide, which a 900–960 screen gives it: the Embed's
+     desktop height (the two-column layout) would crop it, so the frame takes the tablet height there. Heights are
+     the provider's content height (measured 7 Oct 2026), as the Embed's height props. */
+  @media (min-width: 900px) and (max-width: 960px) {
+    :global(#share .embed__iframe-frame) {
+      height: 2352px;
+    }
+  }
+</style>
