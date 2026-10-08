@@ -1578,5 +1578,38 @@
     "codeOnly": [
       "The hidden copy of the built count that holds each chip's width as live counts fall (data-reserve)"
     ]
+  },
+  "phase4Faq8Oct": {
+    "date": "2026-10-08",
+    "context": "FAQ page (Q126, Q141) pushed to Figma at Ross's request: Subnav item vertical / count / Disabled, Block/FAQ index, and the page frame. Ground truth: src/pages/faq/index.astro, src/blocks/FaqIndex.astro, src/data/faqs.ts and the coded page at 1440.",
+    "components": {
+      "Subnav item 101:448": "Variant property Layout (Horizontal | Vertical) and State=Disabled added: Horizontal Disabled 475:3147; Vertical Default 475:3150, Hover 475:3153, Active 475:3156, Focus 475:3159, Disabled 475:3163 (304 wide, space-between, gap space/16, count text/secondary unless Active). New properties Count#475:0 (TEXT, '(9)') and Show count#475:5 (BOOLEAN, off) on a Count text after the label (gap space/4). Existing variants renamed Layout=Horizontal, State=…; Subnav instances unaffected. Doc example Group/Examples · counts (Q141) 475:18417"
+    },
+    "blocks": {
+      "Block/FAQ index": "set 476:9533 on doc frame Blocks / FAQ index 476:9363 (x -10768, y -7612, under SDG goals): Breakpoint=Desktop 476:9368 (Rail 304: Search field, Body/Small count, six Subnav item Vertical with counts; Groups FILL, section/md apart: Section header Desktop (Text FILL override so the action shows in 864) over Accordion items, stack/lg), Mobile 476:9461 (Layout/Typography Mobile modes: search and count above the groups; topics live in the Section subnav)"
+    },
+    "pageFrame": {
+      "id": "478:9665",
+      "name": "FAQ",
+      "x": 22960,
+      "height": 9319,
+      "source": "src/pages/faq/index.astro",
+      "sections": {
+        "Header (Desktop overlay, Navy mode, bg/default fill)": "478:9666",
+        "Page hero Text, navy (breadcrumb Home › FAQ: Level 1 and its chevron hidden)": "478:9712",
+        "FAQ index, all six groups, 67 questions (DETACHED from Block/FAQ index 476:9368: an instance can't hold six groups)": "478:9927",
+        "CTA panel Still have a question? (no contact, white ground)": "478:10479",
+        "Footer": "478:10513"
+      },
+      "notShown": "Section subnav: hideOnDesktop in code, so not on the Desktop frame"
+    },
+    "fixes": {
+      "Our culture header 454:17975": "had no fill, so its white Navy-mode content vanished on the frame: bg/default fill added (navy in Navy mode), as Financial calendar's"
+    },
+    "gaps": [
+      "No FAQ mobile page frame (the block's Mobile variant covers the layout)",
+      "CTA band Panel without a contact stacks the button under the text in Figma (Home and FAQ); the code puts it at the right. Master fix left for a CTA pass",
+      "Search states (matches marked, no-match message, Disabled topics) shown only in the Subnav item doc example, not as a block variant"
+    ]
   }
 }

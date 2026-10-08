@@ -9,7 +9,7 @@
 // 2. Section subnav In-page: the six groups, in the main navigation's order; below 1100 only (the rail has them)
 // 3. FAQ index (8 Oct 2026, Q141; was Accordion Split × 6, white and tint in turn): every group on one ground beside
 //    a sticky rail (search, count, topics), anchored by group, one FAQPage JSON-LD for the page
-// 4. CTA Panel (tint): the PDF's wording
+// 4. CTA Panel (white, the FAQ index's ground: docs/08 §6): the PDF's wording
 // Redirects: dev /faq/ and /faqs/ → here (dev /careers/opportunities/careers-faq/ → /faq/#careers).
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/header/Header.astro';
@@ -44,7 +44,7 @@ const schema = faqPageSchema(groups.flatMap((g) => g.items));
 
     <CtaBand
       style="panel"
-      background="tint"
+      background="white"
       title="Still have a question?"
       text="Reach out to us today."
       actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}

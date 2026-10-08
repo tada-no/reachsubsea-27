@@ -28,7 +28,7 @@ Context: Ross: the FAQ page "could make better use of the 1 col". Each of the si
 - [x] Below 1100: search and count above the groups, topics in the page's Section subnav (new `hideOnDesktop`, so they show once at every width)
 - [x] Subnav item gains an optional bracketed count and a disabled look (`aria-disabled`)
 - [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll, rail and list aligned, scroll-spy follows, token audit clean
-- [ ] Figma after approval: FAQ index block, Subnav item vertical with count + Disabled state, FAQ page frame
+- [x] Figma (8 Oct 2026, Ross: push the FAQ page): Subnav item gains Layout=Vertical, State=Disabled and Show count / Count (101:448); Block/FAQ index 476:9533 (Desktop 476:9368, Mobile 476:9461) on Blocks / FAQ index 476:9363; page frame Pages / FAQ 478:9665 (all six groups, 67 questions). The page's CTA panel moved to white, the FAQ index's ground (docs/08 §6: on tint it left a tint strip above the panel), in code and Figma
 
 ### Q140. The fourth value: "Leave no one behind", and no numbers on the overview (8 Oct 2026)
 Context: Ross, on the Careers overview's four value cards (Learn · Teach · Reach · Never leave anyone behind, numbered 01–04): should the fourth go navy as on Our culture? Answered no: in an equal row of four a navy card reads as "selected", against the numbering. Instead the numbers go, and a shorter wording.
@@ -180,7 +180,7 @@ Context: Ross: build the FAQ page, gather every FAQ made so far, and set them up
 - [x] Built `/faq/`: Hero Text on navy (PDF title, lead "Answers to what we are asked most, organised by topic.") · Subnav In-page (six groups) · Accordion Split × 6, white / tint in turn, first item open in each · CTA Panel (tint, the PDF's "Still have a question?"). One FAQPage JSON-LD for the page (new Accordion `structuredData` switch, off on the FAQ page); Services group title "Services & technology" (the PDF's longer title broke over three lines)
 - [x] Fix found on the way: a Split accordion's sticky header slid under a docked Section subnav when the header came back on scroll-up (Services, the service pages, now the FAQ page). It now docks below the subnav (measured: 24 clear, header hidden and shown)
 - [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll, chips scroll sideways on phones, `#faq-{slug}` and `#<group>` deep links open and clear the subnav; axe 0 violations
-- [ ] Figma after approval: FAQ page frame (no new components)
+- [x] Figma: FAQ page frame 478:9665, built from the Q141 FAQ index (see Q141)
 
 **Answer:** every FAQ, grouped; merged and reworded; new questions with their pages.
 
