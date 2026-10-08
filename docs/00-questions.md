@@ -816,6 +816,7 @@ Context: the client PDF (p59, "27 — Contact") and the dev site's /contact/ dis
 - [x] No CTA band: the FAQ closes the page, as in the PDF (the footer carries phone, email and socials)
 - [ ] CTA panel (Open positions or Investors)
 
+- [x] Figma (8 Oct 2026): `Block/Fleet register` 601:15053 (Desktop 601:14839, Mobile 601:14943; Fleet group 601:14728, Fleet unit 601:14644, Fleet legend item 601:14645) on Blocks / Fleet register 601:14637; Card spec 599:31872 and Card `Show specs#599:6` (Q78 spec rows); Feed grid `Show row 3/4`; page frame Pages / Assets 606:20465. Ledger key sweep8OctAssetsFixes
 **Answer:** as ticked. Also decided by Claude, open to change: the office keeps the client's label "Sandnes (Stavanger)" with "Sandnes" on the map pin; no mailbox is tied to an office (they are company-wide) and the HQ row carries the general phone and post@ from `contactDetails`. Page: Hero Text (navy) · **Offices map** (new block: dot-matrix map beside the office list, HQ first, "Also present in…" under the list) (white) · **Contact list** (the six topic mailboxes as a two-column list of rows, not six cards) (tint) · Accordion Split, the PDF's three FAQs with answers built from the data (white). The map is the homepage's dot-matrix map, extracted into shared pieces (`src/lib/dot-map-client.ts`, `src/components/DotMap.astro`) that Live operations and Offices map both use; the Live operations block was checked element by element before and after (docs/07 §3).
 
 ### Q72. Live operations map: dot density (22 Sep 2026, Live operations)
@@ -968,6 +969,7 @@ Context: the PDF uses a navy→sage gradient on Investors/Company pages and phot
 
 ### Q56. Live operations map: placement (17 Sep 2026, docs/07)
 Context: the client PDF puts a "live zones" panel over the Home hero. The user decided on a standalone block instead of a hero overlay.
+- [x] Figma (8 Oct 2026): Pages / Subsea services 359:4009 brought up to the code: subnav 6th pill Research & Publications, Split media pictogram and copy, capability cards with scope lists (603:33422), bento title "Vessels and ROVs" with photos, projects as Feed grid Grid 4 columns (604:21600), CTA on tint. Ledger key sweep8OctAssetsFixes
 - [x] Home straight after the Stats band, plus the Assets overview
 - [ ] Assets overview only
 - [ ] Home only

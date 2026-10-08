@@ -210,7 +210,8 @@
         "Meta item ×3",
         "Action"
       ],
-      "scope8OctServices": "Scope list (Show scope#519:1, Show 4th scope item#519:40) also in Media=None, Surface=Tint, Size=Default 103:483 (566:2546) and Media=Image top, Surface=White, Size=Default 103:836 (566:2551), 8 Oct 2026."
+      "scope8OctServices": "Scope list (Show scope#519:1, Show 4th scope item#519:40) also in Media=None, Surface=Tint, Size=Default 103:483 (566:2546) and Media=Image top, Surface=White, Size=Default 103:836 (566:2551), 8 Oct 2026.",
+      "specs8OctAssets": "Show specs#599:6 (off), Show 5th spec#599:45 (off), Show 6th spec#599:84 (off), 8 Oct 2026 (sweep8OctAssetsFixes, Q78): a Specs frame (wrap, gap space/16 × space/8) of six Card spec instances (exposed, 'Spec 1'–'Spec 6', each FILL with min width 240 so a card 560+ wide shows two pairs across, as the code's specColumns 2 container query) after Scope in Media=Image top, Surface=White, Size=Default 103:836 (Specs 599:31873) and Media=Image bg, Surface=Navy, Size=Default 103:1040 (Specs 599:31892). Used by the vessel, ROV and DriX cards on Pages / Assets."
     },
     "Card presets": {
       "Service": "113:672",
@@ -446,6 +447,14 @@
       "id": "519:2513",
       "type": "COMPONENT",
       "position8Oct": "Moved to (1540, -399) on Components, clear of the Icons doc frame (8 Oct 2026, sweep8OctServices)."
+    },
+    "Card spec": {
+      "id": "599:31872",
+      "type": "COMPONENT_SET",
+      "variants": "Label=Short 599:31866 (label width space/64), Label=Long 599:31869 (space/96)",
+      "props": "Label#599:0, Value#599:3",
+      "position": "Components page (1540, -320), under List item",
+      "note": "Card.astro .card__spec (Q78): Label Body/Small text/secondary; Value Body/Small at weight/medium text/primary (no such text style: size/body-sm, line-height/body-sm, family/sans, weight/medium bound), wraps; gap space/16. Code sizes the label column max-content per card; Figma uses the two fixed widths (vessels Short, ROVs and DriX Long). 8 Oct 2026, sweep8OctAssetsFixes"
     }
   },
   "ledgers": {

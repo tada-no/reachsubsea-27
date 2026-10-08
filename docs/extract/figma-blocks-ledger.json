@@ -2047,5 +2047,75 @@
       "Comparison spacer columns: the 192 corner and the Wide 'Grid column 6' spacer are fixed widths (no column-width token)",
       "Footer and CTA panel text size differ from the code on every frame (component-level, not this batch)"
     ]
+  },
+  "sweep8OctAssetsFixes": {
+    "date": "2026-10-08",
+    "context": "Figma sweep batch 6a (8 Oct 2026): the Assets overview (Q77, Q78, Q85: Block/Fleet register, Card specs, page frame Assets), Subsea services 359:4009 brought up to src/pages/services/subsea/index.astro, the CTA band Panel master (wrapping title; actions beside the text with no contact card, as CtaBand.astro) and page-frame Header fills. Ground truth: src/pages/assets/index.astro, src/blocks/FleetRegister.astro, src/demos/fleet-register.astro, src/components/Card.astro (specs), src/blocks/CtaBand.astro, src/data/{assets,projects,faqs,services}.ts; production build at 1440 and 375.",
+    "images": "Uploaded from public/images (Figma image fills, reuse by hash): vessel-deep-cygnus ae70f561…, vessel-offshore-surveyor 42038e38…, vessel-olympic-taurus 0a408512…, vessel-olympic-triton 2127c366…, asset-havila-subsea 2f01f9b8…, vessel-viking-reach 42f41ee2…, vessel-agalas dadf260d…, reach-remote-bow aefd8991…, usv-reach-remote-3-4 63946c9a…, asset-constructor-wrov c04242b9…, rov-supporter-launch 3e1aee59…, rov-hd-wrov cf3a860f…, asset-supporter-wrov 8cca733b…, project-troll-boulder 10febb40…, project-tolmount-pipelay 817370e0…, project-haven-removal 394a9471… (hash = SHA-1 of the file). Reused: vessel-northern-maria, vessel-go-electra, usv-drix-wind, rov-surveyor-launch, rov-zeerov-seabed, reach-remote-side, project-trinidad-inspection, project-gwatch-equinor, project-depthwatch-shell, project-ormen-lange. Normand Jarstein has no photo in code either (placeholder kept). Staging frames deleted.",
+    "components": {
+      "Card spec 599:31872 (new, Components page)": "Label=Short 599:31866 (space/64), Label=Long 599:31869 (space/96); Label#599:0, Value#599:3. See figma-components-ledger.json",
+      "Card 103:1110": "Show specs#599:6, Show 5th spec#599:45, Show 6th spec#599:84 (all off): Specs (wrap; six exposed Card spec, min width 240) in Media=Image top, Surface=White, Size=Default 103:836 (599:31873) and Media=Image bg, Surface=Navy, Size=Default 103:1040 (599:31892)",
+      "Fleet unit 601:14644 (new, Blocks / Fleet register)": "Status=In service 601:14642 (16 circle, radius/full, text/primary fill), Status=Joining 601:14643 (2px text/primary ring inside, no fill)",
+      "Fleet legend item 601:14645 (new)": "Fleet unit at 12 (exposed 'Marker') + Body/Caption text/secondary Label#601:0, gap space/8, centred",
+      "Fleet group 601:14728 (new)": "Markers=Row × Breakpoint: Desktop 601:14648 (292), Mobile 601:14688 (327); Markers=Rows of 8: Desktop 601:14666, Mobile 601:14706. Props Value#601:1, Label#601:6, Note#601:11, Show note#601:16, Show rule#601:21. Value Heading/Display text/accent-display · Label Body/Body at weight/medium text/primary (typography variables bound; no such style) · Note Body/Small text/secondary · Units (padding-top space/16, gap space/8; Row: 12 exposed Fleet unit slots in one row, Rows of 8: 16 slots wrapping at 184), gap space/4. Rule: absolute 1px border/subtle, Desktop x −24 full height (centred in the space/48 gap), Mobile y −12 full width. Mobile variants carry Typography/Layout Mobile modes"
+    },
+    "blocks": {
+      "Block/Fleet register": "set 601:15053 on doc frame Blocks / Fleet register 601:14637 (x -10768, y 29068, under Comparison): Breakpoint=Desktop 601:14839, Mobile 601:14943. White ground (bg/default), padding section/md × grid/margin, gap stack/xl: Section header 'The fleet at a glance' (no eyebrow, intro, action) · Groups (Desktop four Fleet group FILL, space/48, stretched; Mobile one column space/24): Chartered vessels 9 (9 + 2 joining, '2 joining 2026 and 2027'), Reach Remote USVs 2 (2 + 2 joining, '2 in build, due 2027'), DriX survey USVs 2, ROV systems 15 (Rows of 8, '13 work-class and 2 Surveyor Interceptor'), rules on groups 2–4 · Legend (two Fleet legend items, wrap, space/24)",
+      "Block/Feed grid 156:2012": "Show row 3#606:0 and Show row 4#606:7 (off): Row 3 606:30203 and Row 4 606:30207 (clones of Row 2, three Card preset/Project each) in Filters=Off, Desktop, Layout=Grid 154:1636. Hidden rows add no height, so the set and doc frame did not move",
+      "Block/CTA band 179:5432": "Style=Panel, Breakpoint=Desktop 246:9087: Message 448:16518 is now a horizontal wrap row (gap grid/gutter, row gap stack/lg, bottom-aligned): Text 448:16519 FILL with min width 720, Title 448:16520 and Lead 448:16521 FILL + auto height (they wrap; Title was HUG and ran out of the panel). With Show contact off the Actions sit at the right of the text, bottom-aligned (CtaBand.astro from 900); with Show contact on (Message 824 wide) the text no longer fits beside them and they drop under it, left-aligned. Variant 348 → 268 tall with one-line copy; Footer ground scales with it. Mobile unchanged (title already FILL)",
+      "Block/Card bento 312:10744": "Pattern=lead-tall-wide, Desktop 310:5156: cells were 644 / 310 / 310 (1328, the tall card clipped 16 by the 1312 grid) → 640 / 304 / 304 and the wide row 640 / 640, as the code's 6 + 3 + 3 columns. Fixes Subsea services, Survey and Assets instances"
+    },
+    "pageFrames": [
+      {
+        "id": "606:20465",
+        "name": "Assets",
+        "x": 50840,
+        "height": 10544,
+        "source": "src/pages/assets/index.astro",
+        "sections": {
+          "Header (cloned from Survey: Desktop overlay, Navy mode, bg/default fill)": "606:20466",
+          "Page hero Photo (Deep Cygnus; breadcrumb Home › Assets, Level 1 and its chevron hidden; Talk to our team + Explore the 3D World)": "606:20550",
+          "Section subnav (Overview active · Vessels · Reach Remote · ROVs · Equipment; 6th and 7th hidden)": "606:20602",
+          "Fleet register Desktop, the fleet at a glance (white)": "606:20628",
+          "Feed grid Grid, rows 3–4 on, the chartered fleet (tint; eleven Card preset/Project → Image top White with specs Charter · Owner · Crane · Assets; Sale agreed Neutral, Joining 2026/2027 Navy badges; 12th card hidden, row 4 cards fixed 416; rows equalised with Content bottom padding tokens)": "607:20768",
+          "Card bento lead-tall-wide, the uncrewed fleet (white; Reach Remote 1 & 2 lead, ~750 stat, Reach Remote 3 & 4 tall, 30 stat, DriX Orca 1 & 2 with specs Long, Reach Horizon None/Tint)": "609:21445",
+          "Card grid 3 columns + second row, 15 ROV systems by class (Navy mode; five Card Image top White in Light mode, N in service Accent badge, six specs Long, Spec sheet (PDF) as Link File except Supporter)": "609:33284",
+          "Card grid 2 columns, survey and monitoring equipment (white; Card Icon Tint, Pictogram/survey 40:96, Pictogram/global-monitoring 39:102)": "609:34172",
+          "Feed grid Grid 4 columns, recent deployments across the fleet (tint; row 2 hidden)": "609:35051",
+          "Accordion Split, assets FAQs (white; three)": "609:35497",
+          "CTA panel, Would you like to know more? (white; Fleet: Knut Jacob Medhaug, VP Group Assets)": "609:35545",
+          "Footer": "609:35577"
+        }
+      },
+      {
+        "id": "359:4009",
+        "name": "Subsea services",
+        "x": 9840,
+        "height": 7072,
+        "source": "src/pages/services/subsea/index.astro",
+        "sections": {
+          "Header: bg/default fill added": "359:4010",
+          "Page hero: secondary action Anchor → Page arrow, as the code": "359:4056",
+          "Section subnav: 6th pill 'Research & Publications' (was Explore 3D World)": "359:4123",
+          "Split media Image End: title 'Work-class ROVs, crewed or uncrewed', the code's one-sentence body, Show pictogram on (Pictogram/subsea-infrastructure), rov-supporter-launch photo": "359:4138",
+          "Card grid 3 columns + second row, what we deliver: replaced by a clone of Survey's capability grid; six Card None/Tint with scope lists (three items each), no eyebrow": "603:33422",
+          "Card bento: title 'Vessels and ROVs' (was 'The vessels and ROVs behind the work'); Havila Subsea, Supporter WROV, Reach Remote 1 & 2, Constructor WROV photos": "359:12927",
+          "Feed grid Grid 4 columns 566:28682 instance replaces the Card grid 4 columns: Subsea work in the field, Troll B, Tolmount, Trinidad, Haven (photos, Surface White, one map-pin meta; long eyebrows wrap)": "604:21600",
+          "CTA panel: tint ground (bg/tint fill) as the code": "449:16874"
+        }
+      }
+    ],
+    "headers": "Header instances with no fill (white Navy-mode content read white on white) given the bg/default fill the other frames use: Home 260:228, Investors overview 295:8327, Why invest 346:2704, About 351:3195, Services overview 355:3375, Subsea services 359:4010, Research & Publications 419:13893, Sustainability 441:6602, Sponsorship 523:13261, Transparency Act 528:13562. Every page-frame header now has the fill",
+    "ctaInstances": "All 26 CTA band instances on Pages checked after the master change: no-contact panels (Home, Services overview, Research & Publications, FAQ, Survey, Monitoring, Technology & Innovation, Explore 3D World) now have the button at the right; contact panels keep it under the text; no title overflows. Charter agreements 515:11858: the Title FILL workaround removed (resetOverrides, properties and white ground fill restored)",
+    "gaps": [
+      "Fleet register: Value uses Heading/Display (line height 88; the code sets line-height/figure = 1, 80) and no −0.05em optical pull; the 600–1199 2 × 2 grid, the hover highlight (markers turn icon/accent) and the count-up / landing motion are not drawn",
+      "Card spec label column is a fixed width (Short 64, Long 96); code uses max-content per card. Two pairs across needs a card 560+ wide (min width 240 per row is a raw geometry value, no token)",
+      "CTA band Panel: the 720 min width on the text column is a raw value (no token between 466 and 826 fits); Message has no gap to the contact card beyond its 40 left padding (code: 64 + 48)",
+      "Row equalising: card rows are equalised with Content bottom padding tokens; Viking Reach / Havila / Normand Jarstein row and the Constructor / Supporter / HD row end up to 4px apart (no token for 84 or 76)",
+      "Eyebrows in Figma are a little wider than the code's, so 'Construction support · 2020' (Subsea feed) and 'Survey, IMR & construction' + 'Sale agreed' (Viking Reach) wrap where the code holds one line",
+      "Feed grid Grid Mobile and the vessel feed's 2-across below 1320 are not drawn (no mobile page frames)",
+      "Normand Jarstein card keeps the image placeholder (no photo in code)"
+    ],
+    "housekeeping": "Overlap audit clean on Components, Blocks and Pages. Repeated-structure scan empty on Blocks / Fleet register and the Assets and Subsea services frames (layout rows hold only instances)."
   }
 }
