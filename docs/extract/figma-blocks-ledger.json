@@ -2117,5 +2117,105 @@
       "Normand Jarstein card keeps the image placeholder (no photo in code)"
     ],
     "housekeeping": "Overlap audit clean on Components, Blocks and Pages. Repeated-structure scan empty on Blocks / Fleet register and the Assets and Subsea services frames (layout rows hold only instances)."
+  },
+  "sweep8OctFinalAudit": {
+    "date": "2026-10-08",
+    "context": "Figma sweep batch 6b (8 Oct 2026), the last: FAQ index the components way, Subsea services bento labels, loose layers on Components / Blocks / Pages, and a whole-file audit (overlaps, repeated structures, instance-only page sections, page coverage, Footer and CTA band type against the code). Ground truth: src/pages/faq/index.astro, src/blocks/FaqIndex.astro, src/data/faqs.ts (the built /faq/ at :4322), src/pages/services/subsea/index.astro, src/components/Footer.astro, src/blocks/CtaBand.astro, src/styles/tokens.css.",
+    "variables": {
+      "size/eyebrow VariableID:10:46": "Desktop 14 → 13 (Mobile 12 kept), as --wp--preset--font-size--eyebrow clamp(12 → 13). UI/Eyebrow follows, so every Eyebrow, Footer and Section header eyebrow is the code's size"
+    },
+    "components": {
+      "FAQ group 614:14991 (new, Blocks / FAQ index 476:9363)": "Breakpoint=Desktop 614:14896 (864), Mobile 614:14990 (327). Section header (exposed instance; Title, Show action, Action label) over List of 16 Accordion item instances (Item 1 Open, 2–16 Closed; gap space/16; group gap as the block's). Show item 4#614:0 … Show item 16#614:36 (4 on). Built from the block's own group frames",
+      "Filter facet 617:34277 (new, Blocks / Feed grid 152:1428 > Group/Parts)": "Breakpoint=Desktop 617:34267 (label inline + 5 Filter chips), Mobile 617:34276 (label over the chip row, 327). Label#617:2, Show chip 5#617:5. Replaces the four raw Facet frames in Feed grid Filters=On Desktop / Mobile (instances 617:34312, 617:34353, 617:34385, 617:34426)",
+      "Region status 457:8661": "Type dot 2 / Type dot 3 added on Show type 2#617:0 / Show type 3#617:1 (off). The four raw Region frames in Live operations Live / Stale replaced by instances 617:34153, 617:34172, 617:34190, 617:34207 (icons ship · submarine · drone, and drone · ship, swapped in)",
+      "Footer 125:3011 / Footer column 621:2544 (new)": "See figma-components-ledger.json: Footer rebuilt to Footer.astro (tagline, columns in code order with the code's links, legal hairline); the columns are Footer column instances (Desktop 621:2546, 621:2557, 621:2568, 621:2579; Mobile 621:2591, 621:2602, 621:2613, 621:2624)"
+    },
+    "blocks": {
+      "Block/FAQ index 476:9533": "Groups in Desktop 476:9368 and Mobile 476:9461 are six FAQ group instances (Desktop 615:14855, 615:14964, 615:15094, 615:15148, 615:15230, 615:15324; Mobile 615:15418 … 615:15887) carrying the FAQ page's copy: About Reach Subsea 9, Services & technology 16 (All services), Vessels, ROVs & the fleet 3 (Fleet overview), Leadership, HSEQ & sustainability 11 (About Reach), Results, reports & governance 14 (Investor overview), Working at Reach Subsea 14 (Careers overview); first question of each open. Show group 3#615:0 … Show group 6#615:9 (off in the master, so it shows two groups: Desktop 3054, Mobile 4086)",
+      "Block/CTA band 179:5432": "Style=Panel lead (Desktop 448:16521, Mobile 448:16605): no text style at size/h3 (32/40, 24/32) → Body/Lead (20/32, 18/28), as the code's .cta-band__lead.text-lead. Title H2, contact name H4, role Body/Small, buttons already matched"
+    },
+    "pageFrames": [
+      {
+        "id": "478:9665",
+        "name": "FAQ",
+        "x": 22960,
+        "height": 9275,
+        "source": "src/pages/faq/index.astro",
+        "sections": {
+          "FAQ index: Block/FAQ index Desktop instance, Show group 3–6 on (replaces the detached 478:9927, deleted after the screenshot)": "616:33670"
+        }
+      },
+      {
+        "id": "359:4009",
+        "name": "Subsea services",
+        "x": 9840,
+        "height": 7072,
+        "source": "src/pages/services/subsea/index.astro",
+        "sections": {
+          "Card bento 359:12927: Havila Subsea card link 'View vessel' → 'Our vessels' (I359:12927;310:5169;103:1106), Supporter WROV 'View ROV' → 'Our ROVs' (I359:12927;310:5244;103:1071); Constructor WROV keeps 'View ROV', as the code": "359:12927"
+        }
+      }
+    ],
+    "looseLayers": {
+      "Blocks page": {
+        "435:17585 'text/text'": "Ross's reference for Split media Layout=Beside (cited in docs/05 §2.4, Q139, sweep ledger): kept, renamed 'Reference: Layout Beside (Ross, 8 Oct 2026; Q139)', moved into Blocks / Split media 162:2081",
+        "435:17473 Block/Split media instance": "deleted: an unmodified default instance (0 overrides), no citation",
+        "424:14318 'Frame'": "deleted: empty 100x100 frame at 0,0",
+        "246:9139 Post card (set)": "deleted: 0 instances, no ID citation; superseded by Social post 457:8485 in Social feed",
+        "Moved into their doc frame's new Group/Parts (instances stay linked)": "SDG goal 450:16287 → SDG goals 439:7722; Share bar 450:17107 → Share bars 438:7702; Figure card 455:17942, Chart label 455:17948, Figure point 457:8823 → Figures 314:6177; Embed zone 457:8412 → Embed 201:4459; Social post 457:8485 → Social feed 246:9109; Region status 457:8661 → Live operations 269:4799; Timeline event 461:8616 → Timeline 188:2945; Year bar 461:8677 → Year bars 417:13858; Map marker 461:8989 → Offices map 373:7048; Report quarter 465:8744, Meeting row 465:9033, Publication row 465:9447, Calendar row 472:9156 → Data list 195:3648; Result item 465:9591, Result row 465:9694 → Results band 321:6312; Lifecycle phase 465:9815, step 465:10053, cell 465:10203, line 472:9242 → Lifecycle 324:6654; Values step 472:9363 → Values 329:6823"
+      },
+      "Components page": {
+        "435:16283 Card instance": "deleted: a default Card Row (Sustainability copy as in the master), only noted as loose in phase ledgers, not a reference",
+        "421:9597 'icons-green-line_handshake 1'": "deleted: Ross's raw source vectors for the handshake redraw, which is Pictogram/handshake 421:9647 in the library; no citation, no use",
+        "Moved into doc frames' Group/Parts": "Menu post 470:18190 → Site menu panel 122:1862; List item 519:2513 → Meta item 91:281; Card spec 599:31872 → Card 103:446"
+      },
+      "Pages page": "no loose layers"
+    },
+    "audit": {
+      "a_overlaps": "None on Components, Blocks or Pages. Doc frames that grew were re-stacked per column, 200 apart (Blocks: the FAQ index column and others moved down; Components: frames below Icons moved down)",
+      "b_repeatedStructureScan": "Empty on all three pages. Fixed on the way: Feed grid Facets (now Filter facet), Live operations Regions (now Region status), Footer Mobile rows (now Footer column instances; the rows hold only instances)",
+      "c_pageSectionsInstances": "Every direct child of all 32 page frames is an INSTANCE",
+      "d_pageCoverage": {
+        "/": "Home 260:22",
+        "/company/": "About 351:3194",
+        "/company/leadership-board/": "Leadership & Board 548:13802",
+        "/company/hseq/": "HSEQ 555:14272",
+        "/company/hseq/life-saving-rules/": "Life-Saving Rules 557:15336",
+        "/company/hseq/campaigns/": "HSEQ campaigns 558:16363",
+        "/company/sustainability/": "Sustainability 441:6601 (+ Mobile 445:7129)",
+        "/company/sustainability/sponsorship/": "Sponsorship 523:13260",
+        "/transparency-act/": "Transparency Act 528:13561",
+        "/services/": "Services overview 355:3374 (+ Mobile 370:13225)",
+        "/services/subsea/": "Subsea services 359:4009",
+        "/services/survey/": "Survey 566:28950",
+        "/services/monitoring/": "Monitoring 566:29560",
+        "/services/technology-innovation/": "Technology & Innovation 566:30170",
+        "/services/technology-innovation/research-publications/": "Research & Publications 419:13892",
+        "/assets/": "Assets 606:20465",
+        "/3d-world/": "Explore 3D World 566:30780",
+        "/3d-world/explore/": "NONE: the app page (solid header + the scene iframe, no blocks, no footer; docs/05 §3)",
+        "/investors/": "Investors overview 295:8326",
+        "/investors/why-invest/": "Why invest 346:2703",
+        "/investors/financial-calendar/": "Financial calendar 426:12486",
+        "/investors/reports-presentations/": "Reports & presentations 494:10132",
+        "/investors/governance-meetings/": "Governance & general meetings 513:11216",
+        "/investors/charter-agreements/": "Charter agreements 515:11849",
+        "/investors/share-information/": "Share information 515:13417",
+        "/careers/": "Careers overview 302:8729",
+        "/careers/why-work-with-us/": "Why work with us 588:19574",
+        "/careers/life-at-reach/": "Life at Reach 589:31472",
+        "/careers/our-culture/": "Our culture 454:17974",
+        "/contact/": "Contact 378:5002",
+        "/faq/": "FAQ 478:9665"
+      },
+      "e_textStyles": "Footer: links Body/Small 16/24 · 14/20, legal Body/Caption 14/20 match .text-small / .text-caption; the eyebrows were 14 against the code's 13 (size/eyebrow fixed, above); the structure differed (no tagline, social buttons, Company first, Explore 3D World under Services, phone and address under Get in touch) and is now the code's. CTA band Panel: the lead was H3-sized (fixed, above); the rest matched"
+    },
+    "gaps": [
+      "/3d-world/explore/ has no page frame (no blocks to instance: header + iframe)",
+      "Footer tagline widths 204 / 170 are raw (the code's 14ch); Figma wraps the desktop tagline 'Transforming the / way we work in / the ocean.' (code balances it)",
+      "Footer Mobile: post@reachsubsea.com wraps at the dot in its 156 column (the code's link is inline-block and runs to the column edge)",
+      "FAQ group Mobile master shows four items with long default copy; search states (marks, no-match) still only in the Subnav item doc example",
+      "Region status Stale instances: plain instances like the raw rows they replace (the earlier Stale instances carry fill overrides)"
+    ]
   }
 }

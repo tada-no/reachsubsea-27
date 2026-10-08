@@ -80,6 +80,7 @@ Context: Ross asked for a sweep of the whole site once the page chats had finish
 - [x] Links still pointing at the asset single pages Q78 dropped now go to the Assets page anchors: Home's ROV card (`/assets/#rovs`), Services overview's Our vessels (`/assets/#vessels`), Subsea's bento vessel and ROV cards ("Our vessels" · "Our ROVs", were "View vessel" Havila Subsea / "View ROV" Supporter WROV)
 - [ ] Known, left: Home's three service cards are three across from 900 (Q79), so at 900–950 their descriptions run to four lines at 191px
 - [x] Figma scope (Ross): a desktop page frame for every built page, built from block instances; every new block with Desktop and Mobile variants; no separate mobile page frames
+- [x] Figma final audit (8 Oct 2026, ledger `sweep8OctFinalAudit`): Subsea services 359:4009 bento links read Our vessels / Our ROVs; loose layers on Components and Blocks moved into their doc frames' Group/Parts (22 part components) or deleted (5 leftovers); new parts Filter facet 617:34277 and Footer column 621:2544, Region status Show type 2/3; Footer 125:3011 brought to Footer.astro (tagline, column order and links, legal hairline); CTA Panel lead to Body/Lead; size/eyebrow Desktop 14 → 13. Overlaps none, repeated-structure scan empty, every page-frame section an instance; 30 of 31 coded pages have a desktop frame (not /3d-world/explore/: header + iframe, no blocks)
 
 **Answer:** one column of side-by-side image cards at 768–1199; a badge-only lighter accent on navy; desktop frames plus block mobile variants.
 
@@ -102,6 +103,7 @@ Context: Ross: the FAQ page "could make better use of the 1 col". Each of the si
 - [x] Subnav item gains an optional bracketed count and a disabled look (`aria-disabled`)
 - [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll, rail and list aligned, scroll-spy follows, token audit clean
 - [x] Figma (8 Oct 2026, Ross: push the FAQ page): Subnav item gains Layout=Vertical, State=Disabled and Show count / Count (101:448); Block/FAQ index 476:9533 (Desktop 476:9368, Mobile 476:9461) on Blocks / FAQ index 476:9363; page frame Pages / FAQ 478:9665 (all six groups, 67 questions). The page's CTA panel moved to white, the FAQ index's ground (docs/08 §6: on tint it left a tint strip above the panel), in code and Figma
+- [x] Figma, components not copies (8 Oct 2026, final audit): the page frame's detached FAQ index replaced by Block/FAQ index instance 616:33670 (Show group 3–6 on); the groups are `FAQ group` 614:14991 instances (Desktop 614:14896, Mobile 614:14990; Show item 4–16) carrying the page's 67 questions
 
 ### Q140. The fourth value: "Leave no one behind", and no numbers on the overview (8 Oct 2026)
 Context: Ross, on the Careers overview's four value cards (Learn · Teach · Reach · Never leave anyone behind, numbered 01–04): should the fourth go navy as on Our culture? Answered no: in an equal row of four a navy card reads as "selected", against the numbering. Instead the numbers go, and a shorter wording.

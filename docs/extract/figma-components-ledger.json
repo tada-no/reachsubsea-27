@@ -329,7 +329,8 @@
         "Desktop": "125:2898",
         "Mobile": "125:2953"
       },
-      "notes": "Navy mode on each variant; Mobile also sets Layout/Typography Mobile modes. No component properties: link text is edited in place."
+      "notes": "Navy mode on each variant; Mobile also sets Layout/Typography Mobile modes. No component properties: link text is edited in place.",
+      "update8OctFinalAudit": "Brought to src/components/Footer.astro (sweep8OctFinalAudit): Brand = Logo + Tagline (Heading/H4 'Transforming the way we work in the ocean.', 'in the ocean.' text/accent, width 204 Desktop / 170 Mobile = the code's 14ch; Desktop Brand fills the row height, space-between, so the tagline sits level with the longest column's foot); the Social icon buttons removed (LinkedIn and Facebook are text links under Get in touch). Columns are Footer column 621:2544 instances in the code's order: Services & Assets (Subsea, Survey, Monitoring, Fleet overview, Reach Remote), Company (About us, Leadership & Board, HSEQ, Sustainability), Explore (Projects, Explore 3D World, Investors, Careers, Newsroom, Events, FAQ), Get in touch (Contact, post@reachsubsea.com, LinkedIn, Facebook). Desktop columns fixed 192 (2 of 12 cols); Mobile two Rows of two (FILL). Legal: 1px border/subtle top hairline, padding-top space/32. Desktop 1440x529, Mobile 375x845."
     },
     "Media toggle": {
       "id": "365:2391",
@@ -446,7 +447,8 @@
     "List item": {
       "id": "519:2513",
       "type": "COMPONENT",
-      "position8Oct": "Moved to (1540, -399) on Components, clear of the Icons doc frame (8 Oct 2026, sweep8OctServices)."
+      "position8Oct": "Moved to (1540, -399) on Components, clear of the Icons doc frame (8 Oct 2026, sweep8OctServices).",
+      "position8OctFinalAudit": "Moved into Components / Meta item 91:281 > Group/Parts (8 Oct 2026, sweep8OctFinalAudit); 96 instances stay linked."
     },
     "Card spec": {
       "id": "599:31872",
@@ -454,7 +456,22 @@
       "variants": "Label=Short 599:31866 (label width space/64), Label=Long 599:31869 (space/96)",
       "props": "Label#599:0, Value#599:3",
       "position": "Components page (1540, -320), under List item",
-      "note": "Card.astro .card__spec (Q78): Label Body/Small text/secondary; Value Body/Small at weight/medium text/primary (no such text style: size/body-sm, line-height/body-sm, family/sans, weight/medium bound), wraps; gap space/16. Code sizes the label column max-content per card; Figma uses the two fixed widths (vessels Short, ROVs and DriX Long). 8 Oct 2026, sweep8OctAssetsFixes"
+      "note": "Card.astro .card__spec (Q78): Label Body/Small text/secondary; Value Body/Small at weight/medium text/primary (no such text style: size/body-sm, line-height/body-sm, family/sans, weight/medium bound), wraps; gap space/16. Code sizes the label column max-content per card; Figma uses the two fixed widths (vessels Short, ROVs and DriX Long). 8 Oct 2026, sweep8OctAssetsFixes",
+      "position8OctFinalAudit": "Moved into Components / Card 103:446 > Group/Parts, under the Card set (8 Oct 2026, sweep8OctFinalAudit); 12 instances stay linked."
+    },
+    "Footer column": {
+      "id": "621:2544",
+      "type": "COMPONENT",
+      "position": "Components / Footer 125:2893 > Group/Parts",
+      "props": "Link 1#621:0 … Link 7#621:6 (TEXT), Show link 5#621:7 (on), Show link 6#621:8, Show link 7#621:9 (off); Heading = exposed Eyebrow 89:264 instance (Tone=Accent, set its Text)",
+      "note": "Footer.astro .site-footer__column: Eyebrow over a list of Body/Small links in text/secondary, gap space/16 / space/12. One component for both breakpoints: type sizes follow the Footer variant's Typography mode. Navy mode and bg/tint fill on the master so the doc shows it as in the footer."
+    },
+    "Menu post": {
+      "id": "470:18190",
+      "type": "COMPONENT",
+      "position": "Components / Site menu panel 122:1862 > Group/Parts (moved from page level, 8 Oct 2026, sweep8OctFinalAudit)",
+      "props": "Meta, Title",
+      "note": "Site menu Newsroom item; 15 instances in Site menu panel 122:2417."
     }
   },
   "ledgers": {
@@ -481,7 +498,8 @@
     "Header family: Nav item has 9 variants (Link has no Open). Header Nav items fill the header height (layoutSizingVertical FILL), so the bar sits on the bottom edge at 96 and 72. Menu link Current bar is absolute at x −12 (in the gutter); parent frames need clipsContent=false or it's clipped (fixed on the Menu link example group). Examples change nested instance variants with setProperties({ State: 'Open' }) / ({ Level: 'L2' }) and keep label overrides.",
     "Badge Tone=Neutral was 112×30 because its 1px inside stroke counted in layout; fixed with strokesIncludedInLayout=false (now 110×28 like the other tones).",
     "QA audit 15 Sep: 157 top-level components/sets, 1457 nodes (instance internals skipped): 0 unbound solid fills/strokes, 0 text without a style, 0 effects without a style, 0 default layer names, 0 loose nodes at page root.",
-    "17 Sep 2026 (follow-up session, Live operations block — see figma-blocks-ledger.json 'blocks.Live operations'): no 'radar' icon exists in this set for the code's uncrewed-vessel asset type (src/data/live-operations.ts); substituted 'drone' (27:142). Same gap pattern as the Social feed block's missing 'thumb-up' (figma-blocks-ledger.json phase4HomeRedesign.socialFeed.openItem). No new shared components were added for this block — it reuses Badge (87:249), Filter chip (92:337), Link (68:326) and existing icons unchanged."
+    "17 Sep 2026 (follow-up session, Live operations block — see figma-blocks-ledger.json 'blocks.Live operations'): no 'radar' icon exists in this set for the code's uncrewed-vessel asset type (src/data/live-operations.ts); substituted 'drone' (27:142). Same gap pattern as the Social feed block's missing 'thumb-up' (figma-blocks-ledger.json phase4HomeRedesign.socialFeed.openItem). No new shared components were added for this block — it reuses Badge (87:249), Filter chip (92:337), Link (68:326) and existing icons unchanged.",
+    "8 Oct 2026 (sweep8OctFinalAudit): size/eyebrow (VariableID:10:46) Desktop 14 → 13, as --wp--preset--font-size--eyebrow (clamp 12 → 13); UI/Eyebrow and every Eyebrow follow. Fixes the 'eyebrows a little wider than the code' wraps (sweep8OctAssetsFixes gap). Deleted from the Components page: loose Card instance 435:16283 (an unmodified-default Card Row, no doc citation as a reference) and 'icons-green-line_handshake 1' 421:9597 (Ross's raw source vectors for the handshake redraw, now Pictogram/handshake 421:9647; no citation, no use). Components page frames re-stacked 200 apart."
   ],
   "qaTodo": [
     "Client to confirm: LinkedIn URL (two on dev), street address (old Figma only), pictogram names that don't match their imagery (see figma-pictograms-ledger.json).",
