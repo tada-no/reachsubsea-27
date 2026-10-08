@@ -246,7 +246,9 @@ const posts = raw.map((p) => {
     const isDateline = (m) => words(m).length <= 6 && datelineOf(plain(m[1]))?.end >= plain(m[1]).length - 1;
     const lead = isDateline(paras[0]) ? paras[1] : paras[0];
     if (lead && words(lead).length >= 15 && /[.!?”"]$/.test(plain(lead[1]))) {
-      content = content.slice(0, lead.index) + '<p class="article-lead">' + content.slice(lead.index + 3);
+      // Bold goes (Q152): the lead is already larger and navy, and nine posts bolded all of it or its dateline
+      const inner = lead[1].replace(/<\/?strong>/g, '');
+      content = content.slice(0, lead.index) + `<p class="article-lead">${inner}</p>` + content.slice(lead.index + lead[0].length);
       report.leads++;
     }
   }

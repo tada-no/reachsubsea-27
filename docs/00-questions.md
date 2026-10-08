@@ -18,6 +18,13 @@ Context: Ross asked whether stories with long titles should have a trimmed bread
 
 **Answer:** as ticked.
 
+### Q152. News single: no bold in the lead paragraph (8 Oct 2026)
+Context: nine live posts set their opening paragraph in bold: five bold the whole paragraph (the Pareto conference story among them), four bold only the dateline ("Haugesund, 9 May 2023:"). Set larger and navy as the lead (Q147), the bold made it heavier than every other story. Ross: "yes, strip the bold from lead paragraphs".
+- [x] The import drops `<strong>` inside the lead paragraph (both kinds), so every lead reads the same. Bold elsewhere in a post stays
+- [x] WordPress: the same step in the migration (docs/09 §News, step 7)
+
+**Answer:** as ticked.
+
 ### Q151. Story photos: the Reach grade, and the Press enquiries button (8 Oct 2026)
 Context: Ross: "the colour grading has gone on the news and project post, is there a reason, I wanted to try and cheat a little so that all the images have a certain Reach feel". There was no reason. The photo tint (19 Sep 2026: every photo screen-blended over navy-900) is a list of wrappers in base.css, and the new single templates' figures weren't on it. He also found the panel's button label "Email media@reachsubsea.com" wrapping to two lines on phones.
 - [x] News single: the featured image and every photo in the body (JPEG and PNG) take the tint. A figure can hold a caption, so the tint is a grid-stacked layer under the photo, not the figure's background. SVGs keep their colours. WordPress: the same rule on core/image inside a post
