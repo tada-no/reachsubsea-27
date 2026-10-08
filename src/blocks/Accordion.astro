@@ -1,13 +1,14 @@
 ---
 // Accordion / FAQ · reach/accordion (docs/05 §2.6). Layout Stacked · Split (Split is Desktop only,
-// stacks below 900 to the Stacked layout). Source FAQ (query by topic, outputs FAQPage JSON-LD) or
-// manual items. More than one item may be open at once (AccordionItem's own script is per-item).
-// #faq-{slug} deep links open and scroll (handled by AccordionItem).
-// Figma hides the Section header eyebrow on this block, so it's dropped even if passed.
+// stacks below 900 to the Stacked layout). Source FAQ (the FAQ post type queried by topic: pass
+// `items={faqsFor(topic)}` from src/data/faqs.ts; outputs FAQPage JSON-LD) or manual items. More than one item may
+// be open at once (AccordionItem's own script is per-item). #faq-{slug} deep links open and scroll (handled by
+// AccordionItem). Figma hides the Section header eyebrow on this block, so it's dropped even if passed.
 import BlockSection from '../components/BlockSection.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import AccordionItem from '../components/AccordionItem.astro';
 import { makeId } from '../lib/ids';
+import { faqPageSchema } from '../lib/faq-schema';
 import type { BlockFields, SectionHeaderField } from '../lib/types';
 
 interface FaqItem {
@@ -25,25 +26,16 @@ interface Props extends BlockFields {
   /** FAQ source: the topic these items were queried by. */
   topic?: string;
   items: FaqItem[];
+  /** FAQ source: emit FAQPage JSON-LD (default). Off where the page emits one for several blocks (the FAQ page). */
+  structuredData?: boolean;
 }
 
-const { sectionHeader, layout = 'stacked', source = 'manual', topic, items, background, spacing, anchor } = Astro.props;
+const { sectionHeader, layout = 'stacked', source = 'manual', items, structuredData = true, background, spacing, anchor } = Astro.props;
 
 const hasItems = items.length > 0;
 const titleId = makeId('accordion', sectionHeader?.title);
 
-const faqJsonLd =
-  source === 'faq' && hasItems
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        mainEntity: items.map((item) => ({
-          '@type': 'Question',
-          name: item.question,
-          acceptedAnswer: { '@type': 'Answer', text: item.answer },
-        })),
-      }
-    : null;
+const faqJsonLd = source === 'faq' && structuredData && hasItems ? faqPageSchema(items) : null;
 ---
 
 {
@@ -96,6 +88,11 @@ const faqJsonLd =
       grid-column: 1 / span 5;
       position: sticky;
       top: calc(var(--header-offset, 96px) + var(--wp--preset--spacing--24));
+    }
+    /* Under a docked Section subnav (72 tall, below the header or at the top while the header is hidden), as
+       the Charter timeline's axis: clear the bar, not just the header (FAQ page, 7 Oct 2026) */
+    main:has(.subnav) .accordion--split .accordion__header {
+      top: calc(var(--reach-subnav-top, 0px) + var(--wp--preset--spacing--72) + var(--wp--preset--spacing--24));
     }
     /* In the narrow column the action stacks under the intro instead of sitting beside it */
     .accordion--split .section-header.section-header--has-action {

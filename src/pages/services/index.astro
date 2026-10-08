@@ -26,6 +26,7 @@ import type { CardField } from '../../lib/types';
 import { navSections } from '../../data/navigation';
 import { cardPresets } from '../../data/card-presets';
 import { serviceLines, lifecyclePhases, lifecycleRows, lifecycleFoundation } from '../../data/services';
+import { faqsFor, faqHubHref } from '../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 const services = navSections.find((s) => s.id === 'services')!;
@@ -131,27 +132,7 @@ const actionItems: CardField[] = [
   }),
 ];
 
-const faqItems = [
-  {
-    slug: 'which-service-lines',
-    question: 'What service lines does Reach Subsea offer?',
-    answer:
-      'Three: Subsea (inspection, maintenance, repair and construction support), Survey (seabed, cable and positioning data) and Monitoring (gWatch, DepthWatch, Wellwatch and Drillwatch). Under all three sits our in-house technology, Reach Pilot, Reach Remote, Reach Horizon and Reach Relay. All are delivered from crewed or uncrewed vessels.',
-    open: true,
-  },
-  {
-    slug: 'which-service-do-i-need',
-    question: 'How do I know whether I need Subsea, Survey or Monitoring?',
-    answer:
-      'Subsea covers physical work on the asset, Survey collects seabed and positioning data, and Monitoring measures reservoirs, wells and the environment over time. Many projects combine more than one. Tell us about the asset and we will help scope it.',
-  },
-  {
-    slug: 'crewed-or-uncrewed',
-    question: 'Do you use crewed or uncrewed vessels?',
-    answer:
-      'Both. Reach Remote runs uncrewed operations from shore through Reach Horizon, and our crewed vessels carry the same ROV and survey spreads. The project decides which fits, not the service line.',
-  },
-];
+const faqItems = faqsFor('services');
 ---
 
 <BaseLayout title="Services · Reach Subsea" motion>
@@ -251,10 +232,11 @@ const faqItems = [
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'About choosing between our service lines.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('services') },
       }}
       layout="split"
       source="faq"
+      topic="services"
       topic="services"
       background="tint"
       items={faqItems}

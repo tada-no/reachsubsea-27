@@ -18,6 +18,7 @@ import Accordion from '../../blocks/Accordion.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
 import { worldPath, worldZones, worldZoneUrl } from '../../data/world';
 import type { CardField } from '../../lib/types';
+import { faqsFor, faqHubHref } from '../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 
@@ -58,28 +59,7 @@ const zoneCards: CardField[] = worldZones.map((z) => ({
   action: { label: 'Fly to this zone', url: worldZoneUrl(z.zone, worldPath), action: 'page', context: z.label },
 }));
 
-// The PDF's three FAQs (p29), FAQ post type, topic 3D World
-const faqItems = [
-  {
-    slug: 'what-is-explore-3d-world',
-    question: 'What is Explore 3D World?',
-    answer:
-      'An interactive 3D environment where you can fly between four working zones and click on vessels, ROVs, platforms and structures to learn more about each one.',
-    open: true,
-  },
-  {
-    slug: 'install-explore-3d-world',
-    question: 'Do I need to install anything to use Explore 3D World?',
-    answer:
-      'No. It runs in your web browser. It loads an 18 MB scene, so it works best on a computer or tablet with a current version of Chrome, Edge, Firefox or Safari. On a phone it may run slowly.',
-  },
-  {
-    slug: 'what-can-i-click-3d-world',
-    question: 'What can I click on inside the 3D world?',
-    answer:
-      'The assets in each zone: vessels, ROVs, platforms and subsea structures, each with its own information panel.',
-  },
-];
+const faqItems = faqsFor('3d-world');
 ---
 
 <BaseLayout title="Explore 3D World · Reach Subsea" motion>
@@ -132,10 +112,11 @@ const faqItems = [
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'About our interactive 3D operations environment.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('3d-world') },
       }}
       layout="split"
       source="faq"
+      topic="3d-world"
       topic="3d-world"
       background="white"
       items={faqItems}

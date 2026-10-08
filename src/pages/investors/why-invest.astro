@@ -18,6 +18,7 @@ import Accordion from '../../blocks/Accordion.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
 import { navSections } from '../../data/navigation';
 import { latestResults as r, reportCards } from '../../data/investor-results';
+import { faqsFor, faqHubHref } from '../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 const investors = navSections.find((s) => s.id === 'investors')!;
@@ -57,25 +58,7 @@ const reasons = [
   },
 ];
 
-const faqItems = [
-  {
-    slug: 'why-invest-in-reach-subsea',
-    question: 'Why should I invest in Reach Subsea?',
-    answer: `Strong recent growth (${r.period} revenue +44% and EBIT +111% year on year), a NOK 1,850m order backlog and a NOK 9bn tender pipeline, together with a differentiated uncrewed operations platform in Reach Remote and Reach Horizon.`,
-    open: true,
-  },
-  {
-    slug: 'reach-subsea-growth-strategy',
-    question: "What is Reach Subsea's growth strategy?",
-    answer:
-      'Scaling Reach Remote and Reach Horizon commercially, including a carve-out into a dedicated technology company, alongside continued growth in the core chartered-vessel business.',
-  },
-  {
-    slug: 'reach-subsea-revenue-growth',
-    question: 'How has revenue grown recently?',
-    answer: `Revenue reached NOK 988.1m in ${r.period}, up 44% year on year, with EBIT up 111% and net profit up 84% over the same period.`,
-  },
-];
+const faqItems = faqsFor('why-invest');
 ---
 
 <BaseLayout title="Why invest in Reach Subsea · Investors" motion>
@@ -156,10 +139,11 @@ const faqItems = [
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'About the investment case for Reach Subsea.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('why-invest') },
       }}
       layout="split"
       source="faq"
+      topic="why-invest"
       topic="investors"
       background="tint"
       items={faqItems}

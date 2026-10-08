@@ -14,8 +14,9 @@ import Footer from '../../components/Footer.astro';
 import OfficesMap from '../../blocks/OfficesMap.astro';
 import CardGrid from '../../blocks/CardGrid.astro';
 import Accordion from '../../blocks/Accordion.astro';
-import { contactIntro, offices, mailboxes, contactFaqs } from '../../data/contact';
+import { contactIntro, offices, mailboxes } from '../../data/contact';
 import type { CardField } from '../../lib/types';
+import { faqsFor, faqHubHref } from '../../data/faqs';
 
 const mailboxCards: CardField[] = mailboxes.map((m) => ({
   media: 'icon',
@@ -44,12 +45,13 @@ const mailboxCards: CardField[] = mailboxes.map((m) => ({
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'Answers about reaching our offices and teams.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('contact') },
       }}
       layout="split"
       source="faq"
       topic="contact"
-      items={contactFaqs}
+      topic="contact"
+      items={faqsFor('contact')}
     />
   </main>
   <Footer />

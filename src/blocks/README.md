@@ -55,7 +55,7 @@ A block does one job. If a field only applies to one of its media types or style
 | `Stat` | `value`, `label`, `note`, `size` large/medium, `align`, `as` |
 | `FilterChip` | `label`, `count`, `selected` (aria-pressed), `disabled` |
 | `SubnavItem` | `label`, `href`, `active`, plus aria attrs (`aria-current`, `role="tab"`, `aria-selected`) |
-| `AccordionItem` (.faq-item) | `question`, `answer` or slot, `open`, `id` (use `faq-{slug}` for deep links), `headingLevel` |
+| `AccordionItem` (.faq-item) | `question`, `answer` or slot, `open`, `id` (use `faq-{slug}` for deep links), `headingLevel`. FAQs come from the FAQ post type, `src/data/faqs.ts` (`faqsFor(topic)`): never type them in a page |
 | `Card` | `CardField`: `media`, `surface`, `size`, `pictogram`, `image`, `eyebrow`, `badge`, `title`, `description`, `meta[]`, `action`, `headingLevel`. Presets in `src/data/card-presets.ts` |
 | `MediaFrame` | `ratio`, `image`, `radius`, `caption`, `showPlay`, `playLabel`, `playAttrs`, `priority` |
 | `Dialog` | rendered once per page. Open with `data-lightbox="<group>" data-src data-alt data-caption`, or `data-video-src data-video-title` (`#` = placeholder) |

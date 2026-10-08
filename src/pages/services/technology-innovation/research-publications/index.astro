@@ -16,6 +16,7 @@ import Accordion from '../../../../blocks/Accordion.astro';
 import CtaBand from '../../../../blocks/CtaBand.astro';
 import { navSections } from '../../../../data/navigation';
 import { publications, publicationFacets, publicationsByYear } from '../../../../data/documents';
+import { faqsFor, faqHubHref } from '../../../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 const services = navSections.find((s) => s.id === 'services')!;
@@ -24,27 +25,7 @@ const total = publications.length;
 const firstYear = Math.min(...publications.map((p) => p.year));
 const lastYear = Math.max(...publications.map((p) => p.year));
 
-// The Tech page's three PDF FAQs (p16), answers verbatim: the PDF names a page-specific FAQ but gives no text for it
-const faqItems = [
-  {
-    slug: 'research-development-investment',
-    question: 'What research and development does Reach Subsea invest in?',
-    answer:
-      'Several active programmes: AI-enabled perception and robotics for our ROV fleet (Reach Pilot), autonomous and remote vessel operations (Reach Remote), in-house data infrastructure (Reach Relay), and geophysical monitoring technology developed with research partners including ASUMO and DIGIMON.',
-    open: true,
-  },
-  {
-    slug: 'research-partnerships',
-    question: 'Who does Reach Subsea do research with?',
-    answer:
-      'DIGIMON (CCS monitoring) and ASUMO (seafloor and earthquake monitoring), delivered with research institutes, universities and industry partners.',
-  },
-  {
-    slug: 'published-research',
-    question: 'Where can I read Reach Subsea’s published research?',
-    answer: `Our Research & Publications library lists ${total} conference papers and journal articles from ${firstYear} to ${lastYear}, co-authored by our geophysics and monitoring teams.`,
-  },
-];
+const faqItems = faqsFor('research');
 const subnavItems = [
   { label: 'Overview', href: services.href },
   ...services.links.map((l) => ({ label: l.label, href: l.href })),
@@ -99,10 +80,11 @@ const subnavItems = [
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'Answers about our R&D programme and the technology behind our services.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('research') },
       }}
       layout="split"
       source="faq"
+      topic="research"
       topic="research-publications"
       background="white"
       items={faqItems}

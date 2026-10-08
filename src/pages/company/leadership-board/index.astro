@@ -16,7 +16,8 @@ import Profiles from '../../../blocks/Profiles.astro';
 import Accordion from '../../../blocks/Accordion.astro';
 import CtaBand from '../../../blocks/CtaBand.astro';
 import { navSections } from '../../../data/navigation';
-import { management, board, personMeta, leadershipFaqs } from '../../../data/people';
+import { management, board, personMeta } from '../../../data/people';
+import { faqsFor, faqHubHref } from '../../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 const company = navSections.find((s) => s.id === 'company')!;
@@ -85,13 +86,14 @@ const boardProfiles = board.map((p) => ({
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'Answers about our management team and Board of Directors.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('leadership') },
       }}
       layout="split"
       source="faq"
       topic="leadership"
+      topic="leadership"
       background="white"
-      items={leadershipFaqs}
+      items={faqsFor('leadership')}
     />
 
     <CtaBand

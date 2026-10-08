@@ -36,6 +36,7 @@ import { cardPresets } from '../../data/card-presets';
 import { assets, assetsOf, fleetCounts, fleetContact, statusBadge, unitsOf } from '../../data/assets';
 import type { Asset } from '../../data/assets';
 import type { CardField } from '../../lib/types';
+import { faqsFor, faqHubHref } from '../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 const section = navSections.find((s) => s.id === 'assets')!;
@@ -231,26 +232,7 @@ const projectItems = [...projects]
     }),
   );
 
-// The PDF's three fleet FAQs (p21), answers rebuilt from the data (FAQ post type, topic Assets)
-const vesselsInService = fleetCounts.vessels.inService;
-const faqItems = [
-  {
-    slug: 'how-many-vessels',
-    question: 'How many vessels does Reach Subsea operate?',
-    answer: `A fleet of ${fleet.value} in service: ${vesselsInService} chartered vessels plus Reach Remote 1 & 2, our own uncrewed surface vessels, together with two DriX survey vehicles. ${newbuilds.value} more are joining: Viking Vigor, Newbuild NB76 and Reach Remote 3 & 4.`,
-    open: true,
-  },
-  {
-    slug: 'chartered-vs-newbuilds',
-    question: 'What is the difference between the chartered fleet and the newbuilds?',
-    answer: 'The chartered fleet is operating today. The newbuilds, Viking Vigor and Newbuild NB76, are vessels still under construction or mobilising, shown separately until they enter service.',
-  },
-  {
-    slug: 'owned-or-chartered',
-    question: 'Does Reach Subsea own any vessels outright, or are they all chartered?',
-    answer: 'Both. Most of the active fleet is chartered from partners such as Olympic Subsea, Havila Shipping and Solstad Maritime, while Reach Remote 1–4 and the DriX vehicles are owned and operated by Reach Subsea.',
-  },
-];
+const faqItems = faqsFor('assets');
 ---
 
 <BaseLayout title="Fleet overview · Reach Subsea" motion>
@@ -347,10 +329,11 @@ const faqItems = [
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'Answers about our fleet, ROVs and uncrewed vessels.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('assets') },
       }}
       layout="split"
       source="faq"
+      topic="assets"
       topic="assets"
       background="white"
       items={faqItems}

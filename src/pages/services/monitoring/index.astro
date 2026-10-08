@@ -22,6 +22,7 @@ import { cardPresets } from '../../../data/card-presets';
 import { navSections } from '../../../data/navigation';
 import { serviceLines, lifecyclePhases, lifecycleRows, lifecycleTasks } from '../../../data/services';
 import type { CardField } from '../../../lib/types';
+import { faqsFor, faqHubHref } from '../../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 const line = serviceLines.find((l) => l.id === 'monitoring')!;
@@ -55,28 +56,7 @@ const projectItems: CardField[] = projectsFor(line.id, 4).map((p) =>
     action: { label: 'Read project', url: p.url, context: p.title },
   }),
 );
-// The PDF's three FAQs (p13), FAQ post type, topic Monitoring
-const faqItems = [
-  {
-    slug: 'monitoring-technology-operated',
-    question: 'What monitoring technology does Reach Subsea operate?',
-    answer:
-      'Our own proprietary systems: gWatch for 4D gravity monitoring, DepthWatch for seafloor subsidence, Wellwatch for injection integrity and Drillwatch for well drilling control, alongside environmental monitoring covering seismic, CO2 storage and geothermal sites.',
-    open: true,
-  },
-  {
-    slug: 'gwatch-depthwatch-wellwatch-drillwatch',
-    question: 'What is the difference between gWatch, DepthWatch, Wellwatch and Drillwatch?',
-    answer:
-      'gWatch measures 4D gravity change to track reservoir behaviour; DepthWatch tracks seafloor subsidence; Wellwatch monitors well injection integrity; Drillwatch monitors well drilling control. All four are developed and operated in-house.',
-  },
-  {
-    slug: 'environmental-monitoring',
-    question: 'Can your monitoring systems track the surrounding environment as well as reservoirs and wells?',
-    answer:
-      'Yes. Alongside the reservoir and well systems, we operate environmental monitoring covering earthquake and seismic activity, CO2 storage sites and geothermal operations.',
-  },
-];
+const faqItems = faqsFor('monitoring');
 const subnavItems = [
   { label: 'Overview', href: services.href },
   ...services.links.map((l) => ({ label: l.label, href: l.href })),
@@ -166,10 +146,11 @@ const subnavItems = [
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'About our reservoir, well and environmental monitoring technology.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('monitoring') },
       }}
       layout="split"
       source="faq"
+      topic="monitoring"
       topic="monitoring"
       background="white"
       items={faqItems}

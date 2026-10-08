@@ -21,6 +21,7 @@ import { liveOperations } from '../data/live-operations';
 import { cardPresets } from '../data/card-presets';
 import { pickFigures } from '../data/key-figures';
 import type { CardField } from '../lib/types';
+import { faqsFor, faqHubHref } from '../data/faqs';
 
 // Bento: 7 cards on a 12-column grid (6×2 · 3 · 3×2 / 3 · then 4 · 5 · 3).
 const bentoCards: CardField[] = [
@@ -184,33 +185,7 @@ const linkedInPosts = [
   },
 ];
 
-const faqItems = [
-  {
-    slug: 'what-does-reach-subsea-do',
-    question: 'What does Reach Subsea do?',
-    answer:
-      'Reach Subsea delivers subsea survey, inspection, maintenance, intervention and data services for customers operating in offshore energy, infrastructure and other ocean industries.',
-    open: true,
-  },
-  {
-    slug: 'what-industries-do-you-serve',
-    question: 'What industries do you serve?',
-    answer:
-      'We primarily support offshore energy, offshore wind, subsea cables and emerging ocean industries with subsea services, technology and data solutions.',
-  },
-  {
-    slug: 'where-does-reach-subsea-operate',
-    question: 'Where does Reach Subsea operate?',
-    answer:
-      'We operate from Haugesund, Norway, with additional offices in Bergen, Sandnes, Harstad, Billingstad, West Perth, Singapore and Aberdeen, and further presence in Sweden, Brazil and Cyprus, reaching clients in nine countries worldwide.',
-  },
-  {
-    slug: 'what-makes-reach-subsea-different',
-    question: 'What makes Reach Subsea different?',
-    answer:
-      'A combination of deep offshore engineering experience, in-house ROV and monitoring technology, and Reach Remote: our uncrewed surface vessel platform operated from shore via Reach Horizon.',
-  },
-];
+const faqItems = faqsFor('general');
 ---
 
 <BaseLayout title="Reach Subsea · Transforming the way we work in the ocean" motion>
@@ -276,10 +251,11 @@ const faqItems = [
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'Answers to what we are asked most, plus every other topic, organised by subject.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('general') },
       }}
       layout="split"
       source="faq"
+      topic="general"
       background="tint"
       items={faqItems}
     />

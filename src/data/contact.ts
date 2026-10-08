@@ -1,4 +1,4 @@
-// Contact (22 Sep 2026, Q73). Offices, "also present" places, topic mailboxes and the Contact FAQs.
+// Contact (22 Sep 2026, Q73). Offices, "also present" places and topic mailboxes.
 // Every value has a source: the client PDF p59 ("27 — Contact") or the dev site's /contact/ map data
 // (`window.contactMapData.locations`, Sep 2026). Nothing is invented; where the two disagree, Q73 decides
 // (Singapore: PDF; Aberdeen: PDF email + dev phone). Pins use the dev site's coordinates (city level:
@@ -10,7 +10,7 @@
 // The Offices map block queries it; the footer and the header's "Get in touch" read the HQ row.
 // Topic mailboxes: a repeater on the same options page (`topic`, `email`, `pictogram`), rendered as a
 // Card grid (3 columns, icon media) on the page (Q75).
-// FAQs: the FAQ post type, topic Contact.
+// FAQs: the FAQ post type, topic Contact (src/data/faqs.ts).
 import { contactDetails } from './navigation';
 import { pickFigures } from './key-figures';
 
@@ -167,12 +167,10 @@ export const officeList = offices.filter((o) => o.type === 'office');
 export const presenceList = offices.filter((o) => o.type === 'presence');
 export const headquarters = offices.find((o) => o.hq)!;
 
-/** Office cities in list order, HQ marked, for the FAQs (About reuses this). */
+/** Office cities in list order, HQ marked, for the offices FAQ (src/data/faqs.ts). */
 export const officeCities = officeList.map((o) => (o.hq ? `${o.city} (HQ)` : o.city));
 /** "Sweden, Brazil and Cyprus". */
 export const presenceCountries = presenceList.map((o) => o.country);
-
-const joinAnd = (items: string[]) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items.join(''));
 
 export interface Mailbox {
   id: string;
@@ -194,34 +192,13 @@ export const mailboxes: Mailbox[] = [
   { id: 'hseq', topic: 'HSEQ', email: mail('hseq@reachsubsea.com'), pictogram: 'shield-tick' },
 ];
 
-const [officesFigure, officeCountriesFigure] = pickFigures(['offices', 'office-countries']);
-const mailboxFor = (id: string) => mailboxes.find((m) => m.id === id)!;
+const [officesFigure] = pickFigures(['offices']);
 
 /** The page's opening words (PDF p59 hero). No Page hero on Contact (Q75): the Offices map block carries them as its h1. */
 export const contactIntro = {
   title: 'Get in touch',
   lead: 'If you have any questions, please feel free to get in touch. Use the topic-specific address below, or find the office nearest you.',
 };
-
-/** PDF p59 FAQs (FAQ post type, topic Contact). Counts come from Key figures; lists from the data above. */
-export const contactFaqs = [
-  {
-    slug: 'how-to-get-in-touch',
-    question: 'How do I get in touch with Reach Subsea?',
-    answer: `Use the topic-specific email address that matches your question, or find the office nearest you, both above. For anything else, email ${contactDetails.email.label} or call ${contactDetails.phone.label}.`,
-    open: true,
-  },
-  {
-    slug: 'where-are-the-offices',
-    question: 'Where are Reach Subsea’s offices located?',
-    answer: `${officesFigure.value} offices across ${officeCountriesFigure.value} countries: ${joinAnd(officeCities)}, with further presence in ${joinAnd(presenceCountries)}.`,
-  },
-  {
-    slug: 'investor-or-press',
-    question: 'Who do I contact for investor or press inquiries specifically?',
-    answer: `Use the dedicated addresses above: ${mailboxFor('investors').email.label} for investor relations and ${mailboxFor('media').email.label} for press.`,
-  },
-];
 
 if (import.meta.env.DEV && String(officeList.length) !== officesFigure.value) {
   console.warn(`contact.ts: ${officeList.length} offices listed, but Key figures says ${officesFigure.value}`);

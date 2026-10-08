@@ -23,6 +23,7 @@ import { navSections } from '../../../data/navigation';
 import { serviceLines } from '../../../data/services';
 import { publications } from '../../../data/documents';
 import type { CardField } from '../../../lib/types';
+import { faqsFor, faqHubHref } from '../../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 const line = serviceLines.find((l) => l.id === 'technology')!;
@@ -99,28 +100,7 @@ const videoCards: CardField[] = [
   },
 ];
 
-// The PDF's three FAQs (p16), FAQ post type, topic Technology & Innovation
-const faqItems = [
-  {
-    slug: 'research-development-investment',
-    question: 'What research and development does Reach Subsea invest in?',
-    answer:
-      'Several active programmes: AI-enabled perception and autonomy for our ROV fleet (Reach Pilot), autonomous and remote vessel operations (Reach Remote), in-house data infrastructure (Reach Relay) and geophysical monitoring technology developed with research partners including ASUMO and DIGIMON.',
-    open: true,
-  },
-  {
-    slug: 'what-is-reach-pilot',
-    question: 'What is Reach Pilot?',
-    answer:
-      'A suite of perception and robotics applications developed in-house, giving ROV operators real-time situational awareness (obstacle detection, pipeline tracking and computer-vision tools) and laying the groundwork for autonomous ROV capability.',
-  },
-  {
-    slug: 'published-research',
-    question: 'Where can I read Reach Subsea’s published research?',
-    answer:
-      `Our Research & Publications library lists ${publications.length} conference papers and journal articles from 2013 to 2026, co-authored by our geophysics and monitoring teams.`,
-  },
-];
+const faqItems = faqsFor('technology');
 const subnavItems = [
   { label: 'Overview', href: services.href },
   ...services.links.map((l) => ({ label: l.label, href: l.href })),
@@ -200,10 +180,11 @@ const subnavItems = [
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'About our R&D programme and the technology behind our services.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('technology') },
       }}
       layout="split"
       source="faq"
+      topic="technology"
       topic="technology-innovation"
       background="tint"
       items={faqItems}

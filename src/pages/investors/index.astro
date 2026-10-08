@@ -29,6 +29,7 @@ import { cardPresets } from '../../data/card-presets';
 import { latestResults as r, reportCards } from '../../data/investor-results';
 import { investorCalendar } from '../../data/investor-calendar';
 import type { CardField } from '../../lib/types';
+import { faqsFor, faqHubHref } from '../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 const investors = navSections.find((s) => s.id === 'investors')!;
@@ -37,8 +38,6 @@ const subnavItems = [
   ...investors.links.map((l) => ({ label: l.label, href: l.href })),
 ];
 const fig = (key: string) => r.headline.find((s) => s.key === key)!;
-const longDate = (iso: string) =>
-  new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 // Bento on 12 columns: the case (6×2) beside three headline figures and the Charter agreements card (3×1 each).
 const glanceCards: CardField[] = [
@@ -122,24 +121,7 @@ const newsItems: CardField[] = [
   }),
 ];
 
-const faqItems = [
-  {
-    slug: 'where-is-reach-subsea-listed',
-    question: 'Where is Reach Subsea listed?',
-    answer: 'Reach Subsea ASA is listed on the Oslo Stock Exchange (Euronext) under the ticker REACH.',
-    open: true,
-  },
-  {
-    slug: 'latest-quarterly-results',
-    question: 'What were the latest reported quarterly results?',
-    answer: `${r.period}: revenue NOK 988.1m (+44% year on year), EBIT NOK 192.4m (+111%), net profit NOK 133.6m (+84%) and an order backlog of NOK 1,850m (+61%).`,
-  },
-  {
-    slug: 'next-quarterly-report',
-    question: 'When is the next quarterly report due?',
-    answer: `${longDate(r.next.date)} (${r.next.label}). Every reporting date is in the financial calendar.`,
-  },
-];
+const faqItems = faqsFor('investors');
 ---
 
 <BaseLayout title="Investor relations · Reach Subsea" motion>
@@ -234,10 +216,11 @@ const faqItems = [
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'About our listing, results and reporting.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('investors') },
       }}
       layout="split"
       source="faq"
+      topic="investors"
       topic="investors"
       background="tint"
       items={faqItems}

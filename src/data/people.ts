@@ -147,28 +147,3 @@ export const board = people.filter((p) => p.group === 'board');
 /** "Born 1969 · On the board since 2020": the PDF's bio lead, as one meta line. */
 export const personMeta = (p: Person) =>
   [p.born && `Born ${p.born}`, p.since && `On the board since ${p.since}`].filter(Boolean).join(' · ');
-
-const ceo = management[0];
-const chair = board.find((p) => p.chair)!;
-const members = board.filter((p) => !p.chair).map((p) => p.name);
-
-/** PDF p33 FAQs (FAQ post type, topic Leadership). Answers are built from the list above, so they never go
- * stale; the PDF's "See this page for the full current Board…" pointed at the page it sits on. */
-export const leadershipFaqs = [
-  {
-    slug: 'who-is-ceo',
-    question: 'Who is the CEO of Reach Subsea?',
-    answer: `${ceo.name}.`,
-    open: true,
-  },
-  {
-    slug: 'who-sits-on-board',
-    question: 'Who sits on Reach Subsea’s Board of Directors?',
-    answer: `${chair.name} (Chairperson), ${members.slice(0, -1).join(', ')} and ${members.at(-1)}.`,
-  },
-  {
-    slug: 'contact-leadership',
-    question: 'How can I get in touch with a member of the leadership team?',
-    answer: 'Use the contact details listed against each member of the management team on this page, or reach our general contact channels on the Contact page.',
-  },
-];

@@ -24,6 +24,7 @@ import { cardPresets } from '../../../data/card-presets';
 import { navSections } from '../../../data/navigation';
 import { serviceLines, lifecyclePhases, lifecycleRows, lifecycleTasks } from '../../../data/services';
 import type { CardField } from '../../../lib/types';
+import { faqsFor, faqHubHref } from '../../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 const line = serviceLines.find((l) => l.id === 'subsea')!;
@@ -97,28 +98,7 @@ const projectItems: CardField[] = projectsFor(line.id, 4).map((p) =>
     action: { label: 'Read project', url: p.url, context: p.title },
   }),
 );
-// The PDF's three FAQs: genuine operator questions (FAQ post type, topic Subsea)
-const faqItems = [
-  {
-    slug: 'what-is-imr',
-    question: 'What is IMR, and does Reach Subsea provide it?',
-    answer:
-      'IMR stands for inspection, maintenance and repair. It is the core of our subsea work, alongside asset integrity, light construction and intervention, delivered from crewed vessels or from Reach Remote, both carrying the same ROV capability.',
-    open: true,
-  },
-  {
-    slug: 'subsea-vessels-equipment',
-    question: 'What vessels and equipment do you use for subsea work?',
-    answer:
-      'Work-class ROVs such as Supporter and Constructor, deployed from DP2 vessels like Havila Subsea or from the uncrewed Reach Remote. The scope of work is the same either way.',
-  },
-  {
-    slug: 'uncrewed-intervention',
-    question: 'Can subsea intervention be done without a crew on the vessel?',
-    answer:
-      'Yes. Reach Remote carries a work-class ROV and delivers IMR and light construction scope, operated from shore through Reach Horizon.',
-  },
-];
+const faqItems = faqsFor('subsea');
 const subnavItems = [
   { label: 'Overview', href: services.href },
   ...services.links.map((l) => ({ label: l.label, href: l.href })),
@@ -208,10 +188,11 @@ const subnavItems = [
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'About our subsea IMR, asset integrity and construction work.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('subsea') },
       }}
       layout="split"
       source="faq"
+      topic="subsea"
       topic="subsea"
       background="tint"
       items={faqItems}

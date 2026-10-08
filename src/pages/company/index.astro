@@ -20,8 +20,9 @@ import Accordion from '../../blocks/Accordion.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
 import { navSections } from '../../data/navigation';
 import { pickFigures } from '../../data/key-figures';
-import { vision, story, values, promise, management, certificates, companyFaqs } from '../../data/company';
+import { vision, story, values, promise, management, certificates } from '../../data/company';
 import type { CardField } from '../../lib/types';
+import { faqsFor, faqHubHref } from '../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 const company = navSections.find((s) => s.id === 'company')!;
@@ -90,13 +91,14 @@ const certificateTiles: CardField[] = certificates.map((c) => ({
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'Answers about who we are and where we work.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('company') },
       }}
       layout="split"
       source="faq"
       topic="company"
+      topic="company"
       background="tint"
-      items={companyFaqs}
+      items={faqsFor('company')}
     />
 
     <CtaBand

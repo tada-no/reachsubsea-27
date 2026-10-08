@@ -2,16 +2,7 @@
 // wording, plus the promise ("Everything within Reach.", live /about/ and dev vision-values-and-promise), the
 // ISO certificates and the management team (dev /company/who-we-are/about-us/). Figures are never typed here:
 // they come from key-figures.ts. In WordPress: a Company options page (vision, promise, values) + the People
-// post type (management) + the FAQ post type (topic Company).
-import { pickFigures } from './key-figures';
-
-const [established, people, offices, officeCountries, countries] = pickFigures([
-  'established',
-  'people',
-  'offices',
-  'office-countries',
-  'countries',
-]);
+// post type (management) + the FAQ post type (topic Company, src/data/faqs.ts).
 
 /** The vision (PDF p30 hero and "Our vision"). */
 export const vision = {
@@ -69,28 +60,4 @@ export const certificates = [
   { standard: 'ISO 9001:2015', scope: 'Quality' },
   { standard: 'ISO 14001:2015', scope: 'Environment' },
   { standard: 'ISO 45001:2018', scope: 'Health and safety' },
-];
-
-/** Office locations (PDF p31 FAQ), from the Contact data (22 Sep 2026): one list for the whole site. */
-export { officeCities } from './contact';
-import { officeCities } from './contact';
-
-/** PDF p31 FAQs: genuine questions, answers built from the figures above (FAQ post type, topic Company). */
-export const companyFaqs = [
-  {
-    slug: 'when-established',
-    question: 'When was Reach Subsea established?',
-    answer: `In ${established.value}. We are headquartered in Haugesund, Norway.`,
-    open: true,
-  },
-  {
-    slug: 'where-offices',
-    question: 'Where does Reach Subsea have offices?',
-    answer: `${officeCities.slice(0, -1).join(', ')} and ${officeCities.at(-1)}, with further presence in Sweden, Brazil and Cyprus: ${offices.value} offices across ${officeCountries.value} countries, reaching clients in ${countries.value} countries in total.`,
-  },
-  {
-    slug: 'how-many-people',
-    question: 'How many people work at Reach Subsea?',
-    answer: `${people.value} people across our operations, offshore and onshore.`,
-  },
 ];

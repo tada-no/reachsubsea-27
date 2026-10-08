@@ -26,8 +26,9 @@ import CtaBand from '../../blocks/CtaBand.astro';
 import { navSections } from '../../data/navigation';
 import { worldCareersUrl, worldCareersPath } from '../../data/world';
 import { pickFigures } from '../../data/key-figures';
-import { hrManager, vacancies, thrive, trainees, recruiter, careersFaqs } from '../../data/careers';
+import { hrManager, vacancies, thrive, trainees, recruiter } from '../../data/careers';
 import type { CardField } from '../../lib/types';
+import { faqsFor, faqHubHref } from '../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
 const careers = navSections.find((s) => s.id === 'careers')!;
@@ -191,13 +192,14 @@ const siblingCards: CardField[] = [
       sectionHeader={{
         title: 'Frequently asked questions',
         intro: 'Answers about working at Reach Subsea.',
-        action: { label: 'See all FAQs', url: '/faq/' },
+        action: { label: 'See all FAQs', url: faqHubHref('careers') },
       }}
       layout="split"
       source="faq"
       topic="careers"
+      topic="careers"
       background="tint"
-      items={careersFaqs}
+      items={faqsFor('careers')}
     />
 
     <CtaBand
