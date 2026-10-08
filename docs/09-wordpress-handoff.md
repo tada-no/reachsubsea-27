@@ -31,11 +31,11 @@ Read with: [05-blocks-spec.md](05-blocks-spec.md) (block behaviour) · [04-compo
 | Status | Pages |
 |---|---|
 | **Built, reviewed** | Home · Services overview · Services › Subsea · Company › About · Investors › Overview · Investors › Why invest · Careers › Overview |
-| **Built, awaiting review** | Investors › Governance & general meetings (7 Oct 2026, Q121; new block Meeting archive, docs/05 §2.24) · FAQ (7 Oct 2026, Q126; every FAQ from the FAQ post type, `src/data/faqs.ts`) |
+| **Built, awaiting review** | Investors › Governance & general meetings (7 Oct 2026, Q121; new block Meeting archive, docs/05 §2.24) · FAQ (7 Oct 2026, Q126; every FAQ from the FAQ post type, `src/data/faqs.ts`) · Newsroom archive and News single (8 Oct 2026, Q145; templates in `src/templates/`, all 189 live posts) |
 | **Built, utility** | `/3d-world/explore/` (full-viewport iframe page) · header and mega menus · footer |
 | **Review routes, not pages** (do not ship) | `/blocks/*` · `/header/*` · `/live-operations-review/` |
-| **Specified in docs/05 §3, not built** | Survey · Monitoring · Technology & Innovation (reuse the Subsea template) · Research & Publications · Assets overview · Asset single · Reach Remote · Reach Remote 3 & 4 · Projects archive · Project single · Leadership & Board · HSEQ · Sustainability · Charter agreements · Financial calendar · Share information · Life at Reach · Our culture · Why work with us · Newsroom · News single · Events · Press & media · Contact · Privacy · Transparency Act · 404 |
-| **Templates, not blocks** (Phase 4, not built) | Search results · news and project single layouts · archive pagination |
+| **Specified in docs/05 §3, not built** | Survey · Monitoring · Technology & Innovation (reuse the Subsea template) · Research & Publications · Assets overview · Asset single · Reach Remote · Reach Remote 3 & 4 · Projects archive · Project single · Leadership & Board · HSEQ · Sustainability · Charter agreements · Financial calendar · Share information · Life at Reach · Our culture · Why work with us · Events · Press & media · Contact · Privacy · Transparency Act · 404 |
+| **Templates, not blocks** (Phase 4) | Search results · project single layout not built. News archive, News single and Pagination are built (Q145, §3 News) |
 
 The header links to about 30 pages that do not exist yet, so link-checking the prototype will show many dead links. That is expected.
 
@@ -64,7 +64,29 @@ The header links to about 30 pages that do not exist yet, so link-checking the p
 | `card-presets.ts`, `feed-samples.ts` | Not content. **Card presets = one template per post type** in the Feed grid query | Copy in them is placeholder |
 | `faqs.ts` | **FAQ** CPT `faq` (title = question, content = answer, slug = the `#faq-{slug}` deep link, `menu_order` = list order) + hierarchical **`faq_topic`** taxonomy: six parent terms (general · services · assets · company · investors · careers) = the FAQ page's groups and their overview pages' topics; child terms = the other pages (subsea, hseq, governance…). A FAQ on several pages is one post with several terms; its primary term (Yoast / Rank Math) places it on the FAQ page. Accordion source FAQ: `tax_query` on the block's `topic`, `include_children` false, by `menu_order`, first item open. FAQ page: one Accordion per parent term, children included, each post once, one `FAQPage` JSON-LD for the page | 58 FAQs from 19 built pages (7 Oct 2026, Q126); the dev site's ~30 (about 17 Lorem Ipsum) are replaced. Answers that quote a figure, a person or a list are built from the data files in the prototype: use the Key figures / Latest results shortcodes or block bindings there so they can't go stale. Answers never say "above" or "on this page" |
 
-Post types still to define, from docs/01 §4: **Asset** (type, status, unified spec schema, gallery, spec sheet, contact), **News** (category: news · stock exchange · report), **Event**, **Person**, **Office**, **Publication**.
+Post types still to define, from docs/01 §4: **Asset** (type, status, unified spec schema, gallery, spec sheet, contact), **Event**, **Person**, **Office**, **Publication**.
+
+### News (Q145, 8 Oct 2026): ordinary Posts, migrated from the live site
+
+News is **not a custom post type**: the core `post` type with the core categories **News** and **Reports**, exactly as on the live site, so the migration is a WordPress export/import of 189 posts plus their media. No ACF fields. `scripts/import-news.mjs` pulls the same posts into the prototype and is the reference for each clean-up step below.
+
+| Setting | Value |
+|---|---|
+| Permalinks | `/newsroom/%postname%/`; category base `newsroom/category`; posts page = Newsroom (`/newsroom/`) |
+| Redirects | `docs/extract/news-redirects.csv`: the 189 live root URLs (`/<slug>/`) → `/newsroom/<slug>/`, plus `/news/` and the two category archives |
+| Archive | home.php and category.php: lead = newest post on page 1 only, then 10 a page. Offset the main query by one (`pre_get_posts` sets `offset` = 1 + (paged − 1) × 10, and `found_posts` is reduced by one so `paginate_links()` counts right). Chips link to the category archives with `count` from the term |
+| Cards | Card image-top, White: date (no read time), a "Report" badge for the Reports category only, title, summary (the excerpt without its dateline, 3 lines), Read more. Default featured image for the 5 posts without one: `ocean-horizon-calm.jpg` |
+| Single | single.php: light article header in the 880 column, not the Page hero (breadcrumb ending at the category archive, title, date, read time = words / 200, rounded up), featured image, `the_content()` in the 880 column, 3 related posts from the same category, press CTA |
+
+**Migration clean-up** (what the import script does, which the real import has to repeat):
+1. **Dates:** 109 posts share the bulk-import timestamp 21 Mar 2023 18:31. Set each to the date in `scripts/news-dates.json` (Q146): 83 from the matching Oslo Børs Newsweb release (message id included), 15 estimated from the text or the image upload month (month only: use the 1st and keep the note), 11 with no evidence (recommend not migrating them; Reach to decide)
+2. **Markup:** remove 133 empty paragraphs and 364 `&nbsp;`; drop inline styles and classes; unwrap empty Columns and Groups; one subheading level (the posts mix h2–h5 for the same job, often with `<strong>` inside); `<p><img></p>` from the classic editor becomes an Image block
+3. **Links:** 7 Outlook "safe links" pasted from email → their real `url=` target; `http://` and `www.reachsubsea.com` → the new site; links to other posts → their `/newsroom/` URL
+4. **File blocks:** remove the PDF `<object>` preview (33 posts), keep the link; the theme renders File and Buttons as the Link component (download icon for PDFs)
+5. **Gallery plugin:** 2 posts use "Simply Gallery" (`pgcsimplygalleryblock`); replace with a core Gallery so the plugin can go
+6. **Images:** 56 of 112 body images are already 404 on the live site (old imgix CDN = 410), in 28 posts; 14 were found as the original upload. The import drops the dead ones; restore them from a backup if one exists. No featured image has alt text
+7. **Lead paragraph (Q147):** register a "Lead" block style on core/paragraph (`is-style-lead`: Lead size, text/primary) and set it on the first paragraph of a story with 4+ paragraphs when that paragraph is a sentence of 15+ words (after a bare dateline, the next one). The prototype marks it `article-lead`
+8. **Embeds:** webcast iframes (qcnl.tv, companywebcast, royalcast) and one Vimeo stay as Embed blocks behind the consent placeholder; old webcasts may have expired
 
 ---
 

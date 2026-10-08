@@ -1,0 +1,18 @@
+---
+// Category archive pages 2… (/newsroom/category/news/page/2/).
+import NewsArchive from '../../../../../templates/NewsArchive.astro';
+import { newsCategories, archivePages } from '../../../../../data/news';
+
+export function getStaticPaths() {
+  return newsCategories.flatMap((c) =>
+    archivePages(c.slug)
+      .slice(1)
+      .map((p) => ({ params: { category: c.slug, page: String(p.page) } })),
+  );
+}
+
+const { category } = Astro.params;
+const page = Number(Astro.params.page);
+---
+
+<NewsArchive category={category} page={page} />

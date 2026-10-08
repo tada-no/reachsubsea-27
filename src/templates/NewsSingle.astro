@@ -1,0 +1,182 @@
+---
+// News single template (8 Oct 2026, Q145): WordPress single.php for a Post. A light article header in the 880 column
+// (breadcrumb ending at the category, Q148, which also replaces the category eyebrow; title, date and read time), the featured image and the post's own core blocks under it
+// (.article in base.css), three more posts from the same category, and the press contact. As on the dev single there
+// is no sidebar and no share row.
+// Not the Page hero (Q146, Ross: "a light hero section and not so tall"): the navy Text hero repeated on 189 articles
+// was heavy and put the story below the fold, and its text ran the container width while the body sits in the 880
+// column. Here the header, image and text share one left edge. The section landing pages keep the one hero height.
+//
+// The body is the live post after scripts/import-news.mjs cleaned it. File downloads and button rows come out of it
+// as Link components, so a PDF in a post looks like every other download on the site; in WordPress the theme
+// styles core/file and core/buttons the same way (theme.json + block styles).
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/header/Header.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import MetaItem from '../components/MetaItem.astro';
+import BlockSection from '../components/BlockSection.astro';
+import FeedGrid from '../blocks/FeedGrid.astro';
+import CtaBand from '../blocks/CtaBand.astro';
+import Link from '../components/Link.astro';
+import { newsPosts, newsCard, categoryLabel, archiveUrl, postDate, NEWSROOM, type NewsPost } from '../data/news';
+import type { LinkAction } from '../lib/types';
+
+interface Props {
+  post: NewsPost;
+}
+
+const { post } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const category = post.categories.includes('reports') ? 'reports' : 'news';
+const related = newsPosts.filter((p) => p.id !== post.id && p.categories.includes(category)).slice(0, 3);
+
+// Split the body around file and button rows, which render as Link components
+type Part = { html: string } | { links: { label: string; href: string; action: LinkAction }[] };
+const actionFor = (href: string): LinkAction =>
+  /\.pdf($|\?)/i.test(href) ? 'file' : /^https?:/.test(href) && !href.includes('reachsubsea.no/') ? 'external' : 'page';
+const linksIn = (html: string) =>
+  [...html.matchAll(/<a href="([^"]*)">([\s\S]*?)<\/a>/g)].map(([, href, label]) => ({
+    href: href.replace(/&amp;/g, '&'),
+    label: label.replace(/<[^>]+>/g, '').trim(),
+    action: actionFor(href),
+  }));
+const parts: Part[] = [];
+let rest = post.content;
+const ROW = /<p class="article-file">[\s\S]*?<\/p>|<ul class="article-links">[\s\S]*?<\/ul>/;
+for (let m = rest.match(ROW); m; m = rest.match(ROW)) {
+  if (m.index) parts.push({ html: rest.slice(0, m.index) });
+  const links = linksIn(m[0]);
+  // Consecutive download rows read as one list
+  const prev = parts[parts.length - 1];
+  if (prev && 'links' in prev) prev.links.push(...links);
+  else parts.push({ links });
+  rest = rest.slice(m.index! + m[0].length).trimStart();
+}
+if (rest) parts.push({ html: rest });
+---
+
+<BaseLayout title={`${post.title} · Reach Newsroom`} motion>
+  <Header current="newsroom" />
+  <main id="main">
+    <BlockSection slug="news-article" root="news-article" background="white" labelledBy="news-article-title">
+      <article class="news-article__column">
+        <header class="news-article__header">
+          <Breadcrumb
+            items={[{ label: 'Home', href: base }, { label: 'Newsroom', href: NEWSROOM }, { label: categoryLabel(category), href: archiveUrl(category === 'reports' ? 'reports' : 'news') }]}
+            endsWithCurrent={false}
+          />
+          <div class="news-article__heading">
+            <h1 id="news-article-title" class="news-article__title text-h2">{post.title}</h1>
+            <ul class="news-article__meta">
+              <MetaItem icon="calendar" text={postDate(post)} as="li" />
+              <MetaItem icon="clock" text={`${post.readMinutes} min read`} as="li" />
+            </ul>
+          </div>
+        </header>
+        {
+          post.image && (
+            <figure class="news-article__image">
+              <img
+                src={post.image.large}
+                alt={post.image.alt}
+                width={post.image.width ?? undefined}
+                height={post.image.height ?? undefined}
+                decoding="async"
+              />
+            </figure>
+          )
+        }
+        <div class="prose article">
+          {parts.map((part) =>
+            'html' in part ? (
+              <Fragment set:html={part.html} />
+            ) : (
+              <ul class="article__links">
+                {part.links.map((l) => (
+                  <li>
+                    <Link label={l.label} href={l.href} action={l.action} />
+                  </li>
+                ))}
+              </ul>
+            ),
+          )}
+        </div>
+      </article>
+    </BlockSection>
+
+    <FeedGrid
+      source="news"
+      background="tint"
+      sectionHeader={{
+        title: category === 'reports' ? 'More reports' : 'More news',
+        action: { label: category === 'reports' ? 'All reports' : 'All news', url: archiveUrl(category === 'reports' ? 'reports' : undefined) },
+      }}
+      items={related.map((p) => newsCard(p))}
+      showLoadMore={false}
+    />
+
+    <CtaBand
+      style="panel"
+      background="tint"
+      title="Press enquiries"
+      text="Our communications team answers questions from the media."
+      actions={[
+        { label: 'Email media@reachsubsea.com', url: 'mailto:media@reachsubsea.com' },
+        { label: 'Contact us', url: '/contact/', action: 'page' },
+      ]}
+    />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style is:global>
+  /* Opens the page under the fixed solid header: clear the bar (72 / 96, fixed values as the Page hero), then a
+     short gap, not a hero's height */
+  .news-article {
+    padding-top: calc(72px + var(--wp--custom--stack--xl));
+  }
+  @media (min-width: 1200px) {
+    .news-article {
+      padding-top: calc(96px + var(--wp--custom--stack--xl));
+    }
+  }
+  .news-article__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+  }
+  .news-article__heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+  }
+  .news-article__title {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .news-article__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--24);
+    padding-top: var(--wp--preset--spacing--4);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .news-article__column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+    max-width: var(--wp--style--global--content-size);
+    margin-inline: auto;
+  }
+  /* More news: the date row keeps a Report badge's height, as in the archive (a post can be in both categories) */
+  main:has(.news-article) .feed-grid .card__top {
+    min-height: 28px;
+  }
+  .news-article__image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--disabled);
+  }
+</style>

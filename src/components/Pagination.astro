@@ -1,0 +1,156 @@
+---
+// Pagination (8 Oct 2026, Newsroom, Q145): numbered pages for an archive, as the dev site's FacetWP pager, but plain
+// links (WordPress `paginate_links()` on the main query), so every page can be crawled and shared.
+// Previous · 1 … 4 5 6 … 19 · Next. The current page is a navy circle (aria-current). Previous on the first page and
+// Next on the last keep their space (visibility: hidden), so the numbers sit in the same place on every page.
+// Phones (< 600): the neighbours of the current page drop out (1 … 5 … 19), so the row fits 375.
+import Icon from './Icon.astro';
+
+interface Props {
+  current: number;
+  /** One URL per page, page 1 first. */
+  urls: string[];
+  label?: string;
+  class?: string;
+}
+
+const { current, urls, label = 'Pages', class: className } = Astro.props;
+const total = urls.length;
+
+// First, last, the current page and one each side; a gap of one page is shown as the page, not "…"
+type Slot = { page: number; near?: boolean } | { gap: true };
+const keep = new Set([1, total, current, current - 1, current + 1].filter((p) => p >= 1 && p <= total));
+const slots: Slot[] = [];
+let last = 0;
+for (const page of [...keep].sort((a, b) => a - b)) {
+  if (page - last === 2) slots.push({ page: last + 1, near: true });
+  else if (page - last > 2) slots.push({ gap: true });
+  slots.push({ page, near: page !== 1 && page !== total && page !== current });
+  last = page;
+}
+---
+
+{
+  total > 1 && (
+    <nav class:list={['pagination', className]} aria-label={label}>
+      <a
+        class="pagination__step text-label"
+        href={urls[current - 2]}
+        rel="prev"
+        aria-hidden={current === 1 ? 'true' : undefined}
+        tabindex={current === 1 ? -1 : undefined}
+        data-hidden={current === 1 ? '' : undefined}
+      >
+        <Icon name="arrow-left" size={20} />
+        <span>Previous</span>
+      </a>
+      <ol class="pagination__pages">
+        {slots.map((slot) =>
+          'gap' in slot ? (
+            <li class="pagination__gap text-label" aria-hidden="true">…</li>
+          ) : (
+            <li class:list={[slot.near && 'pagination__near']}>
+              <a
+                class="pagination__page text-label"
+                href={urls[slot.page - 1]}
+                aria-current={slot.page === current ? 'page' : undefined}
+                aria-label={`Page ${slot.page}`}
+              >
+                {slot.page}
+              </a>
+            </li>
+          ),
+        )}
+      </ol>
+      <a
+        class="pagination__step text-label"
+        href={urls[current]}
+        rel="next"
+        aria-hidden={current === total ? 'true' : undefined}
+        tabindex={current === total ? -1 : undefined}
+        data-hidden={current === total ? '' : undefined}
+      >
+        <span>Next</span>
+        <Icon name="arrow-right" size={20} />
+      </a>
+    </nav>
+  )
+}
+
+<style is:global>
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wp--preset--spacing--16);
+  }
+  .pagination__pages {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--4);
+  }
+  .pagination__page,
+  .pagination__gap {
+    display: grid;
+    place-items: center;
+    min-width: 44px;
+    height: 44px;
+    padding-inline: var(--wp--preset--spacing--8);
+    border-radius: var(--wp--custom--radius--full);
+    font-variant-numeric: tabular-nums;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .pagination__gap {
+    min-width: 0;
+    padding-inline: var(--wp--preset--spacing--4);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .pagination__page[aria-current='page'] {
+    background-color: var(--wp--custom--color--action--primary--bg);
+    color: var(--wp--custom--color--action--primary--fg);
+  }
+  .pagination__step {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--8);
+    min-height: 44px;
+    padding-inline: var(--wp--preset--spacing--8);
+    border-radius: var(--wp--custom--radius--full);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .pagination__step[data-hidden] {
+    visibility: hidden;
+  }
+  @media (hover: hover) {
+    .pagination__page:not([aria-current='page']):hover,
+    .pagination__step:hover {
+      background-color: var(--wp--custom--color--action--outline--bg-hover);
+    }
+  }
+  .pagination a:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+  }
+  @media (max-width: 599px) {
+    .pagination {
+      gap: var(--wp--preset--spacing--4);
+    }
+    .pagination__near {
+      display: none;
+    }
+    /* Arrows only: the words don't fit beside the numbers at 375 */
+    .pagination__step span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .pagination__step {
+      justify-content: center;
+      min-width: 44px;
+      padding-inline: 0;
+    }
+  }
+</style>

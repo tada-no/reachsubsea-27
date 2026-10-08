@@ -5,6 +5,8 @@
 // Counts are bracketed, "2025–26 (7)" (Q93). The chip hugs its content (Q142): a count only falls from the one it is
 // built with (Data list counts are a share of it), so a hidden copy of that first count holds its width and a live
 // count going from 14 to 5 moves nothing.
+// With `href` (8 Oct 2026, Newsroom, Q145) the chip is a link to a filtered archive page instead of a toggle: the
+// selected chip is the current page (aria-current), with the same look.
 import Icon from './Icon.astro';
 
 interface Props {
@@ -12,26 +14,26 @@ interface Props {
   count?: number | string;
   selected?: boolean;
   disabled?: boolean;
+  /** A link chip: goes to this URL (a category archive) instead of toggling a filter in place. */
+  href?: string;
   class?: string;
   [attr: string]: unknown;
 }
 
-const { label, count, selected = false, disabled = false, class: className, ...attrs } = Astro.props;
+const { label, count, selected = false, disabled = false, href, class: className, ...attrs } = Astro.props;
+const Tag = href ? 'a' : 'button';
+const state = href
+  ? { href, 'aria-current': selected ? 'page' : undefined }
+  : { type: 'button', 'aria-pressed': String(selected), disabled };
 ---
 
-<button
-  type="button"
-  class:list={['filter-chip', 'text-label', className]}
-  aria-pressed={String(selected)}
-  disabled={disabled}
-  {...attrs}
->
+<Tag class:list={['filter-chip', 'text-label', className]} {...state} {...attrs}>
   <Icon name="check" size={16} class="filter-chip__check" />
   <span class="filter-chip__label">{label}</span>
   {count !== undefined && (
     <span class="filter-chip__count" data-reserve={`(${count})`}><span class="filter-chip__count-value">{count}</span></span>
   )}
-</button>
+</Tag>
 
 <style is:global>
   .filter-chip {
@@ -77,21 +79,24 @@ const { label, count, selected = false, disabled = false, class: className, ...a
   .filter-chip__count-value::after {
     content: ')';
   }
-  .filter-chip[aria-pressed='true'] {
+  .filter-chip[aria-pressed='true'],
+  .filter-chip[aria-current='page'] {
     padding-inline: var(--wp--preset--spacing--16);
     background-color: var(--wp--custom--color--action--primary--bg);
     color: var(--wp--custom--color--action--primary--fg);
     box-shadow: none;
   }
-  .filter-chip[aria-pressed='true'] .filter-chip__check {
+  .filter-chip[aria-pressed='true'] .filter-chip__check,
+  .filter-chip[aria-current='page'] .filter-chip__check {
     display: block;
   }
-  .filter-chip[aria-pressed='true'] .filter-chip__count {
+  .filter-chip[aria-pressed='true'] .filter-chip__count,
+  .filter-chip[aria-current='page'] .filter-chip__count {
     color: inherit;
   }
 
   @media (hover: hover) {
-    .filter-chip:not(:disabled, [aria-pressed='true']):hover {
+    .filter-chip:not(:disabled, [aria-pressed='true'], [aria-current='page']):hover {
       background-color: var(--wp--custom--color--action--outline--bg-hover);
       box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--strong);
     }

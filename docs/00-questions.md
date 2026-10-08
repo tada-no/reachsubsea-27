@@ -10,6 +10,49 @@ _No open questions right now._
 
 ## Answered log
 
+### Q148. Newsroom: breadcrumb ends at the category; a light archive header like dev (8 Oct 2026)
+Context: Ross asked whether stories with long titles should have a trimmed breadcrumb. Claude: no, drop the title instead, since the H1 sits right under it and a title cut with "…" looks broken. Ross agreed, and asked for a lighter, smaller archive hero, a bit like the dev site.
+- [x] Story breadcrumb: Home › Newsroom › News (or Reports), every item a link to its archive; phones show "‹ News". Breadcrumb gains `endsWithCurrent` (default true, so every other page is unchanged)
+- [x] The category eyebrow on stories goes: the breadcrumb now names the category, so it said "News" twice
+- [x] Archive header: no Page hero. Solid site header, then on white "Reach Newsroom" (H1 at H2 size) and the dev intro, with the chips straight under; no breadcrumb (depth 2). The lead story starts at 436px on desktop, and title and chips sit in the same place on every archive page. Section landing pages elsewhere keep the one hero height (7 Oct 2026)
+
+**Answer:** as ticked.
+
+### Q147. News single: a lead paragraph in navy (8 Oct 2026)
+Context: Ross asked whether long stories could open with larger green intro text. Claude: larger yes, green no. Green is the label colour (the category eyebrow sits right above the title, and accent-display is for big figures), a paragraph of it reads as a callout, and it drops contrast to about 5.8:1 against roughly 11:1 for navy.
+- [x] Navy at Lead size (20) against the grey body (Ross: "go with navy")
+- [x] Rule: stories of 4+ paragraphs whose opening paragraph is a full sentence of 15+ words. A bare dateline before it ("Haugesund, 6 February 2023:") stays above in body grey. Old posts that open with a title repeat, a heading typed as a paragraph or a broken sentence get no lead. 113 of 189 stories have one
+- [x] WordPress: a "Lead" block style on core/paragraph (`is-style-lead`), set by the import on that first paragraph; editors can set it on new posts
+
+**Answer:** as ticked.
+
+### Q146. Newsroom: real dates from Newsweb, a light article header (8 Oct 2026)
+Context: Ross asked to match the 99 undated posts (Q145) against Newsweb, and suggested the story template's hero be light and not so tall. Claude agreed: the navy Text hero on 189 articles was heavy, put the story below the fold, and its text ran the container width while the body sits in the 880 column.
+- [x] Dates: Reach's whole Oslo Børs Newsweb archive (1,042 releases from 2008, public API) matched to the 109 bulk-imported posts by body text (4-word shingles, Dice) plus title, checked by hand. **83 dated from their release** (73 of the 99, plus the 10 dateline dates, 9 confirmed). Newsweb corrects one: the 4Q 2021 report's dateline says 8 Feb 2021, the release is **8 Feb 2022**
+- [x] **15 estimated** (web stories, never releases): a date in the text ("contract signed 4 May 2017", "ONS 2012") or the month the post's own images were uploaded; shown as a month ("Aug 2016"). Each has its evidence in `scripts/news-dates.json`
+- [x] **11 undated** (three "We're hiring", Teamday!, Business Development Manager, early Surveyor Interceptor and Supporter test notes, NB 825, Establishment of Reach Subsea AS): shown as "Undated", kept last
+- [x] Single: a light article header instead of the Page hero. Solid header, then in the 880 column: breadcrumb, category eyebrow, title (H1 at H2 size), date and read time, then the image and the text, one left edge. The image starts at 500px on desktop; on a phone the story starts within the first screen. Section landing pages keep the one hero height (7 Oct 2026); the Newsroom archive keeps its navy hero
+- [ ] For Reach: the 11 undated posts. Recommend not migrating them (hiring calls and team notes from 2012–2020), or Reach supplies dates
+- [ ] For Reach: confirm the 15 estimates if exact dates matter
+
+**Answer:** as ticked; Reach items open.
+
+### Q145. Newsroom: dev site layout, all live posts, built for migration (8 Oct 2026)
+Context: Ross: set up the Newsroom like the dev site, not the client PDF; all posts on the live site will be pulled into WordPress, so plan the build that way. Dev `/news/`: All · Reports (18) · News (160) chips, a full-width lead, cards in rows of 4 · 2 · 4, 11 a page, FacetWP pager. Live REST API: 189 standard posts, core categories News (174) and Reports (19), 4 in both; no tags, no custom fields; 184 with a featured image, none with alt text.
+- [x] Layout: the dev rhythm (lead story with its image beside the text, then 4 · 2 · 4), rebuilt with our Card and tokens
+- [x] Paging: numbered pages (`/newsroom/page/2/`, `paginate_links()`), new **Pagination** component; the lead (newest post) on page 1 only, then 10 a page
+- [x] Data: all 189 live posts via `scripts/import-news.mjs` → `src/data/news-posts.json`; every single is built from the post's real body, so the article styles are tested on the content being migrated
+- [x] URLs: `/newsroom/<slug>/` and `/newsroom/category/<slug>/`, with a generated redirect map from the live root URLs (`docs/extract/news-redirects.csv`, 192 rows)
+- [x] Chips are links to the category archives (FilterChip gains `href`, selected = `aria-current`), with counts; the hero is the same on every archive page so the chips never move
+- [x] Breakpoints (from the docs/08 sweep): four across from 1400, not the Feed grid's 1320 (titles ran to six lines at 278px); H5 titles in the four-across cards, H4 for the wide pair, H3 for the lead; two across at 768–1399, where the wide pair becomes full-row cards with the image beside the text; one column below 768. The date row keeps a Report badge's height so titles line up; read time is on the single only
+- [x] Single: Text hero on navy (breadcrumb, category, date, read time) · featured image and the body in the 880 column (new `.article` styles: subheading, quote with cite, image + caption, embed, table, separator, gallery; file and button rows render as Link) · More news / More reports (3 from the same category) on tint · CTA panel "Press enquiries" (media@reachsubsea.com)
+- [x] Site menu: the Newsroom feature card and the three news links are now the latest real posts
+- [x] ~~For migration: 99 posts still need their real date~~ Done in Q146 (83 from Newsweb, 15 estimated, 11 undated)
+- [ ] **For migration:** 56 of the 112 body images are already broken on the live site (404, and the old imgix CDN answers 410), in 28 posts; 14 more were recovered from the original upload. The import drops the dead ones. Restore from a backup if Reach has one
+- [ ] For Reach: alt text for the featured images (none have any; cards treat them as decorative)
+
+**Answer:** as ticked; migration items open.
+
 ### Q144. Sponsorship and Transparency Act pages (8 Oct 2026)
 Context: Ross asked to add the dev site's Transparency Act and Sponsorship pages. Both were already planned (Q115: the Transparency Act stays the legal page `/transparency-act/`; Q117: Sponsorship a child page of Sustainability with a teaser on the hub) but not built.
 - [x] `/company/sustainability/sponsorship/`: Text hero on navy · Company subnav · Split media Image ("More than support" beside the stacked-hands photo) · three white cards on tint (What we sponsor · What we look for · What we don't fund, each title the list's lead-in; the non-political, non-religious line as the header intro) · Numbered list split ("Reviewed twice a year", due 1 April and 1 November, the portal link, four steps: apply, committee review, decision, reporting) · CTA panel with the committee's email. Dev's "next due date is 01 April 2026" dropped (already past)
@@ -763,6 +806,7 @@ Context: first build of `/assets/` (Fleet overview), the Assets section landing 
 - [x] Viking Reach: stays in the fleet with a "Sale agreed" badge (MoA 4 Aug 2026, close expected Q4 2026; neither site marks it). Flag for the client in the handoff
 - [ ] In service, no mention
 - [ ] Leave it out (fleet would drop to 10 against the key figure 11)
+- [x] Figma (8 Oct 2026): `Block/Fleet register` 601:15053 (Desktop 601:14839, Mobile 601:14943; Fleet group 601:14728, Fleet unit 601:14644, Fleet legend item 601:14645) on Blocks / Fleet register 601:14637; Card spec 599:31872 and Card `Show specs#599:6` (Q78 spec rows); Feed grid `Show row 3/4`; page frame Pages / Assets 606:20465. Ledger key sweep8OctAssetsFixes
 
 **Answer:** as ticked. Also decided by Claude, open to change: no charter periods on the overview cards (they live on the Investors charter page); no per-class ROV unit counts (the per-vessel breakdown does not reconcile with the reported 15, and the Viking Reach sale changes it); where prose and spec table disagree on a dev page (Deep Cygnus and Olympic Triton ROVs, DriX 8 m vs 7.7 m) the spec table wins; Olympic Taurus keeps "In service" although its published charter ended April 2026 (the 2Q 2026 report lists it); spec-sheet links render only where a PDF exists.
 
@@ -817,7 +861,6 @@ Context: the client PDF (p59, "27 — Contact") and the dev site's /contact/ dis
 - [x] No CTA band: the FAQ closes the page, as in the PDF (the footer carries phone, email and socials)
 - [ ] CTA panel (Open positions or Investors)
 
-- [x] Figma (8 Oct 2026): `Block/Fleet register` 601:15053 (Desktop 601:14839, Mobile 601:14943; Fleet group 601:14728, Fleet unit 601:14644, Fleet legend item 601:14645) on Blocks / Fleet register 601:14637; Card spec 599:31872 and Card `Show specs#599:6` (Q78 spec rows); Feed grid `Show row 3/4`; page frame Pages / Assets 606:20465. Ledger key sweep8OctAssetsFixes
 **Answer:** as ticked. Also decided by Claude, open to change: the office keeps the client's label "Sandnes (Stavanger)" with "Sandnes" on the map pin; no mailbox is tied to an office (they are company-wide) and the HQ row carries the general phone and post@ from `contactDetails`. Page: Hero Text (navy) · **Offices map** (new block: dot-matrix map beside the office list, HQ first, "Also present in…" under the list) (white) · **Contact list** (the six topic mailboxes as a two-column list of rows, not six cards) (tint) · Accordion Split, the PDF's three FAQs with answers built from the data (white). The map is the homepage's dot-matrix map, extracted into shared pieces (`src/lib/dot-map-client.ts`, `src/components/DotMap.astro`) that Live operations and Offices map both use; the Live operations block was checked element by element before and after (docs/07 §3).
 
 ### Q72. Live operations map: dot density (22 Sep 2026, Live operations)
@@ -916,6 +959,7 @@ Proposal answers and review rounds, `/services/subsea/`:
 - [x] **No child pages, no links** on the capability cards (they would be thin pages; the detail lives here)
 - [x] "Industries we serve" (PDF pills) as an icon strip after Ross's "Where it's used" reference, not photo cards (too heavy). New Oil & gas and Offshore wind pictograms with the same loop feel (wave flow; rotor turn; crane luffs, pays out the hook line and runs a gap down the line into the sea)
 - [x] Lifecycle moved up under the industries strip on **navy**, to break up the text-heavy first half; capabilities follow on white
+- [x] Figma (8 Oct 2026): Pages / Subsea services 359:4009 brought up to the code: subnav 6th pill Research & Publications, Split media pictogram and copy, capability cards with scope lists (603:33422), bento title "Vessels and ROVs" with photos, projects as Feed grid Grid 4 columns (604:21600), CTA on tint. Ledger key sweep8OctAssetsFixes
 
 **Answer:** Built as above; section list in docs/05 §3. **Open:** the lifecycle cell mapping and per-phase tasks are placeholders until Reach confirms. The Services overview's Subsea card sub-links point to child pages that won't exist: they should go to `/services/subsea/#what-we-do` or be dropped (overview chat), and the old dev child URLs redirect there too. The Supporter WROV depth rating is left out until confirmed.
 
@@ -970,7 +1014,6 @@ Context: the PDF uses a navy→sage gradient on Investors/Company pages and phot
 
 ### Q56. Live operations map: placement (17 Sep 2026, docs/07)
 Context: the client PDF puts a "live zones" panel over the Home hero. The user decided on a standalone block instead of a hero overlay.
-- [x] Figma (8 Oct 2026): Pages / Subsea services 359:4009 brought up to the code: subnav 6th pill Research & Publications, Split media pictogram and copy, capability cards with scope lists (603:33422), bento title "Vessels and ROVs" with photos, projects as Feed grid Grid 4 columns (604:21600), CTA on tint. Ledger key sweep8OctAssetsFixes
 - [x] Home straight after the Stats band, plus the Assets overview
 - [ ] Assets overview only
 - [ ] Home only

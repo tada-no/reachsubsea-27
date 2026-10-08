@@ -11,11 +11,15 @@ export interface BreadcrumbItem {
 
 interface Props {
   items: BreadcrumbItem[];
+  /** False (8 Oct 2026, News single, Q148): the trail ends on the parent, every item a link, and the page's own
+   * title is left to the H1 right under it. A story's title repeated (or cut with "…") added nothing. */
+  endsWithCurrent?: boolean;
   class?: string;
 }
 
-const { items, class: className } = Astro.props;
-const parent = items.length > 1 ? items[items.length - 2] : undefined;
+const { items, endsWithCurrent = true, class: className } = Astro.props;
+// Phones show one link up: the parent, or the last item when the trail already ends on the parent
+const parent = endsWithCurrent ? (items.length > 1 ? items[items.length - 2] : undefined) : items[items.length - 1];
 ---
 
 {
@@ -23,7 +27,8 @@ const parent = items.length > 1 ? items[items.length - 2] : undefined;
     <nav aria-label="Breadcrumb" class:list={['breadcrumb', className]}>
       <ol class="breadcrumb__list">
         {items.map((item, i) => {
-          const isCurrent = i === items.length - 1;
+          const isLast = i === items.length - 1;
+          const isCurrent = isLast && endsWithCurrent;
           return (
             <li class="breadcrumb__item">
               {!isCurrent && item.href ? (
@@ -35,7 +40,7 @@ const parent = items.length > 1 ? items[items.length - 2] : undefined;
                   {item.label}
                 </span>
               )}
-              {!isCurrent && <Icon name="chevron-right" size={16} class="breadcrumb__sep" />}
+              {!isLast && <Icon name="chevron-right" size={16} class="breadcrumb__sep" />}
             </li>
           );
         })}

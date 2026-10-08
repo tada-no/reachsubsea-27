@@ -3,6 +3,12 @@
 // from one ACF options row per section. Here it's typed placeholder data for the static prototype.
 import type { CardField, LinkField } from '../lib/types';
 import { worldPagePath, worldLabel } from './world';
+import { newsPosts, postUrl } from './news';
+import { shortDate } from '../lib/dates';
+
+// The newest posts (8 Oct 2026, Newsroom, Q145): in WordPress the same query as the archive's lead
+const [latestPost] = newsPosts;
+const dotted = (iso: string) => iso.split('-').reverse().join('.');
 
 /** One row in a Mega menu / Site menu / Mobile menu link list. */
 export interface MenuLinkItem {
@@ -203,10 +209,9 @@ export const navSections: NavSection[] = [
     feature: {
       media: 'none',
       surface: 'tint',
-      eyebrow: '12 Aug 2026 · 3 min read',
-      badge: { label: 'Contract', tone: 'navy' },
-      title: 'Headline of the latest news article',
-      action: { label: 'Read more', url: '/newsroom/headline-of-the-latest-news-article/' },
+      eyebrow: `${shortDate(latestPost.date)} · ${latestPost.readMinutes} min read`,
+      title: latestPost.title,
+      action: { label: 'Read more', url: postUrl(latestPost) },
     },
   },
 ];
@@ -229,11 +234,7 @@ export const siteMenu = {
     image: { src: `${import.meta.env.BASE_URL}images/usv-drix-wind.jpg`, alt: 'Uncrewed survey vessel passing an offshore wind farm' },
     action: { label: 'Read project', url: '/projects/cable-route-survey-southern-north-sea/' },
   } satisfies CardField,
-  news: [
-    { date: '04.08.2026', title: 'MoA signed for sale of Viking Reach and onboard WROV', href: '/newsroom/' },
-    { date: '13.10.2025', title: 'Reach Remote 1 cleared for operations without supporting vessel', href: '/newsroom/' },
-    { date: '24.09.2025', title: 'Reach Subsea orders Reach Remote 3 and 4 from Kongsberg Maritime', href: '/newsroom/' },
-  ],
+  news: newsPosts.slice(0, 3).map((p) => ({ date: dotted(p.date), title: p.title, href: postUrl(p) })),
   events: [
     { date: '15 Oct 2026', title: 'Offshore Technology Conference', place: 'Stavanger', href: '/newsroom/events/' },
     { date: '14 Apr 2027', title: 'Ocean Business 2027', place: 'Southampton', href: '/newsroom/events/' },

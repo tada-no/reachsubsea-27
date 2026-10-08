@@ -1,0 +1,13 @@
+---
+// News single (/newsroom/<slug>/, Q145): one page per live post. Template: src/templates/NewsSingle.astro.
+import NewsSingle from '../../templates/NewsSingle.astro';
+import { newsPosts, type NewsPost } from '../../data/news';
+
+export function getStaticPaths() {
+  return newsPosts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: NewsPost };
+---
+
+<NewsSingle post={post} />

@@ -1,0 +1,13 @@
+---
+// Category archive (/newsroom/category/news/, /newsroom/category/reports/): the chips link here.
+import NewsArchive from '../../../../templates/NewsArchive.astro';
+import { newsCategories } from '../../../../data/news';
+
+export function getStaticPaths() {
+  return newsCategories.map((c) => ({ params: { category: c.slug } }));
+}
+
+const { category } = Astro.params;
+---
+
+<NewsArchive category={category} />

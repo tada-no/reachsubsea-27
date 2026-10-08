@@ -1,0 +1,210 @@
+---
+// Newsroom archive template (8 Oct 2026, Q145): WordPress home.php (the posts page, /newsroom/) and category.php
+// (/newsroom/category/<slug>/), with paginate_links(). Not a block: the editor doesn't place it, the query fills it.
+// Laid out like the dev site's newsroom: category chips (All · News · Reports, with counts), the newest post as a
+// wide lead story on page 1, then cards in rows of 4 · 2 · 4, then numbered pages. The header is the same on every
+// archive page, so the chips and the grid start in the same place whichever chip or page is open.
+// Header (Q148, Ross: "lighter smaller hero a bit like the dev site"): no Page hero. Title and intro on white under
+// the solid site header, the chips straight after, as on dev; no breadcrumb (depth 2, docs/04 §11 shows it from 3).
+//
+// Grid: four across from 1400, two across at 768–1399, one below. Every 5th and 6th card of each ten is wide (two
+// columns), so the rhythm is 4 · 2 · 4 on desktop and 2 · 2 · wide · wide · 2 · 2 on tablets. From 768, a card 640 or
+// wider (the lead, and the wide pair on tablets) lays its image beside the text. Four across starts at 1400, not the
+// Feed grid's 1320: release titles are long, and at 1320 the 278 cards ran them to six lines.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/header/Header.astro';
+import Footer from '../components/Footer.astro';
+import BlockSection from '../components/BlockSection.astro';
+import Card from '../components/Card.astro';
+import FilterChip from '../components/FilterChip.astro';
+import Pagination from '../components/Pagination.astro';
+import { newsPosts, newsCategories, archivePages, archiveUrl, newsCard, categoryLabel } from '../data/news';
+
+interface Props {
+  /** Category slug for a category archive; none for the posts page. */
+  category?: string;
+  page?: number;
+}
+
+const { category, page = 1 } = Astro.props;
+const pages = archivePages(category);
+const { lead, posts, total } = pages[page - 1];
+const heading = category ? categoryLabel(category) : 'All news';
+const title = ['Reach Newsroom', category && categoryLabel(category), page > 1 && `Page ${page}`].filter(Boolean).join(' · ');
+const chips = [
+  { label: 'All', count: newsPosts.length, href: archiveUrl(), selected: !category },
+  ...newsCategories.map((c) => ({ label: c.label, count: c.count, href: archiveUrl(c.slug), selected: category === c.slug })),
+];
+---
+
+<BaseLayout title={title} motion>
+  <Header current="newsroom" />
+  <main id="main">
+    <BlockSection slug="news-archive" root="news-archive" background="white" labelledBy="news-archive-title">
+      <div class="block__body">
+        <div class="news-archive__head">
+          <div class="news-archive__intro">
+            <h1 id="news-archive-title" class="news-archive__title text-h2">Reach Newsroom</h1>
+            <p class="news-archive__lead-text text-lead">
+              Stay up to date with Reach Subsea, from news and reports to the projects and operations shaping offshore services.
+            </p>
+          </div>
+          <h2 class="visually-hidden">{heading}{page > 1 && `, page ${page} of ${total}`}</h2>
+          <nav class="news-archive__chips scroll-row" aria-label="Categories">
+            {chips.map((chip) => <FilterChip label={chip.label} count={chip.count} href={chip.href} selected={chip.selected} />)}
+          </nav>
+        </div>
+
+        {
+          lead && (
+            <div class="news-archive__lead">
+              <Card {...newsCard(lead, 'featured')} headingLevel="h3" />
+            </div>
+          )
+        }
+
+        <ul class="news-archive__list">
+          {posts.map((post) => (
+            <li class="news-archive__item">
+              <Card {...newsCard(post)} headingLevel="h3" />
+            </li>
+          ))}
+        </ul>
+
+        <Pagination
+          class="news-archive__pages"
+          current={page}
+          urls={pages.map((p) => archiveUrl(category, p.page))}
+          label={`${heading} pages`}
+        />
+      </div>
+    </BlockSection>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style is:global>
+  /* Opens the page under the fixed solid header: clear the bar (72 / 96, as the Page hero), then a short gap */
+  .news-archive.block {
+    padding-top: calc(72px + var(--wp--custom--stack--xl));
+  }
+  @media (min-width: 1200px) {
+    .news-archive.block {
+      padding-top: calc(96px + var(--wp--custom--stack--xl));
+    }
+  }
+  .news-archive__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+  }
+  .news-archive__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+    max-width: var(--wp--style--global--content-size);
+  }
+  .news-archive__title {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .news-archive__lead-text {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .news-archive__chips {
+    flex-wrap: wrap;
+  }
+  @media (max-width: 599px) {
+    .news-archive__chips {
+      flex-wrap: nowrap;
+    }
+  }
+
+  .news-archive__list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .news-archive__item {
+    display: flex;
+    min-width: 0;
+  }
+  .news-archive__item > .card {
+    width: 100%;
+  }
+  .news-archive__item:nth-child(10n + 5),
+  .news-archive__item:nth-child(10n + 6) {
+    grid-column: span 2;
+  }
+  @media (max-width: 1399px) {
+    .news-archive__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 767px) {
+    .news-archive__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .news-archive__item:nth-child(n) {
+      grid-column: auto;
+    }
+  }
+
+  /* Four across, the cards are ~300 wide and release titles are long (a quarter run past 60 characters): at H4 they
+     ran to six lines. H5 there; the wide pair keeps H4 and the lead H3 */
+  @media (min-width: 1400px) {
+    .news-archive__item:not(:nth-child(10n + 5), :nth-child(10n + 6)) .card__title {
+      font-size: var(--wp--preset--font-size--h5);
+      line-height: var(--wp--custom--line-height--h5);
+    }
+  }
+
+  /* The date row is as tall as a Report badge (28) whether or not the card has one, so every title in a row starts
+     on the same line */
+  .news-archive .card__top {
+    min-height: 28px;
+  }
+
+  /* Summaries stop at three lines in the grid, so a long one doesn't make its row taller than the rest */
+  .news-archive__item .card__description,
+  .news-archive__lead .card__description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+  }
+  /* The lead's summary is longer, but not the whole 240 characters on a phone or tablet (seven to nine lines) */
+  .news-archive__lead .card__description {
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+  }
+
+  /* Image beside the text once the card is 640 wide: the lead, and the wide pair when it takes a full row (tablets).
+     The photo takes half the card and the card's full height (3:2 at least); the text sits in the middle. Not on
+     phones (one column, below 768): there every card stacks the same way. */
+  @media (min-width: 768px) {
+    .news-archive__lead,
+    .news-archive__item:nth-child(10n + 5),
+    .news-archive__item:nth-child(10n + 6) {
+      container: news-card / inline-size;
+    }
+  }
+  @container news-card (min-width: 640px) {
+    .card--media-image-top {
+      flex-direction: row;
+    }
+    .card--media-image-top .card__media {
+      flex: 0 0 50%;
+      aspect-ratio: 3 / 2;
+    }
+    .card--media-image-top .card__content {
+      flex: 1;
+      min-width: 0;
+      justify-content: center;
+    }
+  }
+
+  .news-archive__pages {
+    padding-top: var(--wp--preset--spacing--16);
+  }
+</style>

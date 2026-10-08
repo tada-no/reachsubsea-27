@@ -267,6 +267,118 @@ a {
   color: var(--wp--custom--color--text--accent);
 }
 
+/* ── Article: a post's core blocks (8 Oct 2026, Newsroom single, Q145) ──
+   What the live posts use, after scripts/import-news.mjs: Paragraph, Heading (all one level), Quote with cite,
+   Image with caption, Embed (webcast and video iframes), Table, Separator, a two-up gallery, and File/Buttons rows
+   (rendered as Link components). In WordPress this is theme.json for the post content. */
+/* Lead (Q147): the opening paragraph of a longer story, Lead size in navy against the grey body. Navy, not the
+   accent green: green is the label colour (the category eyebrow sits just above) and a paragraph of it reads as a callout */
+.prose.article .article-lead {
+  color: var(--wp--custom--color--text--primary);
+  font-size: var(--wp--preset--font-size--lead);
+  line-height: var(--wp--custom--line-height--lead);
+}
+.article .article-lead + * {
+  margin-top: var(--wp--custom--stack--md);
+}
+.article h2 {
+  margin-top: var(--wp--custom--stack--lg);
+  color: var(--wp--custom--color--text--primary);
+  font-size: var(--wp--preset--font-size--h4);
+  line-height: var(--wp--custom--line-height--h4);
+  font-weight: var(--wp--custom--font-weight--bold);
+}
+.article h2 + * {
+  margin-top: var(--wp--preset--spacing--8);
+}
+.article blockquote {
+  margin-block: var(--wp--custom--stack--md);
+  padding-left: var(--wp--preset--spacing--24);
+  border-left: 2px solid var(--wp--custom--color--border--accent);
+}
+.article blockquote p {
+  color: var(--wp--custom--color--text--primary);
+  font-size: var(--wp--preset--font-size--lead);
+  line-height: var(--wp--custom--line-height--lead);
+}
+.article blockquote > * + * {
+  margin-top: var(--wp--preset--spacing--8);
+}
+.article cite {
+  display: block;
+  margin-top: var(--wp--preset--spacing--12);
+  color: var(--wp--custom--color--text--secondary);
+  font-size: var(--wp--preset--font-size--body-sm);
+  line-height: var(--wp--custom--line-height--body-sm);
+  font-style: normal;
+}
+.article figure {
+  margin-block: var(--wp--custom--stack--md);
+}
+.article figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--wp--custom--radius--lg);
+}
+.article figcaption {
+  margin-top: var(--wp--preset--spacing--8);
+  color: var(--wp--custom--color--text--secondary);
+  font-size: var(--wp--preset--font-size--caption);
+  line-height: var(--wp--custom--line-height--caption);
+}
+.article .article-embed iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+  border-radius: var(--wp--custom--radius--lg);
+  background-color: var(--wp--custom--color--bg--disabled);
+}
+.article .article-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--wp--preset--spacing--16);
+}
+.article .article-gallery img {
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+.article .article-table {
+  overflow-x: auto;
+}
+.article table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--wp--preset--font-size--body-sm);
+  line-height: var(--wp--custom--line-height--body-sm);
+}
+.article td,
+.article th {
+  padding: var(--wp--preset--spacing--12) var(--wp--preset--spacing--16) var(--wp--preset--spacing--12) 0;
+  border-bottom: 1px solid var(--wp--custom--color--border--subtle);
+  text-align: left;
+  vertical-align: top;
+}
+.article hr {
+  margin-block: var(--wp--custom--stack--lg);
+  border: 0;
+  border-top: 1px solid var(--wp--custom--color--border--subtle);
+}
+.article .article__links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--wp--preset--spacing--12);
+  margin-block: var(--wp--custom--stack--md);
+  padding-left: 0;
+  list-style: none;
+}
+.article .article__links a {
+  text-decoration: none;
+}
+
 /* ── Utilities ─────────────────────────────────────────────── */
 .visually-hidden {
   position: absolute !important;
