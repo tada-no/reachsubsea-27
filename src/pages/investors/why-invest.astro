@@ -18,8 +18,10 @@ import Accordion from '../../blocks/Accordion.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
 import { navSections } from '../../data/navigation';
 import { latestResults as r, reportCards } from '../../data/investor-results';
+import { pickFigures } from '../../data/key-figures';
 import { faqsFor, faqHubHref } from '../../data/faqs';
 
+const [uncrewedDays] = pickFigures(['uncrewed-days']);
 const base = import.meta.env.BASE_URL;
 const investors = navSections.find((s) => s.id === 'investors')!;
 const subnavItems = [
@@ -28,6 +30,7 @@ const subnavItems = [
 ];
 const pick = (key: string) => [...r.headline, ...r.secondary].find((s) => s.key === key)!;
 const renewables = r.revenueMix[1];
+const [mixBefore, mixNow] = r.revenueShift.slice(-2);
 
 // Each reason carries a figure the Results band above doesn't already show (review round 3).
 const reasons = [
@@ -40,19 +43,19 @@ const reasons = [
   {
     title: 'Reach Remote is scaling commercially',
     text: "Uncrewed operations delivered every quarter, DNV's world-first AROS class notation, and remote-sailing permits in place in Norway, Australia and the UK.",
-    figure: '750+',
-    caption: 'Uncrewed operational days delivered per quarter.',
+    figure: uncrewedDays.value,
+    caption: `${uncrewedDays.label}.`,
   },
   {
     title: 'Revenue diversifying beyond oil & gas',
-    text: `Renewables and other segments now make up ${renewables.value}% of revenue. Offshore wind and emerging ocean industries are growing their share of demand.`,
+    text: `Renewables and other segments now make up more than half of revenue: ${renewables.value}% in the ${mixNow.label.toLowerCase().replace('half ', 'half of ')}, up from ${mixBefore.value}% a year earlier. Offshore wind and emerging ocean industries are growing their share of demand.`,
     caption: 'Revenue by segment',
-    period: r.period,
+    period: mixNow.label,
     split: r.revenueMix,
   },
   {
     title: 'A fleet built for growth',
-    text: `A stronger balance sheet, with NOK ${pick('cash').value} in cash, supports continued fleet investment: the Viking Vigor newbuild due in H2 2026 and the Reach Remote 3 & 4 build.`,
+    text: `A stronger balance sheet, with NOK ${pick('cash').value} in cash, supports continued fleet investment: the Viking Vigor newbuild due in the second half of 2026 and the Reach Remote 3 & 4 build.`,
     figure: '1,172.5m',
     caption: 'NOK in equity at quarter end.',
   },
@@ -130,7 +133,7 @@ const faqItems = faqsFor('why-invest');
         },
         {
           title: 'Grow the fleet with a disciplined balance sheet',
-          text: 'Add capacity such as the Viking Vigor newbuild (H2 2026) while managing the balance sheet. The Viking Reach divestment unlocks over NOK 200m in liquidity.',
+          text: 'Add capacity such as the Viking Vigor newbuild (second half of 2026) while managing the balance sheet. The Viking Reach divestment unlocks over NOK 200m in liquidity.',
         },
       ]}
     />

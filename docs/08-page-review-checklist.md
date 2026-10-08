@@ -80,12 +80,16 @@ If a card fails, change the row's shape at that width (fewer columns, or the car
 - Section grounds alternate sensibly (white / tint). Two adjacent sections on the same ground need a reason.
 - Heroes: calm photo, subject right, never enlarged beyond its native width. Breadcrumb at the top of the hero. No gradients.
 - The page ties to its siblings: same subnav, same CTA pattern, same shared components and data.
+- **Read the whole page top to bottom, not block by block** (Ross, 7 Oct 2026). Every full-width section heads the same way: the shared Section header (Eyebrow, H2, Lead intro, one onward link at the row's far end from 900). Intro copy is the same size and its link sits in the same place on every block. A stacked Split media uses Section header too. Side-by-side splits keep body copy and actions under the text, because that's their own pattern.
+- **Hairlines only where they help** (Ross, 7 Oct 2026). Use one where the eye has to track across a gap (Spec rows: label left, value right), where the row is a control (Accordion), or where tiles sit beside Spec rows and share their rhythm (HSEQ ISO certificates; Ross kept those lines). Leave them off one-line link lists, between tiles or cards that spacing already separates, and over the first row under a heading.
 - Don't cut client-PDF content just because a sibling page has it. Decide by what visitors come to that page for.
 
 ## 6. Motion and accessibility
 
 - No transparency in icon or pictogram animation (trim paths, movement, scale).
 - Everything works with reduced motion and without JS (content is never hidden).
+- **CTA panel ground (7 Oct 2026).** A closing CTA panel's `background` equals the block above it, or a strip of the wrong colour shows over the panel. Recheck whenever a block's background changes.
+- **Charts lead, figures follow (7 Oct 2026, Ross).** Where a chart (`data-grow`: bars, a ring) and counting figures (`data-count-up`) share the screen, the chart draws first and the figures rise and count about 1s later. motion.ts does this for every block (`afterCharts`); a new chart only needs `data-grow`, new figures only `data-count-up`. Check by landing on the pair together. A chart already on screen when the page loads (e.g. just under the hero) draws at once, even if only partly in view; further down, charts draw once 90% in view.
 - Contrast: 4.5:1 for body text, 3:1 for large text (24px bold and up).
 - Repeated link labels ("Report", "Download") carry hidden context.
 - One `h1`. Headings in order.

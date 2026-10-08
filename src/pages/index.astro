@@ -23,6 +23,8 @@ import { pickFigures } from '../data/key-figures';
 import type { CardField } from '../lib/types';
 import { faqsFor, faqHubHref } from '../data/faqs';
 
+const [uncrewedDays] = pickFigures(['uncrewed-days']);
+
 // Bento: 7 cards on a 12-column grid (6×2 · 3 · 3×2 / 3 · then 4 · 5 · 3).
 const bentoCards: CardField[] = [
   {
@@ -37,8 +39,8 @@ const bentoCards: CardField[] = [
   {
     media: 'stat',
     surface: 'navy',
-    statValue: '750+',
-    title: 'Uncrewed operational days, per quarter',
+    statValue: uncrewedDays.value,
+    title: uncrewedDays.label,
     action: { label: 'Reach Remote', url: '/assets/reach-remote/' },
   },
   {
@@ -127,7 +129,7 @@ const newsroomItems: CardField[] = [
     badge: { label: 'PDF', tone: 'neutral' },
     title: 'Q2 2026 report',
     meta: [{ icon: 'calendar', text: '20 Aug 2026' }],
-    action: { label: 'Download report (PDF)', url: '#', action: 'file' },
+    action: { label: 'Report (PDF)', url: '#', action: 'file' },
   }),
   cardPresets.news({
     media: 'none',
