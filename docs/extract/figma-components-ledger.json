@@ -209,7 +209,8 @@
         "Badge",
         "Meta item ×3",
         "Action"
-      ]
+      ],
+      "scope8OctServices": "Scope list (Show scope#519:1, Show 4th scope item#519:40) also in Media=None, Surface=Tint, Size=Default 103:483 (566:2546) and Media=Image top, Surface=White, Size=Default 103:836 (566:2551), 8 Oct 2026."
     },
     "Card presets": {
       "Service": "113:672",
@@ -425,6 +426,26 @@
         "Show rule#551:12"
       ],
       "notes": "Added 8 Oct 2026 (sweep8OctCompany) for Split media tiles (HSEQ ISO certificates). Doc frame Components / Pictogram tile 551:2517 at (0, 58353). Pictogram 64 (Mobile 48) beside Title Heading/H5, Text Body/Small text/secondary and an exposed Link (File Medium 'Certificate (PDF)'); padding space/24 top and bottom (Mobile 16), gap space/24 (Mobile 16), body gap space/4; Rule = absolute 1px border/subtle at the top. Code src/components/PictogramTile.astro."
+    },
+    "Icon/device-desktop": {
+      "id": "566:2526",
+      "type": "COMPONENT",
+      "notes": "Added 8 Oct 2026 (sweep8OctServices), tile 566:2525 in Components / Icons grid 22:27. Tabler Outline, 1.5 stroke bound icon/primary (VariableID:8:42). Section header meta row (3D World)."
+    },
+    "Icon/browser": {
+      "id": "566:2537",
+      "type": "COMPONENT",
+      "notes": "Added 8 Oct 2026 (sweep8OctServices), tile 566:2536. Tabler Outline, 1.5 stroke bound icon/primary."
+    },
+    "Pictogram/needed": {
+      "id": "571:2563",
+      "type": "COMPONENT",
+      "notes": "Added 8 Oct 2026 (sweep8OctServices), tile 571:2540 in Components / Pictograms grid 33:79. Placeholder for a pictogram that does not exist yet (code needed-<meaning>): 96, bg/tint, 2px dashed border/accent, radius/sm, 'Icon needed' Body/Caption text/secondary. Used for Reach Pilot, Horizon, Relay on the Technology & Innovation frame."
+    },
+    "List item": {
+      "id": "519:2513",
+      "type": "COMPONENT",
+      "position8Oct": "Moved to (1540, -399) on Components, clear of the Icons doc frame (8 Oct 2026, sweep8OctServices)."
     }
   },
   "ledgers": {

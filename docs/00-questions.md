@@ -575,7 +575,7 @@ Context: client screens PDF p28–29 draw a Services page for the 3D World: hero
 - [x] Cut: cards over the hero (docs/06 §2), stats band (repeats Home and Services), Related services
 - [x] FAQ: the PDF's three questions; CTA: the PDF's wording
 
-**Answer:** as ticked. **Open, for Reach:** the zone blurbs are the world's DRAFT copy, tightened; the zone links (`?zone=`) and the 18 MB figure depend on the world (docs/09 §7: `?zone` is not read yet). Figma page frame to follow once approved.
+**Answer:** as ticked. **Open, for Reach:** the zone blurbs are the world's DRAFT copy, tightened; the zone links (`?zone=`) and the 18 MB figure depend on the world (docs/09 §7: `?zone` is not read yet). Figma page frame to follow once approved. **Figma (8 Oct 2026):** page frame Pages / Explore 3D World 566:30780; Section header `Show meta#566:0` (the two notes, new Icon/device-desktop 566:2526 and Icon/browser 566:2537) and Card Image top White scope 566:2551 for the zone cards.
 
 ### Q94. 3D World: hosted separately, content from WordPress over an API (6 Oct 2026)
 Context: the world's info panels, zone texts, careers route and links are hard-coded in the reach-world source, and much of it repeats what WordPress will hold (Assets, Careers, Contact, Services). Ross asked whether the world should live inside the Reach site; Claude suggested a WordPress plugin on the same domain. Ross then agreed with the WordPress developer: the world stays a separate static app on its own host, and reads its content from the Reach site through an API.
@@ -693,6 +693,8 @@ Context: the page for the technology under the three lines (Q79), on the service
 - [x] Pictograms from the library: Pilot survey-rov, Remote marine, Horizon technology, Relay subsea-telemetry. Reach to confirm the matches
 - [ ] Open: Pilot, Horizon, Relay and Research & Publications pages are not built (links point at the planned URLs); DigiMon and ASUMO kept as the client wrote them
 
+- [x] Figma (8 Oct 2026): page frame Pages / Technology & Innovation 566:30170; `Pictogram/needed` placeholder 571:2563 for Reach Pilot, Horizon and Relay
+
 **Answer:** built at `/services/technology-innovation/`.
 
 ### Q82. Services › Survey single (5 Oct 2026)
@@ -701,6 +703,8 @@ Context: third service single, on the Subsea / Monitoring template. Source: clie
 - [x] The PDF's overlapping "How we deliver / Industries / photo" cards and the "Related services" row are dropped (nothing overlaps the hero; the Subnav does the related links); the video cards are dropped (no real footage, PDF p31)
 - [x] Hero: Offshore Surveyor from above (calm green water, subject right); the PDF's blue Go Electra moves into the Split media
 - [ ] Open for Ross/Reach: a named Survey contact (none on dev or PDF, so no contact card); capability summaries, scope items and lifecycle tasks are drafts; cable-route project has no date on dev (none shown); the site-survey project's dev photo shows a fishing-type vessel, and the cable-route photo is a sidescan mosaic (real, but not a vessel); Siem Pride and the other third-party vessels are named only in alt text
+
+- [x] Figma (8 Oct 2026): page frame Pages / Survey 566:28950 (Split media `Show pictogram#566:5`, Lifecycle Focus Rail track 566:31484, Card scope)
 
 **Answer:** built at `/services/survey/`; data in `services.ts` (survey capabilities, industries, `lifecycleTasks.survey`) and `projects.ts` (three survey projects, `year` now optional).
 
@@ -714,6 +718,8 @@ Context: second service single, on the Subsea template. Source: client PDF p12�
 
 **Seismic risk monitoring pictogram (6 Oct 2026, same session):** the library's flattened glyphs can't be trimmed, so Ross pointed to the stroked originals in Figma (`Pictogram/subsea-telemetry` 394:7809; `seabed-scanner` is 394:7777): real 2.5 strokes, one vector per part, on the 96 grid. `src/assets/pictograms/subsea-telemetry.svg` is that file with parts tagged (`pg-arc`, `pg-cable`, `pg-sea`/`pg-wave`, `pg-dot`), and its 3.2s loop is in `Pictogram.astro` (swell, seabed sensors ping, box pings, a gap runs up the cable, antenna pings, sediment stirs). Industry tiles now use stroked Figma originals too: `carbon-storage` (394:7870) and `geothermal` (394:7959), both animated in `Pictogram.astro` on the same 3.2s cycle (CO2 letters hop, a gap runs round each arrow; swell + a gap rising up each heat arrow). The flattened `co2`/`mountain` exports are gone.
 
+- [x] Figma (8 Oct 2026): page frame Pages / Monitoring 566:29560 (Feed grid Layout=Grid 4 columns 566:28682)
+
 **Answer:** as ticked. Built at `/services/monitoring/`; data in `services.ts` (`Capability.group`, monitoring capabilities, industries, `lifecycleTasks.monitoring`) and `projects.ts` (four monitoring projects).
 
 ### Q80. Services overview cards: the sub-service lists (5 Oct 2026)
@@ -722,7 +728,7 @@ Context: the three line cards listed four chevron links each, to the dev site's 
 - [ ] Chevron links, all to the single's capability section
 - [ ] Drop the lists
 
-**Answer:** as ticked. `subServices` is gone from `services.ts`; each line carries `scope` instead. Closes the open item in Q63. **Card stroke (same day):** the White card keeps its 1px stroke only on a white ground; on tint (as on navy since 4 Oct) the ground draws the edge. Site-wide, one rule in Card. **List marker (same day):** card scope lists take a 6px accent dot instead of the 19 Sep dash (Ross: a bullet, nearer the discs in rich-text prose); applies to the Subsea capability cards too. *Figma: Card scope list marker.*
+**Answer:** as ticked. `subServices` is gone from `services.ts`; each line carries `scope` instead. Closes the open item in Q63. **Card stroke (same day):** the White card keeps its 1px stroke only on a white ground; on tint (as on navy since 4 Oct) the ground draws the edge. Site-wide, one rule in Card. **List marker (same day):** card scope lists take a 6px accent dot instead of the 19 Sep dash (Ross: a bullet, nearer the discs in rich-text prose); applies to the Subsea capability cards too. *Figma: Card scope list marker.* Done: List item 519:2513 (8 Oct 2026, Q144); scope also in Card None/Tint 566:2546 and Image top/White 566:2551 (8 Oct 2026, Services sweep).
 
 ### Q79. Three service lines, Technology & Innovation as the technology under them; 3D stage off Home (5 Oct 2026)
 Context: the client now counts three services, Subsea, Survey and Monitoring. Technology & Innovation stays under Services but is what the three draw on (client PDF p15), not a fourth line. The client also asked for the "See our operations in 3D" stage to come off the Home page, since the 3D World already has enough entries. Ross asked what Claude thought: agreed on both, and recommended carrying the three-line count through the site rather than changing the Home block alone.

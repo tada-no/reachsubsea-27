@@ -1873,5 +1873,110 @@
       "Production build at :4322 predates fe3eaa1 for HSEQ (shows the Code of Conduct as a header action); the frame follows the source (twelve files, no action)",
       "No mobile page frames (block Mobile variants only)"
     ]
+  },
+  "sweep8OctServices": {
+    "date": "2026-10-08",
+    "context": "Figma sweep batch 4 (8 Oct 2026): Services singles and the 3D World landing page. Page frames Survey, Monitoring, Technology & Innovation (on the Subsea services 359:4009 model) and Explore 3D World (Q95–Q102, Q108). Ground truth: src/pages/services/{survey,monitoring,technology-innovation}/index.astro, src/pages/3d-world/index.astro, src/data/{services,projects,key-figures,world,faqs}.ts, SplitMedia.astro, FeedGrid.astro, SectionHeader.astro, Card.astro, Pictogram.astro; production build at 1440.",
+    "images": "Uploaded from public/images (Figma image fills, reuse by hash): hero-survey cc592a87…, hero-monitoring 186b087b…, hero-tech 7f437afa…, world-hero 3e378873…, vessel-go-electra 41024309…, vessel-northern-maria 9ed8f40b…, rov-surveyor-launch 7a7301a3…, usv-drix-wind 7cfeff99…, reach-remote-side 0e186111…, rov-zeerov-gwatch 5fda97cd…, rov-zeerov-seabed 1efc928b…, project-pipeline-ormen-lange bf2de2c4…, project-site-survey-norway 621a4e10…, project-cable-route-seagreen e92594f6…, project-gwatch-equinor fd7d77c8…, project-depthwatch-shell ba9097b9…, project-ormen-lange db7717fb…, world-step-zones 156d5732…, world-step-panel cc48860e…, world-step-pilot ffb2e20a…, world-zone-1 53a68309…, world-zone-2 9d60c138…, world-zone-3 d96756ff…, world-zone-4 98bd81b4…. Heroes: navy solid + image in SCREEN, as the other hero frames; card and split-media photos plain. Staging frame deleted.",
+    "components": {
+      "Icon/device-desktop 566:2526, Icon/browser 566:2537 (new, Components / Icons grid tiles 566:2525, 566:2536)": "Tabler Outline 3.46, 24 grid, 1.5 stroke bound icon/primary, one flattened Glyph (as the other icons). For the How it works meta row",
+      "Pictogram/needed 571:2563 (new, Components / Pictograms tile 571:2540)": "Placeholder for a missing pictogram (Pictogram.astro .pictogram--missing): 96, bg/tint, 2px dashed border/accent inside, radius/sm, 'Icon needed' Body/Caption text/secondary. Reach Pilot, Horizon, Relay cards",
+      "Card 103:1110": "Scope list (Show scope#519:1, Show 4th scope item#519:40; four List item 519:2513) added under Heading in Media=None, Surface=Tint, Size=Default 103:483 (566:2546) and Media=Image top, Surface=White, Size=Default 103:836 (566:2551)",
+      "Section header 130:68 (Blocks page)": "New BOOLEAN Show meta#566:0 (off): Meta row (wrap, gap space/24, row gap space/8; Center variants centred) with two Meta item instances (device-desktop 'Best on a computer or tablet', browser 'Runs in your browser') at the end of Text: Start Desktop 566:28430, Start Mobile 566:28441, Center Desktop 566:28452, Center Mobile 566:28463"
+    },
+    "blocks": {
+      "Block/Split media 166:2339": "New Show pictogram#566:5 (BOOLEAN, off) + Pictogram#566:34 (INSTANCE_SWAP, default Pictogram/subsea-infrastructure): a 96 Pictogram first in Text of Media=Image, Position=End Desktop 162:2086 (566:28673) and Mobile 164:2211 (566:28675). The code pulls the pictogram 12 left; Figma keeps it on the text edge",
+      "Block/Feed grid 156:2012": "New variant Filters=Off, Breakpoint=Desktop, Layout=Grid 4 columns 566:28682 (cloned from Grid 154:1636; two Rows of four Card preset/Project FILL 304 wide; Section header / More re-bound to Show section header#156:0 / Show load more#156:5). Phones use Layout=Grid Mobile 155:1995. Set resized to 6760; doc frame 152:1428 grew 2228, so Blocks / CTA band 178:2730, Logo strip 190:3229 and Card bento 310:4981 moved down 2228",
+      "Block/Lifecycle 328:6684": "Layout=Focus Desktop 325:6663: the Rail now sits in 'Rail track' 566:31484 (absolute, 1312 × 2, auto-layout, paddingLeft 268 / paddingRight 256 = the Subsea span) so an instance sets the owned span by padding (a nested rectangle's x cannot be overridden). Survey and Monitoring use 6 / 256 (plan to decommission). Note: Lifecycle phase State=Open is the handoff look (line name + arrow, one task) and State=Default the owned phase (label + three tasks)"
+    },
+    "pageFrames": [
+      {
+        "id": "566:28950",
+        "name": "Survey",
+        "x": 41000,
+        "height": 7256,
+        "source": "src/pages/services/survey/index.astro",
+        "sections": {
+          "Header (Desktop overlay, Navy mode, bg/default fill, as HSEQ)": "566:28951",
+          "Page hero Photo (hero-survey; Home › Services › Survey; See survey in 3D as a Page link)": "566:28952",
+          "Section subnav (Survey active; 6th item Research & Publications)": "566:28953",
+          "Split media Image End, Show pictogram (Pictogram/survey), go-electra photo (white)": "566:28954",
+          "Card grid Strip, industries we serve (4 tiles)": "566:28955",
+          "Lifecycle Focus, navy (From first survey to as-left; Extend life = Subsea handoff)": "566:28956",
+          "Card grid 3 columns + second row, Capabilities (six Card None/Tint with scope)": "566:28957",
+          "Card bento lead-tall-wide, Vessels and vehicles for survey (tint; 500+ and 9 stats)": "566:28958",
+          "Feed grid Grid (3 columns), Survey in the field (row 2 hidden, no Load more; Card preset/Project cards set to Surface=White)": "566:32501",
+          "Accordion Split, survey FAQs (tint)": "566:28960",
+          "CTA panel, Planning survey work? (tint, no contact card)": "566:28961",
+          "Footer": "566:28962"
+        }
+      },
+      {
+        "id": "566:29560",
+        "name": "Monitoring",
+        "x": 42640,
+        "height": 6914,
+        "source": "src/pages/services/monitoring/index.astro",
+        "sections": {
+          "Header": "566:29561",
+          "Page hero Photo (hero-monitoring; Home › Services › Monitoring)": "566:29562",
+          "Section subnav (Monitoring active)": "566:29563",
+          "Split media Image End, Show pictogram (Pictogram/global-monitoring), gWatch ROV photo": "566:29564",
+          "Card grid Strip, industries (oil-gas, carbon-storage, geothermal, subsea-telemetry)": "566:29565",
+          "Lifecycle Focus, navy (From baseline to storage; Install = Survey handoff)": "566:29566",
+          "Card grid 3 columns + second row, Geophysical monitoring (eyebrow Capabilities, intro; six Card None/Tint with scope)": "566:29567",
+          "Card grid 3 columns, Environmental monitoring (padding section/sm, three cards)": "569:20053",
+          "Feed grid Grid 4 columns, Monitoring in the field (tint, row 2 hidden, no Load more)": "569:32679",
+          "Accordion Split, monitoring FAQs (white)": "566:29570",
+          "CTA panel, Planning monitoring work? (white, no contact card)": "566:29571",
+          "Footer": "566:29572"
+        }
+      },
+      {
+        "id": "566:30170",
+        "name": "Technology & Innovation",
+        "x": 44280,
+        "height": 6620,
+        "source": "src/pages/services/technology-innovation/index.astro",
+        "sections": {
+          "Header": "566:30171",
+          "Page hero Photo (hero-tech; Talk to our team, Meet Reach Remote; Home › Services › Technology)": "566:30172",
+          "Section subnav (Technology & Innovation active)": "566:30173",
+          "Card grid 2 columns + second row, the four products (Card Pictogram panel Tint Featured, FILL 640; Pictogram/needed for Pilot, Horizon, Relay; reach-remote)": "571:23226",
+          "Stats band Feature Count=3 (tint; ~750 lead, 90%, 25x)": "571:23657",
+          "Split media Image End, Reach Remote operated from shore (white)": "566:30174",
+          "Card grid 2 columns, heritage (tint; Card Icon White: global-monitoring, book)": "571:23710",
+          "Card grid 2 columns, Technology videos (Card Image bg Navy, eyebrow Film, Link Video)": "571:23929",
+          "Accordion Split, technology FAQs (tint)": "566:30180",
+          "CTA panel, Interested in partnering on R&D? (tint, no contact card)": "566:30181",
+          "Footer": "566:30182"
+        }
+      },
+      {
+        "id": "566:30780",
+        "name": "Explore 3D World",
+        "x": 45920,
+        "height": 4817,
+        "source": "src/pages/3d-world/index.astro",
+        "sections": {
+          "Header": "566:30781",
+          "Page hero Photo (world-hero; Home › Explore 3D World, Level 1 and its chevron hidden; one action Launch 3D World)": "566:30782",
+          "Card grid 3 columns, How it works (white; Section header Show meta + action Our services; three Card Image top White with the world screenshots)": "566:30787",
+          "Card grid 2 columns + second row, the four zones (tint; Card Image top White with eyebrow Zone N, scope assets, Fly to this zone)": "573:33162",
+          "Accordion Split, 3D World FAQs (white)": "566:30790",
+          "CTA panel, Would you like to know more? (white, no contact card)": "566:30791",
+          "Footer": "566:30792"
+        }
+      }
+    ],
+    "housekeeping": "Components page: List item 519:2513 moved to (1540, −399), clear of the grown Icons doc frame; Components / Card 103:446 and the 15 frames below it moved down 300 (Subnav 101:434 overlapped Card since the FAQ batch). Overlap audit clean on Components, Blocks and Pages. Repeated-structure scan empty on the four page frames (layout Rows hold only instances). Q143 check: Card grid 3 columns Mobile 147:1191 and Feed grid Mobile 155:1995 are one column, as the code below 768; the 768–1199 side-by-side trio is tablet-only, no variant",
+    "gaps": [
+      "Card Pictogram panel Featured keeps its 260 pictogram at 640 (the code drops to 200 under an 800 card), so the Tech product text column is ~260 wide, not ~320; a nested instance's size cannot be overridden",
+      "Card grid row cards inherit fixed heights from the block's example cards: where a card swaps Media (Image top, Icon with long copy), Card, Content and Text group are set to Hug and short cards are padded (space/24–space/64 tokens) to equal the row; Image top images stay 280 tall (code ~426 at 640). Tech video cards are 488 tall (code 520) via space/160 paddings",
+      "CTA panel without a contact card stacks the button under the text (as Services overview 449:16842); in code it sits at the right of the message",
+      "Body copy with an inline link (Monitoring's 'Technology & Innovation') is plain text; Survey's two paragraphs are one Body layer with a blank line",
+      "Subsea services 359:4009 not changed: its 6th subnav pill still reads Explore 3D World, capability cards have no scope, the projects row is still a Card grid 4 columns instance (could swap to the new Feed grid Grid 4 columns)",
+      "No mobile page frames (block Mobile variants only)"
+    ]
   }
 }
