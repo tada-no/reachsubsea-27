@@ -1,0 +1,68 @@
+---
+// Transparency Act (8 Oct 2026), the legal page linked from the footer's legal row and HSEQ's "Campaigns, reporting
+// and transparency" row (Q115: it stays at /transparency-act/, outside the Company section, so no subnav). The live
+// page and its June 2026 statement in their own wording (src/data/hseq.ts): the introduction beside its heading
+// (Split media Beside), then the process: the procedure, its owner and the early-2026 audit in the Section header,
+// the statement PDF at its far end, and the three areas it covers as white cards on tint (two Spec-row lists side
+// by side were tried: the long values wrapped unevenly and the rows didn't line up); the HSEQ contact closes it, as on live. Text hero on navy (Q57).
+// Redirects: /company/hseq/transparency-act/ (dev) → this page; live /transparency-act/ is this URL.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/header/Header.astro';
+import Footer from '../components/Footer.astro';
+import PageHero from '../blocks/PageHero.astro';
+import SplitMedia from '../blocks/SplitMedia.astro';
+import CardGrid from '../blocks/CardGrid.astro';
+import CtaBand from '../blocks/CtaBand.astro';
+import { transparencyAct, hseqContact } from '../data/hseq';
+
+const base = import.meta.env.BASE_URL;
+const t = transparencyAct;
+---
+
+<BaseLayout title={t.title} motion>
+  <Header overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[{ label: 'Home', href: base }, { label: t.title }]}
+      eyebrow={t.statement}
+      title={t.title}
+      lead={t.text}
+    />
+
+    <SplitMedia
+      anchor="introduction"
+      layout="beside"
+      background="white"
+      title={t.introTitle}
+      body={t.intro.map((p) => `<p>${p}</p>`).join('')}
+    />
+
+    <CardGrid
+      anchor="process"
+      layout="3-columns"
+      media="none"
+      surface="white"
+      background="tint"
+      sectionHeader={{
+        title: t.processTitle,
+        intro: t.process,
+        action: { label: `${t.title} statement (PDF)`, url: t.file, action: 'file' },
+      }}
+      cards={t.scope.map((s) => ({ title: s.title, description: s.text }))}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="white"
+      title="Would you like to know more?"
+      text="If you have any further queries or questions, please get in touch."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact
+      contact={hseqContact}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

@@ -12,7 +12,9 @@
 // - UN goals → SDG goals (white, Ross 7 Oct 2026): the official tiles, what we do for each under them.
 // - "Read the full picture" folds into the closing CTA panel with the dev site's sustainability contact.
 // Redirects: /company/hseq/sustainability/ and its four dev children (sustainability-introduction,
-// our-un-sustainability-goals, material-sustainability-matters, sponsorship-at-reach-subsea) → this page.
+// our-un-sustainability-goals, material-sustainability-matters) → this page; sponsorship-at-reach-subsea → the
+// Sponsorship child page (./sponsorship/), teased here under the goals (Split media Image, the photo first, with a link; Ross, 8 Oct 2026: the
+// text-only Beside teaser was too plain).
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/header/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -22,6 +24,7 @@ import ShareBars from '../../../blocks/ShareBars.astro';
 import StatsBand from '../../../blocks/StatsBand.astro';
 import CardGrid from '../../../blocks/CardGrid.astro';
 import SdgGoals from '../../../blocks/SdgGoals.astro';
+import SplitMedia from '../../../blocks/SplitMedia.astro';
 import Accordion from '../../../blocks/Accordion.astro';
 import CtaBand from '../../../blocks/CtaBand.astro';
 import { navSections } from '../../../data/navigation';
@@ -35,6 +38,7 @@ import {
   goalsIntro,
   goals,
   sustainabilityContact,
+  sponsorship,
 } from '../../../data/sustainability';
 import type { CardField } from '../../../lib/types';
 import { faqsFor, faqHubHref } from '../../../data/faqs';
@@ -109,6 +113,18 @@ const report = latestResults.annualReport;
       goals={goals.map((g) => ({ ...g, image: `${base}images/sdg/goal-${g.goal}.png` }))}
     />
 
+    <SplitMedia
+      anchor="sponsorship"
+      media="image"
+      position="start"
+      background="tint"
+      eyebrow="Sponsorship"
+      title={sponsorship.introTitle}
+      body={`<p>${sponsorship.teaser}</p>`}
+      image={{ src: `${base}images/sponsorship.jpg`, alt: '', width: 1600, height: 1016 }}
+      actions={[{ label: 'Our sponsorship policy', url: `${page.href}sponsorship/`, action: 'page' }]}
+    />
+
     <Accordion
       sectionHeader={{
         title: 'Frequently asked questions',
@@ -118,14 +134,14 @@ const report = latestResults.annualReport;
       layout="split"
       source="faq"
       topic="sustainability"
-      background="tint"
+      background="white"
       items={faqsFor('sustainability')}
     />
 
     <CtaBand
       anchor="contact"
       style="panel"
-      background="tint"
+      background="white"
       title="Read the full picture"
       text="Our annual & sustainability report sets out our commitments in full."
       actions={[

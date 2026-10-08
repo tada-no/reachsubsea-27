@@ -168,3 +168,86 @@ export const sustainabilityContact = {
   phone: cfo.phone?.label.replace(/\u00a0/g, ' '),
   email: cfo.email?.label,
 };
+
+// ── Sponsorship (dev /company/hseq/sustainability/sponsorship-at-reach-subsea/, 8 Oct 2026) ────────────────────
+// The dev page in its own wording, in the dev order: intro, Our purpose, Sponsorship criteria, What we don't
+// sponsor, then Governance, Application process and Reporting merged into one process (the steps an applicant
+// meets). Left out: dev's "next due date is 01 April 2026" (already past; the two yearly dates say it without
+// going stale) and "Deadlines and evaluation timelines are communicated regularly".
+// For Reach to confirm: the sponsorship portal's address (dev says "submitted via our sponsorship portal" but has
+// no link), so `portal` is `#`.
+// WordPress: a Sponsorship options page (intro, the three lists, the steps, the two due dates, portal URL, email).
+
+export const sponsorship = {
+  title: 'Sponsorship',
+  lead: 'How we select, support and manage sponsorships that make a measurable difference.',
+  introTitle: 'More than support',
+  intro:
+    'At Reach Subsea, sponsorship is more than support: it’s a strategic commitment to communities, causes and initiatives that reflect our values and purpose. Through our sponsorship programme, we aim to make a meaningful impact while fostering pride and engagement across our organisation.',
+  /** Hub teaser (Sustainability page). */
+  teaser:
+    'We sponsor events, organisations and initiatives that reflect our values, especially those supporting underrepresented and vulnerable groups in local communities.',
+  /** Dev's "Reach Subsea maintains a non-political and non-religious sponsorship policy", the policy block's intro. */
+  policyIntro: 'We maintain a non-political and non-religious sponsorship policy.',
+  /** Dev's three lists, each card's title now its lead-in (dev: "We sponsor … that:", "applicants must
+   * demonstrate:", "We do not fund:"), so the lists start on one line across the row. */
+  policy: [
+    {
+      title: 'What we sponsor',
+      points: [
+        'Initiatives that align with our business objectives and corporate social responsibility',
+        'Support for underrepresented and vulnerable groups, especially in local communities',
+        'Causes with personal involvement from our employees',
+        'Activities that strengthen our employer brand and showcase Reach Subsea as a great place to work',
+      ],
+    },
+    {
+      title: 'What we look for',
+      points: [
+        'Relevance: alignment with our values, goals and CSR strategy',
+        'Positive impact: clear societal, environmental or industry benefit',
+        'Professionalism: a structured and credible approach to planning and execution',
+        'Target audience: reach and relevance to our markets or CSR priorities',
+      ],
+    },
+    {
+      title: 'What we don’t fund',
+      points: [
+        'Political campaigns or candidates',
+        'Religious campaigns or activities',
+        'Initiatives that present conflicts of interest or lack transparency',
+      ],
+    },
+  ],
+  /** Applications are reviewed twice a year (dev: "due dates 01 April and 01 November"). */
+  dueDates: ['1 April', '1 November'],
+  process:
+    'Sponsorships are managed by a dedicated Sponsorship Committee of cross-functional team members. Only complete applications submitted through our portal are considered.',
+  processTitle: 'Reviewed twice a year',
+  steps: [
+    {
+      title: 'Apply through our portal',
+      text: 'Submit your application through our sponsorship portal. Relevant documentation can be sent to sponsorship@reachsubsea.com.',
+    },
+    {
+      title: 'Committee review',
+      text: 'The Sponsorship Committee reviews applications and evaluates their impact and alignment with our policy.',
+    },
+    {
+      title: 'Decision',
+      text: 'If your application is approved, you will receive formal feedback within two weeks of the submission deadline.',
+    },
+    {
+      title: 'Reporting & evaluation',
+      text: 'Every sponsored activity is evaluated after the event, with its impact included in our monthly internal reporting and public disclosures, so we keep improving.',
+    },
+  ],
+  portal: '#',
+  email: 'sponsorship@reachsubsea.com',
+};
+
+/** The CTA panel's contact: the committee, by email (dev "Questions"). No label: the panel's title already asks. */
+export const sponsorshipContact = {
+  name: 'Sponsorship Committee',
+  email: sponsorship.email,
+};

@@ -6,7 +6,9 @@
 //   the 11 policies and the Code of Conduct 2025, the whistleblowing channel, the campaign archive, the HSEQ
 //   contact. Every file URL below is the live media-library URL, checked 200 on 6 Oct 2026.
 // - Dev /company/hseq/* (six child pages): the Life-Saving Rules page (the nine rules, their "I …" commitments
-//   and the IOGP icons), the Transparency Act statement (June 2025).
+//   and the IOGP icons).
+// - Live https://reachsubsea.no/transparency-act/ (8 Oct 2026): the Transparency Act page and its June 2026 statement
+//   (newer than dev's June 2025 one: the procedure is now owned by the CEO, and an early-2026 audit is added).
 // - The Q2 2026 campaign poster (live, 2026/07): the featured campaign's copy, transcribed.
 // Not used: the Q2 2026 report's HSEQ figures (LTIs, spills): quarterly figures stay in Investors (Q115).
 //
@@ -105,18 +107,44 @@ export const codeOfConduct = {
   file: up('2025/12/Code-of-Conduct-2025.pdf'),
 };
 
-/** Whistleblowing (live /hseq/) and the Transparency Act (dev, June 2025 statement; the legal page). */
+/** Whistleblowing (live /hseq/). */
 export const whistleblowing = {
   title: 'Whistleblowing channel',
   text: 'Report suspected misconduct or wrongdoing in our organisation, with enhanced protection for the person reporting.',
   url: 'https://reachsubsea.whistlelink.com',
 };
 
+/**
+ * The Transparency Act (live /transparency-act/, the June 2026 statement), the legal page at /transparency-act/.
+ * The live wording, with its grammar fixed ("that offer" → "that offers", "efforts in to identifying" → "efforts in
+ * identifying"). For Reach to confirm: the live intro calls it "also known as the Transparency in Supply Chains Act"
+ * and describes it as aimed at human trafficking, forced labour and modern slavery. Norway's Transparency Act
+ * (Åpenhetsloven) is about fundamental human rights and decent working conditions, and the Transparency in Supply
+ * Chains Act is a Californian law; kept as published until Reach (or their counsel) confirms.
+ */
 export const transparencyAct = {
   title: 'Transparency Act',
   text: 'How we respect fundamental human rights and ensure decent working conditions in our operations and supply chains.',
   url: '/transparency-act/',
-  file: up('2025/06/The-Transparency-Act-Reach-Subsea-ASA-statement-June-2025.pdf'),
+  statement: 'Statement, June 2026',
+  file: up('2026/07/The-Transparency-Act-Reach-Subsea-ASA-statement-June-2026.pdf'),
+  introTitle: 'Transparency and accountability',
+  intro: [
+    'Reach Subsea ASA (“Reach Subsea”, “Reach” or “the Group”) is a prominent offshore contractor that offers high quality solutions and technology to clients in need of ocean data and services. With a strong commitment to transparency and accountability, Reach Subsea has taken proactive steps to ensure compliance with the Transparency Act.',
+    'The Transparency Act, also known as the Transparency in Supply Chains Act, is a legislative framework aimed at promoting transparency and combating human trafficking, forced labour and modern slavery in supply chains. Organisations are required to disclose their efforts in identifying and addressing these issues within their operations and supply chains.',
+    'Recognising the significance of these global challenges and the importance of ethical practices, Reach Subsea has adopted the Transparency Act as part of its corporate responsibility strategy. The company firmly believes in the principles of human rights, fair labour practices and environmental sustainability.',
+  ],
+  processTitle: 'Process to fulfil the Transparency Act',
+  /** Live: the procedure "has been put in place to ensure that we fully adhere to the regulations", "is owned by the
+   * Reach Subsea CEO", and the early-2026 audit "was concluded with a satisfactory result". */
+  process:
+    'Our procedure, Safeguarding the Transparency Act (REACH‑ADM‑WP‑011), ensures that we fully adhere to the regulations. It is owned by our CEO, and an audit in early 2026 verified our compliance with a satisfactory result.',
+  /** "The procedure applies to all activities concerning the Company’s actions including:" (short titles added). */
+  scope: [
+    { title: 'Human rights', text: 'Promoting our respect for fundamental human rights.' },
+    { title: 'Working conditions', text: 'Ensuring decent working conditions in connection with the delivery of our services.' },
+    { title: 'Public access', text: 'Ensuring public access to information accordingly.' },
+  ],
 };
 
 /** HSEQ contact (live /hseq/ "Would you like to talk to us about HSEQ?"). */

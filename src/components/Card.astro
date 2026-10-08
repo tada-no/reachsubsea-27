@@ -464,8 +464,9 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     line-height: var(--wp--custom--line-height--tight);
   }
   /* No action below it: the list takes the card's foot, so lists line up across a row even when one
-     summary wraps a line less */
-  .card__scope:last-child {
+     summary wraps a line less. With no summary the list follows the title (8 Oct 2026, Sponsorship policy:
+     lists of 4, 4 and 3 pinned to the foot started on different lines) */
+  .card:has(.card__description) .card__scope:last-child {
     margin-top: auto;
   }
   .card__scope li {

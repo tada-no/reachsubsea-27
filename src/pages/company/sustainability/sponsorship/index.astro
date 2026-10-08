@@ -1,0 +1,89 @@
+---
+// Company › Sustainability › Sponsorship (8 Oct 2026, Q117: a child page with a teaser on the hub). The dev page in
+// its own wording (src/data/sustainability.ts): the intro beside a photo (Split media Image; Ross's
+// stacked-hands photo, Q144: not as the hero, where its busy centre would sit under the title); the policy's three lists as three white cards on tint (What we sponsor · What we look for · What we don't
+// fund, each title the list's lead-in), one pattern for the parallel lists; then Governance, Application process and Reporting as one process
+// (Numbered list split: the committee, the two yearly due dates and the portal link in the sticky text column, the
+// four steps beside); the committee's email closes it (dev "Questions"). Text hero on navy (Q57, Q115).
+// Redirect: /company/hseq/sustainability/sponsorship-at-reach-subsea/ (dev) → this page.
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Header from '../../../../components/header/Header.astro';
+import Footer from '../../../../components/Footer.astro';
+import PageHero from '../../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../../blocks/SectionSubnav.astro';
+import SplitMedia from '../../../../blocks/SplitMedia.astro';
+import CardGrid from '../../../../blocks/CardGrid.astro';
+import CtaBand from '../../../../blocks/CtaBand.astro';
+import { navSections } from '../../../../data/navigation';
+import { sponsorship, sponsorshipContact } from '../../../../data/sustainability';
+
+const base = import.meta.env.BASE_URL;
+const company = navSections.find((s) => s.id === 'company')!;
+const sustainability = company.links.find((l) => l.label === 'Sustainability')!;
+const subnavItems = [
+  { label: 'About', href: company.href },
+  ...company.links.map((l) => ({ label: l.label, href: l.href })),
+];
+const [first, second] = sponsorship.dueDates;
+---
+
+<BaseLayout title={sponsorship.title} motion>
+  <Header current="company" overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Company', href: company.href },
+        { label: 'Sustainability', href: sustainability.href },
+        { label: sponsorship.title },
+      ]}
+      title={sponsorship.title}
+      lead={sponsorship.lead}
+    />
+
+    <SectionSubnav source="section-pages" label="Company" items={subnavItems} current={sustainability.href} />
+
+    <SplitMedia
+      anchor="introduction"
+      media="image"
+      background="white"
+      title={sponsorship.introTitle}
+      body={`<p>${sponsorship.intro}</p>`}
+      image={{ src: `${base}images/sponsorship.jpg`, alt: '', width: 1600, height: 1016 }}
+    />
+
+    <CardGrid
+      anchor="policy"
+      layout="3-columns"
+      media="none"
+      surface="white"
+      background="tint"
+      sectionHeader={{ title: 'Our sponsorship policy', intro: sponsorship.policyIntro }}
+      cards={sponsorship.policy.map((p) => ({ title: p.title, scope: p.points }))}
+    />
+
+    <SplitMedia
+      anchor="apply"
+      media="numbered-list"
+      background="white"
+      eyebrow="Application process"
+      title={sponsorship.processTitle}
+      body={`<p><strong>Applications are due ${first} and ${second}.</strong> ${sponsorship.process}</p>`}
+      actions={[{ label: 'Apply for sponsorship', url: sponsorship.portal, action: 'external' }]}
+      items={sponsorship.steps}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title="Any questions?"
+      text="Send them to our Sponsorship Committee."
+      showContact
+      contact={sponsorshipContact}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

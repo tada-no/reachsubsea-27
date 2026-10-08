@@ -6,7 +6,7 @@
 // PDF's bento overlapping the hero is gone (no overlaps, docs/05 Page hero): its six areas are icon cards under a
 // one-column header (Ross, 7 Oct 2026; a numbered list beside the copy until then).
 // Redirects: /hseq/, /hseq-2/ (live) and /company/hseq/hseq-introduction/, /hseq-standards/,
-// /policies-code-of-conduct/ (dev) → this page; /company/hseq/transparency-act/ (dev) → /transparency-act/.
+// /policies-code-of-conduct/ (dev) → this page; /company/hseq/transparency-act/ (dev) → /transparency-act/ (src/pages/transparency-act.astro).
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/header/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -60,7 +60,7 @@ const moreCards: CardField[] = [
     action: { label: 'Report a concern', url: whistleblowing.url, action: 'external' },
   },
   {
-    eyebrow: 'Statement, June 2025',
+    eyebrow: transparencyAct.statement,
     title: transparencyAct.title,
     description: transparencyAct.text,
     action: { label: 'Read our statement', url: transparencyAct.url, action: 'page' },
@@ -136,8 +136,7 @@ const moreCards: CardField[] = [
       background="navy"
       title="Policies & Code of Conduct"
       intro={policiesIntro}
-      actions={[{ label: `${codeOfConduct.title} (PDF)`, url: codeOfConduct.file, action: 'file' }]}
-      documents={policies.map((p) => ({ label: p.title, url: p.file, action: 'file', context: ' (PDF)' }))}
+      documents={[codeOfConduct, ...policies].map((p) => ({ label: p.title, url: p.file, action: 'file', context: ' (PDF)' }))}
     />
 
     <CardGrid
