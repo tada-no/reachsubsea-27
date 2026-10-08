@@ -54,19 +54,16 @@ export const vacancies: Vacancy[] = [
 ];
 
 /** "Who thrives here": the live /careers/ copy, verbatim except that the values sentence is split into its
- * four points (Learn, Teach, Reach, never leave anyone behind). */
+ * four points (Learn, Teach, Reach, leave no one behind: the live "never leave anyone behind", shortened to read as a verb like the other three, Ross 8 Oct 2026, Q140, to confirm with Reach). */
 export const thrive = {
   title: 'You will thrive if your values are in line with ours.',
-  /** The live copy, unchanged, in two paragraphs (two columns under the heading). */
-  body: [
-    'We value competence and experience, but we set an even higher regard to attitude and potential! Sounds good, doesn’t it? Does it come without frustrations? We can assure you that it does not.',
-    'Nothing comes for free folks. Ultimately, the sense of accomplishment we experience when overcoming challenges, coupled with the celebrations we share as a team, makes all the effort worthwhile.',
-  ],
+  /** The live copy, unchanged, as one paragraph beside the heading (Ross, 8 Oct 2026; Figma 435:17585). */
+  body: 'We value competence and experience, but we set an even higher regard to attitude and potential! Sounds good, doesn’t it? Does it come without frustrations? We can assure you that it does not. Nothing comes for free folks. Ultimately, the sense of accomplishment we experience when overcoming challenges, coupled with the celebrations we share as a team, makes all the effort worthwhile.',
   items: [
     { title: 'Learn', pictogram: 'value-learn', text: 'We continuously search for new and relevant insight to challenge established ways of performance.' },
     { title: 'Teach', pictogram: 'value-teach', text: 'We value sharing of knowledge throughout the team, and succeeding in alignment with our clients.' },
     { title: 'Reach', pictogram: 'value-reach', text: 'We substantiate the importance of having ambitions, and of reaching for them.' },
-    { title: 'Never leave anyone behind', pictogram: 'value-behind', text: 'A commitment we have manifested. It is the attitude we expect from our people.' },
+    { title: 'Leave no one behind', pictogram: 'value-behind', text: 'A commitment we have manifested. It is the attitude we expect from our people.' },
   ],
 };
 
@@ -74,11 +71,11 @@ export const thrive = {
 export const trainees = {
   title: 'Trainees (lærlinger)',
   image: { file: 'trainee-workshop.jpg', alt: 'Three engineers working on cables and electronics at a workshop bench', focalPoint: { x: 0.55, y: 0.5 } },
-  /** The commitment, then the two tracks as bold lead-ins (the "rooted in our belief…" sentence is left out). */
+  /** Two paragraphs: the commitment, then both tracks in one (Ross, 8 Oct 2026: the bold lead-ins read bitty). The
+   * "rooted in our belief…" sentence is left out. */
   body: [
     `Since ${traineeSince.value}, Reach Subsea has embraced a culture of welcoming trainees (lærlinger) into our organisation. Each trainee who successfully completes their final exams during their traineeship has been offered a full-time position.`,
-    '<strong>Offshore trainees</strong> have completed ‘Grunnkurs elektro og datateknologi’ or ‘Teknologi og industrifag’, in addition to ‘VG2 Automatisering’.',
-    '<strong>Onshore trainees</strong> vary, with traineeships in administration, IT, media and similar fields.',
+    'Offshore trainees have completed ‘Grunnkurs elektro og datateknologi’ or ‘Teknologi og industrifag’, in addition to ‘VG2 Automatisering’. Onshore traineeships vary, in administration, IT, media and similar fields.',
   ],
 };
 

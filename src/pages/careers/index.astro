@@ -69,7 +69,7 @@ const siblingCards: CardField[] = [
     media: 'none',
     surface: 'tint',
     title: 'Life at Reach',
-    description: 'Working with us is about more than just a job, it’s about belonging to a team that values sharing knowledge and never leaving anyone behind.',
+    description: 'Working with us is about more than just a job, it’s about belonging to a team that values sharing knowledge and leaving no one behind.',
     action: { label: 'Explore life at Reach', url: '/careers/life-at-reach/' },
   },
   {
@@ -119,15 +119,15 @@ const siblingCards: CardField[] = [
 
     <SplitMedia
       anchor="who-thrives"
-      layout="wide"
+      layout="beside"
       background="white"
       eyebrow="Who thrives here"
       title={thrive.title}
-      body={thrive.body.map((p) => `<p>${p}</p>`).join('')}
+      body={`<p>${thrive.body}</p>`}
     />
 
     {/* The four points, each with its value pictogram (Learn · Teach · Reach, then the fourth) */}
-    <CardGrid anchor="values" layout="4-columns" media="icon" surface="tint" numbered joined background="white" cards={thriveCards} />
+    <CardGrid anchor="values" layout="4-columns" media="icon" surface="tint" joined background="white" cards={thriveCards} />
 
     {/* The PDF's stats panel, moved out of the hero into the first block below it */}
     <StatsBand
@@ -196,7 +196,6 @@ const siblingCards: CardField[] = [
       }}
       layout="split"
       source="faq"
-      topic="careers"
       topic="careers"
       background="tint"
       items={faqsFor('careers')}
