@@ -59,7 +59,7 @@ const certificateTiles: CardField[] = certificates.map((c) => ({
       background="white"
       eyebrow="Our story"
       title={story.title}
-      body={story.body.map((p) => `<p>${p}</p>`).join('')}
+      body={`<p>${story.body}</p>`}
       image={{ src: `${base}images/vessel-olympic-zeus.jpg`, alt: 'Olympic Zeus, a Reach Subsea construction vessel, on a calm sea', focalPoint: { x: 0.5, y: 0.55 } }}
     />
 

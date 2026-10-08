@@ -10,13 +10,10 @@ export const vision = {
   text: 'Our vision underpins our commitment to take part in the creation of a sustainable future, for our clients, our people and the ocean we work in.',
 };
 
-/** Our story (PDF p30), verbatim. The PDF hero's "Established in 2008…" lead is carried by the founded figure. */
+/** Our story (PDF p30), verbatim, one paragraph as on the Careers overview. The PDF hero's "Established in 2008…" lead is carried by the founded figure. */
 export const story = {
   title: 'Deep operational experience, moving technology forward',
-  body: [
-    'We have built our reputation on deep operational experience across the oil &amp; gas and renewables industries: flexible, highly competitive delivery, backed by people who know these environments inside out.',
-    'Today that same experience carries our fleet of survey, IMR and remote-operated vessels across subsea, survey &amp; positioning, geophysical monitoring and environmental monitoring, worldwide, and increasingly through technology we have developed ourselves, like Reach Remote and Reach Horizon.',
-  ],
+  body: 'We have built our reputation on deep operational experience across the oil &amp; gas and renewables industries: flexible, highly competitive delivery, backed by people who know these environments inside out. Today that same experience carries our fleet of survey, IMR and remote-operated vessels across subsea, survey &amp; positioning, geophysical monitoring and environmental monitoring, worldwide, and increasingly through technology we have developed ourselves, like Reach Remote and Reach Horizon.',
 };
 
 export interface CompanyValue {
