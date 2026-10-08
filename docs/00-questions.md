@@ -232,7 +232,7 @@ Context: Ross: next the charter agreements page, with lots of care for the UI an
 - [x] Ross: what happened to the project charter pattern? The PDF marked Normand Jarstein three ways (navy striped bar and lighter striped option, a key entry, a PROJECT CHARTER badge) plus a divider label. Kept: the divider, as the "Project charter" group heading, and footnote 3. Ross chose the group heading only (over restoring a striped bar, or a live comparison): its firm period and option work like the long-term charters', so the same styles keep them comparable; navy means Owned on this page; stripes would read close to the dashed "joining" style. If Reach (Jorunn's Sep 2026 correction) asks for the striped bar, it is a new segment kind in CharterTimeline plus a key entry
 - [ ] assets.ts keeps its verbatim `charter` strings for the Assets cards; once approved, the cards should read the generated text from charters.ts so the period exists once (another chat's file)
 - [ ] Ask Reach: Offshore Surveyor's "1 year option + x 6 months option" (how many 6-month options; drawn as one); the firm periods for Viking Vigor and NB76 once signed; whether a vessel's quarterly status may be published as is
-- [ ] Figma after approval: Block/Charter timeline, Bar/Charter segment, page frame
+- [x] Figma after approval: Block/Charter timeline 508:12049, Bar/Charter segment 505:10935, Charter row 507:11084 (+ Charter key 505:10936, footnote 505:10939, fact 505:10942), page frame Charter agreements 515:11849 (ledger sweep8OctInvestors)
 
 **Answer:** awaiting Ross's review.
 
@@ -250,6 +250,7 @@ Context: Ross: do we still need a share info pill? The 20 largest shareholders a
 - [ ] Keep, and move the shareholders and announcements there (Reports documents only)
 - [ ] Drop the pill and page, re-point the six links
 - [x] Built: Hero Text · Subnav · Embed Iframe (the OMS standard page) · CTA Panel. OMS switches to one column below ~838 wide, so the frame is 2352 tall at 900–960 (page CSS), 1792 above
+- [x] Figma: page frame Share information 515:13417 (Embed Iframe Loaded, frame 1792); the Subnav component's 7th item (Show 7th item#497:0) is now on in every Investors frame (ledger sweep8OctInvestors)
 - [ ] Reports' "20 largest shareholders" block has no anchor, so this page can't link straight to it (another chat's file)
 
 **Answer:** keep, live data only.
@@ -260,7 +261,7 @@ Context: Ross: start to build the financial calendar page. Sources: client PDF p
 - [x] A new **Date list** block (docs/05 §2.25) in the Results / Meeting archive row language, used twice: Key dates (upcoming; Next on Navy, as the page's main task, with countdown and Add to calendar; later dates dashed) and Earlier dates (this year's past dates with the files each produced, so the calendar also answers "where's that report?")
 - [x] "Add all confirmed dates to your calendar": one .ics with every confirmed upcoming date
 - [ ] The Investors overview Track still draws the three 2027 placeholder dates (AR 26 · Q1 27 · AGM). Hide unconfirmed markers there too? (not this page's file)
-- [ ] Reports & presentations: Q4 2026 now reads "16 Feb 2027 · provisional"; it should be confirmed. reports.ts `CONFIRMED_DATES` could read `confirmed` from investor-calendar.ts (another chat's uncommitted file, not edited)
+- [x] (Done 8 Oct 2026, Q143: reports.ts reads `confirmed` from investor-calendar.ts) Reports & presentations: Q4 2026 now reads "16 Feb 2027 · provisional"; it should be confirmed. reports.ts `CONFIRMED_DATES` could read `confirmed` from investor-calendar.ts (another chat's uncommitted file, not edited)
 - [ ] The live calendar says Q4 2025 on 13 Feb 2026; reports.ts has published 12 Feb (upload date). Calendar date used here
 - [ ] Ask Reach: the 2027 dates (annual report, Q1, AGM), and whether results days have a fixed time/webcast to show in the rows
 - [ ] DateList, ResultsArchive and MeetingArchive each carry a copy of the row CSS; fold them into one shared Row part once the three pages are approved
@@ -283,6 +284,8 @@ Context: Ross: start the page, thinking about balance and layout and what the ot
 - [ ] investor-calendar.ts has a placeholder AGM 27 May 2027 (not this page's file)
 - [x] Ross: stay truer to the client PDF and include its AGM / EGM explainer. Asked: (1) where → **opens the meetings section** (recommended; meetings stay first): "General meetings" header, the PDF's two columns in its words (no em dash, no AGM/EGM abbreviations), then "Notices & minutes" over the archive; (2) how far → **PDF headings and lead** (recommended): "Articles & policies", "Notices & minutes", the PDF's hero lead with its listing clause cut (three lines → two; the listing is in the first FAQ). No extra eyebrows. The explainer's paragraphs share rows with each other (subgrid), level at 900–1440. Toned down (Ross): titles H4 size, copy Body/Small, now one line each from 1200 and level at every width. Then moved under the rows (Ross: "could even be moved under the calendar lists"; agreed, the papers are the task, the explainer background). With nothing between the section header and the rows, the "Notices & minutes" subheading went (two headings for one list); its wording is now the section intro. Under the rows it went back to full type (H3 titles, Body copy; Ross); the shared-row alignment removed, since at H3 it left an empty line above the AGM paragraph. EGM heading shortened to "Called between annual meetings" (Ross). Open rows cut to Next, 2026 and 2025 (Ross: hide 2024 and the 2023 meetings); "Earlier meetings, 2012–2024"
 
+- [x] Figma: Block/Meeting archive 503:10948 (Meeting archive row 500:10914, Meeting guide item 501:10732), Split media Documents Stacked 511:11845 and Spec table Stacked paired 511:11890 (+ Mobile), page frame Governance & general meetings 513:11216 (ledger sweep8OctInvestors)
+
 **Answer:** awaiting Ross's review.
 
 ### Q120. Reports & presentations built fresh (7 Oct 2026)
@@ -300,7 +303,7 @@ Context: Ross: build the page fresh in the new design system, from the client PD
 - [ ] Between 600 and 899 the announcements frame can show up to ~100px of white under the last row: the OMS list gets shorter as it widens, and a fixed height must fit the narrowest width. Ask OMS whether the components can post their height (auto-resize), which would remove this on every page
 - [x] FAQ: the PDF's three plus "What is the ESEF file?", since the shelf labels it
 - [ ] Ask Reach: webcast links for Q4 2025, Q1 2026 and Q2 2026 (none on the live site); the Q1 2021 report (the live "Report" link opens the presentation)
-- [ ] Placeholder dates to fix at source (not this page's files): Annual report 2025 was published 30 Apr 2026 (investor-results.ts says 26 Mar); Q1 2026 on 5 May 2026 (investor-calendar.ts says 24 Apr); Q4 2026 (11 Feb 2027) is still a placeholder
+- [ ] Placeholder dates to fix at source (not this page's files): Annual report 2025 was published 30 Apr 2026 (investor-results.ts says 26 Mar); Q1 2026 on 5 May 2026 (investor-calendar.ts says 24 Apr); Q4 2026 (11 Feb 2027) is still a placeholder (fixed: 16 Feb 2027, confirmed, Q122/Q143)
 - [ ] Hero: Go Electra, as in the PDF; it is busier than our calm-hero rule (harbour town behind). Swap if Ross prefers
 - [x] Figma (8 Oct 2026): `Block/Results archive` 486:10207 (Desktop 486:9500, Mobile 486:9856, Report-only 486:9619 / 486:9972), `Block/Report shelf` 490:10568 (Desktop 490:10099, Mobile 490:10345), `Block/File list` 492:10759 (Desktop 492:10455, Mobile 492:10607); parts Results row 484:9566, Year row 485:9546, Shelf item 490:10086 (the real covers), File row 492:10454; page frame Pages / Reports & presentations 494:10132
 

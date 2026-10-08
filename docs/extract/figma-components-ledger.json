@@ -164,7 +164,10 @@
       "id": "102:460",
       "type": "COMPONENT_SET",
       "variants": 2,
-      "props": []
+      "props": [
+        "Show 7th item#497:0"
+      ],
+      "notes8Oct": "8 Oct 2026 (sweep batch 2, ledger sweep8OctInvestors): a 7th Subnav item (Desktop 497:2531, Mobile 497:2534), label 'Share information', visibility bound to the new BOOLEAN Show 7th item#497:0 (default off), so the Investors section shows its seven pages (src/data/navigation.ts) without detaching. On in Investors overview 295:8480, Why invest 346:2817, Financial calendar 426:12593, Reports & presentations 494:10249 and the Governance, Charter agreements and Share information frames; other sections unchanged."
     },
     "Card": {
       "id": "103:1110",
