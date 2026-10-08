@@ -1,0 +1,127 @@
+---
+// Careers › Our culture (8 Oct 2026, Q127). Client PDF "24 — Careers — Our Culture" (Full Resolution screens
+// p53–54, Design Reference p26) for the structure and wording; the live /careers/ page for the comfort-zone intro
+// and the fourth value. Built for a prospective hire asking what working here is like day to day: the values with
+// one concrete example each · who the team is and how safety works · the HOP principles · FAQ · a way in.
+// Copy: src/data/culture.ts (values from company.ts, figures from key-figures.ts, offices from contact.ts).
+// Hero Text on navy, as the PDF's gradient hero (no photo: the calm-sea photo already heads Careers and About).
+// The PDF's three value cards are Card grid Rows (as Sustainability's pillars), with the live site's fourth value;
+// its 5-up HOP cards are a numbered list beside the intro (docs/03: "HOP 5-up → numbered list").
+// Redirect: dev /careers/people/our-culture/ (empty on dev) → this page.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import CardGrid from '../../../blocks/CardGrid.astro';
+import SplitMedia from '../../../blocks/SplitMedia.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { navSections } from '../../../data/navigation';
+import { hrManager, recruiter } from '../../../data/careers';
+import { cultureIntro, valuesIntro, cultureValues, peopleAndSafety, hop, cultureCta } from '../../../data/culture';
+import type { CardField } from '../../../lib/types';
+import { faqsFor, faqHubHref } from '../../../data/faqs';
+
+const base = import.meta.env.BASE_URL;
+const careers = navSections.find((s) => s.id === 'careers')!;
+const page = careers.links.find((l) => l.href === '/careers/our-culture/')!;
+const subnavItems = [
+  { label: 'Overview', href: careers.href },
+  ...careers.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+const valueCards: CardField[] = cultureValues.map((v) => ({
+  pictogram: v.pictogram,
+  title: v.word,
+  leadEyebrow: v.eyebrow,
+  description: v.text,
+}));
+
+const peopleCards: CardField[] = [peopleAndSafety.people, peopleAndSafety.safety].map((c) => ({
+  media: 'image-top',
+  image: { src: `${base}images/${c.image.file}`, alt: c.image.alt, focalPoint: c.image.focalPoint },
+  eyebrow: c.eyebrow,
+  title: c.title,
+  description: c.text,
+  action: c.action,
+}));
+---
+
+<BaseLayout title="Our culture · Careers · Reach Subsea" motion>
+  <Header current="careers" overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Careers', href: careers.href },
+        { label: page.label },
+      ]}
+      title={cultureIntro.title}
+      lead={cultureIntro.lead}
+    />
+
+    <SectionSubnav source="section-pages" label="Careers" items={subnavItems} current={page.href} />
+
+    <CardGrid
+      anchor="values"
+      layout="rows"
+      rowStyle="cards"
+      featureLast
+      mirrored
+      surface="tint"
+      media="icon"
+      background="white"
+      sectionHeader={valuesIntro}
+      cards={valueCards}
+    />
+
+    <CardGrid
+      anchor="people-and-safety"
+      layout="2-columns"
+      media="image-top"
+      surface="white"
+      background="tint"
+      ariaLabel="Our people, safety and quality"
+      cards={peopleCards}
+    />
+
+    <SplitMedia
+      anchor="hop"
+      media="numbered-list"
+      position="end"
+      background="white"
+      eyebrow={hop.eyebrow}
+      title={hop.title}
+      body={`<p>${hop.body}</p>`}
+      items={hop.principles}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about our culture and values.',
+        action: { label: 'See all FAQs', url: faqHubHref('culture') },
+      }}
+      layout="split"
+      source="faq"
+      topic="culture"
+      background="tint"
+      items={faqsFor('culture')}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title={cultureCta.title}
+      text={cultureCta.text}
+      actions={[{ label: 'View vacancies', url: hrManager.vacancies, action: 'external' }]}
+      showContact
+      contact={recruiter}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

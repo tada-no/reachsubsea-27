@@ -632,7 +632,7 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
       const value = chip.dataset.value;
       if (!facet || !value) return;
       const n = rows.filter(publicationMatcher(root, { facet, values: [value] })).length;
-      const countEl = chip.querySelector('.filter-chip__count');
+      const countEl = chip.querySelector('.filter-chip__count-value');
       if (countEl) countEl.textContent = String(n);
       chip.disabled = n === 0 && chip.getAttribute('aria-pressed') !== 'true';
     });
@@ -650,6 +650,10 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
     single.dataset.value = year;
     const label = single.querySelector('.filter-chip__label');
     if (label) label.textContent = year;
+    // Hold room for the year's full count, the most it can show (Q142), so the chip hugs it and never widens
+    const count = single.querySelector<HTMLElement>('.filter-chip__count');
+    const total = root.querySelectorAll(`[data-single="${CSS.escape(year)}"]`).length;
+    if (count) count.dataset.reserve = `(${total})`;
     single.hidden = false;
     // A chart pick is a jump to that one year: it replaces the other year ticks
     root.querySelectorAll<HTMLElement>('[data-facet="year"]').forEach((chip) => toggleChip(chip, chip === single));
@@ -1100,7 +1104,7 @@ function quartersOf(y: ReportYear): (QuarterEntry | null)[] {
     }
     /* Right-aligned so (7) and (14) line up as a column */
     .data-list__rail .filter-chip__count {
-      text-align: right;
+      justify-items: end;
     }
     .data-list__rail .filter-chip[aria-pressed='true'] {
       background-color: transparent;

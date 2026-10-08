@@ -2,7 +2,9 @@
 // Filter chip (docs/04 §10). Selected = aria-pressed="true" (navy fill + check icon).
 // No jump on select (Q92): the check (16 + 8 gap = 24) appears inside the chip's own side padding, so the
 // chip keeps its width and the chips after it stay put. Unselected 28 each side; selected 16 + check + 16.
-// Counts are bracketed, "2025–26 (7)" (Q93), and keep two-digit room for the same reason.
+// Counts are bracketed, "2025–26 (7)" (Q93). The chip hugs its content (Q142): a count only falls from the one it is
+// built with (Data list counts are a share of it), so a hidden copy of that first count holds its width and a live
+// count going from 14 to 5 moves nothing.
 import Icon from './Icon.astro';
 
 interface Props {
@@ -26,14 +28,15 @@ const { label, count, selected = false, disabled = false, class: className, ...a
 >
   <Icon name="check" size={16} class="filter-chip__check" />
   <span class="filter-chip__label">{label}</span>
-  {count !== undefined && <span class="filter-chip__count">{count}</span>}
+  {count !== undefined && (
+    <span class="filter-chip__count" data-reserve={`(${count})`}><span class="filter-chip__count-value">{count}</span></span>
+  )}
 </button>
 
 <style is:global>
   .filter-chip {
     display: inline-flex;
     align-items: center;
-    gap: var(--wp--preset--spacing--8);
     min-height: 40px;
     padding-inline: calc(var(--wp--preset--spacing--16) + var(--wp--preset--spacing--12));
     border-radius: var(--wp--custom--radius--full);
@@ -47,19 +50,31 @@ const { label, count, selected = false, disabled = false, class: className, ...a
   }
   .filter-chip__check {
     display: none;
+    margin-inline-end: var(--wp--preset--spacing--8);
   }
   /* The count is bracketed (Q93): a bare number after a label that is itself a number ("2025–26 7") read as
-     part of it. Counts can change live (Data list, Q89): tabular figures and room for two digits plus
-     brackets, so 14 → 5 keeps the chip's width */
+     part of it. A word space from its label, not a gap: "2025–26 (7)" reads as one phrase (Ross, 8 Oct 2026, Q142).
+     Counts can change live (Data list, Q89): the live value and a hidden copy of the built count share one grid
+     cell, so the chip hugs its own count and keeps that width as it falls (tabular figures) */
   .filter-chip__count {
-    min-width: 4ch;
+    display: inline-grid;
+    justify-items: start;
+    margin-inline-start: var(--wp--preset--spacing--4);
     font-variant-numeric: tabular-nums;
     color: var(--wp--custom--color--text--secondary);
   }
-  .filter-chip__count::before {
-    content: '(';
+  .filter-chip__count > *,
+  .filter-chip__count::after {
+    grid-area: 1 / 1;
   }
   .filter-chip__count::after {
+    content: attr(data-reserve);
+    visibility: hidden;
+  }
+  .filter-chip__count-value::before {
+    content: '(';
+  }
+  .filter-chip__count-value::after {
     content: ')';
   }
   .filter-chip[aria-pressed='true'] {
