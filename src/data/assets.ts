@@ -410,7 +410,7 @@ export const fleetCounts = {
   usvs: { inService: unitsOf(assetsOf('usv').filter(inService)), joining: unitsOf(assetsOf('usv').filter((a) => a.status === 'newbuild')) },
 };
 
-/** Status badge for cards: In service · Joining 3Q 2026 · Sale agreed. */
+/** Status badge for cards: In service · Joining Q3 2026 · Sale agreed. */
 export function statusBadge(asset: Asset): { label: string; tone: 'success' | 'navy' | 'neutral' } {
   if (asset.status === 'newbuild') return { label: asset.joining ? `Joining ${asset.joining}` : 'Newbuild', tone: 'navy' };
   if (asset.status === 'sale-agreed') return { label: 'Sale agreed', tone: 'neutral' };

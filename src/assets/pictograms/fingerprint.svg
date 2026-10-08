@@ -1,0 +1,22 @@
+<svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Figma Pictogram/fingerprint (421:9574), Ross's 2.5 stroke redraw, parts tagged for the loop (the frame closes in, the ridges redraw from the core out) -->
+<g stroke="currentColor" stroke-width="2.5" stroke-miterlimit="10">
+<g class="pg-corner pg-corner--tl"><path d="M19.78 26.91V19.73H26.97"/></g>
+<g class="pg-corner pg-corner--tr"><path d="M76.22 26.91V19.73H69.03"/></g>
+<g class="pg-corner pg-corner--br"><path d="M76.22 69.09V76.27H69.03"/></g>
+<g class="pg-corner pg-corner--bl"><path d="M19.78 69.09V76.27H26.97"/></g>
+<path class="pg-ridge pg-ridge--1 pg-lead" pathLength="100" stroke-linecap="round" d="M40.73 49.01C41.25 46.18 43.96 44.28 46.8 44.79C49.64 45.33 51.53 47.99 51.03 50.83C50.93 51.45 48.52 64.55 37.87 72.21"/>
+<path class="pg-ridge pg-ridge--1" pathLength="100" stroke-linecap="round" d="M45.88 49.93C45.88 49.93 43.38 64.26 31.38 69.99"/>
+<path class="pg-ridge pg-ridge--2" pathLength="100" stroke-linecap="round" d="M43.12 39.85C44.58 39.45 46.14 39.36 47.72 39.64C47.93 39.68 48.09 39.72 48.25 39.75C53.65 41.03 57.14 46.29 56.19 51.73C56.15 51.96 55.84 53.63 55.05 56.09"/>
+<path class="pg-ridge pg-ridge--2" pathLength="100" stroke-linecap="round" d="M26.87 60.55C33.68 57.3 35.57 48.11 35.59 48.02C36.02 45.71 37.18 43.72 38.81 42.24"/>
+<path class="pg-ridge pg-ridge--2" pathLength="100" stroke-linecap="round" d="M29.13 65.27C34.65 62.63 37.69 57.47 39.26 53.66"/>
+<path class="pg-ridge pg-ridge--2" pathLength="100" stroke-linecap="round" d="M53.15 60.99C51.58 64.48 49.25 68.47 45.87 72.08"/>
+<path class="pg-ridge pg-ridge--3" pathLength="100" stroke-linecap="round" d="M52.86 35.89C57.38 38.15 60.54 42.46 61.36 47.37"/>
+<path class="pg-ridge pg-ridge--3" pathLength="100" stroke-linecap="round" d="M61.34 52.63C61.25 53.13 59.99 60 55.61 67.57"/>
+<path class="pg-ridge pg-ridge--3" pathLength="100" stroke-linecap="round" d="M26.69 54.31C28.93 52.03 30.13 48.49 30.46 46.99C32.01 38.81 39.76 33.28 47.96 34.39"/>
+<path class="pg-ridge pg-ridge--4" pathLength="100" stroke-linecap="round" d="M25.84 43.88C28.86 33.88 39.05 27.46 49.57 29.34C50.06 29.44 50.36 29.5 50.66 29.57C54.59 30.5 58.02 32.49 60.68 35.17"/>
+<path class="pg-ridge pg-ridge--4" pathLength="100" stroke-linecap="round" d="M63.78 39.14C63.94 39.39 64.08 39.65 64.23 39.91C66.43 43.93 67.34 48.7 66.49 53.53C66.42 53.95 65.61 58.35 63.15 64.09"/>
+<path class="pg-ridge pg-ridge--5" pathLength="100" stroke-linecap="round" d="M46.88 23.8C48.08 23.85 49.28 23.98 50.49 24.2C51.13 24.31 51.5 24.39 51.87 24.48C63.44 27.22 71.48 37.31 72.01 48.73"/>
+<path class="pg-ridge pg-ridge--5" pathLength="100" stroke-linecap="round" d="M23.99 35.63C27.97 29.58 34.37 25.39 41.54 24.16"/>
+</g>
+</svg>

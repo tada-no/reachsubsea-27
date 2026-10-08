@@ -142,7 +142,7 @@ export const navSections: NavSection[] = [
       eyebrow: 'Sustainability',
       badge: { label: 'PDF', tone: 'neutral' },
       title: 'Sustainability report 2025',
-      action: { label: 'Download report (PDF)', url: '#', action: 'file' },
+      action: { label: 'Report (PDF)', url: '#', action: 'file' },
     },
   },
   {

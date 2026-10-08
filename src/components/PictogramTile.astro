@@ -2,8 +2,9 @@
 // Pictogram tile (4 Oct 2026, Assets overview › Survey and monitoring equipment). The line pictogram (64, 48 on
 // phones) beside a title, one line of text and optionally the item's own link. Used by Split media's `tiles`
 // under the body copy, one per row in the text column, where two or three short items would be too few for a
-// card row. 6 Oct 2026 (Ross: the right column felt clunky, boxes and a separate link row): open rows divided
-// by a hairline, no tinted box, and the link sits in the row it belongs to.
+// card row. 6 Oct 2026 (Ross: the right column felt clunky, boxes and a separate link row): open rows, no tinted
+// box, and the link sits in the row it belongs to. Rows are divided by a hairline between tiles, none over the
+// first (Ross, 7 Oct 2026: tried without, the lines back; they match the Spec rows beside them on HSEQ).
 import Pictogram from './Pictogram.astro';
 import Link from './Link.astro';
 import type { LinkField } from '../lib/types';
@@ -37,13 +38,29 @@ const { pictogram, title, text, link, headingLevel: Heading = 'h3', class: class
     align-items: flex-start;
     gap: var(--wp--preset--spacing--24);
     padding-block: var(--wp--preset--spacing--24);
+  }
+  .pictogram-tile:first-child {
+    padding-top: 0;
+  }
+  .pictogram-tile + .pictogram-tile {
     border-top: 1px solid var(--wp--custom--color--border--subtle);
   }
+  /* Title + text read as one unit, 4 apart, as Card's heading (Ross, 7 Oct 2026: the lines felt loose at 8).
+     The link follows straight on: its own 12 of hit-area padding is the gap above it, and the same 12 is
+     pulled back below so the tile's bottom padding still reads 24, not 36. */
   .pictogram-tile__body {
     display: flex;
     flex-direction: column;
-    gap: var(--wp--custom--stack--xs);
+    gap: var(--wp--preset--spacing--4);
     min-width: 0;
+  }
+  .pictogram-tile__body .link-arrow {
+    margin-bottom: calc(-1 * var(--wp--preset--spacing--12));
+  }
+  /* Optical top (Ross, 7 Oct 2026): the glyph sits ~12 inside its 64 frame and the H5's cap top ~7 inside its
+     line, so the frame rises 4 to put the drawing's top on the title's cap height, not the boxes' tops. */
+  .pictogram-tile .pictogram {
+    margin-top: calc(-1 * var(--wp--preset--spacing--4));
   }
   .pictogram-tile__title {
     color: var(--wp--custom--color--text--primary);
@@ -55,6 +72,9 @@ const { pictogram, title, text, link, headingLevel: Heading = 'h3', class: class
     .pictogram-tile {
       gap: var(--wp--preset--spacing--16);
       padding-block: var(--wp--preset--spacing--16);
+    }
+    .pictogram-tile:first-child {
+      padding-top: 0;
     }
     .pictogram-tile .pictogram {
       width: 48px;

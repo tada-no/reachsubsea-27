@@ -91,7 +91,7 @@ export const cardPresets = {
       { icon: 'file-text', text: '4.2 MB' },
       { icon: 'calendar', text: '28 Mar 2026' },
     ],
-    action: { label: 'Download report (PDF)', url: '#', action: 'file' },
+    action: { label: 'Report (PDF)', url: '#', action: 'file' },
   }),
   office: preset({
     media: 'none',

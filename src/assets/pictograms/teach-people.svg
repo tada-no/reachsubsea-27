@@ -1,0 +1,20 @@
+<svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Figma Pictogram/teach-people (421:9572), Ross's 2.5 stroke redraw, parts tagged for the loop (knowledge passes across and back) -->
+<g stroke="currentColor" stroke-width="2.5" stroke-miterlimit="10">
+<g class="pg-person pg-person--a">
+<path d="M37.48 27.47C37.48 30.54 35.01 33.05 31.98 33.05C28.95 33.05 26.48 30.54 26.48 27.47V25.39C26.48 22.32 28.95 19.81 31.98 19.81C35.01 19.81 37.48 22.32 37.48 25.39V27.47Z"/>
+<path stroke-linejoin="round" d="M20.08 49.64V43.61C20.08 39.36 23.16 37.79 27.12 37.79L31.98 43.15L36.5 37.79C40.46 37.79 43.88 39.36 43.88 43.61V49.64"/>
+</g>
+<g class="pg-person pg-person--b">
+<path d="M69.52 54.02C69.52 57.09 67.05 59.61 64.02 59.61C60.99 59.61 58.52 57.09 58.52 54.02V51.95C58.52 48.87 60.99 46.36 64.02 46.36C67.05 46.36 69.52 48.87 69.52 51.95V54.02Z"/>
+<path stroke-linejoin="round" d="M52.12 76.19V70.17C52.12 65.91 55.2 64.34 59.16 64.34L64.02 69.7L68.54 64.34C72.5 64.34 75.92 65.91 75.92 70.17V76.19"/>
+</g>
+<path class="pg-dash pg-dash--a1" pathLength="100" d="M42.2 23.75H45.74"/>
+<path class="pg-dash pg-dash--a2" pathLength="100" d="M48.15 23.75H51.7"/>
+<path class="pg-pass pg-pass--a pg-lead" pathLength="100" d="M54.23 23.75H58.98C61.75 23.75 64.01 26.01 64.01 28.78V40.33"/>
+<path class="pg-head pg-head--a" stroke-linejoin="round" d="M58.34 34.95L64.02 40.6L69.7 34.95"/>
+<path class="pg-dash pg-dash--b1" pathLength="100" d="M44.63 68.83H48.17"/>
+<path class="pg-pass pg-pass--b" pathLength="100" d="M41.95 68.83H37C34.23 68.83 31.96 66.58 31.96 63.81V51.12"/>
+<path class="pg-head pg-head--b" stroke-linejoin="round" d="M37.64 56.5L31.96 50.85L26.28 56.5"/>
+</g>
+</svg>

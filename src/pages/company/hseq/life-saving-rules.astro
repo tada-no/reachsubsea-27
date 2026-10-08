@@ -1,0 +1,71 @@
+---
+// Company › HSEQ › Life-Saving Rules (6 Oct 2026, Q115). The dev site's Life Saving Rules page: the nine IOGP
+// rules with their icons (dev media, IOGP artwork) and every "I …" commitment, plus the live poster download.
+// Its own page because the commitments run to ~40 lines; the HSEQ hub shows the nine icons as a teaser that
+// links to each rule's anchor here. Text hero (a reference page, Q57).
+// Redirect: /company/hseq/life-saving-rules/ (dev) is this URL.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import ChecklistGrid from '../../../blocks/ChecklistGrid.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { navSections } from '../../../data/navigation';
+import { lifeSavingRules, lifeSavingRulesIntro, hseqContact } from '../../../data/hseq';
+
+const base = import.meta.env.BASE_URL;
+const company = navSections.find((s) => s.id === 'company')!;
+const hseq = company.links.find((l) => l.label === 'HSEQ')!;
+const subnavItems = [
+  { label: 'About', href: company.href },
+  ...company.links.map((l) => ({ label: l.label, href: l.href })),
+];
+---
+
+<BaseLayout title="Life-Saving Rules" motion>
+  <Header current="company" overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Company', href: company.href },
+        { label: 'HSEQ', href: hseq.href },
+        { label: lifeSavingRulesIntro.title },
+      ]}
+      eyebrow="IOGP"
+      title={lifeSavingRulesIntro.title}
+      lead={lifeSavingRulesIntro.lead}
+      actions={[{ label: 'Life-Saving Rules poster (PDF)', url: lifeSavingRulesIntro.poster, action: 'file' }]}
+    />
+
+    <SectionSubnav source="section-pages" label="Company" items={subnavItems} current={hseq.href} />
+
+    <ChecklistGrid
+      anchor="rules"
+      layout="full"
+      background="tint"
+      items={lifeSavingRules.map((rule, i) => ({
+        slug: rule.slug,
+        icon: `${base}images/hseq/life-saving-rules/${i + 1}.svg`,
+        title: rule.title,
+        rule: rule.rule,
+        points: rule.commitments,
+      }))}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title="Would you like to know more?"
+      text="Reach out to us today."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact
+      contact={hseqContact}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,19 @@
+<svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Figma Pictogram/life-ring (421:9576), Ross's 2.5 stroke redraw, parts tagged for the loop (thrown: a full turn, then it bobs) -->
+<g stroke="currentColor" stroke-width="2.5" stroke-miterlimit="10">
+<g class="pg-buoy pg-lead">
+<path stroke-linejoin="round" d="M21.48 40.7C24 31.53 31.15 24.27 40.27 21.6"/>
+<path stroke-linejoin="round" d="M44.61 75.29C32.14 73.76 22.25 63.88 20.71 51.41"/>
+<path stroke-linejoin="round" d="M75.29 51.41C73.75 63.88 63.85 73.77 51.38 75.29"/>
+<path stroke-linejoin="round" d="M51.49 20.72C63.89 22.29 73.72 32.13 75.28 44.54"/>
+<path stroke-linejoin="round" d="M44.77 62.48C39.16 61.23 34.74 56.81 33.51 51.2"/>
+<path stroke-linejoin="round" d="M62.48 51.23C61.24 56.84 56.81 61.25 51.2 62.49"/>
+<path stroke-linejoin="round" d="M51.21 33.52C56.79 34.75 61.2 39.13 62.46 44.7"/>
+<path stroke-linejoin="round" d="M33.53 44.72C34.79 39.15 39.18 34.76 44.76 33.52"/>
+<path stroke-linejoin="round" d="M49.12 17.66H46.88C45.77 17.66 44.88 18.56 44.88 19.66V33.41C44.88 34.52 45.77 35.41 46.88 35.41H49.12C50.23 35.41 51.12 34.52 51.12 33.41V19.66C51.12 18.56 50.23 17.66 49.12 17.66Z"/>
+<path stroke-linejoin="round" d="M49.12 60.59H46.88C45.77 60.59 44.88 61.48 44.88 62.59V76.34C44.88 77.44 45.77 78.34 46.88 78.34H49.12C50.23 78.34 51.12 77.44 51.12 76.34V62.59C51.12 61.48 50.23 60.59 49.12 60.59Z"/>
+<path stroke-linejoin="round" d="M76.34 44.88H62.59C61.48 44.88 60.59 45.77 60.59 46.88V49.13C60.59 50.23 61.48 51.13 62.59 51.13H76.34C77.44 51.13 78.34 50.23 78.34 49.13V46.88C78.34 45.77 77.44 44.88 76.34 44.88Z"/>
+<path stroke-linejoin="round" d="M33.41 44.88H19.66C18.56 44.88 17.66 45.77 17.66 46.88V49.13C17.66 50.23 18.56 51.13 19.66 51.13H33.41C34.52 51.13 35.41 50.23 35.41 49.13V46.88C35.41 45.77 34.52 44.88 33.41 44.88Z"/>
+</g>
+</g>
+</svg>

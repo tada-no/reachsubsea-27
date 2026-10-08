@@ -4,6 +4,14 @@
 // grid, not a spanning first tile), each a <button> opening the Lightbox dialog. visibleCount shown,
 // the rest stay in the DOM `hidden` (still in lightbox order) until "Show all N photos" reveals them.
 // Videos: a Card grid (Image top, White), action Video → the Video dialog. No carousels, no More link.
+// Posters (6 Oct 2026, HSEQ campaigns, Q115): one row per year, newest first, with the year (H4) in cols 1–2
+// and four quarter slots Q1–Q4 in cols 3–12, like the Reports table (an empty quarter stays an empty slot, so
+// the columns line up as a calendar). Each poster is a 5:7 frame (A-series portrait, cover, top-anchored so
+// the poster's headline stays) with a 1px subtle edge and no photo tint (posters are artwork, not photos),
+// the quarter in UI/Label text/accent and the title in Body/Small under it. The tile opens the poster's PDF in a
+// new tab (the browser's viewer) and a Download link follows it (Ross, 7 Oct 2026: PDFs, not the Lightbox).
+// `visibleYears` rows show, "Show all years" reveals the rest. Below 1200 the year sits above its row;
+// below 600 the quarters go 2 × 2 and empty slots drop out.
 import BlockSection from '../components/BlockSection.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import MediaFrame from '../components/MediaFrame.astro';
@@ -24,20 +32,39 @@ interface GalleryVideo {
   image?: ImageField;
 }
 
+interface GalleryPoster {
+  year: number;
+  quarter: 1 | 2 | 3 | 4;
+  title: string;
+  /** Poster image; its alt is built from the quarter and title. */
+  image: ImageField;
+  /** The poster as a PDF: the tile opens it, a Download link under the title saves it (Ross, 7 Oct 2026). */
+  file?: string;
+}
+
 interface Props extends BlockFields {
   sectionHeader?: SectionHeaderField;
-  type: 'photos' | 'videos';
+  type: 'photos' | 'videos' | 'posters';
+  posters?: GalleryPoster[];
+  /** Posters: year rows shown before "Show all years". */
+  visibleYears?: number;
   photos?: GalleryPhoto[];
   /** Photos shown before "Show all". */
   visibleCount?: number;
   videos?: GalleryVideo[];
 }
 
-const { sectionHeader, type, photos = [], visibleCount = 6, videos = [], background, spacing, anchor } = Astro.props;
+const { sectionHeader, type, photos = [], visibleCount = 6, videos = [], posters = [], visibleYears = 3, background, spacing, anchor } = Astro.props;
 
-const hasContent = type === 'photos' ? photos.length > 0 : videos.length > 0;
+const hasContent = type === 'photos' ? photos.length > 0 : type === 'posters' ? posters.length > 0 : videos.length > 0;
 const titleId = sectionHeader ? makeId('gallery', sectionHeader.title) : undefined;
-const fallbackLabel = type === 'photos' ? 'Photo gallery' : 'Videos';
+const fallbackLabel = { photos: 'Photo gallery', videos: 'Videos', posters: 'Posters' }[type];
+const posterYears = [...new Set(posters.map((p) => p.year))].sort((a, b) => b - a).map((year) => ({
+  year,
+  quarters: ([1, 2, 3, 4] as const).map((q) => posters.find((p) => p.year === year && p.quarter === q)),
+}));
+const hiddenYears = Math.max(0, posterYears.length - visibleYears);
+const posterCaption = (p: GalleryPoster) => `Q${p.quarter} ${p.year} · ${p.title}`;
 const lightboxGroup = makeId('gallery-photos');
 const hiddenCount = Math.max(0, photos.length - visibleCount);
 ---
@@ -57,7 +84,48 @@ const hiddenCount = Math.max(0, photos.length - visibleCount);
         {sectionHeader && (
           <SectionHeader title={sectionHeader.title} intro={sectionHeader.intro} action={sectionHeader.action} align={sectionHeader.align} id={titleId} />
         )}
-        {type === 'photos' ? (
+        {type === 'posters' ? (
+          <div class="gallery__posters-wrap" data-gallery>
+            {posterYears.map((group, i) => (
+              <div class="gallery__year" data-gallery-photo hidden={i >= visibleYears ? true : undefined}>
+                <h3 class="gallery__year-title text-h4">{group.year}</h3>
+                <ul class="gallery__posters">
+                  {group.quarters.map((poster, q) =>
+                    poster ? (
+                      <li class="gallery__poster-slot">
+                        <a
+                          class="gallery__poster"
+                          href={poster.file ?? poster.image.src}
+                          target="_blank"
+                          rel="noopener"
+                          aria-label={`${posterCaption(poster)} (${poster.file ? 'PDF, ' : ''}opens in a new tab)`}
+                        >
+                          <span class="gallery__poster-frame">
+                            <img src={poster.image.src} alt="" width={poster.image.width} height={poster.image.height} loading="lazy" decoding="async" />
+                          </span>
+                          <span class="gallery__poster-text">
+                            <span class="gallery__poster-quarter text-label">Q{poster.quarter}</span>
+                            <span class="gallery__poster-title text-small">{poster.title}</span>
+                          </span>
+                        </a>
+                        {poster.file && (
+                          <Link label="Poster (PDF)" href={poster.file} action="file" size="small" context={posterCaption(poster)} download />
+                        )}
+                      </li>
+                    ) : (
+                      <li class="gallery__poster-slot gallery__poster-slot--empty" aria-hidden="true" data-quarter={q + 1} />
+                    ),
+                  )}
+                </ul>
+              </div>
+            ))}
+            {hiddenYears > 0 && (
+              <div class="gallery__more">
+                <Link label="Show all years" action="expand" data-gallery-expand />
+              </div>
+            )}
+          </div>
+        ) : type === 'photos' ? (
           <div class="gallery__photos-wrap" data-gallery>
             <div class="gallery__photos">
               {photos.map((photo, i) => (
@@ -112,7 +180,9 @@ const hiddenCount = Math.max(0, photos.length - visibleCount);
     hidden.forEach((photo) => photo.removeAttribute('hidden'));
     trigger.setAttribute('aria-expanded', 'true');
     trigger.hidden = true;
-    hidden[0]?.focus();
+    // Photos are buttons themselves; a poster year row holds its poster links
+    const first = hidden[0];
+    (first?.matches('button') ? first : first?.querySelector<HTMLElement>('a, button'))?.focus();
   });
 </script>
 
@@ -146,6 +216,112 @@ const hiddenCount = Math.max(0, photos.length - visibleCount);
     display: flex;
     justify-content: center;
     margin-top: var(--wp--custom--stack--md);
+  }
+
+  /* ── Posters ─────────────────────────────────────────── */
+  .gallery__posters-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--48);
+  }
+  .gallery__year {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    align-items: start;
+  }
+  .gallery__year[hidden] {
+    display: none;
+  }
+  .gallery__year-title {
+    grid-column: 1 / span 2;
+    color: var(--wp--custom--color--text--primary);
+  }
+  .gallery__posters {
+    grid-column: 3 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* A poster with its PDF: the link follows the title straight on (its own 12 of hit area is the gap) */
+  .gallery__poster-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  /* Downloads line up across a year row whatever the title's length (docs/08 §2: actions line up) */
+  .gallery__poster-slot > .link-arrow {
+    margin-top: auto;
+  }
+  .gallery__poster {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+    width: 100%;
+    text-align: left;
+    border-radius: var(--wp--custom--radius--md);
+  }
+  .gallery__poster:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 4px;
+  }
+  .gallery__poster-frame {
+    display: block;
+    aspect-ratio: 5 / 7;
+    overflow: hidden;
+    border: 1px solid var(--wp--custom--color--border--subtle);
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--custom--color--bg--disabled);
+  }
+  .gallery__poster-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 0%;
+    transition: transform var(--wp--custom--motion--duration) var(--wp--custom--motion--ease-out);
+  }
+  .gallery__poster-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xs);
+  }
+  .gallery__poster-quarter {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .gallery__poster-title {
+    color: var(--wp--custom--color--text--primary);
+    text-wrap: pretty;
+  }
+  @media (hover: hover) {
+    .gallery__poster:hover .gallery__poster-frame img {
+      transform: scale(1.04);
+    }
+    .gallery__poster:hover .gallery__poster-title {
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+  }
+  @media (max-width: 1199px) {
+    .gallery__year {
+      display: flex;
+      flex-direction: column;
+      gap: var(--wp--custom--stack--md);
+    }
+    .gallery__year[hidden] {
+      display: none;
+    }
+  }
+  @media (max-width: 599px) {
+    .gallery__posters {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: var(--wp--preset--spacing--32);
+    }
+    .gallery__poster-slot--empty {
+      display: none;
+    }
   }
 
   .gallery__videos {

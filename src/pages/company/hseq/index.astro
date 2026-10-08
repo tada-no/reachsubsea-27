@@ -1,0 +1,179 @@
+---
+// Company › HSEQ (6 Oct 2026, Q115). Client PDF p34–35 ("14 — Company — HSEQ") for the page's intent and
+// wording; the live /hseq/ page and the dev site's six HSEQ child pages for the substance (hseq.ts lists every
+// source). One hub and two children (Q115): Life-Saving Rules and HSEQ campaigns are their own pages, the
+// hub keeps a teaser of each; Standards and Policies stay here (on their own they would be thin lists). The
+// PDF's bento overlapping the hero is gone (no overlaps, docs/05 Page hero): its six areas are icon cards under a
+// one-column header (Ross, 7 Oct 2026; a numbered list beside the copy until then).
+// Redirects: /hseq/, /hseq-2/ (live) and /company/hseq/hseq-introduction/, /hseq-standards/,
+// /policies-code-of-conduct/ (dev) → this page; /company/hseq/transparency-act/ (dev) → /transparency-act/.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import SplitMedia from '../../../blocks/SplitMedia.astro';
+import ChecklistGrid from '../../../blocks/ChecklistGrid.astro';
+import CardGrid from '../../../blocks/CardGrid.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { navSections } from '../../../data/navigation';
+import {
+  hseqIntro,
+  hseqAreas,
+  certificates,
+  registrations,
+  policiesIntro,
+  policies,
+  codeOfConduct,
+  whistleblowing,
+  transparencyAct,
+  hseqContact,
+  lifeSavingRules,
+  lifeSavingRulesIntro,
+  featuredCampaign,
+} from '../../../data/hseq';
+import type { CardField } from '../../../lib/types';
+import { faqsFor, faqHubHref } from '../../../data/faqs';
+
+const base = import.meta.env.BASE_URL;
+const company = navSections.find((s) => s.id === 'company')!;
+const page = company.links.find((l) => l.label === 'HSEQ')!;
+const subnavItems = [
+  { label: 'About', href: company.href },
+  ...company.links.map((l) => ({ label: l.label, href: l.href })),
+];
+const rulesPath = `${page.href}life-saving-rules/`;
+const campaignsPath = `${page.href}campaigns/`;
+
+const moreCards: CardField[] = [
+  {
+    eyebrow: `Q${featuredCampaign.quarter} ${featuredCampaign.year} campaign`,
+    title: featuredCampaign.title,
+    description: 'Our quarterly HSEQ campaigns keep risks like manual handling front of mind, on board and onshore.',
+    action: { label: 'All HSEQ campaigns', url: campaignsPath, action: 'page' },
+  },
+  {
+    eyebrow: 'Speak up',
+    title: whistleblowing.title,
+    description: whistleblowing.text,
+    action: { label: 'Report a concern', url: whistleblowing.url, action: 'external' },
+  },
+  {
+    eyebrow: 'Statement, June 2025',
+    title: transparencyAct.title,
+    description: transparencyAct.text,
+    action: { label: 'Read our statement', url: transparencyAct.url, action: 'page' },
+  },
+];
+---
+
+<BaseLayout title="HSEQ" motion>
+  <Header current="company" overlay />
+  <main id="main">
+    <PageHero
+      style="photo"
+      animate
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Company', href: company.href }, { label: 'HSEQ' }]}
+      title={hseqIntro.title}
+      lead={hseqIntro.lead}
+      image={{ src: `${base}images/hero-hseq.jpg`, alt: '', focalPoint: { x: 0.5, y: 0.52 } }}
+    />
+
+    <SectionSubnav source="section-pages" label="Company" items={subnavItems} current={page.href} />
+
+    <CardGrid
+      anchor="how-we-operate"
+      layout="3-columns"
+      media="icon"
+      surface="tint"
+      background="white"
+      sectionHeader={{ eyebrow: 'How we operate', title: hseqIntro.cultureTitle, intro: hseqIntro.cultureIntro }}
+      cards={hseqAreas.map((a) => ({ pictogram: a.pictogram, title: a.title, description: a.text }))}
+    />
+
+    <SplitMedia
+      anchor="standards"
+      media="spec-table"
+      layout="stacked"
+      background="tint"
+      eyebrow="Standards & certification"
+      title="Operating to recognised industry standards"
+      intro="Our management system is certified to three ISO standards, and we are registered with the supplier qualification schemes our clients use."
+      tiles={certificates.map((c) => ({
+        pictogram: 'shield-tick',
+        title: c.standard,
+        text: c.scope,
+        link: { label: 'Certificate (PDF)', url: c.file, action: 'file', context: `, ${c.standard}` },
+      }))}
+      tilesHeading="ISO certificates"
+      specHeading="Supplier registrations"
+      specs={registrations.map((r) => ({ label: r.scheme, value: `ID ${r.id} (${r.country})` }))}
+    />
+
+    <ChecklistGrid
+      anchor="life-saving-rules"
+      layout="compact"
+      background="white"
+      sectionHeader={{
+        eyebrow: 'IOGP',
+        title: lifeSavingRulesIntro.title,
+        intro: lifeSavingRulesIntro.lead,
+        action: { label: 'Read the Life-Saving Rules', url: rulesPath },
+      }}
+      items={lifeSavingRules.map((rule, i) => ({
+        slug: rule.slug,
+        icon: `${base}images/hseq/life-saving-rules/${i + 1}.svg`,
+        title: rule.title,
+        href: `${rulesPath}#${rule.slug}`,
+      }))}
+    />
+
+    <SplitMedia
+      anchor="policies"
+      media="documents"
+      layout="stacked"
+      background="navy"
+      title="Policies & Code of Conduct"
+      intro={policiesIntro}
+      actions={[{ label: `${codeOfConduct.title} (PDF)`, url: codeOfConduct.file, action: 'file' }]}
+      documents={policies.map((p) => ({ label: p.title, url: p.file, action: 'file', context: ' (PDF)' }))}
+    />
+
+    <CardGrid
+      anchor="more"
+      layout="3-columns"
+      media="none"
+      surface="white"
+      background="tint"
+      sectionHeader={{ title: 'Campaigns, reporting and transparency' }}
+      cards={moreCards}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about our safety, quality and environmental certifications.',
+        action: { label: 'See all FAQs', url: faqHubHref('hseq') },
+      }}
+      layout="split"
+      source="faq"
+      topic="hseq"
+      topic="hseq"
+      background="white"
+      items={faqsFor('hseq')}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="white"
+      title="Would you like to know more?"
+      text="Reach out to us today."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact
+      contact={hseqContact}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

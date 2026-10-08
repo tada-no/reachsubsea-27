@@ -347,6 +347,43 @@ const objectPosition = image?.focalPoint
       padding-top: calc(96px + var(--wp--preset--spacing--24));
     }
   }
+  /* Text style opening the page (6 Oct 2026, HSEQ child pages): the header is fixed over it too, so it clears
+     the bar exactly as the Photo hero does and the crumbs sit at the same height on every page */
+  .site-header ~ main > .page-hero--text:first-child .page-hero__frame {
+    padding-top: calc(72px + var(--wp--preset--spacing--24));
+  }
+  @media (min-width: 1200px) {
+    .site-header ~ main > .page-hero--text:first-child .page-hero__frame {
+      padding-top: calc(96px + var(--wp--preset--spacing--24));
+    }
+  }
+  /* One hero height (Ross, 7 Oct 2026): the Text hero takes the Photo hero's layout, crumbs at the top and the
+     title stack at the bottom, and its height: from 900 the Photo hero's min-height exactly, so every page but
+     Home opens the same. Below 900 the Photo hero is content-height (its photo band sits above the text,
+     532–800 tall), so the Text hero gets a floor in line with the shortest of them instead of stopping short. */
+  .page-hero--text .page-hero__frame {
+    display: flex;
+    min-height: min(140vw, 640px);
+  }
+  .page-hero--text .page-hero__container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+  }
+  .page-hero--text .page-hero__breadcrumb {
+    margin-bottom: auto;
+    padding-bottom: var(--wp--custom--stack--xl);
+  }
+  @media (min-width: 900px) {
+    .page-hero--text .page-hero__frame {
+      min-height: clamp(640px, 47.2vw, 800px);
+    }
+  }
+  /* A Navy Text hero sits on the Photo hero's navy/900 ground (Ross, 7 Oct 2026), so the two read as one
+     hero with and without a photo */
+  .page-hero--text.has-surface-navy .page-hero__frame {
+    background-color: var(--wp--preset--color--navy-900);
+  }
   /* Small overscan only: enough for the drift, not enough to zoom the photo (review round 4) */
   .page-hero--motion:not(.page-hero--video) .page-hero__media {
     top: -6%;

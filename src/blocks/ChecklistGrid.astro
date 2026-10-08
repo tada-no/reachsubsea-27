@@ -1,0 +1,268 @@
+---
+// Checklist grid · reach/checklist-grid (added 6 Oct 2026, HSEQ, Q115; outside the 14-block budget).
+// A set of rules, each an icon (an SVG from the media library, e.g. the IOGP Life-Saving Rules icons), a title,
+// the rule in one line and the "I …" commitments under it. Two layouts:
+//
+// Full (Life-Saving Rules page): white cards on tint, three across from 1200 (icon, H3 title, the rule in
+// Body medium, the commitments as a quiet list with Card `scope`'s sage dot). Rows stretch to the
+// tallest card; nothing is pinned, the list simply follows the rule. 600–1199: one column of wide rows, the
+// icon beside the text and the commitments in two newspaper columns. Below 600: the icon (64) beside the title, rule and
+// list full width under both.
+//
+// Compact (HSEQ hub teaser): icon and title only, each a link to the item's anchor on the full page. Nine
+// across from 1200 (icon over a centred title); 600–1199 three across with the icon beside the title; phones
+// three across, icon over title again.
+//
+// Icons are decorative (alt ""): the title sits beside them. No items → render nothing (docs/05 §0).
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+
+export interface ChecklistItem {
+  /** Anchor id on the full page ("confined-space"). */
+  slug: string;
+  icon: string;
+  title: string;
+  rule?: string;
+  points?: string[];
+  /** Compact: where the item links (the full page's anchor). */
+  href?: string;
+}
+
+interface Props extends BlockFields {
+  layout?: 'full' | 'compact';
+  sectionHeader?: SectionHeaderField;
+  items?: ChecklistItem[];
+}
+
+const { layout = 'full', sectionHeader, items = [], background, spacing, anchor } = Astro.props;
+const titleId = sectionHeader ? makeId('checklist-grid', sectionHeader.title) : undefined;
+---
+
+{
+  items.length > 0 && (
+    <BlockSection
+      slug="checklist-grid"
+      root="checklist-grid"
+      class={`checklist-grid--${layout}`}
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : 'Rules'}
+    >
+      <div class="block__body">
+        {sectionHeader && (
+          <SectionHeader eyebrow={sectionHeader.eyebrow} title={sectionHeader.title} intro={sectionHeader.intro} action={sectionHeader.action} id={titleId} />
+        )}
+        {layout === 'compact' ? (
+          <ul class="checklist-grid__icons">
+            {items.map((item) => (
+              <li class="checklist-grid__icon-item">
+                <a class="checklist-grid__icon-link" href={item.href ?? `#${item.slug}`}>
+                  <img class="checklist-grid__icon" src={item.icon} alt="" width="80" height="80" loading="lazy" decoding="async" />
+                  <span class="checklist-grid__icon-title text-label">{item.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ul class="checklist-grid__list">
+            {items.map((item) => (
+              <li class="checklist-grid__item has-surface-light" id={item.slug}>
+                <img class="checklist-grid__icon" src={item.icon} alt="" width="96" height="96" loading="lazy" decoding="async" />
+                <div class="checklist-grid__head">
+                  <h3 class="checklist-grid__title text-h4">{item.title}</h3>
+                  {item.rule && <p class="checklist-grid__rule">{item.rule}</p>}
+                </div>
+                {item.points && item.points.length > 0 && (
+                  <ul class="checklist-grid__points">
+                    {item.points.map((point) => (
+                      <li class="text-small">{point}</li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  /* ── Full ─────────────────────────────────────────────── */
+  .checklist-grid__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+  }
+  .checklist-grid__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    padding: var(--wp--preset--spacing--32);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--default);
+    scroll-margin-top: var(--wp--preset--spacing--128);
+  }
+  .checklist-grid__item .checklist-grid__icon {
+    width: 96px;
+    height: 96px;
+  }
+  .checklist-grid__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xs);
+  }
+  .checklist-grid__title {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .checklist-grid__rule {
+    font-weight: var(--wp--custom--font-weight--medium);
+    color: var(--wp--custom--color--text--primary);
+  }
+  .checklist-grid__points {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .checklist-grid__points li {
+    display: flex;
+    gap: var(--wp--preset--spacing--12);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* Card `scope`'s marker: a 6px sage dot on the first line's centre, so a wrapped point keeps it at the top */
+  .checklist-grid__points li::before {
+    content: '';
+    flex: none;
+    align-self: flex-start;
+    width: 6px;
+    height: 6px;
+    margin-top: calc((1lh - 6px) / 2);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--icon--accent);
+  }
+
+  @media (max-width: 1199px) {
+    .checklist-grid__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .checklist-grid__item {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      column-gap: var(--wp--preset--spacing--32);
+      row-gap: var(--wp--custom--stack--md);
+      align-items: start;
+    }
+    .checklist-grid__item .checklist-grid__icon {
+      grid-row: span 2;
+    }
+    /* Newspaper columns, not a grid: the points read top-down and a long one leaves no gap beside it */
+    .checklist-grid__points {
+      display: block;
+      columns: 2;
+      column-gap: var(--wp--preset--spacing--32);
+    }
+    .checklist-grid__points li {
+      break-inside: avoid;
+      margin-bottom: var(--wp--custom--stack--xs);
+    }
+  }
+  @media (max-width: 599px) {
+    .checklist-grid__item {
+      grid-template-columns: 64px minmax(0, 1fr);
+      column-gap: var(--wp--preset--spacing--16);
+      padding: var(--wp--preset--spacing--24);
+    }
+    .checklist-grid__item .checklist-grid__icon {
+      width: 64px;
+      height: 64px;
+      grid-row: auto;
+    }
+    .checklist-grid__head {
+      align-self: center;
+    }
+    .checklist-grid__rule,
+    .checklist-grid__points {
+      grid-column: 1 / -1;
+    }
+    /* The rule leaves the head so it can run full width under the icon */
+    .checklist-grid__head {
+      display: contents;
+    }
+    .checklist-grid__title {
+      align-self: center;
+    }
+    .checklist-grid__points {
+      columns: 1;
+    }
+  }
+
+  /* ── Compact ──────────────────────────────────────────── */
+  .checklist-grid__icons {
+    display: grid;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .checklist-grid__icon-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--wp--custom--stack--sm);
+    color: var(--wp--custom--color--text--primary);
+    text-align: center;
+    text-decoration: none;
+  }
+  .checklist-grid__icons .checklist-grid__icon {
+    width: 80px;
+    height: 80px;
+    transition: transform var(--wp--custom--motion--duration-fast) var(--wp--custom--motion--ease-out);
+  }
+  .checklist-grid__icon-title {
+    text-wrap: balance;
+  }
+  .checklist-grid__icon-link:hover .checklist-grid__icon-title {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .checklist-grid__icon-link:hover .checklist-grid__icon {
+    transform: scale(1.06);
+  }
+
+  @media (max-width: 1199px) {
+    .checklist-grid__icons {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      row-gap: var(--wp--preset--spacing--24);
+    }
+    .checklist-grid__icon-link {
+      flex-direction: row;
+      text-align: left;
+      gap: var(--wp--preset--spacing--16);
+    }
+    .checklist-grid__icons .checklist-grid__icon {
+      width: 64px;
+      height: 64px;
+      flex: none;
+    }
+  }
+  @media (max-width: 599px) {
+    .checklist-grid__icons {
+      gap: var(--wp--preset--spacing--16);
+      row-gap: var(--wp--preset--spacing--24);
+    }
+    .checklist-grid__icon-link {
+      flex-direction: column;
+      text-align: center;
+      gap: var(--wp--custom--stack--xs);
+    }
+  }
+</style>

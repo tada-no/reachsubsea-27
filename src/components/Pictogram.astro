@@ -1196,4 +1196,355 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     0%, 56%, 76%, 100% { transform: scale(1); }
     66% { transform: scale(1.05); }
   }
+
+  /* ── HSEQ areas (7 Oct 2026): Ross's 2.5 stroke redraws (Figma 421:9572–9590), each acting out its area once.
+     Trimmed strokes rewind towards their start and draw out again (dash 100 + gap 120, offset 0 → 110 → 0);
+     arrowheads and marks scale from their own point. Keyframe names are prefixed per icon. */
+  .pictogram--teach-people,
+  .pictogram--leaf-hand,
+  .pictogram--fingerprint,
+  .pictogram--planner,
+  .pictogram--life-ring,
+  .pictogram--goals {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--teach-people :is(.pg-dash, .pg-pass),
+  .pictogram--fingerprint .pg-ridge,
+  .pictogram--planner .pg-play {
+    stroke-dasharray: 100 120;
+  }
+
+  /* Employee involvement: knowledge passes across, the colleague nods; then back the other way */
+  .pictogram--teach-people :is(.pg-head, .pg-person) {
+    transform-box: view-box;
+  }
+  .pictogram--teach-people .pg-head--a {
+    transform-origin: 64.02px 40.6px;
+  }
+  .pictogram--teach-people .pg-head--b {
+    transform-origin: 31.96px 50.85px;
+  }
+  .pictogram--teach-people.is-playing .pg-dash--a1 { animation-name: pg-tp-dash-a1; }
+  .pictogram--teach-people.is-playing .pg-dash--a2 { animation-name: pg-tp-dash-a2; }
+  .pictogram--teach-people.is-playing .pg-pass--a { animation-name: pg-tp-pass-a; }
+  .pictogram--teach-people.is-playing .pg-head--a { animation-name: pg-tp-head-a; }
+  .pictogram--teach-people.is-playing .pg-person--b { animation-name: pg-tp-nod-b; }
+  .pictogram--teach-people.is-playing .pg-dash--b1 { animation-name: pg-tp-dash-b1; }
+  .pictogram--teach-people.is-playing .pg-pass--b { animation-name: pg-tp-pass-b; }
+  .pictogram--teach-people.is-playing .pg-head--b { animation-name: pg-tp-head-b; }
+  .pictogram--teach-people.is-playing .pg-person--a { animation-name: pg-tp-nod-a; }
+  @keyframes pg-tp-dash-a1 {
+    0%, 4%, 18%, 100% { stroke-dashoffset: 0; }
+    10%, 12% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-tp-dash-a2 {
+    0%, 4%, 22%, 100% { stroke-dashoffset: 0; }
+    10%, 16% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-tp-pass-a {
+    0%, 4%, 34%, 100% { stroke-dashoffset: 0; }
+    10%, 20% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-tp-head-a {
+    0%, 4%, 42%, 100% { transform: scale(1); }
+    8%, 32% { transform: scale(0); }
+    37% { transform: scale(1.2); }
+  }
+  @keyframes pg-tp-nod-b {
+    0%, 34%, 54%, 100% { transform: translate3d(0, 0, 0); }
+    42%, 46% { transform: translate3d(0, -2.5px, 0); }
+  }
+  @keyframes pg-tp-dash-b1 {
+    0%, 50%, 62%, 100% { stroke-dashoffset: 0; }
+    56% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-tp-pass-b {
+    0%, 50%, 74%, 100% { stroke-dashoffset: 0; }
+    56%, 60% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-tp-head-b {
+    0%, 50%, 82%, 100% { transform: scale(1); }
+    54%, 72% { transform: scale(0); }
+    77% { transform: scale(1.2); }
+  }
+  @keyframes pg-tp-nod-a {
+    0%, 74%, 94%, 100% { transform: translate3d(0, 0, 0); }
+    82%, 86% { transform: translate3d(0, -2.5px, 0); }
+  }
+
+  /* Environmental management: the hand lifts the seedling, which sways on its stem, each leaf a beat behind */
+  .pictogram--leaf-hand :is(.pg-plant, .pg-leaf) {
+    transform-box: view-box;
+  }
+  .pictogram--leaf-hand .pg-plant {
+    transform-origin: 45.88px 53.18px;
+  }
+  .pictogram--leaf-hand .pg-leaf--small {
+    transform-origin: 40.45px 31.95px;
+  }
+  .pictogram--leaf-hand .pg-leaf--big {
+    transform-origin: 45.35px 46.43px;
+  }
+  .pictogram--leaf-hand.is-playing .pg-cradle { animation-name: pg-lh-lift; }
+  .pictogram--leaf-hand.is-playing .pg-plant { animation-name: pg-lh-sway; }
+  .pictogram--leaf-hand.is-playing .pg-leaf--small { animation-name: pg-lh-leaf-small; }
+  .pictogram--leaf-hand.is-playing .pg-leaf--big { animation-name: pg-lh-leaf-big; }
+  @keyframes pg-lh-lift {
+    0%, 6%, 52%, 100% { transform: translate3d(0, 0, 0); }
+    22%, 32% { transform: translate3d(0, -2.5px, 0); }
+  }
+  @keyframes pg-lh-sway {
+    0%, 8%, 60%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(-5deg); }
+    34% { transform: rotate(4deg); }
+    47% { transform: rotate(-1.5deg); }
+  }
+  @keyframes pg-lh-leaf-small {
+    0%, 14%, 64%, 100% { transform: rotate(0deg); }
+    26% { transform: rotate(-8deg); }
+    40% { transform: rotate(5deg); }
+    52% { transform: rotate(-2deg); }
+  }
+  @keyframes pg-lh-leaf-big {
+    0%, 18%, 68%, 100% { transform: rotate(0deg); }
+    30% { transform: rotate(-6deg); }
+    44% { transform: rotate(4deg); }
+    56% { transform: rotate(-1.5deg); }
+  }
+
+  /* Security: the frame closes in on the print, the ridges redraw from the core outwards, the frame lets go */
+  .pictogram--fingerprint.is-playing .pg-corner--tl { animation-name: pg-fp-tl; }
+  .pictogram--fingerprint.is-playing .pg-corner--tr { animation-name: pg-fp-tr; }
+  .pictogram--fingerprint.is-playing .pg-corner--br { animation-name: pg-fp-br; }
+  .pictogram--fingerprint.is-playing .pg-corner--bl { animation-name: pg-fp-bl; }
+  .pictogram--fingerprint.is-playing .pg-ridge--1 { animation-name: pg-fp-ridge-1; }
+  .pictogram--fingerprint.is-playing .pg-ridge--2 { animation-name: pg-fp-ridge-2; }
+  .pictogram--fingerprint.is-playing .pg-ridge--3 { animation-name: pg-fp-ridge-3; }
+  .pictogram--fingerprint.is-playing .pg-ridge--4 { animation-name: pg-fp-ridge-4; }
+  .pictogram--fingerprint.is-playing .pg-ridge--5 { animation-name: pg-fp-ridge-5; }
+  @keyframes pg-fp-tl {
+    0%, 4%, 76%, 100% { transform: translate3d(0, 0, 0); }
+    14%, 62% { transform: translate3d(3px, 3px, 0); }
+  }
+  @keyframes pg-fp-tr {
+    0%, 4%, 76%, 100% { transform: translate3d(0, 0, 0); }
+    14%, 62% { transform: translate3d(-3px, 3px, 0); }
+  }
+  @keyframes pg-fp-br {
+    0%, 4%, 76%, 100% { transform: translate3d(0, 0, 0); }
+    14%, 62% { transform: translate3d(-3px, -3px, 0); }
+  }
+  @keyframes pg-fp-bl {
+    0%, 4%, 76%, 100% { transform: translate3d(0, 0, 0); }
+    14%, 62% { transform: translate3d(3px, -3px, 0); }
+  }
+  @keyframes pg-fp-ridge-1 {
+    0%, 12%, 29%, 100% { stroke-dashoffset: 0; }
+    19% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-fp-ridge-2 {
+    0%, 18%, 35%, 100% { stroke-dashoffset: 0; }
+    25% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-fp-ridge-3 {
+    0%, 24%, 41%, 100% { stroke-dashoffset: 0; }
+    31% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-fp-ridge-4 {
+    0%, 30%, 47%, 100% { stroke-dashoffset: 0; }
+    37% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-fp-ridge-5 {
+    0%, 36%, 53%, 100% { stroke-dashoffset: 0; }
+    43% { stroke-dashoffset: 110; }
+  }
+
+  /* Risk management: the two risks are marked, the play is drawn towards the target, which takes the hit */
+  .pictogram--planner :is(.pg-mark, .pg-target, .pg-tip) {
+    transform-box: view-box;
+  }
+  .pictogram--planner .pg-mark--a {
+    transform-origin: 63.11px 36.88px;
+  }
+  .pictogram--planner .pg-mark--b {
+    transform-origin: 44.71px 50.92px;
+  }
+  .pictogram--planner .pg-target {
+    transform-origin: 34.07px 35.88px;
+  }
+  .pictogram--planner .pg-tip {
+    transform-origin: 43.65px 36.24px;
+  }
+  .pictogram--planner.is-playing .pg-play { animation-name: pg-pl-play; }
+  .pictogram--planner.is-playing .pg-tip { animation-name: pg-pl-tip; }
+  .pictogram--planner.is-playing .pg-mark--b { animation-name: pg-pl-mark-b; }
+  .pictogram--planner.is-playing .pg-mark--a { animation-name: pg-pl-mark-a; }
+  .pictogram--planner.is-playing .pg-target { animation-name: pg-pl-target; }
+  @keyframes pg-pl-play {
+    0%, 4%, 46%, 100% { stroke-dashoffset: 0; }
+    14%, 30% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-pl-tip {
+    0%, 4%, 54%, 100% { transform: scale(1); }
+    9%, 44% { transform: scale(0); }
+    49% { transform: scale(1.2); }
+  }
+  @keyframes pg-pl-mark-b {
+    0%, 14%, 30%, 100% { transform: scale(1); }
+    21% { transform: scale(1.3); }
+  }
+  @keyframes pg-pl-mark-a {
+    0%, 20%, 36%, 100% { transform: scale(1); }
+    27% { transform: scale(1.3); }
+  }
+  @keyframes pg-pl-target {
+    0%, 50%, 66%, 100% { transform: scale(1); }
+    57% { transform: scale(1.2); }
+  }
+
+  /* Safety: the ring is thrown, a full turn as it flies, then it lands and bobs on the water */
+  .pictogram--life-ring .pg-buoy {
+    transform-box: view-box;
+    transform-origin: 48px 48px;
+  }
+  .pictogram--life-ring.is-playing .pg-buoy { animation-name: pg-lr-throw; }
+  @keyframes pg-lr-throw {
+    0%, 6% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    44% { transform: translate3d(0, 0, 0) rotate(360deg); }
+    54% { transform: translate3d(0, 2.5px, 0) rotate(360deg); }
+    66% { transform: translate3d(0, -1.5px, 0) rotate(360deg); }
+    76% { transform: translate3d(0, 0.6px, 0) rotate(360deg); }
+    86%, 100% { transform: translate3d(0, 0, 0) rotate(360deg); }
+  }
+
+  /* Quality: the arrow draws back, then strikes the centre and the target gives a little */
+  .pictogram--goals.is-playing .pg-arrow { animation-name: pg-gl-arrow; }
+  .pictogram--goals.is-playing .pg-board { animation-name: pg-gl-board; }
+  @keyframes pg-gl-arrow {
+    0%, 6%, 100% { transform: translate3d(0, 0, 0); }
+    26%, 36% { transform: translate3d(10px, 0, 0); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    42% { transform: translate3d(-1.5px, 0, 0); }
+    50% { transform: translate3d(0, 0, 0); }
+  }
+  @keyframes pg-gl-board {
+    0%, 41%, 64%, 100% { transform: translate3d(0, 0, 0); }
+    45% { transform: translate3d(-2px, 0, 0); }
+    52% { transform: translate3d(1px, 0, 0); }
+    58% { transform: translate3d(-0.4px, 0, 0); }
+  }
+
+  /* ── ESG pillars (7 Oct 2026, Sustainability): Ross's 2.5 stroke redraws (Figma 421:9631, 421:9647, 421:9691).
+     The handshake keeps its clasp-and-shake loop above (the redraw replaced the 22 Sep trace, same parts). */
+  .pictogram--globe-hand,
+  .pictogram--legal {
+    --pg-cycle: 3.2s;
+  }
+
+  /* Environmental: the hand lifts the globe, and its land redraws west then east, as if the globe turns */
+  .pictogram--globe-hand .pg-land {
+    stroke-dasharray: 100 120;
+  }
+  .pictogram--globe-hand.is-playing .pg-cradle { animation-name: pg-gh-lift; }
+  .pictogram--globe-hand.is-playing .pg-land--west { animation-name: pg-gh-west; }
+  .pictogram--globe-hand.is-playing .pg-land--east { animation-name: pg-gh-east; }
+  @keyframes pg-gh-lift {
+    0%, 6%, 56%, 100% { transform: translate3d(0, 0, 0); }
+    22%, 36% { transform: translate3d(0, -2.5px, 0); }
+  }
+  @keyframes pg-gh-west {
+    0%, 12%, 34%, 100% { stroke-dashoffset: 0; }
+    21% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-gh-east {
+    0%, 20%, 42%, 100% { stroke-dashoffset: 0; }
+    29% { stroke-dashoffset: 110; }
+  }
+
+  /* Governance: the scales tip one way, then the other, and settle level. The beam turns on the pillar top;
+     each pan rises or drops with its end of the beam (the pans hang 15 out from the pivot: 15 × sin 6° ≈ 1.6), the page stays still */
+  .pictogram--legal .pg-beam {
+    transform-box: view-box;
+    transform-origin: 57.97px 41.2px;
+  }
+  .pictogram--legal.is-playing .pg-beam { animation-name: pg-lg-beam; }
+  .pictogram--legal.is-playing .pg-pan--left { animation-name: pg-lg-pan-left; }
+  .pictogram--legal.is-playing .pg-pan--right { animation-name: pg-lg-pan-right; }
+  @keyframes pg-lg-beam {
+    0%, 6%, 74%, 100% { transform: rotate(0deg); }
+    22% { transform: rotate(6deg); }
+    40% { transform: rotate(-4deg); }
+    54% { transform: rotate(2deg); }
+    64% { transform: rotate(-0.8deg); }
+  }
+  @keyframes pg-lg-pan-left {
+    0%, 6%, 74%, 100% { transform: translate3d(0, 0, 0); }
+    22% { transform: translate3d(0, -1.6px, 0); }
+    40% { transform: translate3d(0, 1.05px, 0); }
+    54% { transform: translate3d(0, -0.53px, 0); }
+    64% { transform: translate3d(0, 0.21px, 0); }
+  }
+  @keyframes pg-lg-pan-right {
+    0%, 6%, 74%, 100% { transform: translate3d(0, 0, 0); }
+    22% { transform: translate3d(0, 1.6px, 0); }
+    40% { transform: translate3d(0, -1.05px, 0); }
+    54% { transform: translate3d(0, 0.53px, 0); }
+    64% { transform: translate3d(0, -0.21px, 0); }
+  }
+  /* ── HSEQ campaign steps (7 Oct 2026): Ross's 2.5 stroke redraws of shield-stop (421:9717) and brain (421:9718),
+     in the family of shield-tick (Lift safe) beside them: trims rewind and redraw, the shield breathes. */
+  .pictogram--shield-stop,
+  .pictogram--brain {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--shield-stop .pg-cross,
+  .pictogram--brain .pg-fold {
+    stroke-dasharray: 100 120;
+  }
+  /* Stop: the cross rewinds and redraws stroke by stroke, then the sign shakes "no" and the shield breathes */
+  .pictogram--shield-stop .pg-sign {
+    transform-box: view-box;
+  }
+  .pictogram--shield-stop .pg-shield {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .pictogram--shield-stop.is-playing .pg-cross--a { animation-name: pg-ss-cross-a; }
+  .pictogram--shield-stop.is-playing .pg-cross--b { animation-name: pg-ss-cross-b; }
+  .pictogram--shield-stop.is-playing .pg-sign { animation-name: pg-ss-shake; }
+  .pictogram--shield-stop.is-playing .pg-shield { animation-name: pg-shield-breathe; }
+  @keyframes pg-ss-cross-a {
+    0%, 6%, 100% { stroke-dashoffset: 0; }
+    16%, 30% { stroke-dashoffset: 110; }
+    44% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-ss-cross-b {
+    0%, 10%, 100% { stroke-dashoffset: 0; }
+    20%, 36% { stroke-dashoffset: 110; }
+    52% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-ss-shake {
+    0%, 54%, 82%, 100% { transform: translate3d(0, 0, 0); }
+    60% { transform: translate3d(-2.5px, 0, 0); }
+    67% { transform: translate3d(2.5px, 0, 0); }
+    74% { transform: translate3d(-1.25px, 0, 0); }
+  }
+  /* Think: the folds rewind and redraw in three waves, top to bottom (thoughts firing); the outline holds */
+  .pictogram--brain.is-playing .pg-fold--1 { animation-name: pg-br-fold-1; }
+  .pictogram--brain.is-playing .pg-fold--2 { animation-name: pg-br-fold-2; }
+  .pictogram--brain.is-playing .pg-fold--3 { animation-name: pg-br-fold-3; }
+  @keyframes pg-br-fold-1 {
+    0%, 4%, 100% { stroke-dashoffset: 0; }
+    14%, 22% { stroke-dashoffset: 110; }
+    36% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-br-fold-2 {
+    0%, 14%, 100% { stroke-dashoffset: 0; }
+    24%, 32% { stroke-dashoffset: 110; }
+    46% { stroke-dashoffset: 0; }
+  }
+  @keyframes pg-br-fold-3 {
+    0%, 24%, 100% { stroke-dashoffset: 0; }
+    34%, 42% { stroke-dashoffset: 110; }
+    56% { stroke-dashoffset: 0; }
+  }
 </style>

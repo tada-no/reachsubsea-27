@@ -279,7 +279,7 @@ export const latestItems: FeedItem[] = [
     title: 'Q2 2026 interim results',
     description: undefined,
     meta: [],
-    action: { label: 'Download report (PDF)', url: '#', action: 'file' },
+    action: { label: 'Report (PDF)', url: '#', action: 'file' },
   }),
   cardPresets.news({
     media: 'image-top',

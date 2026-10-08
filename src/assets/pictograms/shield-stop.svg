@@ -1,0 +1,11 @@
+<svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Figma Pictogram/shield-stop (421:9717), Ross's 2.5 stroke redraw, parts tagged for the loop (the cross redraws, the sign shakes "no", the shield takes a breath) -->
+<g stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<path class="pg-shield" d="M72.21 54V27.64C52.21 27.64 48 17.17 48 17.17C48 17.17 43.79 27.64 23.79 27.64V54C23.79 54 22.17 66.67 48 78.83C73.83 66.67 72.21 54 72.21 54Z"/>
+<g class="pg-sign">
+<path d="M63.33 48.17C63.33 56.64 56.47 63.5 48 63.5C39.53 63.5 32.67 56.64 32.67 48.17C32.67 39.7 39.53 32.84 48 32.84C56.47 32.84 63.33 39.7 63.33 48.17Z"/>
+<path class="pg-cross pg-cross--a pg-lead" pathLength="100" d="M41.02 41.19L54.98 55.15"/>
+<path class="pg-cross pg-cross--b" pathLength="100" d="M54.98 41.19L41.02 55.15"/>
+</g>
+</g>
+</svg>

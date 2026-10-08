@@ -14,10 +14,29 @@
 // two columns (one paragraph each), then the image as a full-width 21:9 banner (16:9 tablet, 4:3 phone).
 // Below 900 the columns stack. The image is optional: Careers › Who thrives (20 Sep 2026) is the same
 // heading over two columns with no banner.
+// Layout Beside (8 Oct 2026, Careers › Who thrives, Ross; Figma 435:17585): short copy that answers the heading.
+// Eyebrow on top, then the heading in cols 1–6 and one paragraph in cols 7–12, top-aligned with the heading's first
+// line. No media. Below 900 the body follows the heading.
+// Poster (6 Oct 2026, HSEQ campaigns, Q115): a campaign poster or similar artwork shown whole, at its own
+// proportions (no crop, no photo tint: it is artwork) in 5 columns, the text in 6, a 1px subtle edge; it opens the
+// Lightbox (the page renders <Dialog type="lightbox" />). Below 900 it follows the text (a tall poster first
+// would push the title a screen down).
+// Documents (6 Oct 2026, HSEQ policies, Q115): the media side is a list of named file links (a policy set, a
+// governance pack) under an optional H5 heading, rows divided like Spec rows, two columns from 600.
+// Documents stacked (7 Oct 2026, HSEQ policies, Ross: the split's two columns zig-zagged and wrapped): heading,
+// body and actions across the top (max 880), then the list full width in newspaper columns that read top-down,
+// three from 1200, two from 600, one on phones.
 // Layout Stacked (18 Sep 2026 review, Numbered list only): heading on top, `items` as three numbered cards in
-// columns.
+// columns. Spec table stacked (6 Oct 2026, HSEQ standards, Q115): heading and body on top, then two parallel,
+// top-aligned lists: the `tiles` (under `tilesHeading`) in cols 1–5 and the spec table in cols 7–12.
+// Stacked heads (7 Oct 2026, Ross: on HSEQ the stacked blocks headed differently from the Card grid and Checklist
+// grid around them): every stacked layout opens with the shared Section header (Eyebrow, H2, Lead `intro`, one
+// action at the row's far end from 900), so a stacked Split media reads like any other full-width block.
+// Numbered list split (6 Oct 2026, HSEQ): a long list beside short copy, so the text column is top-aligned and
+// sticky from 900, like Accordion split, instead of floating mid-list.
 import BlockSection from '../components/BlockSection.astro';
 import Eyebrow from '../components/Eyebrow.astro';
+import SectionHeader from '../components/SectionHeader.astro';
 import Link from '../components/Link.astro';
 import MediaFrame from '../components/MediaFrame.astro';
 import SpecRow from '../components/SpecRow.astro';
@@ -52,16 +71,20 @@ interface TileItem {
 }
 
 interface Props extends BlockFields {
-  media?: 'image' | 'video' | 'spec-table' | 'numbered-list';
+  media?: 'image' | 'video' | 'spec-table' | 'numbered-list' | 'documents' | 'poster';
   /** Numbered list media: `stacked` = heading, then the items as numbered cards in columns.
-   * Image media: `wide` = heading, two-column body, full-width banner image. */
-  layout?: 'split' | 'stacked' | 'wide';
+   * Image media: `wide` = heading, two-column body, full-width banner image; `beside` = heading in the start
+   * half, one paragraph beside it in the end half, no image. */
+  layout?: 'split' | 'stacked' | 'wide' | 'beside';
   position?: 'end' | 'start';
   eyebrow?: string;
   title: string;
   headingLevel?: 'h2' | 'h3';
   /** Rich text HTML string, rendered in .prose via set:html. A default slot also renders in .prose. */
   body?: string;
+  /** Stacked layouts: the head is a Section header (7 Oct 2026), so its copy is one plain-text Lead
+   * paragraph, not rich text, and only the first action shows, at the row's far end from 900. */
+  intro?: string;
   /** 0–2 action Links under the body copy. */
   actions?: LinkField[];
   image?: ImageField;
@@ -69,16 +92,33 @@ interface Props extends BlockFields {
   video?: VideoField;
   specHeading?: string;
   specs?: SpecItem[];
-  /** Only renders when it has a url ("Download spec sheet (PDF)"). */
+  /** Only renders when it has a url ("Spec sheet (PDF)"). */
   specFile?: LinkField;
+  /** Documents media: an optional heading over the list, and the files (each a named LinkField). */
+  documentsHeading?: string;
+  documents?: LinkField[];
   /** 3–6 numbered items (Reach Remote oversight levels, HOP). */
   items?: NumberedListItem[];
   /** 2–3 pictogram tiles under the body copy, one per row in the text column (4 Oct 2026, Assets overview:
    * the survey suite and the monitoring technology). Library pictograms only. */
   tiles?: TileItem[];
+  /** Spec table stacked: an H5 over the tiles, parallel to `specHeading`. */
+  tilesHeading?: string;
   /** A quote in place of the visible heading (19 Sep 2026, Investors overview CEO letter). `title` stays the
    * section's accessible name (a visually hidden H2); the quote reads as H3, then the attribution. */
   quote?: { text: string; name: string; role?: string };
+  /** Spec table stacked: a second spec table in the start column in place of the tiles, under `pairHeading`
+   * (7 Oct 2026, HSEQ campaign: The golden rules beside Offshore risks, both as Spec rows). */
+  pairSpecs?: SpecItem[];
+  pairHeading?: string;
+  /** Keep `title` as the section's accessible name only (a visually hidden heading), where the block continues
+   * the one above (`joined`) and its own H3s head the content. */
+  titleHidden?: boolean;
+  /** Continues the block above on the same ground (7 Oct 2026, HSEQ campaign): no top padding, as Card grid's
+   * `joined`, so a run of blocks reads as one section. */
+  joined?: boolean;
+  /** Image media is artwork (an illustration, not a photo): no photo tint, shown whole on its own ground. */
+  artwork?: boolean;
   /** A 96 line pictogram above the heading (19 Sep 2026, service singles: the line's own pictogram,
    * which plays its loop once as the section scrolls in). */
   pictogram?: string;
@@ -93,6 +133,7 @@ const {
   title,
   headingLevel: Heading = 'h2',
   body,
+  intro,
   actions = [],
   image,
   caption,
@@ -100,10 +141,18 @@ const {
   specHeading,
   specs = [],
   specFile,
+  documentsHeading,
+  documents = [],
   items = [],
   tiles = [],
+  tilesHeading,
   quote,
   pictogram,
+  pairSpecs = [],
+  pairHeading,
+  titleHidden = false,
+  artwork = false,
+  joined = false,
   background,
   spacing,
   anchor,
@@ -115,8 +164,11 @@ const shownActions = actions.slice(0, 2);
 const hasSpecFile = Boolean(specFile?.url);
 const listInText = media !== 'numbered-list' && items.length > 0;
 const stacked = layout === 'stacked' && media === 'numbered-list';
+const specStacked = layout === 'stacked' && media === 'spec-table';
+const docsStacked = layout === 'stacked' && media === 'documents';
 const wide = layout === 'wide' && media === 'image';
-const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked', `split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
+const beside = layout === 'beside';
+const rootClass = [joined && 'split-media--joined', wide && 'split-media--wide', beside && 'split-media--beside', (stacked || specStacked || docsStacked) && 'split-media--stacked', `split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
 ---
 
 <BlockSection
@@ -128,7 +180,16 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
   anchor={anchor}
   labelledBy={titleId}
 >
-  {wide ? (
+  {beside ? (
+    <div class="split-media__beside">
+      {eyebrow && <Eyebrow text={eyebrow} />}
+      <Heading id={titleId} class:list={['split-media__title', Heading === 'h3' ? 'text-h3' : 'text-h2']}>{title}</Heading>
+      <div class="prose split-media__body">
+        {body && <Fragment set:html={body} />}
+        <slot />
+      </div>
+    </div>
+  ) : wide ? (
     <div class="split-media__stack">
       <div class="split-media__stack-head">
         {eyebrow && <Eyebrow text={eyebrow} />}
@@ -144,13 +205,68 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
         </div>
       )}
     </div>
+  ) : docsStacked ? (
+    <div class="split-media__stack">
+      <SectionHeader eyebrow={eyebrow} title={title} intro={intro} action={shownActions[0]} id={titleId} as={Heading} />
+      {documents.length > 0 && (
+        <div class="split-media__documents split-media__documents--stacked">
+          {documentsHeading && <h3 class="split-media__spec-heading text-h5">{documentsHeading}</h3>}
+          <ul class="split-media__document-list">
+            {documents.map((doc) => (
+              <li class="split-media__document">
+                <Link label={doc.label} href={doc.url} action={doc.action ?? 'file'} size="small" context={doc.context} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  ) : specStacked ? (
+    <div class="split-media__stack">
+      {titleHidden ? (
+        <Heading id={titleId} class="visually-hidden">{title}</Heading>
+      ) : (
+        <SectionHeader eyebrow={eyebrow} title={title} intro={intro} action={shownActions[0]} id={titleId} as={Heading} />
+      )}
+      <div class="split-media__pair">
+        {pairSpecs.length > 0 && (
+          <div class="split-media__spec-table split-media__pair-start">
+            {pairHeading && <h3 class="split-media__spec-heading text-h5">{pairHeading}</h3>}
+            <dl class="split-media__specs">
+              {pairSpecs.map((spec) => (
+                <SpecRow label={spec.label} value={spec.value} />
+              ))}
+            </dl>
+          </div>
+        )}
+        {tiles.length > 0 && pairSpecs.length === 0 && (
+          <div class="split-media__pair-start">
+            {tilesHeading && <h3 class="split-media__spec-heading text-h5">{tilesHeading}</h3>}
+            <ul class="split-media__tiles">
+              {tiles.map((tile) => (
+                <PictogramTile pictogram={tile.pictogram} title={tile.title} text={tile.text} link={tile.link} headingLevel={tilesHeading ? 'h4' : 'h3'} />
+              ))}
+            </ul>
+          </div>
+        )}
+        {specs.length > 0 && (
+          <div class="split-media__spec-table split-media__pair-end">
+            {specHeading && <h3 class="split-media__spec-heading text-h5">{specHeading}</h3>}
+            <dl class="split-media__specs">
+              {specs.map((spec) => (
+                <SpecRow label={spec.label} value={spec.value} />
+              ))}
+            </dl>
+            {hasSpecFile && specFile && (
+              <Link label={specFile.label} href={specFile.url} action="file" size="small" context={specFile.context} />
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   ) : stacked ? (
     <div class="split-media__stack">
-      <div class="split-media__stack-head">
-        {eyebrow && <Eyebrow text={eyebrow} />}
-        <Heading id={titleId} class:list={['split-media__title', Heading === 'h3' ? 'text-h3' : 'text-h2']}>{title}</Heading>
-        {body && <div class="prose split-media__body"><Fragment set:html={body} /></div>}
-      </div>
+      <SectionHeader eyebrow={eyebrow} title={title} intro={intro} action={shownActions[0]} id={titleId} as={Heading} />
       {items.length > 0 && (
         <ol class="split-media__list split-media__cols">
           {items.map((item) => (
@@ -213,7 +329,23 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
     </div>
 
     <div class="split-media__media">
-      {media === 'image' && <MediaFrame ratio="4:3" image={image} caption={caption} />}
+      {media === 'image' && <MediaFrame ratio="4:3" image={image} caption={caption} class={artwork ? 'media-frame--artwork' : undefined} />}
+
+      {
+        media === 'poster' && image?.src && (
+          <button
+            type="button"
+            class="split-media__poster"
+            data-lightbox={titleId}
+            data-src={image.src}
+            data-alt={image.alt}
+            data-caption={caption ?? image.alt}
+            aria-label={`Enlarge: ${image.alt}`}
+          >
+            <img src={image.src} alt={image.alt} width={image.width} height={image.height} loading="lazy" decoding="async" />
+          </button>
+        )
+      }
 
       {
         media === 'video' && video && (
@@ -248,6 +380,21 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
             {hasSpecFile && specFile && (
               <Link label={specFile.label} href={specFile.url} action="file" size="small" context={specFile.context} />
             )}
+          </div>
+        )
+      }
+
+      {
+        media === 'documents' && documents.length > 0 && (
+          <div class="split-media__documents">
+            {documentsHeading && <h3 class="split-media__spec-heading text-h5">{documentsHeading}</h3>}
+            <ul class="split-media__document-list">
+              {documents.map((doc) => (
+                <li class="split-media__document">
+                  <Link label={doc.label} href={doc.url} action={doc.action ?? 'file'} size="small" context={doc.context} />
+                </li>
+              ))}
+            </ul>
           </div>
         )
       }
@@ -332,11 +479,44 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
     display: none;
   }
 
+  /* Beside: heading cols 1–6, body cols 7–12 on the heading's row, top-aligned */
+  .split-media__beside {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    row-gap: var(--wp--custom--stack--md);
+    align-items: start;
+  }
+  .split-media__beside > .eyebrow {
+    grid-column: 1 / span 6;
+  }
+  .split-media__beside > .split-media__title {
+    grid-column: 1 / span 6;
+    text-wrap: balance;
+  }
+  .split-media__beside > .split-media__body {
+    grid-column: 7 / span 6;
+  }
+  @media (max-width: 899px) {
+    .split-media__beside > :is(.eyebrow, .split-media__title, .split-media__body) {
+      grid-column: 1 / -1;
+    }
+  }
+
   /* Wide: two-column body, banner image */
+  /* Two columns on the 12-column grid, cols 1–5 and 7–11 (Ross, 8 Oct 2026: a single gutter between two dense
+     paragraphs read tight). The gap is a column and two gutters, and the lines run ~65–70 characters, in line with
+     Split media's text column (1–5) and media column (from 7) elsewhere on the site */
   .split-media__body--cols {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: var(--wp--custom--stack--sm) var(--wp--custom--grid--gutter);
+  }
+  .split-media__body--cols > :nth-child(odd) {
+    grid-column: 1 / span 5;
+  }
+  .split-media__body--cols > :nth-child(even) {
+    grid-column: 7 / span 5;
   }
   .split-media__body--cols > * + * {
     margin-top: 0;
@@ -348,6 +528,9 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
   @media (max-width: 899px) {
     .split-media__body--cols {
       grid-template-columns: 1fr;
+    }
+    .split-media__body--cols > :is(:nth-child(odd), :nth-child(even)) {
+      grid-column: auto;
     }
     .split-media__wide-media .media-frame__frame {
       aspect-ratio: 16 / 9;
@@ -376,6 +559,92 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
     display: flex;
     flex-direction: column;
   }
+  /* Poster: whole artwork, no tint, opens the Lightbox */
+  @media (min-width: 900px) {
+    .split-media--poster.split-media--start .split-media__media {
+      grid-column: 1 / span 5;
+    }
+    .split-media--poster.split-media--start .split-media__text {
+      grid-column: 7 / span 6;
+    }
+    .split-media--poster.split-media--end .split-media__text {
+      grid-column: 1 / span 6;
+    }
+    .split-media--poster.split-media--end .split-media__media {
+      grid-column: 8 / span 5;
+    }
+  }
+  .split-media__poster {
+    display: block;
+    width: 100%;
+    max-width: 560px;
+    overflow: hidden;
+    border: 1px solid var(--wp--custom--color--border--subtle);
+    border-radius: var(--wp--custom--radius--md);
+    cursor: zoom-in;
+  }
+  .split-media__poster img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform var(--wp--custom--motion--duration) var(--wp--custom--motion--ease-out);
+  }
+  .split-media__poster:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 4px;
+  }
+  @media (hover: hover) {
+    .split-media__poster:hover img {
+      transform: scale(1.02);
+    }
+  }
+
+  /* Documents: Spec-row rhythm (padding y space/12, a subtle rule under each), two columns from 600 (at
+     900–1199 the longest title wraps; one column there ran 11 rows, twice the text column's height) */
+  .split-media__documents {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .split-media__document-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* No hairlines (Ross, 7 Oct 2026): a one-line link needs no rule to be read, only a 48 tap row. Rules stay
+     where the eye tracks across a gap (Spec rows) or a row is a control (Accordion). */
+  .split-media__document {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+  }
+  @media (max-width: 599px) {
+    .split-media__document-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* Stacked: newspaper columns, so the list reads top-down in each column */
+  .split-media__documents--stacked .split-media__document-list {
+    display: block;
+    columns: 3;
+    column-gap: var(--wp--custom--grid--gutter);
+  }
+  .split-media__documents--stacked .split-media__document {
+    break-inside: avoid;
+  }
+  @media (max-width: 1199px) {
+    .split-media__documents--stacked .split-media__document-list {
+      columns: 2;
+    }
+  }
+  @media (max-width: 599px) {
+    .split-media__documents--stacked .split-media__document-list {
+      columns: 1;
+    }
+  }
   .split-media__list {
     counter-reset: numbered-item;
     gap: 0;
@@ -389,7 +658,9 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
   .split-media__tiles {
     display: flex;
     flex-direction: column;
-    margin-top: var(--wp--preset--spacing--8);
+    margin: var(--wp--preset--spacing--8) 0 0;
+    padding: 0;
+    list-style: none;
   }
   .split-media__list--text .numbered-item {
     grid-template-columns: 56px 1fr;
@@ -398,6 +669,57 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
   .split-media__list:not(.split-media__cols) .numbered-item:first-child {
     border-top: 0;
     padding-top: 0;
+  }
+
+  /* ── Numbered list split: sticky text column ─────────────── */
+  @media (min-width: 900px) {
+    .split-media--numbered-list:not(.split-media--stacked) .split-media__columns {
+      align-items: start;
+    }
+    .split-media--numbered-list:not(.split-media--stacked) .split-media__text {
+      position: sticky;
+      top: calc(var(--header-offset, 96px) + var(--wp--preset--spacing--24));
+    }
+  }
+
+  /* ── Spec table stacked: two parallel lists ───────────────── */
+  .split-media__pair {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    row-gap: var(--wp--custom--stack--xl);
+    align-items: start;
+  }
+  .split-media__pair-start {
+    grid-column: 1 / span 5;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .split-media__pair-end {
+    grid-column: 7 / span 6;
+  }
+  /* Under a heading the tiles start flush: the heading's own gap replaces the tile list's top margin, and the
+     first tile keeps 12 on top so its title lines up with the first Spec row beside it */
+  .split-media__pair-start .split-media__tiles {
+    margin-top: 0;
+  }
+  .split-media__pair-start .pictogram-tile:first-child {
+    padding-top: var(--wp--preset--spacing--12);
+  }
+  @media (max-width: 899px) {
+    .split-media__pair-start {
+      grid-column: 1 / span 6;
+    }
+    .split-media__pair-end {
+      grid-column: 7 / span 6;
+    }
+  }
+  @media (max-width: 599px) {
+    .split-media__pair-start,
+    .split-media__pair-end {
+      grid-column: 1 / -1;
+    }
   }
 
   /* ── Stacked (Numbered list) ──────────────────────────────── */
@@ -456,5 +778,9 @@ const rootClass = [wide && 'split-media--wide', stacked && 'split-media--stacked
     .split-media--video .split-media__media {
       order: -1;
     }
+  }
+
+  .split-media.split-media--joined {
+    padding-top: 0;
   }
 </style>

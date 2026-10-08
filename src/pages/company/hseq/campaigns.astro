@@ -1,0 +1,116 @@
+---
+// Company › HSEQ › HSEQ campaigns (6 Oct 2026, Q115; rebuilt 7 Oct 2026, Q117). The current campaign written out
+// from its poster PDF (Ross: the poster's content as page text, the first section a text/media block), in the
+// poster's own order as one run on tint (Ross: the three blocks felt disconnected on white, tint and navy; then,
+// tried on the poster's navy, better light; the two below are `joined`, no section break): the intro beside the
+// worker illustration; Stop · Think · Lift safe as three white cards; The golden rules beside Offshore risks, both as Spec rows (Ross:
+// the sage panel felt wrong); then the archive, each poster opening its PDF with a Download link (Ross: not a lightbox) and the poster's closing line as the CTA. Text hero on navy (Q57, Q116).
+// Redirect: /company/hseq/hseq-campaigns/ (dev) → this page.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import SplitMedia from '../../../blocks/SplitMedia.astro';
+import CardGrid from '../../../blocks/CardGrid.astro';
+import MediaGallery from '../../../blocks/MediaGallery.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { navSections } from '../../../data/navigation';
+import { campaigns, campaignsIntro, featuredCampaign, hseqContact } from '../../../data/hseq';
+
+const base = import.meta.env.BASE_URL;
+const company = navSections.find((s) => s.id === 'company')!;
+const hseq = company.links.find((l) => l.label === 'HSEQ')!;
+const subnavItems = [
+  { label: 'About', href: company.href },
+  ...company.links.map((l) => ({ label: l.label, href: l.href })),
+];
+const featured = featuredCampaign;
+const featuredLabel = `Q${featured.quarter} ${featured.year} campaign`;
+const asset = (path: string) => `${base}${path.replace(/^\//, '')}`;
+const feedback = { label: 'Send us your feedback', url: `mailto:${campaignsIntro.feedback}`, action: 'external' as const };
+const posterFile = { label: 'Campaign poster (PDF)', url: asset(featured.file!), action: 'file' as const };
+---
+
+<BaseLayout title="HSEQ campaigns" motion>
+  <Header current="company" overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Company', href: company.href },
+        { label: 'HSEQ', href: hseq.href },
+        { label: campaignsIntro.title },
+      ]}
+      title={campaignsIntro.title}
+      lead={campaignsIntro.lead}
+    />
+
+    <SectionSubnav source="section-pages" label="Company" items={subnavItems} current={hseq.href} />
+
+    <SplitMedia
+      anchor="current"
+      media="image"
+      artwork
+      background="tint"
+      eyebrow={`${featuredLabel} · ${featured.topic}`}
+      title={featured.title}
+      body={`<p>${featured.lead} <strong>${featured.leadStrong}</strong></p><p><small>${featured.references}</small></p>`}
+      image={{ src: asset(featured.illustration.src), alt: '', width: featured.illustration.width, height: featured.illustration.height }}
+      actions={[posterFile]}
+    />
+
+    <CardGrid
+      anchor="stop-think-lift"
+      layout="3-columns"
+      media="icon"
+      surface="white"
+      background="tint"
+      joined
+      ariaLabel="Stop, think, lift safe"
+      cards={featured.steps.map((step) => ({ pictogram: step.pictogram, title: step.title, scope: step.points }))}
+    />
+
+    <SplitMedia
+      anchor="golden-rules"
+      layout="stacked"
+      media="spec-table"
+      background="tint"
+      joined
+      title="Golden rules and offshore risks"
+      titleHidden
+      pairHeading="The golden rules"
+      pairSpecs={featured.goldenRules}
+      specHeading="Offshore risks"
+      specs={featured.offshoreRisks}
+    />
+
+    <MediaGallery
+      anchor="archive"
+      type="posters"
+      background="white"
+      sectionHeader={{ title: 'Campaign archive', intro: campaignsIntro.body }}
+      posters={campaigns.map((c) => ({
+        year: c.year,
+        quarter: c.quarter,
+        title: c.title,
+        image: { src: asset(c.poster), alt: '', width: c.width, height: c.height },
+        file: c.file ? (c.file.startsWith('/') ? asset(c.file) : c.file) : undefined,
+      }))}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="white"
+      title={featured.closing.title}
+      text={featured.closing.text}
+      actions={[feedback]}
+      showContact
+      contact={hseqContact}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

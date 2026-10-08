@@ -249,6 +249,12 @@ a {
   list-style: decimal;
   padding-left: 1.25em;
 }
+/* Fine print in rich text (7 Oct 2026, HSEQ campaign sources): Body small */
+.prose small {
+  display: inline-block;
+  font-size: var(--wp--preset--font-size--body-sm);
+  line-height: var(--wp--custom--line-height--body-sm);
+}
 .prose strong {
   color: var(--wp--custom--color--text--primary);
 }
@@ -360,4 +366,15 @@ html.js [data-reveal].is-settled {
 :is(.page-hero__media, .card__media, .card__bg, .media-frame__frame, .social-feed__media, .statement__photo, .profile__portrait)
   > :is(img, video) {
   mix-blend-mode: screen;
+}
+/* Artwork (7 Oct 2026, HSEQ campaign illustration): an illustration keeps its own colours, so the frame opts out
+   of the tint and shows it whole on the navy it was drawn for */
+.media-frame--artwork .media-frame__frame {
+  aspect-ratio: auto;
+  background-color: transparent;
+  isolation: auto;
+}
+.media-frame--artwork .media-frame__frame > img {
+  height: auto;
+  mix-blend-mode: normal;
 }

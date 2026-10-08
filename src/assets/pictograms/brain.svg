@@ -1,0 +1,24 @@
+<svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Figma Pictogram/brain (421:9718), Ross's 2.5 stroke redraw, parts tagged for the loop (the folds rewind and redraw top to bottom, thoughts firing; the outline holds) -->
+<g stroke="currentColor" stroke-width="2.5" stroke-miterlimit="10" stroke-linecap="round">
+<path d="M39.88 33.79C35.39 33.79 31.75 30.15 31.75 25.66C31.75 21.18 35.39 17.54 39.88 17.54C44.36 17.54 48 21.18 48 25.66"/>
+<path d="M48.01 70.67C47.95 73.31 46.57 75.86 44.14 77.32C40.35 79.59 35.44 78.37 33.17 74.58C31.3 71.48 31.79 67.61 34.12 65.06L38.67 60.12"/>
+<path d="M61.23 64.39L61.85 65.06C64.18 67.61 64.67 71.48 62.8 74.58C60.53 78.37 55.62 79.59 51.83 77.32C49.4 75.86 48.1 73.31 48.03 70.67V25.66C48.03 21.18 51.61 17.54 56.09 17.54C57.94 17.54 59.96 18.32 61.38 19.53"/>
+<path stroke-linejoin="round" d="M26.98 26.45C24.8 27.61 22.82 30.21 24.28 36.04C24.28 36.04 12.78 46.04 23.28 56.29C23.28 56.29 20.28 69.79 31.78 70.54"/>
+<path stroke-linejoin="round" d="M71.72 36.04C71.72 36.04 83.22 46.04 72.72 56.29C72.72 56.29 75.72 69.79 64.22 70.54"/>
+<path d="M57.34 29.34C58.3 26.07 61.32 23.68 64.9 23.68C69.25 23.68 72.77 27.21 72.77 31.56C72.77 33.13 72.31 34.59 71.53 35.81"/>
+<path stroke-linejoin="round" d="M71.72 36.04C71.72 36.04 69.95 34.57 69.14 34.13"/>
+<path class="pg-fold pg-fold--1" pathLength="100" d="M46.02 20.38C47.86 21.82 48.18 24.51 46.74 26.35C45.29 28.18 42.61 28.51 40.77 27.06"/>
+<path class="pg-fold pg-fold--1" pathLength="100" d="M34.62 41.42C32.34 40.86 30.94 38.55 31.5 36.28C32.06 34.01 34.37 32.61 36.64 33.17"/>
+<path class="pg-fold pg-fold--1" pathLength="100" d="M54.28 29.67C57.72 28.84 61.18 30.64 62.53 33.8"/>
+<path class="pg-fold pg-fold--1" pathLength="100" d="M48.17 36.06C48.17 36.06 52.59 39.79 55.42 39.79"/>
+<path class="pg-fold pg-fold--2" pathLength="100" d="M47.73 43.84C45.89 42.16 43.07 42.38 41.52 44.14C41.52 44.14 35 54.45 30.17 54.45"/>
+<path class="pg-fold pg-fold--2" pathLength="100" d="M28.25 46.04C28.25 46.04 32.5 48.04 35.5 51.29"/>
+<path class="pg-fold pg-fold--2" pathLength="100" d="M48.39 50.16C48.39 50.16 56.51 52.34 59.94 46.14"/>
+<path class="pg-fold pg-fold--2" pathLength="100" d="M58 48.86C58 48.86 63.38 53.21 67.75 48.41"/>
+<path class="pg-fold pg-fold--3" pathLength="100" d="M42.25 67.57C43.05 66.08 44.92 65.52 46.41 66.32C47.48 66.9 48.07 68.02 48.02 69.16"/>
+<path class="pg-fold pg-fold--3" pathLength="100" d="M31.13 61.66L35.64 63.25"/>
+<path class="pg-fold pg-fold--3" pathLength="100" d="M62.89 59.1C63.05 61.29 61.98 63.66 59.9 65.22C58.36 66.38 56.56 66.88 54.9 66.76"/>
+<path class="pg-fold pg-fold--3 pg-lead" pathLength="100" d="M55.03 58.57C54.22 57.08 51.43 56.52 49.95 57.32C48.88 57.9 47.98 59.02 48.03 60.16"/>
+</g>
+</svg>
