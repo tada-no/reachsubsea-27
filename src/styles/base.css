@@ -273,7 +273,7 @@ a {
    (rendered as Link components). In WordPress this is theme.json for the post content.
    Rhythm (Q153, after a taste + impeccable review): paragraphs 16 apart; lists step out to stack--md; the lead, photos,
    quotes, tables and embeds to stack--lg; a heading opens a section at stack--xl and binds to what follows (8).
-   Running text stops at the prose measure (720, ~72 characters); photos, tables and embeds keep the 880 column, on
+   Running text stops at the prose measure (720, ~80 characters at Body 18); photos, tables and embeds keep the 880 column, on
    the same left edge. */
 .prose.article > :not(figure) {
   max-inline-size: var(--wp--custom--measure--prose);
@@ -298,7 +298,8 @@ a {
   font-size: var(--wp--preset--font-size--lead);
   line-height: var(--wp--custom--line-height--lead);
 }
-.article .article-lead + * {
+.prose.article .article-lead + * {
+  /* .prose.article, so it also beats a links row's own margin-block (Q153 re-review) */
   margin-top: var(--wp--custom--stack--lg);
 }
 .article h2 {

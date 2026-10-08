@@ -68,7 +68,7 @@ const endParts = boilerplate ? split(boilerplate.replace(/<\/div>\s*$/, '')) : [
 <BaseLayout title={`${post.title} · Reach Newsroom`} motion>
   <Header current="newsroom" />
   <main id="main">
-    <BlockSection slug="news-article" root="news-article" background="white" spacing="sm" labelledBy="news-article-title">
+    <BlockSection slug="news-article" root="news-article" background="white" labelledBy="news-article-title">
       <article class="news-article__column">
         <header class="news-article__header">
           <Breadcrumb
@@ -162,8 +162,12 @@ const endParts = boilerplate ? split(boilerplate.replace(/<\/div>\s*$/, '')) : [
 <style is:global>
   /* Opens the page under the fixed solid header: clear the bar (72 / 96, fixed values as the Page hero), then a
      short gap, not a hero's height */
+  /* and ends a section/sm before More news (64), not the full section/md: the band's own padding follows. Set here,
+     not with spacing="sm", whose .block.has-spacing-sm padding-block (higher specificity) also took the top clearance
+     away and put the breadcrumb under the header (Q153 re-review) */
   .news-article {
     padding-top: calc(72px + var(--wp--custom--stack--xl));
+    padding-bottom: var(--wp--custom--section--sm);
   }
   @media (min-width: 1200px) {
     .news-article {
