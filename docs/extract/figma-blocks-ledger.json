@@ -1978,5 +1978,74 @@
       "Subsea services 359:4009 not changed: its 6th subnav pill still reads Explore 3D World, capability cards have no scope, the projects row is still a Card grid 4 columns instance (could swap to the new Feed grid Grid 4 columns)",
       "No mobile page frames (block Mobile variants only)"
     ]
+  },
+  "sweep8OctCareers": {
+    "date": "2026-10-08",
+    "context": "Figma sweep batch 5 (8 Oct 2026): Careers. Block/Comparison (Q134, new docs/05 §2.29), Figures Grid (Q135), Split media Wide body columns (Q133), Statement Quotes carousel (Q137); page frames Why work with us (Q128) and Life at Reach (Q129); Careers overview 302:8729 (Q139–Q140) and Our culture 454:17974 checked against the code. Ground truth: src/pages/careers/{index,why-work-with-us/index,life-at-reach/index,our-culture/index}.astro, src/blocks/{Comparison,Figures,Statement,SplitMedia}.astro, src/data/{why-work,life-at-reach,careers,culture,quotes,faqs}.ts; production build at 1440 and 375.",
+    "images": "Uploaded from public/images (Figma image fills, reuse by hash): project-trinidad-inspection 29ccaf97f40527ce868c1dde11f3a60b566e2e4e, team-lounge-open-day 7f3cc32b98084c8c27700bacff7463220768fa6f, life-crew-on-deck 3de5b92af61c258f9b5d9d82dea2f82f99adefa4, life-control-room ef5929fea3ceed1c97277fdabfdd53db05b749a7, life-office-harbour-desk 82ef5b4445d0056608e27d203e81da041b3467b6, life-electronics-workshop 5ed40149a12042b50367d0d254e583fd60617820, trainee-workshop f3295f0461875a0d509e365a0715dfdacfe3080e, team-lounge-harbour b65e0b7baddcf8febea5f8b63c2488964c5d1e31, project-suction-anchors b4cc5138b8a600557fd83dba17aa86f2a7d86144. Life at Reach hero reuses the Careers calm sea 3b550055c1b947491800d7fb4819200d11a95fb9. Heroes: navy/900 solid + image in SCREEN. Staging frame deleted.",
+    "components": {
+      "Comparison head 581:14436 (new, Blocks / Comparison)": "Breakpoint=Desktop 581:14430 (528 = five columns), Mobile 581:14433. Props Title#581:0, Lead#581:3. Title Heading/H3 text/primary, Lead Body/Body text/secondary, gap space/8, padding-bottom space/32 (Mobile space/24)",
+      "Comparison row 581:14447 (new, Blocks / Comparison)": "Breakpoint=Desktop 581:14437 (1312: Label 192 · Option 1 528 · Option 2 528, gap grid/gutter; each cell padding space/24 top and bottom with a 1px border/subtle top rule, cells stretch to the tallest; options padding-right space/24), Mobile 581:14444 (label over value, gap space/4, padding space/16, top rule; Value 2 unused). Props Label#581:6, Value 1#581:9, Value 2#581:12. Label is Body/Small at weight/medium, text/secondary: no such text style, so the typography variables are bound (as Checklist item's Rule)",
+      "Figure card 455:17942": "New variant property Layout: the existing variants renamed Layout=Card (Desktop 455:17933, Mobile 455:17941); new Layout=Tile Desktop 584:14497 (640), Mobile 584:14504 (327): bg/tint (navy/900 in Navy), radius/lg, padding space/48 (Mobile space/32), Text (Title Heading/H4, Text Body/Body text/secondary, space/12) and Proof pinned to the foot (padding-top space/32, gap space/4: Value Heading/Display text/accent-display, Caption Body/Small text/secondary). Same Title/Text/Value/Caption props. Placed right of the Card variants; set now 2289 wide",
+      "Quote card 587:14556 (new, Blocks / Statement)": "Breakpoint=Desktop 587:14546 (560), Mobile 587:14551 (307 = 82vw). Props Quote#587:0, Name#587:3, Role#587:6. bg/tint, radius/lg, padding space/48 (Mobile space/32), gap space/32, space between (person at the foot). Quote Body/Lead text/primary with hanging punctuation; the curly marks are range-styled Bold text/accent-display, and must be re-styled in an instance after overriding Quote (a text property carries one style). Name UI/Label text/primary, Role Body/Small text/accent",
+      "Carousel tick 587:14559 (new, Blocks / Statement)": "State=Default 587:14557 (border/subtle), State=Current 587:14558 (icon/accent); 24 (width bound to space/24) × 3, radius/full. Touch-only position bars"
+    },
+    "blocks": {
+      "Block/Comparison": "set 581:31144 on doc frame Blocks / Comparison 581:14425 (x -10768, y 25841 after the Figures shift; under Checklist grid): Breakpoint=Desktop 581:31015 (white; Section header Explore your path · Offshore and onshore · intro; Heads row = empty 192 corner + two Comparison head; five Comparison rows), Breakpoint=Mobile 581:31079 (Section header Mobile; Options space/64: one stack per option, Comparison head + five Comparison row Mobile). Padding section/md × grid/margin, gap stack/xl. Content from src/data/why-work.ts",
+      "Block/Figures 316:6183": "Layout=Grid Desktop 584:31096 (Color mode Navy; Head cloned from Cards with Title#316:0 / Show eyebrow#316:5 rebound; Grid of two Rows, two Figure card Tile instances each, FILL and stretched), Mobile 584:31145 (one column). Set 4855 tall; doc frame 314:6177 grew 1828, so every Blocks node in the x -10768 column below it (Values, Offices map, Year bars, Date list, Share bars, SDG goals, FAQ index, Results archive, Report shelf, File list, Meeting archive, Charter timeline, Profiles, Checklist grid, Comparison and their loose parts) moved down 1828. Description now also explains the Sticky pinned pair (Q132)",
+      "Block/Split media 166:2339": "Media=Wide Desktop 302:4980: paragraphs fixed 528 on cols 1–5 and 7–11 with a 'Grid column 6' spacer (80) between and grid/gutter either side (144 at 1440; no 144 token), Body columns padding-top space/40 so head → columns reads stack/xl, Title fixed 880 (code max 880), Columns frame now hugs (was fixed 208 and clipped). New Media=Wide, Breakpoint=Mobile 585:14546 (paragraphs stacked stack/sm, image 4:3, Show image rebound). Variants below Wide moved down 160; doc frame 162:2081 grew 160, so Blocks / Embed, Blocks / Lifecycle and the Lifecycle parts moved down 160",
+      "Block/Statement 182:2824": "Style=Quotes Desktop 587:14560 (bleed 1440, clips; Head: Section header + Arrows = Icon button Outline Small Disabled (arrow-left) and Default (arrow-right); Carousel › Rail: six Quote card instances from grid/margin, gap grid/gutter, running off the right edge), Mobile 587:14629 (no arrows; 307 cards; Ticks row of six Carousel ticks, first Current). White ground, padding section/md, gap stack/xl. Doc frame 180:2814 grew 1254, so Section subnav, Social feed, Live operations, Split embed docs, Social post and Region status moved down 1254",
+      "Accordion 175:2673": "Layout=Split Desktop 174:2623: a 5th Accordion item 590:32613 (hidden by default) for pages with five FAQs (Careers)"
+    },
+    "pageFrames": [
+      {
+        "id": "588:19574",
+        "name": "Why work with us",
+        "x": 47560,
+        "height": 5157,
+        "source": "src/pages/careers/why-work-with-us/index.astro",
+        "sections": {
+          "Header (Desktop overlay, Navy mode, bg/default fill)": "588:19575",
+          "Page hero Photo (project-trinidad-inspection; Home › Careers › Why work with us; Open positions)": "588:19576",
+          "Section subnav (Why work with us active)": "588:19577",
+          "Split media Wide, Everything within Reach (white; two paragraphs)": "588:19578",
+          "Figures Grid, Four reasons to build your career with us (navy, no eyebrow)": "588:21314",
+          "Comparison, Offshore and onshore (white)": "588:21375",
+          "Accordion Split, why-work FAQs (tint; See all FAQs)": "588:19585",
+          "CTA panel, Ready to find out more? (tint ground; Candidate Portal, Register for new openings, recruiter)": "588:19586",
+          "Footer": "588:19587"
+        }
+      },
+      {
+        "id": "589:31472",
+        "name": "Life at Reach",
+        "x": 49200,
+        "height": 4470,
+        "source": "src/pages/careers/life-at-reach/index.astro",
+        "sections": {
+          "Header": "589:31473",
+          "Page hero Photo (calm sea; Home › Careers › Life at Reach; Open positions)": "589:31474",
+          "Section subnav (Life at Reach active)": "589:31475",
+          "Split media Image End, Expect to be inspired and challenged (white; open-day team photo)": "589:31873",
+          "Card grid 4 columns, From the quayside to the seabed (tint; Card Image top White, one Meta item each: ship, clock, map-pin ×2; cards hug, level at 542)": "589:34350",
+          "Statement Quotes carousel, In their own words (white; six cards, three PLACEHOLDER)": "589:34765",
+          "Accordion Split, life-at-reach FAQs (tint)": "589:31479",
+          "CTA panel, Ready to find out more? (tint ground)": "589:31480",
+          "Footer": "589:31481"
+        }
+      }
+    ],
+    "careersOverview": "302:8729 matched to /careers/: Who thrives is Split media Beside 590:33025 (one paragraph; the Wide instance 302:9280 removed); values Card grid 302:9289 unnumbered (Show eyebrow off), fourth 'Leave no one behind'; Stats band 302:9362 shows the code's figures (500+ feature, 9 Countries reached, 2013 Trainee programme since, 100% Trainees offered a full-time role; the 5th stat hidden; it showed 2008 / 11 / 9 / 15); Trainees 302:9385 two plain paragraphs (one Body layer, blank line, bold lead-ins gone) with the trainee-workshop photo; Embed eyebrow 'Try it in 3D'; bento Life at Reach card 'leaving no one behind' and the two photo cards filled; Accordion 302:8748 the five Careers FAQs (first open; the answers were misaligned) with See all FAQs; header bg/default fill (was transparent, read white); Accordion and CTA grounds tint. Height 6966 → 7162",
+    "ourCulture": "454:17974 checked: Our people / Safety & quality cards (454:18243) showed only the eyebrow (Content fixed 72 clipped title, copy and action) → Content and cards hug, the second card FILLs to the row (538); FAQ gains See all FAQs. Height 5519 → 5703. Rest matched (values rows, HOP five items, CTA View vacancies)",
+    "housekeeping": "Overlap audit clean on Blocks and Pages. Repeated-structure scan empty on every new doc frame, variant and both new page frames plus Careers overview and Our culture (Comparison Mobile option stacks hold only instances). New auto-layout frames had the default white fill cleared. About 351:3306 Our story picks up the Wide change (paragraph 528, as the code)",
+    "gaps": [
+      "No mobile page frames (block Mobile variants only)",
+      "text-wrap: balance has no Figma equivalent: the Figures Grid and Wide titles break one word later than the code",
+      "Statement Quotes: the curly marks are range styles on the instance text; editing the Quote property resets them to the body colour",
+      "Careers HOP-style vertical centring: Split media Numbered list (Our culture HOP) keeps the text column centred; the code tops it (sticky) from 900",
+      "Careers overview: the 3D World poster in the Embed is still a placeholder; the value cards keep the variant's taller icon spacing",
+      "Comparison spacer columns: the 192 corner and the Wide 'Grid column 6' spacer are fixed widths (no column-width token)",
+      "Footer and CTA panel text size differ from the code on every frame (component-level, not this batch)"
+    ]
   }
 }

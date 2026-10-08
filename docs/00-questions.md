@@ -72,7 +72,7 @@ Context: Ross, on the Careers overview: the Trainees copy "looks bitty, remove b
 - [x] Trainees: two plain paragraphs (the commitment; then the offshore and onshore tracks together), no bold lead-ins, the client's wording kept; "rooted in our belief…" left out
 - [x] Split media gets a new Layout **Beside**: eyebrow on top, the heading in cols 1–6, one paragraph in cols 7–12 top-aligned with the heading's first line, no media; below 900 the paragraph follows the heading. Who thrives uses it, its two paragraphs joined into one (the live copy, unchanged). Wide stays for Our story and Why work with us
 - [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll; body top level with the heading top (140 / 140 at 1440)
-- [ ] Figma after approval: Split media Layout=Beside variant (the 435:17585 frame as the reference)
+- [x] Figma after approval: Split media Layout=Beside variant (the 435:17585 frame as the reference): Media=Beside Desktop 520:11966, Mobile 520:11979 (built with Q144); Careers overview frame 302:8729 now uses it for Who thrives (590:33025), with the values cards unnumbered and "Leave no one behind" (Q140), the code's four stats, Trainees in two paragraphs with its photo, the five Careers FAQs and the bento photos (sweep 8 Oct 2026, ledger `sweep8OctCareers`)
 
 ### Q138. Row cards: padding, and tags on the Our culture values (8 Oct 2026)
 Context: Ross, on the Card grid Rows cards (Sustainability, Our culture): more padding; then, on Our culture, the "In practice" line did not need to be bold or its own paragraph, and the cards should carry eyebrows.
@@ -92,7 +92,7 @@ Context: Ross, after the split version (Q136): "not working either, lets think m
 - [x] Position bars, touch only (Ross): one short bar per card under the rail, the current one green, following the card at the rail's start (the last at the far end). Shown on `(hover: none), (pointer: coarse)`, where the arrows are hidden; not tappable (swipe moves the cards), aria-hidden. In the markup from first paint, so nothing shifts. Checked on an emulated phone (bars track all six cards, arrows hidden) and at 1440 (bars hidden, arrows shown)
 - [x] The `needed-quote` pictogram is dropped (no icon), and the block moves from Navy to White (white · tint · white · tint down the page)
 - [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll on the page, names level, next/prev scroll and disable at the ends
-- [ ] Figma after approval: Statement › Quotes carousel variant
+- [x] Figma after approval: Statement › Quotes carousel variant: Style=Quotes on Block/Statement 182:2824, Desktop 587:14560, Mobile 587:14629; parts Quote card 587:14556 and Carousel tick 587:14559; used in the Life at Reach frame 589:31472 (six cards, the three Latin placeholders named PLACEHOLDER)
 
 ### Q136. Life at Reach: the quotes as a split, one quote leading (8 Oct 2026)
 Context: Ross asked to rethink "In their own words" (Statement Quotes, Q130): three equal columns of loose text on navy read as a generic testimonial strip, ended raggedly (one quote two lines longer), and the "Icon needed" box floated above the eyebrow. Two of the three quotes are press lines about Reach Remote and innovation, not working life.
@@ -102,14 +102,14 @@ Context: Ross asked to rethink "In their own words" (Statement Quotes, Q130): th
 - [ ] Drop the CEO quote · [ ] Keep the order
 - [x] Curly quotes added, the opening one hung outside the text edge (the bold lead otherwise read as a second heading)
 - [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll, names aligned in the pair, reveal works (`.statement__quotes-item` unchanged in motion.ts); axe 0 violations on the section
-- [ ] Figma: the Statement Quotes style is not in Figma yet
+- [x] Figma: the Statement Quotes style is not in Figma yet: superseded by the Q137 carousel, now in Figma (Style=Quotes 587:14560 / 587:14629); the split version was never drawn
 
 ### Q135. Why work with us: the four reasons as a grid (8 Oct 2026)
 Context: Ross: the four-reason block (Figures Sticky, the Figma frame `316:6184`) "still feels clunky and not the best UX or UI": make it smoother and more contained. Even as the Q132 pinned pair it took 2,586px of scroll at 1440 to read four short points, one at a time.
 - [x] New Figures layout **Grid**: the heading, then the four points as 2 × 2 tiles from 900 (one column below), each in Why invest's card order (title → text → figure and caption) so every figure sits with its point. Tiles are subgrids of three rows, so titles, texts and figures share lines across a row. Tiles on `bg/tint` (navy/900 in the Navy band; White on Tint); figures at Display, sage on navy, counting up once; tiles rise in with the page reveal. No pinning, no scroll-driven state. 1,224px at 1440 (was 2,586)
 - [ ] Keep the pinned pair (Q132): Sticky stays in the block for other pages
 - [x] Checked at 1440 · 1100 · 920 · 800 · 375: figures level across each row, no sideways scroll, axe 0 violations. Before/after: `review/why-work-reasons-before-after.png`
-- [ ] Figma after approval: Figures Grid variant (Desktop, Mobile)
+- [x] Figma after approval: Figures Grid variant (Desktop, Mobile): Layout=Grid on Block/Figures 316:6183, Desktop 584:31096 (Navy), Mobile 584:31145, from Figure card Layout=Tile (584:14497 / 584:14504)
 
 ### Q134. Why work with us: offshore and onshore as a comparison (8 Oct 2026)
 Context: Ross: the two path cards "look badly laid out". They repeated every label, their rows didn't line up across the two cards, and all the copy was small type.
@@ -117,12 +117,12 @@ Context: Ross: the two path cards "look badly laid out". They repeated every lab
 - [x] The dev labels that differed become one shared label each: Key assets / Key tech → "Assets and tech", Core roles / Core departments → "Roles and teams"
 - [x] Q128's Card grid spec-row rules (one column below 900, label over value under 480) removed: nothing else used them
 - [x] Checked at 1440 · 1100 · 920 · 800 · 375: rows aligned across the three columns at 900+, no sideways scroll, axe 0 violations
-- [ ] Figma after approval: `Block/Comparison` (Desktop, Mobile)
+- [x] Figma after approval: `Block/Comparison` (Desktop, Mobile): set 581:31144 (Desktop 581:31015, Mobile 581:31079), parts Comparison head 581:14436 and Comparison row 581:14447, doc frame 581:14425; docs/05 §2.29
 
 ### Q133. Two-column text: a wider gap (8 Oct 2026)
 Context: Ross: does the gutter on the 2-col text block feel tight? (Split media Wide: Why work with us, About › Our story, Careers › Who thrives.) It was one gutter (32 at 1440) between two ~90-character columns.
 - [x] Yes: the two paragraphs now sit on the 12-column grid, cols 1–5 and 7–11. Gap 144 at 1440 (112 at 1100, 94 at 900), lines ~65–70 characters; stacked below 900 as before. All three pages pick it up (checked 1440 · 1100 · 900 · 800 · 375, no sideways scroll)
-- [ ] Figma after approval: Split media Wide body columns
+- [x] Figma after approval: Split media Wide body columns: Media=Wide Desktop 302:4980 now has the paragraphs on cols 1–5 and 7–11 (528 each), title max 880; Wide Mobile 585:14546 added. About's Our story picks it up
 
 ### Q132. Why work with us: each reason comes through as one unit (8 Oct 2026)
 Context: Ross, on the Figures block (Sticky): can the transitions be worked through better, so each section comes through together? The figure was pinned on the left while the points scrolled past on the right with 400px gaps, so the figure sat beside empty space or the next point for much of the scroll.
@@ -130,13 +130,13 @@ Context: Ross, on the Figures block (Sticky): can the transitions be worked thro
 - [ ] Paired rows, no pinning
 - [ ] Keep it, tighten it
 - [x] Checked at 1440 (each of the four states, then the release), 1000 and 375: no sideways scroll, no console errors. Figures › Cards (Why invest) unchanged
-- [ ] Figma after approval: update the Figures Sticky variant notes
+- [x] Figma after approval: update the Figures Sticky variant notes: Block/Figures 316:6183 description now describes the pinned pair (the variants show one state; the motion is code-only)
 
 ### Q131. Our culture: the fourth value set apart (8 Oct 2026)
 Context: Ross, on the Our culture values: "Never leave anyone behind" should feel different to the three cards above, maybe in purple and a different layout.
 - [x] Card grid Rows gains `featureLast` (row cards only): the last row is a Navy card and mirrored, the title and copy as one column in cols 1–7 and the pictogram on the right in cols 9–12, centred on the text. Below 900 it stacks as the others, on navy. On Our culture only (Ross)
 - [x] Checked at 1440 · 1000 · 375: no sideways scroll
-- [ ] Figma after approval: the feature row as a Card grid Rows variant
+- [x] Figma after approval: the feature row as a Card grid Rows variant: covered by Card Size=Row mirrored, Surface=Navy 454:8354 (Q138), swapped into the last row of the Our culture frame's Card grid Rows 454:18090; no separate block variant, as it is an instance swap
 
 ### Q130. Life at Reach: a collection of quotes (8 Oct 2026)
 Context: Ross: one quote is not enough, make it a collection; he will supply an animated quote pictogram, used once on the block, not per quote.
@@ -148,7 +148,7 @@ Context: Ross: one quote is not enough, make it a collection; he will supply an 
 - [ ] All four (adds the COO)
 - [x] Built as Statement › style **Quotes** (new), fed by `src/data/quotes.ts` (the Quote post type: quote, name, role, source, topics). The quote items reveal on scroll with the others (`motion.ts`)
 - [ ] **Needed:** Ross's animated quote pictogram; `needed-quote` placeholder until then
-- [ ] Figma after approval: Statement › Quotes variant
+- [x] Figma after approval: Statement › Quotes variant: drawn as the Q137 carousel (587:14560 / 587:14629)
 
 ### Q129. Life at Reach built, first pass (8 Oct 2026)
 Context: Ross: make a start on Life at Reach. Sources: client PDF "23 — Careers — Life at Reach" (screen p51: people-photo hero, two photo cards over it, three quotes marked illustrative, the overview's stats band, three FAQs, "Ready to find out more?"); dev /careers/why-work-with-us/life-at-reach/ (three sentences); a survey of every live and dev post, page and media item for people content (almost none: no rotation pattern, no staff events, no crew or trainee voices; a few named staff quotes in press posts). Our culture (Q127) already holds the values, HSEQ and the control-room photo, Why work with us (Q128) the offshore and onshore roles, so this page is the places and the people.
@@ -166,7 +166,7 @@ Context: Ross: make a start on Life at Reach. Sources: client PDF "23 — Career
 - [x] Card fix: a text or image-top card whose description ends on a meta line now pins the meta to the card foot, so rows keep their meta level when descriptions differ by a line (measured 375–1600). Cards with no description (Contact's office cards) keep the meta under the title (checked)
 - [ ] **To confirm with Reach:** the Husøy technical base (being built in April 2024) and where the workshop photo was taken (Sep 2023 series, unlabelled); rotation patterns (not published anywhere)
 - [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll, one h1, card meta level in every row 375–1600
-- [ ] docs/05 §3 row and Figma page frame after approval (no new components or tokens)
+- [x] docs/05 §3 row and Figma page frame after approval (no new components or tokens): §3 row in place; page frame Life at Reach 589:31472 (it needed the Statement Quotes variant, Quote card and Carousel tick after all)
 
 ### Q128. Why work with us built, first pass (8 Oct 2026)
 Context: Ross: start the Why work with us page. Sources: client PDF "25 — Careers — Why Work With Us" (screen p55, Design Reference p27: hero, three "reasons to join" cards over the hero, four "Support to grow" benefit tiles flagged illustrative, three FAQs, "Ready to find out more?"); dev /careers/why-work-with-us/ leaves (Everything Within Reach, Career growth, Sustainability in work, Meet our people) and /careers/explore-your-path/ (Offshore, Onshore, Graduates & students). The live site has one Careers page, used by the overview. Outline put to Ross, four questions, all on the recommended option:
@@ -184,7 +184,7 @@ Context: Ross: start the Why work with us page. Sources: client PDF "25 — Care
 - [ ] **To confirm with Reach:** the benefits package; the graduates intake year (dev says "2026 intake", dropped); "500+ people across nine countries" (PDF) became "8 offices in 4 countries" (nine is where Reach has worked)
 - [x] Redirects to this page: dev /careers/why-work-with-us/{everything-within-reach, career-growth, sustainability-in-work, meet-our-people}/ and /careers/explore-your-path/{offshore-careers, onshore-careers, graduates-students}/
 - [x] Checked at 1440 · 1220 · 1100 · 1000 · 920 · 800 · 620 · 375: no sideways scroll, one h1, path cards equal height with facts ≤3 lines, sticky figures swap per point
-- [ ] After approval: docs/05 §3 row, Figma page frame (+ the Card grid tablet / phone spec-row frames)
+- [x] After approval: docs/05 §3 row, Figma page frame (+ the Card grid tablet / phone spec-row frames): §3 row in place; page frame Why work with us 588:19574 (Wide, Figures Grid, Comparison). The spec-row frames are moot: Q134 replaced the spec rows with the Comparison block
 
 ### Q127. Our culture built, first pass (8 Oct 2026)
 Context: Ross: start the Our Culture page. Sources: client PDF "24 — Careers — Our Culture" (screens p53–54, Design Reference p26: hero, Learn · Teach · Reach cards each with an "In practice" line, Our people + Safety & quality, the five HOP principles, three FAQs, "Want to be part of it?"); live /careers/ (the comfort-zone paragraph and the fourth value). The dev page and the dev People leaves are empty. No question put to Ross; defaults below, for review.
@@ -196,7 +196,7 @@ Context: Ross: start the Our Culture page. Sources: client PDF "24 — Careers �
 - [x] CTA Panel: the PDF's wording, View vacancies (HR-Manager), the named recruiter, as the Careers overview
 - [ ] **To confirm with Reach:** the HOP copy (the PDF notes it is the industry-standard five principles, not a Reach programme); "A team across nine countries" became "four countries" (nine is where Reach has worked, the offices are in four)
 - [x] Checked at 1440 · 1100 · 800 · 375: no sideways scroll, card actions aligned, one h1, axe 0 violations; the three FAQs also list on /faq/ under Careers
-- [x] Figma: page frame 454:17974 on Pages (desktop only; no mobile frame yet). Needed two component additions after all: a mirrored Card Row (Q138) and Split media Show 5th item (the HOP list has five)
+- [x] Figma: page frame 454:17974 on Pages (desktop only; no mobile frame yet). Needed two component additions after all: a mirrored Card Row (Q138) and Split media Show 5th item (the HOP list has five). Sweep 8 Oct 2026: the Our people / Safety & quality cards showed only their eyebrows (fixed-height Content clipped the title, copy and action), now hugging and level; the FAQ gains See all FAQs
 
 ### Q126. FAQ page, and FAQs as one post type (7 Oct 2026)
 Context: Ross: build the FAQ page, gather every FAQ made so far, and set them up as a post type so the move to WordPress is smooth. There were 58 FAQs on 19 pages: 7 sets in data files, 12 typed inline in pages; three questions repeated across pages (offices ×3, R&D ×2, published research ×2), and seven answers said "above" or "on this page". Client PDF Design Reference p30 / screens p61–62: hero, jump chips, five groups of four drafted questions, "Still have a question?" CTA.
