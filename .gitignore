@@ -7,3 +7,10 @@ backups/
 .agents/
 skills-lock.json
 ~$*
+
+# Working material, not site source (Ross, 8 Oct 2026): review screenshots,
+# client photos and PDFs at the root. Files already tracked stay tracked.
+/review/
+/assets/
+/*.pdf
+/ref/*.pdf
