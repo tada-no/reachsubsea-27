@@ -1,0 +1,256 @@
+---
+// Report shelf · reach/report-shelf (7 Oct 2026, Reports & presentations). The newest reports as their real covers,
+// then every earlier year as one compact row (second pass, Ross 7 Oct 2026: only the recent covers large, the rest
+// wrapped up neatly without thumbnails).
+// - Covers (`featured`, newest first): each opens its PDF in a new tab; under it the year and Link Small File
+//   "Report" (saves the PDF) and "ESEF" (the regulatory filing, ZIP). 1px edge, radius/md, 1.04 zoom on hover, as
+//   Media gallery Posters. 3 across from 900 (container); below, the newest spans the row and the next two share one.
+// - Earlier years (`archive`, newest first): one white row per year, the year (H5) then its files in fixed slots
+//   (`columns`, e.g. Report · ESEF · Sustainability report), as the report-only years in the Results archive. A
+//   missing file leaves its slot empty (an invisible copy of the link holds the width, so the slots line up down
+//   the list). Two columns from 1040 (container), newest down the left; one below; under 600 the year sits beside
+//   its links, which wrap and skip empty slots.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Link from '../components/Link.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, LinkField, SectionHeaderField } from '../lib/types';
+import type { PublishedReport } from '../data/reports';
+
+export interface ShelfArchiveRow {
+  year: number;
+  /** One per `columns` entry, in that order; undefined = no file for that year. */
+  links: (LinkField | undefined)[];
+}
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  /** Shown as covers. Each needs a `cover`. */
+  featured: PublishedReport[];
+  archiveTitle?: string;
+  archiveNote?: string;
+  /** Slot labels for the archive rows ("Report", "ESEF", "Sustainability report"). */
+  columns?: string[];
+  archive?: ShelfArchiveRow[];
+}
+
+const { sectionHeader, featured, archiveTitle, archiveNote, columns = [], archive = [], background = 'tint', spacing, anchor } = Astro.props;
+
+const titleId = sectionHeader ? makeId('report-shelf', sectionHeader.title) : undefined;
+const archiveId = archiveTitle ? makeId('report-shelf', archiveTitle) : undefined;
+const covers = featured.filter((r) => r.cover);
+---
+
+{
+  (covers.length > 0 || archive.length > 0) && (
+    <BlockSection
+      slug="report-shelf"
+      root="report-shelf"
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : 'Reports'}
+    >
+      <div class="block__body">
+        {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+
+        <div class="report-shelf__main">
+          {covers.length > 0 && (
+            <ul class="report-shelf__covers">
+              {covers.map((r) => (
+                <li class="shelf-item">
+                  <a class="shelf-item__cover" href={r.report} target="_blank" rel="noopener" aria-label={`${r.title} ${r.year} (PDF, opens in a new tab)`}>
+                    <img src={r.cover!.src} alt="" width={r.cover!.width} height={r.cover!.height} loading="lazy" decoding="async" />
+                  </a>
+                  <p class="shelf-item__year text-h5">{r.year}</p>
+                  <div class="shelf-item__links">
+                    <Link label="Report" href={r.report} action="file" size="small" context={`${r.title} ${r.year}, PDF`} download />
+                    {r.esef && <Link label="ESEF" href={r.esef} action="file" size="small" context={`${r.title} ${r.year}, ESEF filing, ZIP`} download />}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {archive.length > 0 && (
+            <section class="report-shelf__archive" aria-labelledby={archiveId} aria-label={archiveId ? undefined : 'Earlier years'}>
+              {(archiveTitle || archiveNote) && (
+                <div class="report-shelf__archive-head">
+                  {archiveTitle && (
+                    <h3 id={archiveId} class="text-h4">
+                      {archiveTitle}
+                    </h3>
+                  )}
+                  {archiveNote && <p class="text-small report-shelf__archive-note">{archiveNote}</p>}
+                </div>
+              )}
+              <ul class="report-shelf__rows" style={`--shelf-rows: ${Math.ceil(archive.length / 2)}; --shelf-cols: ${Math.max(1, columns.length)}`}>
+                {archive.map((row) => (
+                  <li class="shelf-row">
+                    <h4 class="shelf-row__year text-h5">{row.year}</h4>
+                    <div class="shelf-row__links">
+                      {columns.map((label, i) => {
+                        const l = row.links[i];
+                        return (
+                          <span class:list={['shelf-row__slot', !l && 'shelf-row__slot--empty']}>
+                            {l ? (
+                              <Link label={l.label} href={l.url} action={l.action ?? 'file'} size="small" context={l.context} download />
+                            ) : (
+                              <Link label={label} action="file" size="small" class="shelf-row__ghost" aria-hidden="true" tabindex="-1" />
+                            )}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .report-shelf__main {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
+  }
+
+  /* ── Covers ───────────────────────────────────────────────── */
+  .report-shelf__covers {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--wp--custom--stack--lg) var(--wp--custom--grid--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .report-shelf__covers > :first-child {
+    grid-column: 1 / -1;
+  }
+  @container (min-width: 900px) {
+    .report-shelf__covers {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .report-shelf__covers > :first-child {
+      grid-column: auto;
+    }
+  }
+  .shelf-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+  }
+  .shelf-item__cover {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--wp--custom--color--border--subtle);
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--custom--color--bg--disabled);
+  }
+  .shelf-item__cover:focus-visible {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 4px;
+  }
+  .shelf-item__cover img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform var(--wp--custom--motion--duration) var(--wp--custom--motion--ease-out);
+  }
+  @media (hover: hover) {
+    .shelf-item__cover:hover img {
+      transform: scale(1.04);
+    }
+  }
+  .shelf-item__year {
+    margin-top: var(--wp--custom--stack--sm);
+    font-variant-numeric: tabular-nums;
+  }
+  /* The 44px targets overlap the year's air rather than add to it */
+  .shelf-item__links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--wp--preset--spacing--16);
+    margin-top: calc(var(--wp--preset--spacing--4) - var(--wp--preset--spacing--12));
+  }
+
+  /* ── Earlier years ────────────────────────────────────────── */
+  .report-shelf__archive {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+  }
+  .report-shelf__archive-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xs);
+  }
+  .report-shelf__archive-note {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .report-shelf__rows {
+    display: grid;
+    gap: var(--wp--preset--spacing--12) var(--wp--custom--grid--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Narrow (base): the year beside its links, which wrap; empty slots drop out */
+  .shelf-row {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    column-gap: var(--wp--preset--spacing--16);
+    align-items: center;
+    padding: var(--wp--preset--spacing--4) var(--wp--preset--spacing--16);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  .shelf-row__year {
+    font-variant-numeric: tabular-nums;
+  }
+  .shelf-row__links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--wp--preset--spacing--16);
+  }
+  .shelf-row__slot {
+    display: inline-flex;
+  }
+  .shelf-row__slot--empty {
+    display: none;
+  }
+  .shelf-row__ghost {
+    visibility: hidden;
+  }
+  /* From 600: one line per year, the slots in fixed columns (ghost copies keep every row's columns equal) */
+  @container (min-width: 600px) {
+    .shelf-row {
+      grid-template-columns: var(--wp--preset--spacing--80) repeat(var(--shelf-cols), max-content);
+      column-gap: var(--wp--preset--spacing--32);
+      padding: var(--wp--preset--spacing--8) var(--wp--preset--spacing--32);
+    }
+    .shelf-row__links {
+      display: contents;
+    }
+    .shelf-row__slot--empty {
+      display: inline-flex;
+    }
+  }
+  /* From 1040: two columns, newest down the left */
+  @container (min-width: 1040px) {
+    .report-shelf__rows {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(var(--shelf-rows), auto);
+      grid-auto-flow: column;
+    }
+  }
+</style>

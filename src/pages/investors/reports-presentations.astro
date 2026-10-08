@@ -1,0 +1,203 @@
+---
+// Investors › Reports & presentations (7 Oct 2026). Every document Reach Subsea publishes to the market.
+// Sources: client PDF p44–45 ("19 — Investors — Reports, Presentations & Shareholder Information") for the page's
+// intent, FAQs and closing CTA; the live site's Financial reports page for the documents (src/data/reports.ts;
+// the dev site's copy stops at Q2 2025). Built fresh rather than from either:
+// - The dev site's 4 tabs (Quarterly · Annual · Sustainability · Misc), each with its own Latest card and a grid
+//   of 15px icon links, become three blocks, one per kind of document, each shaped by how it is used:
+//   1. Results archive (white): the quarter is what people look for, so years are tabs and a year is one row
+//      per quarter with labelled Report · Presentation · Webcast. The current year opens, so the latest results
+//      and the next date (with Add to calendar) are the first thing under the hero: no separate Latest card.
+//   2. Report shelf (tint): the three latest annual reports as their covers (rendered from page 1 of each PDF),
+//      then 2012–2022 as compact rows: Report · ESEF · the standalone sustainability report (2019–2022).
+//   3. File list (white): presentations and prospectuses outside the cycle, one dated row each.
+// - Then the PDF's shareholder information, live rather than hand-typed (Ross, 7 Oct 2026: a hub page keeps the
+//   PDF's key content even where a sibling page has it too):
+//   4. Embed (tint): the 20 largest shareholders, the OMS shareholder component (VPS register, Euronext).
+//   5. Embed (white): the latest stock exchange announcements, the OMS company disclosures component, with
+//      Newsweb for the rest.
+//   Both frames are sized to the component's content height per breakpoint (measured 7 Oct 2026) and run edge
+//   to edge on phones, where the shareholder table needs the full 375.
+// - The PDF's accordion by year, chip list and four document cards (three treatments of the same data) and its
+//   source-accuracy banner and provenance footnotes are dropped.
+// - Closing: the PDF's FAQ (three questions, plus what ESEF is, since the shelf labels it) and its CTA wording,
+//   with the investor relations contact.
+// Hero: plain navy Text hero, as every Investors data page (Q124: photos only on Overview and Why invest; was Go
+// Electra).
+// Redirects: /investors/results-reporting/financial-reports/ (dev) and /investors/financial-reports/ (live) → here.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/header/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PageHero from '../../blocks/PageHero.astro';
+import SectionSubnav from '../../blocks/SectionSubnav.astro';
+import ResultsArchive from '../../blocks/ResultsArchive.astro';
+import ReportShelf from '../../blocks/ReportShelf.astro';
+import FileList from '../../blocks/FileList.astro';
+import Embed from '../../blocks/Embed.astro';
+import Accordion from '../../blocks/Accordion.astro';
+import CtaBand from '../../blocks/CtaBand.astro';
+import { navSections } from '../../data/navigation';
+import {
+  quarterlyReleases,
+  nextRelease,
+  upcomingReleases,
+  annualReports,
+  sustainabilityReports,
+  otherDocuments,
+  formatDocDate,
+} from '../../data/reports';
+import type { FileListItem } from '../../blocks/FileList.astro';
+import type { ShelfArchiveRow } from '../../blocks/ReportShelf.astro';
+import { faqsFor, faqHubHref } from '../../data/faqs';
+
+const base = import.meta.env.BASE_URL;
+const investors = navSections.find((s) => s.id === 'investors')!;
+const page = investors.links.find((l) => l.label === 'Reports & presentations')!;
+const subnavItems = [
+  { label: 'Overview', href: investors.href },
+  ...investors.links.map((l) => ({ label: l.label, href: l.href })),
+];
+
+const oms = { name: 'Oslo Market Solutions', domain: 'ir.oms.no' };
+
+const firstYear = Math.min(...quarterlyReleases.map((r) => r.year));
+
+// Annual reports: the covers for the years that have one (2023–2025), then every earlier year as one row with its
+// annual report, ESEF filing and standalone sustainability report (2019–2022) side by side
+const featuredAnnual = annualReports.filter((r) => r.cover);
+const earlierAnnual = annualReports.filter((r) => !r.cover);
+const annualArchive: ShelfArchiveRow[] = earlierAnnual.map((r) => {
+  const s = sustainabilityReports.find((x) => x.year === r.year);
+  return {
+    year: r.year,
+    links: [
+      { label: 'Report', url: r.report, context: `${r.title} ${r.year}, PDF` },
+      r.esef ? { label: 'ESEF', url: r.esef, context: `${r.title} ${r.year}, ESEF filing, ZIP` } : undefined,
+      s ? { label: 'Sustainability report', url: s.report, context: `${s.year}, PDF` } : undefined,
+    ],
+  };
+});
+
+const documents: FileListItem[] = otherDocuments.map((d) => ({
+  date: formatDocDate(d.date),
+  isoDate: d.date,
+  title: d.title,
+  links: d.links.map((l) => ({
+    label: l.kind,
+    url: l.url,
+    action: l.kind === 'Webcast' ? 'external' : 'file',
+    context: l.kind === 'Webcast' ? `${d.title}, webcast` : `${d.title}, ${formatDocDate(d.date)}, PDF`,
+  })),
+}));
+
+const faqItems = faqsFor('reports');
+---
+
+<BaseLayout title="Reports & presentations · Investors" motion>
+  <Header current="investors" overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: 'Investors', href: investors.href },
+        { label: 'Reports & presentations' },
+      ]}
+      title="Reports & presentations"
+      lead={`Everything we publish to the market: quarterly and annual reports, presentations and webcasts, back to ${firstYear}.`}
+    />
+
+    <SectionSubnav source="section-pages" label="Investors" items={subnavItems} current={page.href} />
+
+    <ResultsArchive
+      background="white"
+      sectionHeader={{
+        title: 'Quarterly results',
+        intro: 'The report, presentation and webcast for every quarter, newest first.',
+        action: { label: 'Financial calendar', url: '/investors/financial-calendar/' },
+      }}
+      releases={quarterlyReleases}
+      next={nextRelease}
+      upcoming={upcomingReleases}
+    />
+
+    <ReportShelf
+      background="tint"
+      sectionHeader={{
+        title: 'Annual reports',
+        intro: `Every year since ${annualReports[annualReports.length - 1].year}. From 2023 the annual report includes our sustainability report.`,
+      }}
+      featured={featuredAnnual}
+      archiveTitle={`${earlierAnnual[earlierAnnual.length - 1].year}–${earlierAnnual[0].year}`}
+      archiveNote="Sustainability reports were published on their own from 2019 to 2022."
+      columns={['Report', 'ESEF', 'Sustainability report']}
+      archive={annualArchive}
+    />
+
+    <FileList
+      background="white"
+      sectionHeader={{
+        title: 'Other documents',
+        intro: 'Presentations and prospectuses outside the quarterly cycle.',
+      }}
+      items={documents}
+    />
+
+    <Embed
+      type="iframe"
+      state="loaded"
+      background="tint"
+      sectionHeader={{
+        title: '20 largest shareholders',
+        intro: 'Live from the shareholder register at Euronext Securities (VPS).',
+        action: { label: 'Share information', url: '/investors/share-information/' },
+      }}
+      provider={oms}
+      url="https://ir.oms.no/component/shareholders?token=reach_std&lang=en"
+      iframeTitle="Reach Subsea's 20 largest shareholders, live from Oslo Market Solutions"
+      height={{ desktop: 800, tablet: 872, mobile: 1288 }}
+      bleedMobile
+    />
+
+    <Embed
+      type="iframe"
+      state="loaded"
+      background="white"
+      sectionHeader={{
+        title: 'Stock exchange announcements',
+        intro: 'Our latest filings to Oslo Børs, live.',
+        action: { label: 'All announcements on Newsweb', url: 'https://newsweb.oslobors.no/', action: 'external' },
+      }}
+      provider={oms}
+      url="https://ir.oms.no/component/companyDisclosures?token=reach_std&lang=en"
+      iframeTitle="Reach Subsea's latest stock exchange announcements, live from Oslo Market Solutions"
+      height={{ desktop: 504, tablet: 624, mobile: 864 }}
+      bleedMobile
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'About our reports, presentations and shareholder information.',
+        action: { label: 'See all FAQs', url: faqHubHref('reports') },
+      }}
+      layout="split"
+      source="faq"
+      topic="reports"
+      background="tint"
+      items={faqItems}
+    />
+
+    <CtaBand
+      style="panel"
+      background="tint"
+      title="Looking for something specific?"
+      text="Our investor relations team can point you to the right document."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+      showContact
+      contact={{ label: 'Investor relations', name: 'Arne Joa', role: 'Chief Financial Officer', phone: '+47 474 51 344', email: 'arne.joa@reachsubsea.com' }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

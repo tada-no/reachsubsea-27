@@ -1,0 +1,131 @@
+---
+// File list · reach/file-list (7 Oct 2026, Reports & presentations › Other documents). Dated documents as one
+// list, newest first: date · title · its files. The plain sibling of the Results archive rows, for documents
+// outside a regular cycle (capital markets presentations, prospectuses), where a card each would be too heavy.
+// - Wide (container ≥ 760): date (UI/Label, tabular) · title (Body) · links, the links in columns shared down
+//   the list (subgrid), so "Presentation" / "Prospectus" and "Webcast" each line up. A 1px border/subtle rule
+//   between rows (the eye tracks from the title across to its file; docs/08 §5), none above the first.
+// - Narrow: the date over the title, the links under it.
+// Links: Link Small, File (PDF) or External (webcast), each with hidden context ("Bond prospectus, PDF").
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Link from '../components/Link.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, LinkField, SectionHeaderField } from '../lib/types';
+
+export interface FileListItem {
+  /** Display date ("16 Sep 2026", "Feb 2017", "2016"). */
+  date: string;
+  /** Machine date for <time>, full or partial ISO. */
+  isoDate?: string;
+  title: string;
+  /** 1–2 links, in a fixed order across the list. */
+  links: LinkField[];
+}
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  items: FileListItem[];
+}
+
+const { sectionHeader, items, background = 'white', spacing, anchor } = Astro.props;
+const titleId = sectionHeader ? makeId('file-list', sectionHeader.title) : undefined;
+const linkColumns = Math.max(1, ...items.map((i) => i.links.length));
+---
+
+{
+  items.length > 0 && (
+    <BlockSection
+      slug="file-list"
+      root="file-list"
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : 'Documents'}
+    >
+      <div class="block__body">
+        {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+        <div class="file-list__wrap">
+          <ul class="file-list__rows" style={`--file-list-links: ${linkColumns}`}>
+            {items.map((item) => (
+              <li class="file-list__row">
+                <time class="file-list__date text-label" datetime={item.isoDate}>
+                  {item.date}
+                </time>
+                <p class="file-list__title text-body">{item.title}</p>
+                <div class="file-list__links">
+                  {item.links.map((l) => (
+                    <Link label={l.label} href={l.url} action={l.action ?? 'file'} size="small" context={l.context} />
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  .file-list__wrap {
+    container-type: inline-size;
+  }
+  .file-list__rows {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Narrow (base): date over title, links under */
+  .file-list__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    padding-block: var(--wp--preset--spacing--16) var(--wp--preset--spacing--4);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .file-list__row:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .file-list__date {
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .file-list__title {
+    color: var(--wp--custom--color--text--primary);
+    text-wrap: pretty;
+  }
+  .file-list__links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--wp--preset--spacing--24);
+    /* The 44px targets add 12 above the label; pulled up 8, the label sits 8 under the title */
+    margin-top: calc(-1 * var(--wp--preset--spacing--8));
+  }
+
+  /* Wide: date · title · links on one line, links in columns shared down the list */
+  @container (min-width: 760px) {
+    .file-list__rows {
+      grid-template-columns: max-content minmax(0, 1fr) repeat(var(--file-list-links), max-content);
+      column-gap: var(--wp--preset--spacing--32);
+    }
+    .file-list__row {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      /* A subgrid's own gap overrides the list's: restate 32, or the narrow layout's 4 squeezes date and title */
+      column-gap: var(--wp--preset--spacing--32);
+      align-items: center;
+      padding-block: var(--wp--preset--spacing--4);
+    }
+    .file-list__row:first-child {
+      padding-top: 0;
+    }
+    .file-list__links {
+      display: contents;
+    }
+  }
+</style>

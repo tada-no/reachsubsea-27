@@ -1,0 +1,486 @@
+---
+// Results archive · reach/results-archive (7 Oct 2026, Reports & presentations). Every quarterly result, one
+// year at a time. Replaces Data list type Reports (§2.7) on this page: the dev site's year × quarter grid of
+// 15px icon links and the PDF's accordion both made the latest quarter hard to find and the archive slow to
+// scan. Here:
+// - Year tabs (Subnav item pills, WAI-ARIA tabs): the newest years one each, then one tab for the years that
+//   only have a report ("2012–2020"). The current year opens. `#year-2023` in the URL opens that year.
+// - A year = one row per quarter, newest first, as tint cards on white (navy for the latest): Date tile
+//   (the publication day), title, one-line meta, then Report · Presentation · Webcast in three columns that
+//   line up down the year (CSS subgrid); a missing file leaves its slot empty, never a dash. The newest
+//   quarter is the one Navy row, with the "Latest" kicker (Ross, 7 Oct 2026: it's what people come for). Quarters
+//   still to come are dashed outlines with no fill: the next results date keeps its "Next" kicker, countdown
+//   and Add to calendar; a later quarter shows its Financial calendar date, with Add to calendar once the date is
+//   confirmed, greyed and marked "provisional" until then (or "Date to come" with no date).
+// - The report-only years: one compact row per year, Q1–Q4 links in fixed slots (2012 starts at Q4), in two
+//   columns from 760 so this panel stays shorter than a full year's.
+// - No jump: every panel sits in the same grid cell, so the block is as tall as its tallest year and switching
+//   tabs never moves the page below. Without JS every year is shown in sequence.
+// Below 760 (container) a row stacks: tile beside the text, links under it.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import DateTile from '../components/DateTile.astro';
+import Link from '../components/Link.astro';
+import { makeId } from '../lib/ids';
+import { icsHref } from '../lib/ics';
+import { shortDate } from '../lib/dates';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+import type { Quarter, QuarterRelease } from '../data/reports';
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  releases: QuarterRelease[];
+  /** The next results date: shown at the top of its year. */
+  next?: { year: number; quarter: Quarter; date: string };
+  /** Later results dates from the Financial calendar. The current year always shows four quarters: one not yet
+   * published shows its date from here, or "Date to come". */
+  upcoming?: { year: number; quarter: Quarter; date: string; confirmed?: boolean }[];
+  /** Years older than this share one tab of compact report-only rows. */
+  compactBefore?: number;
+}
+
+const { sectionHeader, releases, next, upcoming = [], compactBefore = 2021, background = 'white', spacing, anchor } = Astro.props;
+
+const titleId = sectionHeader ? makeId('results-archive', sectionHeader.title) : undefined;
+const uid = makeId('results-archive', 'years');
+
+const DAY = 86_400_000;
+const today = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`);
+const daysUntil = (iso: string) => Math.round((Date.parse(`${iso}T00:00:00Z`) - today) / DAY);
+
+const years = [...new Set(releases.map((r) => r.year))].sort((a, b) => b - a);
+const fullYears = years.filter((y) => y >= compactBefore);
+const compactYears = years.filter((y) => y < compactBefore);
+const latest = releases.find((r) => r.report || r.presentation);
+const nextUpcoming = next && daysUntil(next.date) >= 0 ? next : undefined;
+
+const groups = [
+  ...fullYears.map((y) => ({ id: String(y), label: String(y), years: [y], compact: false })),
+  ...(compactYears.length
+    ? [
+        {
+          id: `${compactYears[compactYears.length - 1]}-${compactYears[0]}`,
+          label: `${compactYears[compactYears.length - 1]}–${compactYears[0]}`,
+          years: compactYears,
+          compact: true,
+        },
+      ]
+    : []),
+];
+const activeId = groups[0]?.id;
+const currentYear = Math.max(years[0] ?? 0, nextUpcoming?.year ?? 0);
+// The current year's quarters after the next results date: Q4 above the Next row, newest first like the rest
+const laterQuarters = (year: number) =>
+  year !== currentYear
+    ? []
+    : ([4, 3, 2, 1] as const)
+        .filter((q) => !releases.some((r) => r.year === year && r.quarter === q))
+        .filter((q) => !(nextUpcoming && nextUpcoming.year === year && q <= nextUpcoming.quarter))
+        .map((q) => {
+          const u = upcoming.find((x) => x.year === year && x.quarter === q);
+          return { year, quarter: q, date: u?.date, confirmed: Boolean(u?.date && u.confirmed) };
+        });
+
+const SLOTS = [
+  { key: 'report', label: 'Report', action: 'file', noun: 'report, PDF' },
+  { key: 'presentation', label: 'Presentation', action: 'file', noun: 'presentation, PDF' },
+  { key: 'webcast', label: 'Webcast', action: 'external', noun: 'webcast' },
+] as const;
+const quartersOf = (year: number) => releases.filter((r) => r.year === year).sort((a, b) => b.quarter - a.quarter);
+const period = (r: { quarter: number; year: number }) => `Q${r.quarter} ${r.year}`;
+---
+
+<BlockSection
+  slug="results-archive"
+  root="results-archive"
+  background={background}
+  spacing={spacing}
+  anchor={anchor}
+  labelledBy={titleId}
+  label={titleId ? undefined : 'Quarterly results'}
+  data-results-archive
+>
+  <div class="block__body">
+    {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+
+    <div class="results-archive__main">
+      <div class="results-archive__tabs" role="tablist" aria-label="Year">
+        {
+          groups.map((g) => (
+            <button
+              type="button"
+              class="subnav-item text-label results-archive__tab"
+              role="tab"
+              id={`${uid}-tab-${g.id}`}
+              aria-controls={`${uid}-panel-${g.id}`}
+              aria-selected={String(g.id === activeId)}
+              tabindex={g.id === activeId ? 0 : -1}
+              data-year={g.id}
+            >
+              {g.label}
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="results-archive__panels">
+        {
+          groups.map((g) => (
+            <div
+              class="results-archive__panel"
+              role="tabpanel"
+              id={`${uid}-panel-${g.id}`}
+              aria-labelledby={`${uid}-tab-${g.id}`}
+              data-inactive={g.id === activeId ? undefined : ''}
+            >
+              {g.compact ? (
+                <Fragment>
+                  <p class="results-archive__note text-small">Quarterly reports only. Presentations and webcasts start in {compactBefore}.</p>
+                  <ul
+                    class="results-archive__rows results-archive__rows--compact"
+                    style={`--compact-rows: ${Math.ceil(g.years.length / 2)}`}
+                  >
+                    {g.years.map((year) => {
+                      const qs = releases.filter((r) => r.year === year);
+                      return (
+                        <li class="results-row results-row--compact">
+                          <h3 class="results-row__year text-h5">{year}</h3>
+                          {([1, 2, 3, 4] as const).map((q) => {
+                            const r = qs.find((x) => x.quarter === q);
+                            return (
+                              <span class="results-row__slot">
+                                {r?.report ? (
+                                  <Link label={`Q${q}`} href={r.report} action="file" size="small" context={`${year} report, PDF`} />
+                                ) : (
+                                  <Link label={`Q${q}`} action="file" size="small" class="results-row__ghost" aria-hidden="true" tabindex="-1" />
+                                )}
+                              </span>
+                            );
+                          })}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </Fragment>
+              ) : (
+                <ol class="results-archive__rows">
+                  {laterQuarters(g.years[0]).map((u) => (
+                    <li class:list={['results-row', 'results-row--later', !u.confirmed && 'results-row--provisional']}>
+                      <DateTile date={u.date} band={u.date ? undefined : 'TBC'} icon="calendar" class="results-row__tile" />
+                      <div class="results-row__text">
+                        <h3 class="results-row__title text-h5">{period(u)} results</h3>
+                        <p class="results-row__meta text-small">
+                          {u.date ? (u.confirmed ? shortDate(u.date) : `${shortDate(u.date)} · provisional`) : 'Date to come'}
+                        </p>
+                      </div>
+                      {u.confirmed && u.date && (
+                        <div class="results-row__links">
+                          <span class="results-row__slot results-row__slot--wide">
+                            <Link
+                              label="Add to calendar"
+                              href={icsHref(`Reach Subsea ${period(u)} results`, u.date)}
+                              action="file"
+                              size="small"
+                              context={`${period(u)} results`}
+                              download={`reach-subsea-${u.date}.ics`}
+                            />
+                          </span>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                  {nextUpcoming && nextUpcoming.year === g.years[0] && (
+                    <li class="results-row results-row--next">
+                      <DateTile date={nextUpcoming.date} class="results-row__tile" />
+                      <div class="results-row__text">
+                        <p class="results-row__kicker text-eyebrow">Next</p>
+                        <h3 class="results-row__title text-h5">{period(nextUpcoming)} results</h3>
+                        <p class="results-row__meta text-small">
+                          {shortDate(nextUpcoming.date)}
+                          {daysUntil(nextUpcoming.date) > 0 && (
+                            <Fragment>
+                              {' · in '}
+                              <span data-countdown={nextUpcoming.date}>
+                                {daysUntil(nextUpcoming.date) === 1 ? '1 day' : `${daysUntil(nextUpcoming.date)} days`}
+                              </span>
+                            </Fragment>
+                          )}
+                        </p>
+                      </div>
+                      <div class="results-row__links">
+                        <span class="results-row__slot results-row__slot--wide">
+                          <Link
+                          label="Add to calendar"
+                          href={icsHref(`Reach Subsea ${period(nextUpcoming)} results`, nextUpcoming.date)}
+                          action="file"
+                          size="small"
+                          context={`${period(nextUpcoming)} results`}
+                          download={`reach-subsea-${nextUpcoming.date}.ics`}
+                          />
+                        </span>
+                      </div>
+                    </li>
+                  )}
+                  {quartersOf(g.years[0]).map((r) => (
+                    <li class:list={['results-row', r === latest && 'results-row--latest has-surface-navy']}>
+                      <DateTile date={r.published} band={r.published ? undefined : 'PDF'} class="results-row__tile" />
+                      <div class="results-row__text">
+                        {r === latest && <p class="results-row__kicker text-eyebrow">Latest</p>}
+                        <h3 class="results-row__title text-h5">{period(r)} results</h3>
+                        {r.published && <p class="results-row__meta text-small">Published {shortDate(r.published)}</p>}
+                      </div>
+                      <div class="results-row__links">
+                        {SLOTS.map((s) => (
+                          <span class:list={['results-row__slot', !r[s.key] && 'results-row__slot--empty']}>
+                            {r[s.key] ? (
+                              <Link label={s.label} href={r[s.key]} action={s.action} size="small" context={`${period(r)} ${s.noun}`} />
+                            ) : (
+                              <Link label={s.label} action={s.action} size="small" class="results-row__ghost" aria-hidden="true" tabindex="-1" />
+                            )}
+                          </span>
+                        ))}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</BlockSection>
+
+<noscript>
+  <style>
+    .results-archive__tabs { display: none !important; }
+    .results-archive__panels { display: flex !important; flex-direction: column; gap: var(--wp--custom--stack--lg); }
+    .results-archive__panel[data-inactive] { visibility: visible !important; }
+  </style>
+</noscript>
+
+<script>
+  function select(tab: HTMLElement, moveFocus = false) {
+    const root = tab.closest('[data-results-archive]');
+    if (!root) return;
+    root.querySelectorAll<HTMLElement>('[role="tab"]').forEach((t) => {
+      const on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+    });
+    const panelId = tab.getAttribute('aria-controls');
+    root.querySelectorAll<HTMLElement>('[role="tabpanel"]').forEach((p) => p.toggleAttribute('data-inactive', p.id !== panelId));
+    if (moveFocus) tab.focus();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-results-archive]').forEach((root) => {
+    const tabs = [...root.querySelectorAll<HTMLElement>('[role="tab"]')];
+    tabs.forEach((tab) =>
+      tab.addEventListener('click', () => {
+        select(tab);
+        history.replaceState(null, '', `#year-${tab.dataset.year}`);
+      }),
+    );
+    root.querySelector('[role="tablist"]')?.addEventListener('keydown', (e) => {
+      const ev = e as KeyboardEvent;
+      const i = tabs.indexOf(document.activeElement as HTMLElement);
+      if (i < 0) return;
+      const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[ev.key];
+      if (to === undefined) return;
+      ev.preventDefault();
+      select(tabs[(to + tabs.length) % tabs.length], true);
+    });
+    // #year-2023 (or a year inside a range tab, #year-2015) opens that year
+    const wanted = location.hash.match(/^#year-(\d{4})/)?.[1];
+    if (wanted) {
+      const tab = tabs.find((t) => {
+        const [from, to = from] = (t.dataset.year ?? '').split('-').map(Number);
+        return Number(wanted) >= Math.min(from, to) && Number(wanted) <= Math.max(from, to);
+      });
+      if (tab) {
+        select(tab);
+        root.scrollIntoView({ block: 'start' });
+      }
+    }
+  });
+
+  // Countdown ("in 41 days") from the visitor's today, not the build date
+  document.querySelectorAll<HTMLElement>('.results-archive [data-countdown]').forEach((el) => {
+    const now = new Date();
+    const days = Math.round((Date.parse(`${el.dataset.countdown}T00:00:00Z`) - Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())) / 86_400_000);
+    if (days > 0) el.textContent = days === 1 ? '1 day' : `${days} days`;
+  });
+</script>
+
+<style is:global>
+  .results-archive__main {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+  }
+  .results-archive__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .results-archive__tab {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Every panel in one cell: the block keeps the tallest year's height, so a tab switch never moves the page */
+  .results-archive__panels {
+    display: grid;
+  }
+  .results-archive__panel {
+    grid-area: 1 / 1;
+    align-self: start;
+    min-width: 0;
+  }
+  .results-archive__panel[data-inactive] {
+    visibility: hidden;
+  }
+  .results-archive__note {
+    margin-bottom: var(--wp--preset--spacing--16);
+    color: var(--wp--custom--color--text--secondary);
+  }
+
+  /* ── Rows ─────────────────────────────────────────────────── */
+  .results-archive__rows {
+    display: grid;
+    gap: var(--wp--preset--spacing--12);
+  }
+  /* Narrow (base): tile beside the text; the links on one line under both, from the card's left edge (16 side
+     padding and 12 between links keep Report · Presentation · Webcast on one line at 375) */
+  .results-row {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    column-gap: var(--wp--preset--spacing--16);
+    align-items: center;
+    /* Bottom: 24 less the 12 the links' 44px targets add below their labels */
+    padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--16) var(--wp--preset--spacing--12);
+    border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  /* The latest results: the one Navy row, the thing most visitors come for (Ross, 7 Oct 2026) */
+  .results-row--latest {
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  /* Quarters still to come: a dashed outline and no fill, so they read as slots, not documents. The outline
+     is drawn inside the edge (no layout change). Confirmed dates keep their colours and get Add to calendar;
+     a provisional date (or none yet) is greyed, its palette stepped down to text/secondary, Date tile included,
+     with no calendar link: a placeholder date must not end up in investors' calendars (Ross, 7 Oct 2026) */
+  .results-row--next,
+  .results-row--later {
+    background-color: transparent;
+    outline: 1px dashed var(--wp--custom--color--border--strong);
+    outline-offset: -1px;
+  }
+  .results-row--provisional {
+    --wp--custom--color--text--primary: var(--wp--custom--color--text--secondary);
+    /* Re-resolve the inherited text colour against the stepped-down token */
+    color: var(--wp--custom--color--text--primary);
+    padding-bottom: var(--wp--preset--spacing--24);
+  }
+  /* Its Date tile fainter still (Ross, 7 Oct 2026), drawn as an outline so it passes contrast: pale band with
+     text/secondary lettering (5.3:1), a border/default edge, the day in navy-500 (4.4:1; large bold text needs 3:1).
+     navy-500 is border/strong: there is no text token between secondary and disabled (navy-400 fails at 2.96:1) */
+  .results-row--provisional .results-row__tile {
+    border-color: var(--wp--custom--color--border--default);
+  }
+  .results-row--provisional .date-tile__band {
+    background-color: var(--wp--custom--color--bg--disabled);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .results-row--provisional .date-tile__body {
+    color: var(--wp--custom--color--border--strong);
+  }
+  .results-row__tile {
+    align-self: start;
+  }
+  .results-row__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    min-width: 0;
+  }
+  .results-row__kicker {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .results-row__meta {
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .results-row__links {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--wp--preset--spacing--12);
+    /* The 44px targets add 12 above the labels: with 4 more, the visible gap to the tile is 16 */
+    margin-top: var(--wp--preset--spacing--4);
+  }
+  .results-row__slot {
+    display: inline-flex;
+  }
+  .results-row__slot--empty {
+    display: none;
+  }
+  .results-row__ghost {
+    visibility: hidden;
+  }
+
+  /* Report-only years: the year, then Q1–Q4 in four fixed slots, on one line at every width */
+  .results-row--compact {
+    grid-template-columns: 56px repeat(4, minmax(0, 1fr));
+    padding: var(--wp--preset--spacing--4) var(--wp--preset--spacing--24);
+  }
+  .results-row--compact .results-row__slot {
+    display: inline-flex;
+  }
+  .results-row__year {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Wide: one line per quarter; Report · Presentation · Webcast in columns shared down the year (subgrid).
+     Empty slots keep an invisible copy of the link, so the columns are the same width in every year. */
+  @container (min-width: 760px) {
+    .results-archive__rows:not(.results-archive__rows--compact) {
+      /* max-content edge tracks: a subgrid's padding is added to its first and last tracks */
+      grid-template-columns: max-content minmax(0, 1fr) repeat(3, max-content);
+      /* Each row (subgrid) restates its own 16, which wins: tile to text and link to link */
+      column-gap: var(--wp--preset--spacing--16);
+    }
+    .results-archive__rows:not(.results-archive__rows--compact) > .results-row {
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--32);
+    }
+    .results-row__tile {
+      align-self: center;
+    }
+    .results-row__links {
+      display: contents;
+    }
+    .results-row__slot--empty {
+      display: inline-flex;
+    }
+    .results-row__slot--wide {
+      grid-column: 3 / -1;
+    }
+
+    /* Report-only years in two columns, newest down the left: the panel stays shorter than a full year */
+    .results-archive__rows--compact {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(var(--compact-rows), auto);
+      grid-auto-flow: column;
+      column-gap: var(--wp--custom--grid--gutter);
+    }
+    /* The year (H5 at desktop size) needs more than the tile's 56: give it 80 and 24 of air before Q1 */
+    .results-row--compact {
+      grid-template-columns: var(--wp--preset--spacing--80) repeat(4, minmax(0, 1fr));
+      column-gap: var(--wp--preset--spacing--24);
+      padding: var(--wp--preset--spacing--8) var(--wp--preset--spacing--32);
+    }
+  }
+</style>

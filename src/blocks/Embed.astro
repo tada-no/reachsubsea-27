@@ -73,7 +73,12 @@ interface Props extends BlockFields {
   // Iframe
   url?: string;
   iframeTitle?: string;
-  height?: { desktop?: number; mobile?: number };
+  /** Frame heights (px): desktop ≥ 900, tablet 600–899 (defaults to mobile), mobile < 600. Size each to the
+   *  provider page's content height at that width, so the frame neither crops it nor leaves a blank foot. */
+  height?: { desktop?: number; tablet?: number; mobile?: number };
+  /** Under 600 the frame runs to the screen edges, for provider tables wider than the phone's content column
+   *  (the OMS shareholder list needs 375). */
+  bleedMobile?: boolean;
   // Map
   mapImage?: ImageField;
 }
@@ -99,6 +104,7 @@ const {
   url = '',
   iframeTitle = '',
   height,
+  bleedMobile = false,
   mapImage,
   background,
   spacing,
@@ -106,6 +112,7 @@ const {
 } = Astro.props;
 
 const frameHeight = { desktop: 480, mobile: 560, ...height };
+const tabletHeight = frameHeight.tablet ?? frameHeight.mobile;
 const titleId = type !== '3d-world' && sectionHeader?.title ? makeId('embed', sectionHeader.title) : undefined;
 
 // Names and order from the 3D World build itself, shared with the landing page (src/data/world.ts)
@@ -125,7 +132,7 @@ const defaultConsentText =
     : 'The map is provided by a third party, which may set cookies. You can also open it in a new tab.';
 const defaultLoadLabel = type === 'iframe' ? 'Load share data' : 'Load map';
 const defaultOpenLabel = type === 'iframe' ? `Open ${providerDomain}` : 'Open map';
-const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobile: ${frameHeight.mobile}px`;
+const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-tablet: ${tabletHeight}px; --embed-h-mobile: ${frameHeight.mobile}px`;
 ---
 
 <BlockSection
@@ -249,7 +256,7 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobi
             />
           ) : null}
           {type === 'iframe' && (
-            <div class="embed__iframe-frame" style={heightStyle} hidden={state !== 'loaded'}>
+            <div class:list={['embed__iframe-frame', bleedMobile && 'embed__iframe-frame--bleed']} style={heightStyle} hidden={state !== 'loaded'}>
               {state === 'loaded' ? (
                 <iframe class="embed__iframe" src={url} title={iframeTitle} loading="lazy" />
               ) : (
@@ -521,17 +528,44 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-mobi
     flex-direction: column;
     gap: var(--wp--custom--stack--sm);
   }
+  /* The provider page sits inset in a white card (16 all round), so its own table rules stop short of the rounded
+     edge instead of running into the corners. The height props are the provider content's height; the inset is
+     added on top. */
   .embed__iframe-frame {
+    --embed-inset: var(--wp--preset--spacing--16);
     position: relative;
+    box-sizing: content-box;
     height: var(--embed-h-mobile, 560px);
+    padding: var(--embed-inset);
     overflow: hidden;
     border-radius: var(--wp--custom--radius--lg);
     background-color: var(--wp--custom--color--bg--default);
     box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--subtle);
   }
+  /* In flow, so it fills the inset content box (the 3D World stage positions its iframe absolutely) */
+  .embed__iframe-frame > .embed__iframe {
+    position: static;
+    display: block;
+  }
+  @media (min-width: 600px) {
+    .embed__iframe-frame {
+      height: var(--embed-h-tablet, var(--embed-h-mobile, 560px));
+    }
+  }
   @media (min-width: 900px) {
     .embed__iframe-frame {
       height: var(--embed-h-desktop, 480px);
+    }
+  }
+  /* Bleed: edge to edge under 600 (the full screen width goes to the table), square, a hairline above and below */
+  @media (max-width: 599px) {
+    .embed__iframe-frame--bleed {
+      margin-inline: calc(-1 * var(--wp--style--root--padding-left)) calc(-1 * var(--wp--style--root--padding-right));
+      padding-inline: 0;
+      border-radius: 0;
+      box-shadow:
+        inset 0 1px 0 var(--wp--custom--color--border--subtle),
+        inset 0 -1px 0 var(--wp--custom--color--border--subtle);
     }
   }
 </style>
