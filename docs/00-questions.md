@@ -10,6 +10,19 @@ _No open questions right now._
 
 ## Answered log
 
+### Q143. Full-site sweep: image trios, the accent badge on navy, Figma scope (8 Oct 2026)
+Context: Ross asked for a sweep of the whole site once the page chats had finished: everything committed and pushed, every page checked (docs/08), and Figma brought up to date with repeated items as components and variants. The sweep ran the docs/08 card sweep on all 28 pages at 16 widths (375–1440), axe-core on every page, the token audit and an internal link check on the production build.
+- [x] Three image cards in a row (Ross: one column, image beside text): at 900–1199 three across left 190–250px of text (3D World's How it works to eight lines, Survey's project titles to five). Card grid (3 columns, Image top, exactly three) and Feed grid (3 columns, no filters, exactly three image cards: Subsea, Survey, Monitoring projects) are one column of side-by-side cards at 768–1199, the image 40% beside the text; three across from 1200. Shared in Card (`.cards-beside`)
+- [x] Accent badge on navy (Ross: lighter text on navy): sage-300 on navy-700 was 4.42:1 (Home, Investors). New token `text/on-accent-subtle` (sage-600 light, sage-200 Navy, about 6:1), used by Badge Accent only; other accent text on navy unchanged
+- [x] Life-Saving Rules: the rule titles were h3 straight under the h1 (no Section header). Checklist grid item titles are h2 when the block has no Section header, H4 look unchanged
+- [x] 15 pages declared the Accordion's `topic` twice (four with different values); the duplicate dropped, keeping the value that matches `faqsFor()`. Field contract only, nothing on the page changes
+- [x] docs/05 §3: rows added for HSEQ, Life-Saving Rules, Research & Publications, Assets overview, Why work with us and Life at Reach
+- [x] Checked: no sideways scroll on any page at any width; axe 0 violations once reveals are forced visible (the only hits were the badge above); token audit clean apart from the noted exceptions (Values' min(), Date tile's 22px, header-height and hero art-direction offsets); internal links all resolve apart from template pages outside the prototype (projects, asset singles, newsroom, legal, Reach Pilot/Horizon/Relay)
+- [ ] Known, left: Home's three service cards are three across from 900 (Q79), so at 900–950 their descriptions run to four lines at 191px
+- [x] Figma scope (Ross): a desktop page frame for every built page, built from block instances; every new block with Desktop and Mobile variants; no separate mobile page frames
+
+**Answer:** one column of side-by-side image cards at 768–1199; a badge-only lighter accent on navy; desktop frames plus block mobile variants.
+
 ### Q142. Filter chips: a word space before the count (8 Oct 2026)
 Context: Ross, on the Research & publications chips: "don't think we need these big gaps on the pills, just a space is good".
 - [x] Filter chip: the count sits a word space (4) after its label instead of the 8 gap, so "2025–26 (7)" reads as one phrase. The tick keeps its 8 (now a margin on the tick), so selecting still doesn't move anything (Q92). Applies wherever chips are used (Data list, Feed grid, FAQ, Live operations)

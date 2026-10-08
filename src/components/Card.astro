@@ -221,6 +221,24 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     overflow: hidden;
     background-color: var(--wp--custom--color--bg--disabled);
   }
+  /* Side by side (Card grid and Feed grid image trios at 768–1199, Ross 8 Oct 2026): the image (40%) beside the
+     text, filling the card's height; the grid on .cards-beside sets one column at those widths */
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .cards-beside:has(> :nth-child(3):last-child) .card--media-image-top {
+      flex-direction: row;
+    }
+    .cards-beside:has(> :nth-child(3):last-child) .card--media-image-top .card__media {
+      flex: none;
+      width: 40%;
+      aspect-ratio: auto;
+      min-height: 100%;
+    }
+    .cards-beside:has(> :nth-child(3):last-child) .card--media-image-top .card__content {
+      flex: 1;
+      min-width: 0;
+      justify-content: center;
+    }
+  }
   .card__bg {
     position: absolute;
     inset: 0;

@@ -86,6 +86,10 @@ const trioPanels = media === 'pictogram-panel' && cards.length === 3;
 // ~190–250px of text, one column of wide cards at 768–899 left them half empty, so 768–1199 is two columns with
 // the third spanning both (no hole).
 const trioText = media === 'none' && cards.length === 3;
+// Three image cards in 3 columns (3D World's How it works, Survey's projects; Ross, 8 Oct 2026): three across at
+// 900–1199 left ~190–250px of text (titles to five lines, descriptions to eight), so 768–1199 is one column of
+// side-by-side cards, the image beside the text, as the pictogram-panel trio does.
+const trioImages = media === 'image-top' && layout === '3-columns' && cards.length === 3;
 
 ---
 
@@ -116,7 +120,7 @@ const trioText = media === 'none' && cards.length === 3;
       ) : (
       <div class="block__body">
         {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
-        <ul class:list={['card-grid__list', `card-grid__list--${resolvedLayout}`, openRows && 'card-grid__list--open', layout === 'rows' && rowStyle === 'cards' && 'card-grid__list--row-cards', widePanels && 'card-grid__list--wide', trioPanels && 'card-grid__list--trio-panels', trioText && 'card-grid__list--trio-text']}>
+        <ul class:list={['card-grid__list', `card-grid__list--${resolvedLayout}`, openRows && 'card-grid__list--open', layout === 'rows' && rowStyle === 'cards' && 'card-grid__list--row-cards', widePanels && 'card-grid__list--wide', trioPanels && 'card-grid__list--trio-panels', trioText && 'card-grid__list--trio-text', trioImages && 'card-grid__list--trio-images cards-beside']}>
           {cards.map((card, i) => {
             const feature = featureLast && rows && rowStyle === 'cards' && i === cards.length - 1;
             return (
@@ -432,6 +436,16 @@ const trioText = media === 'none' && cards.length === 3;
       flex: 1;
       min-width: 0;
       gap: var(--wp--custom--stack--md);
+    }
+  }
+  /* Three image cards: one column of side-by-side cards at 768–1199 (the card shape is Card's .cards-beside);
+     :has() out-ranks the three-card rules above and below */
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .card-grid .card-grid__list--3-columns.card-grid__list--trio-images:has(> :nth-child(3):last-child) {
+      grid-template-columns: 1fr;
+    }
+    .card-grid .card-grid__list--trio-images .card-grid__item {
+      grid-column: span 1;
     }
   }
   /* Four across only from 1320 (22 Sep 2026, Q74): at 1200–1319 four cards left ~190px of text and

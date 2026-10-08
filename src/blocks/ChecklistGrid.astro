@@ -38,6 +38,9 @@ interface Props extends BlockFields {
 
 const { layout = 'full', sectionHeader, items = [], background, spacing, anchor } = Astro.props;
 const titleId = sectionHeader ? makeId('checklist-grid', sectionHeader.title) : undefined;
+/* With no Section header the item titles are the first headings under the h1 (Life-Saving Rules), so they step up a
+   level; the look stays H4 */
+const ItemHeading = sectionHeader ? 'h3' : 'h2';
 ---
 
 {
@@ -73,7 +76,7 @@ const titleId = sectionHeader ? makeId('checklist-grid', sectionHeader.title) : 
               <li class="checklist-grid__item has-surface-light" id={item.slug}>
                 <img class="checklist-grid__icon" src={item.icon} alt="" width="96" height="96" loading="lazy" decoding="async" />
                 <div class="checklist-grid__head">
-                  <h3 class="checklist-grid__title text-h4">{item.title}</h3>
+                  <ItemHeading class="checklist-grid__title text-h4">{item.title}</ItemHeading>
                   {item.rule && <p class="checklist-grid__rule">{item.rule}</p>}
                 </div>
                 {item.points && item.points.length > 0 && (

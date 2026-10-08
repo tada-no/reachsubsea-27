@@ -71,7 +71,7 @@ Medium: `UI/Button`, icon 20, padding y `space/12` (48 tall). Small: `UI/Button 
 | Tone | Fill | Text / icon | Note |
 |---|---|---|---|
 | Neutral | `bg/tint` + 1px `border/subtle` | `text/secondary` | Asset status "In build" |
-| Accent | `bg/accent-subtle` | `text/accent` | "Joining fleet", categories |
+| Accent | `bg/accent-subtle` | `text/on-accent-subtle` (sage-600 light, sage-200 Navy; 8 Oct 2026, Q143: `text/accent` on navy-700 was 4.42:1) | "Joining fleet", categories |
 | Navy | `action/primary/bg` | `action/primary/fg` | emphasis, "Latest" |
 | Success | `bg/success-subtle` | `text/success` | "In service". **Light mode forced** on the variant |
 | Error | `bg/error-subtle` | `text/error` | rare. **Light mode forced** |

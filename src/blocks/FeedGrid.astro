@@ -80,6 +80,8 @@ const hasItems = items.length > 0;
 const showFilters = filters && facets.length > 0;
 const titleId = sectionHeader?.title ? makeId('feed-grid', sectionHeader.title) : undefined;
 const instanceId = makeId('feed-grid');
+// Exactly three image cards in a 3-column grid with no filters: one column of side-by-side cards at 768–1199 (CSS)
+const trioImages = layout === 'grid' && columns === 3 && !showFilters && items.length === 3 && items.every((i) => i.media === 'image-top');
 ---
 
 {
@@ -133,7 +135,7 @@ const instanceId = makeId('feed-grid');
             </div>
           )}
 
-          <ul class:list={['feed-grid__list', layout === 'editorial' && 'feed-grid__list--editorial', columns === 4 && 'feed-grid__list--cols-4']} style={`--feed-grid-columns: ${columns}`}>
+          <ul class:list={['feed-grid__list', layout === 'editorial' && 'feed-grid__list--editorial', columns === 4 && 'feed-grid__list--cols-4', trioImages && 'feed-grid__list--trio cards-beside']} style={`--feed-grid-columns: ${columns}`}>
             {items.map((item) => (
               <li class="feed-grid__item" data-facets={JSON.stringify(item.facets ?? {})}>
                 <Card {...item} />
@@ -255,6 +257,15 @@ const instanceId = makeId('feed-grid');
   /* ...and one column below 900: two across at 768–899 left ~350px cards, the same squash again */
   @media (max-width: 899px) {
     .feed-grid__list:has(.card__specs) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Exactly three image cards in a 3-column feed (the service pages' projects; Ross, 8 Oct 2026): three across at
+     900–1199 left ~190px of text and titles ran to five lines, two across at 768–899 left a hole, so 768–1199 is one
+     column of side-by-side cards (Card's .cards-beside), as the Card grid image trio */
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .feed-grid__list--trio:has(> :nth-child(3):last-child) {
       grid-template-columns: 1fr;
     }
   }
