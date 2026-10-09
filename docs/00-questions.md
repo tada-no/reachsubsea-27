@@ -10,6 +10,16 @@ _No open questions right now._
 
 ## Answered log
 
+### Q157. Privacy & Cookie Policy page (9 Oct 2026)
+Context: Ross: "Make Privacy & Cookie Policy page". Built from the live https://reachsubsea.no/privacy-policy/ (last modified 29 March 2023) in its own wording. Layout recorded in docs/05 §3.
+- [x] URL `/privacy-policy/`, the live one (as the Transparency Act keeps its live URL); the footer's and menu's legal link point there (was `/privacy-cookie-policy/`, which never existed). Title "Privacy & Cookie Policy", as the legal links name it
+- [x] Navy Text hero as the Transparency Act (Q57), eyebrow "Updated March 2023" (in WordPress, the page's modified date); the policy's two opening paragraphs became the lead
+- [x] The seven sections heading beside text on the 12-column grid (cols 1–4 / from col 5 at the 720 measure), so the headings share the hero title's left edge and read down as one list of questions; stacked below 900. A centred 880 article column would have started 216 px in from the hero's title at 1440
+- [x] Light English fixes only ("counts for" → "applies to", "is stored" → "are stored", -ise spellings, "NOTE:" → "Note:"); "opt out of Google Analytics" links to Google's opt-out page; the live "Contact us" section is the CTA panel
+- [ ] For Reach: the policy no longer matches the site in places. (1) It describes contact forms; the new site has none (Q39). (2) It describes Facebook Pixels; the live HTML loads Google Analytics 4 through Tag Manager and no pixel is in the page (Tag Manager could still add one). (3) It doesn't mention the videos (YouTube no-cookie, Vimeo), maps, share data (ir.oms.no) and social feed, which load only when a visitor chooses to. (4) "The grounds we use" names no lawful basis under GDPR. (5) A cookie banner, if Reach wants one, should be keyboard-operable with no dark patterns (docs/09). Reach to send updated wording; the page takes it as is
+
+**Answer:** as ticked.
+
 ### Q148. Newsroom: breadcrumb ends at the category; a light archive header like dev (8 Oct 2026)
 Context: Ross asked whether stories with long titles should have a trimmed breadcrumb. Claude: no, drop the title instead, since the H1 sits right under it and a title cut with "…" looks broken. Ross agreed, and asked for a lighter, smaller archive hero, a bit like the dev site.
 - [x] Story breadcrumb: Home › Newsroom › News (or Reports), every item a link to its archive; phones show "‹ News". Breadcrumb gains `endsWithCurrent` (default true, so every other page is unchanged)

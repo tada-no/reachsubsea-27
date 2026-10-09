@@ -285,7 +285,7 @@ export const socialLinks: { icon: string; label: string; href: string }[] = [
 ];
 
 export const legalLinks: NavLink[] = [
-  { label: 'Privacy & Cookie Policy', url: '/privacy-cookie-policy/' },
+  { label: 'Privacy & Cookie Policy', url: '/privacy-policy/' },
   { label: 'Transparency Act', url: '/transparency-act/' },
 ];
 
