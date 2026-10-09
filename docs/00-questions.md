@@ -18,6 +18,17 @@ Context: Ross asked whether stories with long titles should have a trimmed bread
 
 **Answer:** as ticked.
 
+### Q154. News single: second critique, breadcrumb fix, rhythm tweaks (9 Oct 2026)
+Context: Ross asked for the critique to be run again after Q153. It scored 24/36 (heuristic 9 n/a; first run 28/40). The drop was mostly a P0 that Q153 introduced: `spacing="sm"` on the story section let `.block.has-spacing-sm` take away the header clearance, so the breadcrumb sat under the fixed header. Also flagged: quotes and list items broke the text into islands, and More news at H2 matched the story's own title. Ross chose the rhythm tweaks; boilerplate and results-release clean-ups and the minor polish wait.
+- [x] Breadcrumb clears the header again; the story's bottom padding (section/sm) is set on `.news-article`, not with `spacing="sm"`
+- [x] The lead keeps its stack--lg gap above a download row (a links row's own margin had overridden it)
+- [x] Quotes step out stack--md, as lists (not stack--lg); list items 8 apart
+- [x] More news on the story page at H3 (32 / 24), below the story title's H2 size
+- [x] Measure note corrected: 720 is ~80 characters at Body 18, not ~72
+- [ ] Later: boilerplate label lines split; results releases (lead only up to 45 words, duplicate links, bare webcast addresses as links); caption and table measure, duplicate featured/inline photos, unbalanced quotes
+
+**Answer:** as ticked.
+
 ### Q153. News single: spacing and measure after a taste + impeccable review (8 Oct 2026)
 Context: Ross asked for a taste and impeccable run over the stories, "maybe the spacing could look better". The critique (28/40, `.impeccable/critique/`) found: lines of 85–97 characters at 1440; photos, quotes and lists only 8px further out than paragraphs (and the same 16 on phones); quotes styled exactly like the lead; imported leftovers (-ENDS-, press boilerplate as body text, labels typed as paragraphs, email hard wraps) breaking the rhythm; 192px from the story's end to More news. Ross: all five fixes, text 720 with photos at 880, no results-release layout for now.
 - [x] Measure: running text stops at 720 (`--wp--custom--measure--prose`, Figma `container/prose`, ~72 characters); photos, tables and embeds keep 880, one left edge

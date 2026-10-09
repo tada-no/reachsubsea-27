@@ -203,6 +203,12 @@ const endParts = boilerplate ? split(boilerplate.replace(/<\/div>\s*$/, '')) : [
     max-width: var(--wp--style--global--content-size);
     margin-inline: auto;
   }
+  /* More news at H3: at the Section header's H2 it matched the story's own title (Q154) */
+  main:has(.news-article) .feed-grid .section-header__title {
+    font-size: var(--wp--preset--font-size--h3);
+    line-height: var(--wp--custom--line-height--h3);
+    letter-spacing: var(--wp--custom--letter-spacing--h3);
+  }
   /* More news: the date row keeps a Report badge's height, as in the archive (a post can be in both categories) */
   main:has(.news-article) .feed-grid .card__top {
     min-height: 28px;

@@ -272,7 +272,7 @@ a {
    Image with caption, Embed (webcast and video iframes), Table, Separator, a two-up gallery, and File/Buttons rows
    (rendered as Link components). In WordPress this is theme.json for the post content.
    Rhythm (Q153, after a taste + impeccable review): paragraphs 16 apart; lists step out to stack--md; the lead, photos,
-   quotes, tables and embeds to stack--lg; a heading opens a section at stack--xl and binds to what follows (8).
+   tables and embeds to stack--lg; quotes as lists (Q154); a heading opens a section at stack--xl and binds to what follows (8).
    Running text stops at the prose measure (720, ~80 characters at Body 18); photos, tables and embeds keep the 880 column, on
    the same left edge. */
 .prose.article > :not(figure) {
@@ -290,6 +290,10 @@ a {
 }
 .article > :is(ul, ol) {
   margin-block: var(--wp--custom--stack--md);
+}
+/* Bullets that run to two lines need a little air between them, or a list reads as one block (Q154) */
+.prose.article li + li {
+  margin-top: var(--wp--preset--spacing--8);
 }
 /* Lead (Q147): the opening paragraph of a longer story, Lead size in navy against the grey body. Navy, not the
    accent green: green is the label colour (the category eyebrow sits just above) and a paragraph of it reads as a callout */
@@ -312,8 +316,10 @@ a {
 .prose.article h2 + * {
   margin-top: var(--wp--preset--spacing--8);
 }
+/* A quote steps out as far as a list (stack--md), not a photo's stack--lg: a story with several quotes broke into
+   islands (Q154, after the re-run critique) */
 .article blockquote {
-  margin-block: var(--wp--custom--stack--lg);
+  margin-block: var(--wp--custom--stack--md);
   padding-left: var(--wp--preset--spacing--24);
   border-left: 2px solid var(--wp--custom--color--border--accent);
 }
