@@ -1,0 +1,85 @@
+---
+// Result figure (9 Oct 2026, Q159): one reported figure, as the Results band's headline row shows it: label (Small),
+// value at Figure size (an optional unit before it, the scale after it: "988.1m"), and a change line (Small) with an
+// arrow when it carries a trend. Taken out of the Results band so the Key figures row in a results release shows
+// its figures the same way. Layout (columns, rules, padding) belongs to the block that lists them.
+import Icon from './Icon.astro';
+import type { StatField } from '../lib/types';
+
+interface Props {
+  stat: StatField;
+  as?: 'li' | 'div';
+  /** Count the value up from 0 once in view (motion.ts), after `countDelay` ms. */
+  countUp?: boolean;
+  countDelay?: number;
+  class?: string;
+  style?: string;
+}
+
+const { stat, as: Tag = 'li', countUp = false, countDelay = 0, class: className, style } = Astro.props;
+---
+
+<Tag class:list={['result-figure', className]} style={style}>
+  <p class="result-figure__label text-small">{stat.label}</p>
+  {/* The scale ("m", "bn") is part of the counted text, so it always sits hard against the digits */}
+  <p class="result-figure__value">
+    {stat.unit && <span class="result-figure__unit">{stat.unit}</span>}
+    {countUp ? <span data-count-up data-count-up-delay={countDelay}>{stat.value}{stat.suffix}</span> : `${stat.value}${stat.suffix ?? ''}`}
+  </p>
+  {
+    stat.delta && (
+      <p class:list={['result-figure__delta text-small', stat.trend && `result-figure__delta--${stat.trend}`]}>
+        {stat.trend && <Icon name={stat.trend === 'up' ? 'arrow-up-right' : 'arrow-down-right'} size={16} />}
+        {stat.delta}
+      </p>
+    )
+  }
+</Tag>
+
+<style is:global>
+  .result-figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+    min-width: 0;
+  }
+  .result-figure__label {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .result-figure__value {
+    display: flex;
+    align-items: baseline;
+    color: var(--wp--custom--color--text--primary);
+    /* One step below the H2 title so the heading still leads (review round 4) */
+    font-size: var(--wp--preset--font-size--figure);
+    line-height: var(--wp--custom--line-height--figure);
+    font-weight: var(--wp--custom--font-weight--bold);
+    letter-spacing: var(--wp--custom--letter-spacing--figure);
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+  }
+  .result-figure__unit {
+    margin-right: var(--wp--preset--spacing--8);
+    font-size: var(--wp--preset--font-size--body);
+    font-weight: var(--wp--custom--font-weight--medium);
+    letter-spacing: 0;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* The arrow sits on the first line: when the change wraps (2-up on phones) it must not drop to the
+     middle of the block. (1lh − 16) / 2 centres the 16px icon on one line box */
+  .result-figure__delta {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--4);
+    margin-top: var(--wp--preset--spacing--4);
+    color: var(--wp--custom--color--text--secondary);
+    font-weight: var(--wp--custom--font-weight--medium);
+  }
+  .result-figure__delta .icon {
+    flex: none;
+    margin-top: calc((1lh - 16px) / 2);
+  }
+  .result-figure__delta--up {
+    color: var(--wp--custom--color--text--accent);
+  }
+</style>

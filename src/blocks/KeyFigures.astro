@@ -1,0 +1,84 @@
+---
+// Key figures · reach/key-figures (9 Oct 2026, Q159): a results release's headline figures under its lead, so the
+// quarter reads at a glance before the text explains it. Revenue, EBIT and order backlog (two or three; a figure the
+// release doesn't state is left out), each a Result figure as on the Results band: label, value at Figure size, the
+// year-earlier comparison. The period and the currency are stated once, above. Columns with a rule between them, at
+// the text measure; one column with rules between rows on phones. In WordPress a block in the post content, after
+// the Lead; the 16 migrated releases' figures are in src/data/news-key-figures.ts.
+import ResultFigure from '../components/ResultFigure.astro';
+import type { StatField } from '../lib/types';
+
+interface Props {
+  /** "2Q 2026", as the release's title writes it. */
+  period: string;
+  currency?: string;
+  figures: StatField[];
+}
+
+const { period, currency = 'NOK', figures } = Astro.props;
+---
+
+{
+  figures.length > 0 && (
+    <div class="key-figures" style={`--key-figures-count: ${figures.length}`}>
+      <p class="key-figures__caption text-small">{period} · All figures in {currency}</p>
+      <ul class="key-figures__list">
+        {figures.map((stat) => (
+          <ResultFigure stat={stat} class="key-figures__item" />
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+<style is:global>
+  /* Steps out of the text as a photo or table does (stack--lg) */
+  .prose.article .key-figures {
+    margin-block: var(--wp--custom--stack--lg);
+  }
+  .prose.article .key-figures + * {
+    margin-top: var(--wp--custom--stack--lg);
+  }
+  .key-figures {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--16);
+  }
+  .key-figures__caption {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .key-figures__list {
+    display: grid;
+    grid-template-columns: repeat(var(--key-figures-count), minmax(0, 1fr));
+    padding: 0;
+    list-style: none;
+  }
+  .key-figures__item {
+    padding-inline: var(--wp--preset--spacing--24);
+  }
+  .key-figures__item:first-child {
+    padding-left: 0;
+  }
+  .key-figures__item + .key-figures__item {
+    border-left: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  /* Phones: one figure a row, a rule between, label and comparison under the value as on desktop */
+  @media (max-width: 599px) {
+    .key-figures__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .key-figures__item {
+      padding: var(--wp--preset--spacing--16) 0;
+    }
+    .key-figures__item:first-child {
+      padding-top: 0;
+    }
+    .key-figures__item:last-child {
+      padding-bottom: 0;
+    }
+    .key-figures__item + .key-figures__item {
+      border-left: 0;
+      border-top: 1px solid var(--wp--custom--color--border--subtle);
+    }
+  }
+</style>

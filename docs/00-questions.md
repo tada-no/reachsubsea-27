@@ -18,7 +18,8 @@ Context: the third critique of the story pages scored 24/36 (no P0, three P1: ta
 - [x] Rhythm: lists, quotes and link rows step out 24 at every width (16 on phones before, the same as two paragraphs). A link row's first and last Link pull out by their 12 of target padding, so the row's text sits 24 from the paragraphs (was ~40 at 1440); targets stay 48
 - [x] One quote treatment (74 quote blocks): a quote block names its speaker in the cite and has no marks of its own. Marks round a whole quote go; a name and title left after the last sentence, or a closing ", said Jostein Alendal, CEO of Reach Subsea.", moves to the cite; a quote that names its speaker inside keeps marks round the quoted words ("…,” said Alendal. “…”); quotes inside paragraphs keep their marks. Missing full stops added (Beacon), cites carry none, 2 empty quote blocks removed
 - [x] Boilerplate names linked to /contact/ become plain text (5), which also fixes OCTIO's duplicate link and the comma inside "Jostein Alendal,"
-- [ ] Key-figures row for results releases: design pass next
+- [x] Key figures row for results releases: under the lead, revenue, EBIT and order backlog as on the Results band (the figure is now a shared Result figure component), each with the year-earlier figure from the release (or its percentage), the period and "All figures in NOK" once above. 16 releases, 2Q 2021 to 2Q 2026, every value from the release's own text; a figure a release doesn't state is left out (1Q 2026 states no backlog, so it shows two). Columns with rules between at the text measure, one column on phones
+- [ ] Figma: Result figure and Key figures components, the 3:2 photo, quote/list spacing 24 and the News single frames, once Ross approves
 
 **Answer:** Photo crop + measure (Recommended), Release leads, Rhythm + quote consistency, Key-figures row for results.
 

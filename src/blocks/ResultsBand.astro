@@ -7,8 +7,8 @@
 // follows. Headline figures count up when `animate` is on. Max one per page. Replaces the PDF's overlapping card.
 import BlockSection from '../components/BlockSection.astro';
 import Badge from '../components/Badge.astro';
-import Icon from '../components/Icon.astro';
 import ReportCards from '../components/ReportCards.astro';
+import ResultFigure from '../components/ResultFigure.astro';
 import { makeId } from '../lib/ids';
 import type { BlockFields, ReportCardField, StatField } from '../lib/types';
 
@@ -64,24 +64,7 @@ const STAT_STAGGER = 160;
             </div>
             <ul class="results__headline">
               {stats.map((stat, i) => (
-                <li class="results__item" style={`--stat-i: ${i}`}>
-                  <p class="results__label text-small">{stat.label}</p>
-                  {/* The scale ("m", "bn") is part of the counted text, so it always sits hard against the digits */}
-                  <p class="results__value">
-                    {stat.unit && <span class="results__unit">{stat.unit}</span>}
-                    {animate ? (
-                      <span data-count-up data-count-up-delay={150 + i * STAT_STAGGER}>{stat.value}{stat.suffix}</span>
-                    ) : (
-                      `${stat.value}${stat.suffix ?? ''}`
-                    )}
-                  </p>
-                  {stat.delta && (
-                    <p class:list={['results__delta text-small', stat.trend && `results__delta--${stat.trend}`]}>
-                      {stat.trend && <Icon name={stat.trend === 'up' ? 'arrow-up-right' : 'arrow-down-right'} size={16} />}
-                      {stat.delta}
-                    </p>
-                  )}
-                </li>
+                <ResultFigure stat={stat} class="results__item" style={`--stat-i: ${i}`} countUp={animate} countDelay={150 + i * STAT_STAGGER} />
               ))}
             </ul>
             {secondary.length > 0 && (
@@ -142,10 +125,6 @@ const STAT_STAGGER = 160;
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .results__item {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wp--preset--spacing--8);
-    min-width: 0;
     padding: var(--wp--preset--spacing--24) var(--wp--preset--spacing--32) var(--wp--preset--spacing--32);
   }
   .results__item:first-child {
@@ -153,45 +132,6 @@ const STAT_STAGGER = 160;
   }
   .results__item + .results__item {
     border-left: 1px solid var(--wp--custom--color--border--subtle);
-  }
-  .results__label {
-    color: var(--wp--custom--color--text--secondary);
-  }
-  .results__value {
-    display: flex;
-    align-items: baseline;
-    color: var(--wp--custom--color--text--primary);
-    /* One step below the H2 title so the heading still leads (review round 4) */
-    font-size: var(--wp--preset--font-size--figure);
-    line-height: var(--wp--custom--line-height--figure);
-    font-weight: var(--wp--custom--font-weight--bold);
-    letter-spacing: var(--wp--custom--letter-spacing--figure);
-    font-variant-numeric: tabular-nums lining-nums;
-    white-space: nowrap;
-  }
-  .results__unit {
-    margin-right: var(--wp--preset--spacing--8);
-    font-size: var(--wp--preset--font-size--body);
-    font-weight: var(--wp--custom--font-weight--medium);
-    letter-spacing: 0;
-    color: var(--wp--custom--color--text--secondary);
-  }
-  /* The arrow sits on the first line: when the change wraps (2-up on phones) it must not drop to the
-     middle of the block. (1lh − 16) / 2 centres the 16px icon on one line box */
-  .results__delta {
-    display: inline-flex;
-    align-items: flex-start;
-    gap: var(--wp--preset--spacing--4);
-    margin-top: var(--wp--preset--spacing--4);
-    color: var(--wp--custom--color--text--secondary);
-    font-weight: var(--wp--custom--font-weight--medium);
-  }
-  .results__delta .icon {
-    flex: none;
-    margin-top: calc((1lh - 16px) / 2);
-  }
-  .results__delta--up {
-    color: var(--wp--custom--color--text--accent);
   }
   /* One rule, between the headline and secondary rows (review round 2) */
   /* Same distance above the cards as under the Investors overview track */
@@ -261,10 +201,10 @@ const STAT_STAGGER = 160;
     .results__row:nth-child(odd) {
       padding-left: 0;
     }
-    .results__value {
+    .results__item .result-figure__value {
       flex-wrap: wrap;
     }
-    .results__unit {
+    .results__item .result-figure__unit {
       flex-basis: 100%;
       margin: 0 0 var(--wp--preset--spacing--4);
       font-size: var(--wp--preset--font-size--caption);

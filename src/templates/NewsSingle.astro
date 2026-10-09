@@ -19,6 +19,8 @@ import BlockSection from '../components/BlockSection.astro';
 import FeedGrid from '../blocks/FeedGrid.astro';
 import CtaBand from '../blocks/CtaBand.astro';
 import Link from '../components/Link.astro';
+import KeyFigures from '../blocks/KeyFigures.astro';
+import { newsKeyFigures } from '../data/news-key-figures';
 import { newsPosts, newsCard, categoryLabel, archiveUrl, postDate, NEWSROOM, type NewsPost } from '../data/news';
 import type { LinkAction } from '../lib/types';
 
@@ -32,7 +34,7 @@ const category = post.categories.includes('reports') ? 'reports' : 'news';
 const related = newsPosts.filter((p) => p.id !== post.id && p.categories.includes(category)).slice(0, 3);
 
 // Split the body around file and button rows, which render as Link components
-type Part = { html: string } | { links: { label: string; href: string; action: LinkAction }[] };
+type Part = { html: string } | { links: { label: string; href: string; action: LinkAction }[] } | { keyFigures: true };
 const actionFor = (href: string): LinkAction =>
   /\.pdf($|\?)/i.test(href) ? 'file' : /^https?:/.test(href) && !href.includes('reachsubsea.no/') ? 'external' : 'page';
 const linksIn = (html: string) =>
@@ -61,7 +63,18 @@ const split = (html: string) => {
 // story, set small and apart from it
 const BOILERPLATE = '<div class="article-boilerplate">';
 const [story, boilerplate] = post.content.split(BOILERPLATE);
-const parts = split(story);
+const parts: Part[] = split(story);
+// A results release's key figures (Q159) follow its lead, or open the story when it has none
+const keyFigures = newsKeyFigures[post.slug];
+if (keyFigures) {
+  const at = parts.findIndex((p) => 'html' in p && p.html.includes('class="article-lead"'));
+  const part = parts[at] as { html: string } | undefined;
+  const end = part ? part.html.indexOf('</p>', part.html.indexOf('class="article-lead"')) + 4 : -1;
+  if (part && end > 3) {
+    const rest = part.html.slice(end).trim();
+    parts.splice(at, 1, { html: part.html.slice(0, end) }, { keyFigures: true }, ...(rest ? [{ html: rest }] : []));
+  } else parts.unshift({ keyFigures: true });
+}
 const endParts = boilerplate ? split(boilerplate.replace(/<\/div>\s*$/, '')) : [];
 ---
 
@@ -100,6 +113,8 @@ const endParts = boilerplate ? split(boilerplate.replace(/<\/div>\s*$/, '')) : [
           {parts.map((part) =>
             'html' in part ? (
               <Fragment set:html={part.html} />
+            ) : 'keyFigures' in part ? (
+              <KeyFigures period={keyFigures!.period} figures={keyFigures!.figures} />
             ) : (
               <ul class="article__links">
                 {part.links.map((l) => (

@@ -236,12 +236,13 @@ a {
 .prose > * + * {
   margin-top: var(--wp--custom--stack--sm);
 }
-.prose p,
-.prose li {
+/* A block placed in the text (Key figures, Q159) keeps its own type and list styles; :where() keeps these rules as
+   light as before, so .article's own list rows still override them */
+.prose :is(p, li):not(:where(.key-figures *)) {
   font-size: var(--wp--preset--font-size--body);
   line-height: var(--wp--custom--line-height--body);
 }
-.prose ul {
+.prose ul:not(:where(.key-figures__list)) {
   list-style: disc;
   padding-left: 1.25em;
 }
@@ -306,7 +307,7 @@ a {
 }
 /* Bullets that run to two lines need a little air between them, or a list reads as one block (Q154). Not a links
    row: its Links keep their own gap around 48px targets */
-.prose.article :is(ul, ol):not(.article__links) > li + li {
+.prose.article :is(ul, ol):not(.article__links, .key-figures__list) > li + li {
   margin-top: var(--wp--preset--spacing--8);
 }
 /* Lead (Q147): the opening paragraph of a longer story, Lead size in navy against the grey body. Navy, not the
