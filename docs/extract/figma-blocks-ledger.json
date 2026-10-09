@@ -2436,5 +2436,37 @@
       "Leads without the dateline, cite clean-ups and contact unlinking: content fixes in src/data/news-posts.json",
       "Project story and FAQ answers at the measure: code-only (the Project single frame's story is already in the 7-column main column; Accordion item answers in Figma are short)"
     ]
+  },
+  "phase4SearchAnd404_9Oct": {
+    "date": "2026-10-09",
+    "context": "Search results and 404 (Q158) pushed to Figma at Ross's request. Ground truth: src/components/SearchBox.astro, SearchResult.astro, SearchHelp.astro, SeabedScan.astro, header/SearchPanel.astro, src/templates/SearchResults.astro, NotFound.astro.",
+    "components": {
+      "Components / Search 673:2678 (new doc frame, y 64846)": "Header 673:2679 + the three components below",
+      "Search box 673:2724 (new)": "Breakpoint=Desktop (864 x 64, Button Primary 'Search') | Mobile (343 x 56, Layout + Typography modes Mobile) x State=Default | Focus | Filled = 6 (673:2688, 673:2696, 673:2700, 673:2705, 673:2713, 673:2717). Placeholder + Value text properties. padding x space/16, gap space/12, 1px border/strong; Focus = 2px text/primary border, no focus ring; Clear kept at opacity 0 while empty",
+      "Search result 674:2708 (new)": "Eyebrow Accent instance (exposed) · Title Heading/H5 + External icon / File icon (icon/accent, booleans) · Excerpt Body/Small text/secondary, 2 lines. Properties Title, Excerpt, Show excerpt, Show external icon, Show file icon. 864 wide, 104 tall with a 2-line excerpt",
+      "Search help 674:2718 (new)": "304 wide, grid/gutter between two bg/tint panels (radius/lg, space/32): Popular 674:2719 (Eyebrow Muted + 5 Link Small instances) and Contact 674:2743 (Eyebrow Muted 'Can't find it?', Body/Small line, phone + mail Meta items). 332 + 212 = 576 as in code",
+      "Components / Seabed scan 675:2766 (new doc frame, y 66438)": "Header + set",
+      "Seabed scan 675:2771 (new)": "Breakpoint=Desktop 675:2732 (1440 x 680, grid 21.8) | Mobile 675:2749 (375 x 525, grid 12.1). Layers: Field (six dot-size vectors, navy/600, generated with the code's depth function) · Scrim (under-header bar, left / right / bottom fades, copy ellipse; navy/900 gradients, raw colour stops as Figma can't bind them) · Survey line (border/accent, hidden: the animation) · Digits 404 (text/accent, Color mode Navy)",
+      "Search field 417:13857": "State=Focus 417:13840: Focus ring frame removed; 2px text/primary inside border (code: focus shows as a field state, not the ring, Ross 9 Oct 2026)",
+      "Search panel 124:2645": "Search field frames replaced by Search box instances (Desktop 673:3396, Mobile 673:3410, FILL); 'Popular' Eyebrows removed (Ross 9 Oct 2026); Inner gap space/12; Mobile Links list now hugs its five rows (it was clipped to one)"
+    },
+    "pageFrames": {
+      "Search results": {
+        "id": "677:25318",
+        "x": 62820,
+        "source": "src/pages/search/index.astro (SearchResults), ?s=rov",
+        "sections": "Header solid 677:25319 · Search results section 677:25365 (template frame, not a block: Main 677:25366 = H1 Heading/H2, Search box Desktop Filled 'rov', six Filter chip instances with counts, summary line, Results list 677:25424 of ten Search result instances, Button Outline 'Show more results'; Search help 677:25536 in cols 10–12) · Footer 677:25574"
+      },
+      "404 · Page not found": {
+        "id": "678:25556",
+        "x": 64460,
+        "source": "src/pages/404.astro (NotFound), /company/assets/olympic-taurus-2/",
+        "sections": "Not found hero 678:25557 (Color mode Navy, 1440 x 680: Seabed scan Desktop 678:25558; Copy 678:25574 = Eyebrow Accent H1 'Page not found', digits spacer, Body/Lead, Button Primary 'Go to the home page', bottom at 584) · Header overlay 678:25587 (absolute) · Search the site 678:25633 (H2 Heading/H3, Search box Filled 'olympic taurus', Eyebrow Muted guesses + one Search result; Search help 678:25667) · Footer 678:25705"
+      }
+    },
+    "notInFigma": [
+      "No mobile page frames; the Search box, Seabed scan and Search panel have Mobile variants",
+      "Query marks in excerpts (bg/accent-subtle + 2px border/accent underline) are described on Search result, not drawn"
+    ]
   }
 }

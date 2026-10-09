@@ -35,7 +35,8 @@ Context: Ross: "make Search results and a 404 page, is there anything creative w
 - [x] Taller on desktop (Ross): the band takes the site's one hero height from 900 (680 at 1440, 800 from 1695; was content height, 645), the dot field extended to cover it
 - [x] Same feel as the other heroes (Ross, with the Services hero as reference): navy/900 ground, copy pinned to the bottom, the Photo hero's scrim over the dots (side and bottom fades, an ellipse under the copy, the header bar) so they fade in from the edges; the navy halos behind each line of copy are gone. The digits sit above the scrim on their own layer
 - [x] "to 404 m" → "to a depth of 404 m" (Ross asked; Claude: yes, without "depth" 404 m can read as a distance, and the survey line only lands if it reads as depth)
-- [ ] Figma: Search box, Search result, Search help and Seabed scan components, and the two page frames, once approved
+- [x] Figma (9 Oct 2026): Search box 673:2724, Search result 674:2708, Search help 674:2718 (Components / Search 673:2678) and Seabed scan 675:2771 (Components / Seabed scan 675:2766); page frames Search results 677:25318 and 404 · Page not found 678:25556; Search field Focus and the Search panel brought in line (2px text/primary focus border, Search box instances, no "Popular" eyebrow). IDs in figma-blocks-ledger.json `phase4SearchAnd404_9Oct`
+- [x] After review (Ross, 9 Oct 2026): search fields show focus as a 2px text/primary border, not the green ring (a field takes focus on a click, so the ring read as a keyboard highlight); site sweep: Fleet register groups and Lifecycle rows now light on `:has(:focus-visible)`, not `:focus-within`; the Search panel drops its "Popular" eyebrow
 
 **Answer:** Seabed scan (Recommended).
 
