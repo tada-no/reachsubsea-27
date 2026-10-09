@@ -2347,5 +2347,21 @@
       "A frame that was FIXED height stays FIXED (and clips) after its layout changes: set layoutSizingVertical HUG",
       "Hiding a Left label moves the pin inside the marker: record each pin's centre first, then re-place the marker on it"
     ]
+  },
+  "phase4NewsroomQ154_9Oct": {
+    "date": "2026-10-09",
+    "context": "News single rhythm after the second critique (Q154). Ground truth: src/styles/base.css (.article blockquote, .prose.article li + li), src/templates/NewsSingle.astro (More news title).",
+    "pageFrames": {
+      "News single 636:22930 / News single · Mobile 638:24070": "Quote wrapper (642:35357 / 642:35362) paddingTop bound to stack/md (was stack/lg), renamed \"Quote (stack/md above and below, as a list)\". More news Section header title overridden to Heading/H3 (I636:23029;154:1637;130:31 → 32, I638:24120;155:1996;130:42 → 24)."
+    },
+    "components": {
+      "Article quote 629:2685": "Description: stack/md above and below, as a list (Q154).",
+      "Article header 629:2682": "Description corrected: stack/md below the breadcrumb (Q153; it still said stack/lg).",
+      "Article doc text 629:2636": "Q145–Q154; measure ~80 characters at Body 18 (not ~72); lists and quotes stack/md, list items space/8; More news at H3."
+    },
+    "notInFigma": [
+      "List item spacing (space/8): the News single frames show a story with no list, so it lives in the Article doc text only",
+      "Breadcrumb header clearance and the lead → links-row gap: code-only fixes (frames have the header in flow and no links row)"
+    ]
   }
 }
