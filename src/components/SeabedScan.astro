@@ -9,7 +9,8 @@
 // Seen from straight above (Ross: no tilt).
 // Motion: one pass only. On load a survey line in border/accent sweeps the band left to right (4.5 s); each column
 // of dots lights as it passes and settles back, and the digits light and stay lit, so the scan "finds" the 404
-// once. Under 5 s and then still, so no pause control is needed (WCAG 2.2.2; Ross asked to drop it). Solid colour
+// once. Until the line reaches them the digits are unlit field dots from the first paint (Ross, 9 Oct 2026: the 404
+// showed lit on load, before the scan): an inline script marks the scan as waiting before the page paints. Under 5 s and then still, so no pause control is needed (WCAG 2.2.2; Ross asked to drop it). Solid colour
 // throughout, no opacity. The pass waits until the tab is visible. Without JS, or with reduced motion: no sweep,
 // the digits shown lit. Decorative (aria-hidden): the page's H1 stays text.
 // Geometry, built here at render time: 120 × 61 dots on a 16 grid (30 columns left of the digits, 20 rows above,
@@ -83,6 +84,12 @@ const geometry = `--cols: ${COLS}; --rows: ${ROWS}; --left: ${LEFT}; --top: ${TO
     {digits.map((d) => <circle class="seabed-scan__hit" data-cx={d.cx} cx={d.cx} cy={d.cy} r="4.8" />)}
   </svg>
 </div>
+<script is:inline>
+  // Before the first paint: the digits start unlit when the pass will run (not with reduced motion)
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('[data-seabed-scan]').forEach((el) => el.classList.add('is-waiting'));
+  }
+</script>
 
 <style is:global>
   .seabed-scan {
@@ -121,6 +128,10 @@ const geometry = `--cols: ${COLS}; --rows: ${ROWS}; --left: ${LEFT}; --top: ${TO
   .seabed-scan__line {
     fill: var(--seabed-lit);
     visibility: hidden;
+  }
+
+  .seabed-scan.is-waiting .seabed-scan__hit {
+    fill: var(--seabed-dot);
   }
 
   /* The pass (the script sets each column's --x, its place across the band 0–1, and the line's --from / --to) */
