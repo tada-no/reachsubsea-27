@@ -8,7 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import Eyebrow from './Eyebrow.astro';
-import { socialLinks, legalLinks } from '../data/navigation';
+import { socialLinks, legalLinks, SHOW_EVENTS } from '../data/navigation';
 import { worldPagePath } from '../data/world';
 
 interface FooterLink {
@@ -52,7 +52,7 @@ const columns: FooterColumn[] = [
       { label: 'Newsroom', href: '/newsroom/' },
       { label: 'Events', href: '/newsroom/events/' },
       { label: 'FAQ', href: '/faq/' },
-    ],
+    ].filter((l) => SHOW_EVENTS || l.href !== '/newsroom/events/'),
   },
 ];
 

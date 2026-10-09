@@ -12,6 +12,13 @@ import { projectSingles } from './projects';
 const latestProject = [...projectSingles].sort((a, b) => (b.year ?? 0) - (a.year ?? 0))[0];
 
 const [latestPost] = newsPosts;
+
+// Events hidden (Ross, 9 Oct 2026): no Events page is built yet, so its links in the bar, the site menu and the
+// footer are left out. Set true to bring them all back once /newsroom/events/ exists.
+export const SHOW_EVENTS = false;
+const withoutHiddenEvents = <T extends { href: string }>(links: T[]) =>
+  SHOW_EVENTS ? links : links.filter((l) => l.href !== '/newsroom/events/');
+
 const dotted = (iso: string) => iso.split('-').reverse().join('.');
 
 /** One row in a Mega menu / Site menu / Mobile menu link list. */
@@ -205,11 +212,11 @@ export const navSections: NavSection[] = [
     href: '/newsroom/',
     description: 'News, stock exchange announcements, events and press resources.',
     overview: { label: 'All news', url: '/newsroom/' },
-    links: [
+    links: withoutHiddenEvents([
       { label: 'Stock exchange announcements', href: '/newsroom/stock-exchange-announcements/' },
       { label: 'Events', href: '/newsroom/events/' },
       { label: 'Press & media', href: '/newsroom/press-media/' },
-    ],
+    ]),
     feature: {
       media: 'none',
       surface: 'tint',
@@ -224,12 +231,12 @@ export const navSections: NavSection[] = [
  * WP note: `links` = a `site-menu` menu location; project/news/events are queries (latest sticky
  * project, 3 latest posts, next 2 events), so the menu stays fresh without editor work. */
 export const siteMenu = {
-  links: [
+  links: withoutHiddenEvents([
     { label: 'Projects', href: '/projects/', note: 'Our track record, by service' },
     { label: 'Newsroom', href: '/newsroom/', note: 'News, announcements and press' },
     { label: 'Events', href: '/newsroom/events/', note: 'Conferences where we exhibit' },
     { label: 'FAQ', href: '/faq/', note: 'Answers, organised by topic' },
-  ],
+  ]),
   project: {
     media: 'image-bg',
     eyebrow: 'Latest project',

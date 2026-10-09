@@ -22,6 +22,8 @@ import { cardPresets } from '../data/card-presets';
 import { pickFigures } from '../data/key-figures';
 import type { CardField } from '../lib/types';
 import { faqsFor, faqHubHref } from '../data/faqs';
+import { SHOW_EVENTS } from '../data/navigation';
+import { newsPosts, postUrl } from '../data/news';
 
 const [uncrewedDays] = pickFigures(['uncrewed-days']);
 
@@ -112,7 +114,7 @@ const serviceCards = [
   }),
 ];
 
-// Newsroom: one feed, mixed post types (Q52). Lead story + report + event + news.
+// Newsroom: one feed, mixed post types (Q52). Lead story + report + news + event (or the latest post while events are hidden).
 const newsroomItems: CardField[] = [
   cardPresets.news({
     media: 'image-bg',
@@ -140,14 +142,27 @@ const newsroomItems: CardField[] = [
     description: undefined,
     action: { label: 'Read more', url: '/newsroom/' },
   }),
-  cardPresets.event({
-    surface: 'white',
-    eyebrow: 'Conference',
-    title: 'Offshore Technology Conference',
-    meta: [{ icon: 'calendar', text: '15 Oct 2026, Stavanger' }],
-    action: { label: 'Event details', url: '/newsroom/events/', action: 'page' },
-  }),
+  // Events hidden (SHOW_EVENTS, 9 Oct 2026): the latest post takes the event's place
+  SHOW_EVENTS
+    ? cardPresets.event({
+        surface: 'white',
+        eyebrow: 'Conference',
+        title: 'Offshore Technology Conference',
+        meta: [{ icon: 'calendar', text: '15 Oct 2026, Stavanger' }],
+        action: { label: 'Event details', url: '/newsroom/events/', action: 'page' },
+      })
+    : cardPresets.news({
+        media: 'none',
+        surface: 'white',
+        eyebrow: `${newsPosts[0].date.split('-').reverse().join('.')} · ${newsPosts[0].readMinutes} min read`,
+        badge: { label: 'News', tone: 'accent' },
+        title: newsPosts[0].title,
+        description: undefined,
+        action: { label: 'Read more', url: postUrl(newsPosts[0]) },
+      }),
 ];
+// The latest post is the newer of the two news cards, so it goes above the 2025 one
+if (!SHOW_EVENTS) newsroomItems.splice(2, 2, newsroomItems[3], newsroomItems[2]);
 
 // Dummy posts (SocialFeed is a stand-in for the live LinkedIn widget). Text from the client PDF's samples.
 const linkedInPosts = [

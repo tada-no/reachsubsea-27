@@ -10,7 +10,7 @@
 import Card from '../Card.astro';
 import Icon from '../Icon.astro';
 import Link from '../Link.astro';
-import { siteMenu } from '../../data/navigation';
+import { siteMenu, SHOW_EVENTS } from '../../data/navigation';
 
 interface Props {
   id: string;
@@ -66,26 +66,30 @@ const currentHref = current ? `/${current}/` : undefined;
             }
           </ul>
         </div>
-        <div class="site-menu__feed">
-          <a class="site-menu__feed-title text-eyebrow" id={`${id}-events`} href="/newsroom/events/">
-            Events
-            <Icon name="arrow-right" size={16} />
-          </a>
-          <ul class="site-menu__rows">
-            {
-              siteMenu.events.map((item) => (
-                <li>
-                  <a class="site-menu__row" href={item.href}>
-                    <span class="site-menu__row-meta text-caption">
-                      {item.date}, {item.place}
-                    </span>
-                    <span class="site-menu__row-title text-label">{item.title}</span>
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
+        {
+          SHOW_EVENTS && (
+            <div class="site-menu__feed">
+              <a class="site-menu__feed-title text-eyebrow" id={`${id}-events`} href="/newsroom/events/">
+                Events
+                <Icon name="arrow-right" size={16} />
+              </a>
+              <ul class="site-menu__rows">
+                {
+                  siteMenu.events.map((item) => (
+                    <li>
+                      <a class="site-menu__row" href={item.href}>
+                        <span class="site-menu__row-meta text-caption">
+                          {item.date}, {item.place}
+                        </span>
+                        <span class="site-menu__row-title text-label">{item.title}</span>
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          )
+        }
       </div>
     </div>
   </div>
