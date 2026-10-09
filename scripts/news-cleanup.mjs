@@ -7,10 +7,14 @@
 //   4. the press boilerplate at the end (contacts, "About Reach Subsea", the disclosure notice) is wrapped in
 //      <div class="article-boilerplate"> and set small, apart from the story
 //   5. a heading or label left last with nothing under it ("For further information, please contact:") goes
+//   6. valid markup (8 Oct 2026, Q143 HTML validator): an email or www. address typed without its scheme gets mailto: or
+//      https://, other links whose href isn't a URL (a date typed into the link field) are unwrapped, and a body whose tags don't balance (unclosed <div>, <p> inside <em>, a link inside a link) is
+//      re-serialised by an HTML5 parser, as a browser would read it. Bodies that are already valid stay byte for byte
 // Each is a migration step too (docs/09 §News). Idempotent: running it twice changes nothing.
 // Usage: node scripts/news-cleanup.mjs   (applies it to src/data/news-posts.json and prints what changed)
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { parseFragment, serialize } from 'parse5';
 
 const plain = (html) =>
   html
@@ -128,11 +132,63 @@ function cleanOnce(html, report) {
   return out.trim();
 }
 
+// 6. Valid markup. An href that isn't a URL, a path, an anchor, mailto: or tel: is text typed into the link field
+const URLISH = /^\s*(https?:|mailto:|tel:|\/|#)/i;
+function validMarkup(html, report) {
+  let out = html.replace(/<a\b[^>]*\bhref="([^"]*)"[^>]*>([\s\S]*?)<\/a>/g, (m, href, inner) => {
+    if (URLISH.test(href)) return m;
+    // An address typed without its scheme: an email gets mailto:, a www. address https://
+    const fix = /^\s*[^\s@<>"]+@[^\s@<>"]+\.[a-z]{2,}\s*$/i.test(href) ? `mailto:${href.trim()}` : /^\s*www\./i.test(href) ? `https://${href.trim()}` : '';
+    if (fix) {
+      report.linksFixed = (report.linksFixed ?? 0) + 1;
+      return m.replace(`href="${href}"`, `href="${fix}"`);
+    }
+    report.linksUnwrapped = (report.linksUnwrapped ?? 0) + 1;
+    return inner;
+  });
+  // Re-serialise only when the tree needs it: the parser would rebuild it (unclosed tags, a link in a link), an inline
+  // element wraps whole paragraphs (<em><p>…</p></em>: unwrapped), or a boilerplate block or file / link row sits
+  // inside a table or another element (the News single cuts the body at those, so they must be top level: the
+  // boilerplate unwraps, a row keeps its links as plain markup)
+  const tags = (h) => (h.match(/<\/?[a-z][a-z0-9]*/gi) ?? []).map((t) => t.toLowerCase()).join(' ');
+  const frag = parseFragment(out);
+  let edited = false;
+  const INLINE = new Set(['em', 'strong', 'a', 'span', 'sup', 'sub', 'cite']);
+  const BLOCK = new Set(['p', 'div', 'ul', 'ol', 'table', 'blockquote', 'figure', 'h2', 'h3', 'h4', 'h5', 'h6']);
+  const cls = (n) => ` ${(n.attrs ?? []).find((a) => a.name === 'class')?.value ?? ''} `;
+  const unwrap = (n) => {
+    const i = n.parentNode.childNodes.indexOf(n);
+    for (const c of n.childNodes) c.parentNode = n.parentNode;
+    n.parentNode.childNodes.splice(i, 1, ...n.childNodes);
+    edited = true;
+  };
+  const walk = (n) => {
+    for (const c of [...(n.childNodes ?? [])]) {
+      walk(c);
+      if (!c.tagName) continue;
+      if (INLINE.has(c.tagName) && c.childNodes.some((k) => BLOCK.has(k.tagName))) unwrap(c);
+      else if (n !== frag && c.tagName === 'div' && cls(c).includes(' article-boilerplate ')) unwrap(c);
+      else if (n !== frag && / article-(file|links) /.test(cls(c))) {
+        c.attrs = c.attrs.filter((a) => a.name !== 'class');
+        edited = true;
+      }
+    }
+  };
+  walk(frag);
+  const parsed = serialize(frag);
+  if (edited || tags(parsed) !== tags(out)) {
+    report.bodiesBalanced = (report.bodiesBalanced ?? 0) + 1;
+    out = parsed;
+  }
+  return out;
+}
+
 // One pass can uncover another (a split paragraph turns out to be a label), so run until nothing changes
 export function cleanStory(html, report = {}) {
   let out = html;
   for (let i = 0; i < 4; i++) {
-    const next = cleanOnce(out, report);
+    // The parser's tree can give the clean-up something new to do (a balanced boilerplate), so both repeat
+    const next = validMarkup(cleanOnce(out, report), report);
     if (next === out) break;
     out = next;
   }
