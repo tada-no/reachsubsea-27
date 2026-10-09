@@ -229,7 +229,7 @@ export const navSections: NavSection[] = [
 
 /** Site menu (hamburger, ≥1200): big links for what the bar no longer carries, plus featured content.
  * WP note: `links` = a `site-menu` menu location; project/news/events are queries (latest sticky
- * project, 3 latest posts, next 2 events), so the menu stays fresh without editor work. */
+ * project, the latest post as a card and the 3 after it, next 2 events), so the menu stays fresh without editor work. */
 export const siteMenu = {
   links: withoutHiddenEvents([
     { label: 'Projects', href: '/projects/', note: 'Our track record, by service' },
@@ -240,12 +240,27 @@ export const siteMenu = {
   project: {
     media: 'image-bg',
     eyebrow: 'Latest project',
-    title: latestProject.title,
+    // A non-breaking hyphen in names like U-864, which otherwise split across lines in the half-width card
+    title: latestProject.title.replace(/(\w)-(\d)/g, '$1\u2011$2'),
     description: latestProject.field,
     image: latestProject.image,
     action: { label: 'Read project', url: latestProject.url },
   } satisfies CardField,
-  news: newsPosts.slice(0, 3).map((p) => ({ date: dotted(p.date), title: p.title, href: postUrl(p) })),
+  // The latest story as a card beside the project (Ross, 9 Oct 2026: a Newsroom card in the middle column, one card
+  // under each big link); the rows then list the three after it, so no story shows twice
+  newsCard: {
+    media: 'image-bg',
+    eyebrow: 'Latest news',
+    title: latestPost.title,
+    description: shortDate(latestPost.date),
+    image: {
+      src: latestPost.image?.card ?? `${import.meta.env.BASE_URL}images/ocean-horizon-calm.jpg`,
+      // Decorative, as on the news cards: the title says what the story is
+      alt: '',
+    },
+    action: { label: 'Read story', url: postUrl(latestPost) },
+  } satisfies CardField,
+  news: newsPosts.slice(1, 4).map((p) => ({ date: dotted(p.date), title: p.title, href: postUrl(p) })),
   events: [
     { date: '15 Oct 2026', title: 'Offshore Technology Conference', place: 'Stavanger', href: '/newsroom/events/' },
     { date: '14 Apr 2027', title: 'Ocean Business 2027', place: 'Southampton', href: '/newsroom/events/' },

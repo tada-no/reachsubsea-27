@@ -2,7 +2,7 @@
 // Site menu panel (docs/04 §16, reimagined 17 Sep 2026, Q49): what the hamburger opens at ≥1200.
 // No longer a flat sitemap (the bar's Mega menus and the footer already do that job). It now leads
 // with what the bar does not carry: Projects, Newsroom, Events and FAQ as large links, beside live
-// featured content: the latest project (Card, Image bg), the three latest news items, the next
+// featured content: the latest project and the latest story (two Cards, Image bg), the next three news items, the next
 // events, and the 3D World. Modal under the header over the bg/overlay scrim, like before.
 // Below 1200 the hamburger opens the Mobile menu, which lists every section.
 // Motion: the panel settles in and its three columns follow 60 ms apart (occasional action, ~300 ms,
@@ -43,6 +43,7 @@ const currentHref = current ? `/${current}/` : undefined;
 
       <div class="site-menu__col site-menu__project" style="--col-i: 1">
         <Card {...siteMenu.project} headingLevel="h3" />
+        <Card {...siteMenu.newsCard} headingLevel="h3" />
       </div>
 
       {/* Plain groups, not labelled sections: as region landmarks they clashed with page blocks of the same name
@@ -132,9 +133,12 @@ const currentHref = current ? `/${current}/` : undefined;
   .site-menu__links {
     grid-column: 1 / span 3;
   }
+  /* Two cards, Latest project and Latest news, side by side (9 Oct 2026): 3 + 3 columns with the grid gutter */
   .site-menu__project {
     grid-column: 4 / span 6;
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
   }
   .site-menu__feeds {
     grid-column: 10 / span 3;
@@ -181,7 +185,7 @@ const currentHref = current ? `/${current}/` : undefined;
     transform: none;
   }
 
-  /* Featured project: the Card fills the column */
+  /* Featured project and story: each Card fills its half */
   .site-menu__project .card {
     min-height: 400px;
   }
