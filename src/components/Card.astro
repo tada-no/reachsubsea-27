@@ -187,7 +187,8 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     color: var(--wp--custom--color--text--primary);
     transition:
       transform 0.4s var(--wp--custom--motion--ease-out),
-      box-shadow 0.4s var(--wp--custom--motion--ease-out);
+      box-shadow 0.4s var(--wp--custom--motion--ease-out),
+      background-color 0.4s var(--wp--custom--motion--ease-out);
   }
   /* White: 1px inside stroke border/subtle, drawn above the image like Figma */
   .card--white::after {
@@ -587,6 +588,12 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     .card--linked:hover {
       transform: translateY(-3px);
       box-shadow: var(--wp--preset--shadow--md);
+    }
+    /* A Tint card turns White as it lifts (Q166, Ross 9 Oct 2026): on the pale tint the shadow's edge and the fill
+       were nearly one value, so the edge melted into a muddy halo; the white face gives the shadow a crisp edge to
+       sit under. --pg-bg carries the fill, so the pictogram loops' eraser gaps follow. */
+    .card--tint.card--linked:hover {
+      --pg-bg: var(--wp--custom--color--bg--default);
     }
     .card--linked:hover .card__image {
       transform: scale(1.04);

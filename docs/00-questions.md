@@ -10,6 +10,14 @@ _No open questions right now._
 
 ## Answered log
 
+### Q166. Card hover on Tint cards (9 Oct 2026)
+Context: Ross, on Technology & Innovation's Reach Remote card: "on tinted cards, the shadow hover looks mucky". The shadow is navy already; on a Tint card the pale fill and the shadow's edge are nearly one value, so the edge melts into a halo instead of lifting. Compared live on a temporary review page (Hover style chips + Freeze hover; Tint cards on White, White cards on Tint, image cards on White), stacked image `review/card-hover-compare-1440.png`.
+- [x] **Turns white** (recommended): a Tint card fades to White as it lifts (3px, shadow/md unchanged); the pictogram loops' eraser colour follows
+- [ ] ~~Turns white + layered shadow~~: as above, and every linked card's shadow becomes a tight contact shadow (0 1 3, navy 12%) under a softer ambient one (0 12 32, navy 8%) in place of shadow/md
+- [ ] ~~Current: lift + shadow/md~~
+
+**Answer:** Turns white (Ross). In `src/components/Card.astro`: `.card--tint.card--linked:hover` swaps `--pg-bg` to bg/default, with background-color in the card's transition; shadow tokens unchanged. The review page is removed; the image stays.
+
 ### Q164. Newsroom menu: "Stock exchange announcements" (9 Oct 2026)
 Context: Ross spotted it in the mobile menu's Newsroom group. In the menu data since 17 Sep (the brief's sitemap), but no page was ever built: a 404.
 - [x] Remove it (Recommended): the Newsroom group is Press & media (Events while hidden), with All news as its overview. Releases are in the Newsroom; the official record is Newsweb, linked from the Investors overview
@@ -19,11 +27,12 @@ Context: Ross spotted it in the mobile menu's Newsroom group. In the menu data s
 
 ### Q163. Technology & Innovation: product order, Reach Remote link, pictogram suggestions (9 Oct 2026)
 Context: Ross, on the "Where we are investing now" cards: "Have the box first, add link in the Reach Remote box, Reach Pilot 3rd, Relay 4th, suggest in the comments for icons".
-- [x] Order: Reach Horizon · Reach Remote · Reach Pilot · Reach Relay (was Pilot, Remote, Horizon, Relay)
+- [x] Order: Reach Horizon · Reach Remote · Reach Relay · Reach Pilot (was Pilot, Remote, Horizon, Relay; Ross then swapped Pilot and Relay)
 - [x] Reach Remote card: Link "Meet Reach Remote" → `/assets/reach-remote/`, the label and URL the menu, footer and hero already use (the page itself isn't built yet)
-- [ ] Pictograms, suggested in the page's comments, all from the library (Figma 33:74) and unused on the site: Reach Horizon "settings screen" (or "profile laptop"), Reach Pilot "Eye settings" (or "eye"), Reach Relay "satilite" (or "profile connect"). Ross to pick; the `needed-…` boxes stay until then
+- [x] Pictograms, Ross's picks from the library (Figma 33:74), unused elsewhere: Reach Horizon `settings-screen` (658:30054; the dots hop, the cog turns a little in its slot, the hub pings), Reach Pilot `reach-pilot` (658:30341; the eye blinks, the pupil looks left and right), Reach Relay `satellite` ("satilite" 658:30201; the feed flares, the signal arcs ping, each panel rolls on its spar in turn). The Figma tiles for satilite and reach pilot sit in frames named "Tile/legal" (to rename)
+- [x] Cards switched to icon cards, as the heritage block (the pictogram above the heading; the beside-the-text panels left each glyph's built-in margin showing as a gap under the heading). With the full-width text the PDF's full Horizon and Pilot wording is back (it had been trimmed for the panels)
 
-**Answer:** as ticked; pictograms open.
+**Answer:** as ticked.
 
 ### Q162. Press & media page (9 Oct 2026)
 Context: Ross: "connect to Reach Stipl or use what you have in the design system and build the Press & Media page, list anything you're missing". The Stipl connector's workspace had no Reach brandpad; Ross shared the brandpad (stipl.studio, read in his Chrome) and its public page (stipl.site/reach-subsea-1). It mirrors the design system (the site's tokens, Inter, the horizontal logo in two colourways, Guidelines for logo, colour, type, voice and imagery); its Media and Assets are empty, its logo pack holds two SVGs, and its CMYK values are converted from screen colours (no Pantone or RAL). The live Press & Media page (reachsubsea.no/press-media/, Mar 2025) has the EPS · PNG · SVG logo packs (still live) and every colour's HEX, RGB, CMYK, Pantone and RAL. Client PDF p28: hero, announcements, logo & colour swatches, four press-material cards (placeholders: two photo, two video), a media contact card, FAQ, CTA.
@@ -38,7 +47,8 @@ Context: Ross: "connect to Reach Stipl or use what you have in the design system
 - [x] Search entry; redirects from live `/press-media/` and dev `/company/who-we-are/press-media/` noted in the page header
 - [x] Checked 375 · 600 · 700 · 800 · 900 · 1000 · 1080–1095 · 1100 · 1150 · 1200 · 1300 · 1399 · 1440: no sideways scroll, no value wraps or overflows (CMYK "100, 95, 44, 55" was the tightest, fixed with padding 12 and gap 4 at five across), photo titles one height, copy state measured identical; production build matches dev
 - [ ] For Reach (client checklist 67–71): brand colour print values (Primary CMYK, S3 Pantone), logo packs still current, high-resolution press photo packs, optional press video
-- [ ] Figma after approval: Block/Brand assets (Desktop · Mobile), Swatch card component, page frame
+- [x] Figma (9 Oct 2026, Ross: update Figma): Brand artwork components from Reach's own SVGs, Logo tile, Logo set, Pack row, Swatch card and Icon/copy (Components / Brand assets 685:2732); Block/Brand assets 690:16159 (Desktop · Mobile); page frame Press & media 690:38034; Footer legal row and the Newsroom chip row gain the Press & media link (ledger `phase4PressMediaQ162_9Oct`)
+- [x] Figma review (9 Oct 2026, Ross: "fix them all"): Pack rows hug to 64 as the code (were 40, rules under the labels); the photo cards show the press sets' own photos (were the Careers ones); the CTA panel's contact card is 400 wide (360 clipped Jorunn's role and email); the Text hero takes the Photo hero's height and layout (680 Desktop, 525 Mobile, breadcrumb pinned top, title stack at the bottom; all 13 Text-hero page frames follow); Blocks doc frames under the Report shelf moved clear of it (ledger `phase4PressReviewFixes_9Oct`)
 
 **Answer:** built; Reach items open.
 

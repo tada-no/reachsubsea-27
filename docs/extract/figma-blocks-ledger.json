@@ -2482,5 +2482,28 @@
       "Results archive set stays until the page is approved (Q160 open item)",
       "The Next slot's countdown is a static 'in 39 days'; in code it runs from the visitor's today"
     ]
+  },
+  "phase4PressMediaQ162_9Oct": {
+    "date": "2026-10-09",
+    "context": "Press & media Q162 pushed to Figma at Ross's request. Ground truth: src/blocks/BrandAssets.astro, src/pages/newsroom/press-media/index.astro, src/data/press.ts.",
+    "components": {
+      "Icon/copy 684:37067": "New icon (Tile/copy 684:37066, glyph 684:37074), cloned from Icon/check; the HEX copy button",
+      "Components / Brand assets 685:2732": "Doc frame on Components (x 0, y 67882)",
+      "Brand artwork/* (row 685:2770)": "Reach's own SVGs from public/images/brand/, never redrawn: Logo full colour 685:2784, Logo full colour negative 685:2798, Logo navy 685:2812, Logo white 685:2826, Logo black 685:2840 (packs only), Icon full colour 685:2845, Icon full colour negative 685:2850",
+      "Logo tile 688:17961": "Surface=Light | Navy x Kind=Logo | Icon: 688:17931, 688:17946, 689:37374, 689:37376. 3:2, radius/md, bg/default or navy/800; artwork 60% (logo, 122) or 36% (icon, 73). Swap the nested Artwork instance",
+      "Logo set 688:18147": "Version=Full colour 688:17975 | One colour 688:18047 | Icon 688:18106: a Pair of Logo tiles (aspect-locked 3:2, FILL) + Label (UI/Label)",
+      "Pack row 689:2854": "Position=First 689:2842 | Following 689:2848 (border/subtle top rule); exposed Link (Action=File), Meta text property",
+      "Swatch card 689:2901": "Layout=Column 689:2855 (five across, fill 2:1, padding space/12) | Row 689:2878 (fill 64 beside values); text properties Name, HEX, RGB, CMYK, Pantone, RAL, Show RAL; Fill bound per instance to the palette variable",
+      "Blocks / Brand assets 690:15186": "Doc frame on Blocks (x -10768, y 36741)",
+      "Block/Brand assets 690:16159": "Breakpoint=Desktop 690:15299 | Mobile 690:15782 (Layout and Typography collections set to Mobile); Section header, Logos (3 Logo sets), Logo packs (3 Pack rows, 528) + Using the logo (640, column 7), Primary and Secondary colours (5 Swatch cards each)",
+      "Page frame Press & media 690:38034": "Pages page x 66100: Header overlay 690:38750 · Page hero Text navy 690:38036 (breadcrumb Home > Newsroom > Press & media, one Link Latest news) · Brand assets Desktop 690:38280 (tint) · Card grid 4 columns 690:38623 (4 press photo sets, Request photos) · Accordion Split 690:38719 (3 press FAQs, tint) · CTA panel 690:38039 (Press enquiries, one action, Jorunn Håvardsholm; role and email wrap, email before the @) · Footer 690:38040",
+      "Footer 125:3011": "Legal row: Press & media before Privacy & Cookie Policy (Desktop 690:39098, Mobile 690:39099)",
+      "Newsroom page frame 633:22588": "Chips wrapped in Bar 690:39143 (space-between, held at chip height 40) with Link Press & media 690:39144 at the end"
+    },
+    "notInFigma": [
+      "HEX copied state (Copied + check) is code-only; the Swatch card shows the idle state",
+      "Brand assets 600-1199 layout (pairs stacked) is not a variant; Desktop and Mobile only",
+      "Tech & Innovation pictogram picks (Horizon settings-screen 658:30054, Pilot reach pilot 658:30341, Relay satilite 658:30201) not yet on the cards"
+    ]
   }
 }

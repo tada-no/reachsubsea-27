@@ -139,7 +139,7 @@ Icon 20 (`icon/accent`) + `Body/Small` `text/secondary`, gap `space/8`, centred.
 - Spec rows (3 Oct 2026): label · value pairs, labels in one `text/secondary` column, values `text/primary` medium, gap `space/8` × `space/16`, no rules. `Spec columns` 1 | 2 (5 Oct 2026): with short values (ROVs, DriX) the pairs sit two across once the card is 560 wide, the second label indented `space/16`. *Figma: Card spec rows, 1 and 2 columns.*
 - Content stack (gap `stack/md`): Pictogram → Text group (gap `stack/sm`: top row with Eyebrow + Badge, then a Heading group of Title + Text, gap `stack/xs` Default / `space/12` Featured) → Meta list (3 × Meta item, gap `space/8`) → Action (Link, exposed instance).
 - Properties: `Title`, `Text`, `Show eyebrow`, `Show badge`, `Show text`, `Show meta`, `Show action`, `Pictogram` (swap). Eyebrow, Badge, Link and Meta items are exposed nested instances.
-- Hover spec (one example): `Shadow/md` + −3px lift; image cards zoom the image to 1.04 (dev).
+- Hover spec (one example): `Shadow/md` + −3px lift; image cards zoom the image to 1.04 (dev). A Tint card turns White as it lifts (Q166, 9 Oct 2026): on the pale tint the shadow's edge melted into a muddy halo; the white face gives it a crisp edge.
 - Clickable area: for Page and External actions the whole card is the link (stretched link, one tab stop). File, Video and Expand keep the action as the only target.
 - Conditional (PDF p31): the action only renders when its file, video or URL exists.
 

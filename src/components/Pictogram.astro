@@ -1547,4 +1547,112 @@ const live = Boolean(inner && inner.includes('class="pg-'));
     34%, 42% { stroke-dashoffset: 110; }
     56% { stroke-dashoffset: 0; }
   }
+
+  /* Technology & Innovation products (9 Oct 2026, Ross's library picks). Settings screen (Reach Horizon): the
+     window's three dots hop in turn, as a page loading, then the cog turns a little on its hub and back while
+     the hub pings (each arc trims back to its start and redraws, as the sensor arcs in Subsea telemetry). The
+     cog sits in a slot: its legs end on a flat line (y 67.09) in the artwork, so a still wrapper clips it there
+     and the turning legs are cut along that line instead of swinging down into the window's bottom edge. */
+  :is(.pictogram--settings-screen, .pictogram--reach-pilot, .pictogram--satellite) {
+    --pg-cycle: 3.2s;
+  }
+  .pictogram--settings-screen.is-playing .pg-dot--a { animation-name: pg-hz-dot-a; }
+  .pictogram--settings-screen.is-playing .pg-dot--b { animation-name: pg-hz-dot-b; }
+  .pictogram--settings-screen.is-playing .pg-dot--c { animation-name: pg-hz-dot-c; }
+  .pictogram--settings-screen.is-playing .pg-arc--a { animation-name: pg-hz-hub-a; }
+  .pictogram--settings-screen.is-playing .pg-arc--b { animation-name: pg-hz-hub-b; }
+  .pictogram--settings-screen .pg-cog-slot {
+    clip-path: inset(0 0 28.91px 0) view-box;
+  }
+  .pictogram--settings-screen .pg-cog {
+    transform-box: view-box;
+    transform-origin: 48px 64.6px;
+  }
+  .pictogram--settings-screen.is-playing .pg-cog { animation-name: pg-hz-cog; }
+  @keyframes pg-hz-cog {
+    0%, 32%, 88%, 100% { transform: rotate(0deg); }
+    52%, 64% { transform: rotate(8deg); }
+  }
+  @keyframes pg-hz-dot-a {
+    0%, 4%, 16%, 100% { transform: translate3d(0, 0, 0); }
+    10% { transform: translate3d(0, -2px, 0); }
+  }
+  @keyframes pg-hz-dot-b {
+    0%, 12%, 24%, 100% { transform: translate3d(0, 0, 0); }
+    18% { transform: translate3d(0, -2px, 0); }
+  }
+  @keyframes pg-hz-dot-c {
+    0%, 20%, 32%, 100% { transform: translate3d(0, 0, 0); }
+    26% { transform: translate3d(0, -2px, 0); }
+  }
+  @keyframes pg-hz-hub-a {
+    0%, 36%, 62%, 100% { stroke-dashoffset: 0; }
+    47%, 50% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-hz-hub-b {
+    0%, 40%, 70%, 100% { stroke-dashoffset: 0; }
+    53%, 56% { stroke-dashoffset: 110; }
+  }
+  /* Reach pilot: the eye blinks (squashed from its centre: lid and iris close to one line about a stroke thick), then the pupil
+     looks left and right and back, tracking. Only the pupil moves, and only as far as the gap inside the iris
+     allows, so nothing crosses the eye's outline. */
+  .pictogram--reach-pilot :is(.pg-eye, .pg-pupil) {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .pictogram--reach-pilot.is-playing .pg-eye { animation-name: pg-pl-blink; }
+  .pictogram--reach-pilot.is-playing .pg-pupil { animation-name: pg-pl-look; }
+  @keyframes pg-pl-blink {
+    0%, 6%, 26%, 100% { transform: scale(1, 1); }
+    14%, 16% { transform: scale(1, 0.1); }
+  }
+  @keyframes pg-pl-look {
+    0%, 32%, 92%, 100% { transform: translate3d(0, 0, 0); }
+    44%, 54% { transform: translate3d(-2.5px, 0, 0); }
+    68%, 78% { transform: translate3d(2.5px, 0, 0); }
+  }
+  /* Satellite (Reach Relay): the dish's feed flares, then its two signal arcs ping outward, inner then
+     outer, twice: data going out. Meanwhile each solar panel rolls on its spar in turn (the line through the
+     arms and body, like a wing banking), upper panel first, then the lower: it narrows across its width about
+     its own centre, keeps its full length, and turns back. The matrix scales along the panels' short side, the
+     (1, 1) diagonal: a = d = (1 + k) / 2, b = c = (k - 1) / 2 for width factor k (0.6 at the turn: a little, so
+     the lines along the panel thin only slightly, as on a real banked surface). */
+  .pictogram--satellite .pg-feed {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .pictogram--satellite .pg-panel {
+    transform-box: view-box;
+  }
+  .pictogram--satellite .pg-panel--a {
+    transform-origin: 63.45px 27.15px;
+  }
+  .pictogram--satellite .pg-panel--b {
+    transform-origin: 27.19px 63.48px;
+  }
+  .pictogram--satellite.is-playing .pg-panel--a { animation-name: pg-st-roll-a; }
+  .pictogram--satellite.is-playing .pg-panel--b { animation-name: pg-st-roll-b; }
+  @keyframes pg-st-roll-a {
+    0%, 16%, 52%, 100% { transform: matrix(1, 0, 0, 1, 0, 0); }
+    30%, 38% { transform: matrix(0.8, -0.2, -0.2, 0.8, 0, 0); }
+  }
+  @keyframes pg-st-roll-b {
+    0%, 48%, 84%, 100% { transform: matrix(1, 0, 0, 1, 0, 0); }
+    62%, 70% { transform: matrix(0.8, -0.2, -0.2, 0.8, 0, 0); }
+  }
+  .pictogram--satellite.is-playing .pg-feed { animation-name: pg-st-feed; }
+  .pictogram--satellite.is-playing .pg-arc--inner { animation-name: pg-st-arc-inner; }
+  .pictogram--satellite.is-playing .pg-arc--outer { animation-name: pg-st-arc-outer; }
+  @keyframes pg-st-feed {
+    0%, 4%, 18%, 100% { transform: scale(1); }
+    11% { transform: scale(1.9); }
+  }
+  @keyframes pg-st-arc-inner {
+    0%, 14%, 36%, 52%, 74%, 100% { stroke-dashoffset: 0; }
+    23%, 25%, 61%, 63% { stroke-dashoffset: 110; }
+  }
+  @keyframes pg-st-arc-outer {
+    0%, 18%, 40%, 56%, 78%, 100% { stroke-dashoffset: 0; }
+    27%, 29%, 65%, 67% { stroke-dashoffset: 110; }
+  }
 </style>
