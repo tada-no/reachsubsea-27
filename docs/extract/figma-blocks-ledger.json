@@ -2505,5 +2505,17 @@
       "Brand assets 600-1199 layout (pairs stacked) is not a variant; Desktop and Mobile only",
       "Tech & Innovation pictogram picks (Horizon settings-screen 658:30054, Pilot reach pilot 658:30341, Relay satilite 658:30201) not yet on the cards"
     ]
+  },
+  "phase4TechProductsQ163_9Oct": {
+    "date": "2026-10-09",
+    "context": "Technology & Innovation page frame brought in line with the code (Q163): the four products as Icon cards, Ross's library pictograms, order Horizon, Remote, Relay, Pilot, the PDF's full wording. Ground truth: src/pages/services/technology-innovation/index.astro.",
+    "components": {
+      "Page frame Technology & Innovation 566:30170": "Card grid 571:23226 (renamed '... the four products (Card Icon Tint; Horizon, Remote, Relay, Pilot)'): its four Card instances switched from Media=Pictogram panel, Size=Featured to Media=Icon, Surface=Tint, Size=Default; Pictogram swapped to settings-screen 658:30054, reach-remote 52:95, satilite 658:30201, reach pilot 658:30341; Remote shows its action 'Meet Reach Remote'. Inside each instance the empty Top row is hidden and Content and Text group hug, with the shorter card in each row filling to its neighbour (rows 364 and 320, the site's 360 and 316)",
+      "Components / Pictograms 33:74": "Two tiles renamed from a copied 'Tile/legal' to their glyphs: Tile/satilite 658:30147 and Tile/reach pilot 658:30159 (the real Tile/legal is 421:9648); every other tile already matched its Pictogram/ component"
+    },
+    "notInFigma": [
+      "The pictogram loops (code only, Pictogram.astro)",
+      "The Tint card hover turning White (Q166) is not drawn; the Card set has no hover state for it"
+    ]
   }
 }
