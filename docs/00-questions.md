@@ -18,6 +18,18 @@ Context: Ross asked whether stories with long titles should have a trimmed bread
 
 **Answer:** as ticked.
 
+### Q156. News bodies: minor polish from the critique (9 Oct 2026)
+Context: the last items from the Q154 critique. Ross: "do the minor polish next". `scripts/news-cleanup.mjs` step 10 (idempotent), CSS in base.css, titles in `scripts/import-news.mjs`.
+- [x] Captions and tables stop at the 720 text measure (a caption ran ~126 characters under an 880 photo; both tables have two columns). Photos and embeds keep 880
+- [x] The featured photo repeated in the body goes (6 posts); the two copies with a caption stay
+- [x] Quote marks: entities (&#8220;) become the characters; marks typed the wrong way or padded with spaces ("the “ Company “", "says: ” We", «…”) are set right (7); 17 one-off corrections in 11 posts, each a find/replace in the script's `CORRECTIONS` table (missing opening or closing marks, a quote's second paragraph not reopened, a vessel name in double marks inside a quote → single). A check over every post finds no unbalanced quote left
+- [x] Old posts typed line by line: paragraphs broken mid-sentence are joined (38: next starts in lower case, or the first stops on "the", "are", "NOK"…), line breaks mid-sentence joined (18); bullets typed as "– " or "• " paragraphs become lists (7), "o" sub-items nest under theirs (OCTIO in short); four "– END –" markers typed as entities go
+- [x] Titles: a dash keeps to the word before it (no-break space), so "Reach Subsea ASA –2Q 2026" no longer starts the H1's second line with "–2Q" (30 titles; the missing space added)
+- [x] Sub-bullets in a story take an open circle
+- [x] Not changed: the Deep Cygnus story opens without a lead because it is three paragraphs (leads start at four, Q147)
+
+**Answer:** as ticked.
+
 ### Q155. News bodies: boilerplate labels, results-release links, long leads (9 Oct 2026)
 Context: the second critique (Q154) found the press boilerplate's labels typed four ways, and results releases with a 60–115 word lead, the same report linked twice, raw webcast addresses and an empty link. Ross: "do the boilerplate and results release clean-ups next". Done in `scripts/news-cleanup.mjs` steps 7–9 (run by the import and on its own; idempotent), 114 of 189 posts changed.
 - [x] Boilerplate labels: every one is a bold line of its own, no colon (128), so every release ends the same way. A line that carries its content after the colon ("please contact: <name>") or the first line of a hand-wrapped sentence stays as written

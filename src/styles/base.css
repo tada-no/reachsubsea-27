@@ -245,6 +245,9 @@ a {
   list-style: disc;
   padding-left: 1.25em;
 }
+.prose ul ul {
+  list-style: circle;
+}
 .prose ol {
   list-style: decimal;
   padding-left: 1.25em;
@@ -273,9 +276,11 @@ a {
    (rendered as Link components). In WordPress this is theme.json for the post content.
    Rhythm (Q153, after a taste + impeccable review): paragraphs 16 apart; lists step out to stack--md; the lead, photos,
    tables and embeds to stack--lg; quotes as lists (Q154); a heading opens a section at stack--xl and binds to what follows (8).
-   Running text stops at the prose measure (720, ~80 characters at Body 18); photos, tables and embeds keep the 880 column, on
-   the same left edge. */
-.prose.article > :not(figure) {
+   Running text stops at the prose measure (720, ~80 characters at Body 18); photos and embeds keep the 880 column, on
+   the same left edge. Tables and captions are text too and stop at 720 (Q156): the posts' tables have two columns, and
+   a caption ran to ~126 characters under an 880 photo. */
+.prose.article > :not(figure:not(.article-table)),
+.article figcaption {
   max-inline-size: var(--wp--custom--measure--prose);
 }
 .prose.article > :first-child {

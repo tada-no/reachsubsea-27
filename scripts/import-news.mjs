@@ -205,6 +205,9 @@ function tidy(html) {
 const stem = (url) => (url ?? '').split('/').pop().replace(/\.[a-z]+$/i, '').replace(/(-\d+x\d+|-scaled)+$/i, '').toLowerCase();
 
 // ── Build ──────────────────────────────────────────────────────────────────────────────────────────
+// A dash in a title keeps to the word before it and has a space after (Q156): "Reach Subsea ASA –2Q 2026" put "–2Q"
+// at the start of the second line on the card and the H1
+const titleDashes = (t) => t.replace(/\s+([–—])\s*/g, '\u00a0$1 ');
 const report = { posts: raw.length, leads: 0, importDate: 0, newsweb: 0, estimated: 0, datelineRecovered: 0, undated: [], noImage: 0, safelinks: 0, postLinks: 0, duplicateLeadImage: 0 };
 const importStamps = new Map();
 for (const p of raw) importStamps.set(p.date.slice(0, 16), (importStamps.get(p.date.slice(0, 16)) ?? 0) + 1);
@@ -283,7 +286,7 @@ const posts = raw.map((p) => {
   return {
     id: p.id,
     slug: p.slug,
-    title: plain(p.title.rendered),
+    title: titleDashes(plain(p.title.rendered)),
     date,
     dateSource,
     categories: p.categories.map((id) => catSlug[id]).filter(Boolean),
@@ -360,7 +363,7 @@ posts.sort((a, b) => (a.dateSource === 'undated') - (b.dateSource === 'undated')
 
 // Second pass (Q153): markers, <br> runs, labels, the press boilerplate (scripts/news-cleanup.mjs)
 report.cleanup = {};
-for (const p of posts) p.content = cleanStory(p.content, report.cleanup);
+for (const p of posts) p.content = cleanStory(p.content, report.cleanup, p.image?.large);
 
 fs.writeFileSync(OUT, `${JSON.stringify(posts, null, 1)}\n`);
 const csv = ['old_url,new_url', ...posts.map((p) => `${p.oldUrl},/newsroom/${p.slug}/`), `${SITE}/news/,/newsroom/`, `${SITE}/category/news/,/newsroom/category/news/`, `${SITE}/category/reports/,/newsroom/category/reports/`];

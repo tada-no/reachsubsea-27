@@ -20,6 +20,10 @@
 //      ("Quarterly presentation") is a heading, as in step 3, and a heading repeated straight after itself goes
 //   9. a lead longer than 45 words (Q155) keeps its opening sentence(s), at least 10 words and at most 45; the rest is
 //      the next paragraph. When no sentence end falls in that range the paragraph stays body text, with no lead
+//  10. polish (9 Oct 2026, Q156): the featured photo repeated anywhere in the body goes (the import already dropped it
+//      when it came first; a captioned copy stays, its caption says something); quote marks typed the wrong way or
+//      padded with spaces (“ Company “, says: ” We, «…”) are set right; a paragraph broken mid-sentence (it stops
+//      without punctuation and the next starts in lower case) is joined again
 // Each is a migration step too (docs/09 §News). Idempotent: running it twice changes nothing.
 // Usage: node scripts/news-cleanup.mjs   (applies it to src/data/news-posts.json and prints what changed)
 import fs from 'node:fs';
@@ -340,12 +344,96 @@ function releaseTidy(html, report) {
   return shortLinks(shortLead(releaseLinks(story, report), report) + boilerplateLabels(bp, report), report);
 }
 
+// 10. Polish (Q156)
+const photoPath = (u) => (u ?? '').replace(/^https?:\/\/[^/]+/, '').replace(/-(\d+x\d+|scaled)(?=\.\w+$)/, '').toLowerCase();
+function polish(html, featured, report) {
+  const count = (k) => (report[k] = (report[k] ?? 0) + 1);
+  let out = html;
+  if (featured) {
+    out = out.replace(/<figure><img src="([^"]+)"[^>]*><\/figure>\s*/g, (m, src) => (photoPath(src) === photoPath(featured) ? (count('featuredRepeatsRemoved'), '') : m));
+  }
+  // Quote marks (typed as entities in older posts: the characters themselves, so one rule reads both)
+  const ENT = { '&#8220;': '“', '&#8221;': '”', '&#8216;': '‘', '&#8217;': '’', '&#171;': '«', '&#187;': '»', '&#8211;': '–', '&#8212;': '—' };
+  out = out
+    .replace(/&#(8220|8221|8216|8217|171|187|8211|8212);/g, (e) => ENT[e])
+    .replace(/“(?:\s|&nbsp;)*(<strong>)?([^“”<]{1,40}?)(<\/strong>)?(?:\s|&nbsp;)*“/g, (m, b = '', t, e = '') => (count('quotesFixed'), `“${b}${t}${e}”`))
+    .replace(/:\s*”\s*(?=[A-Z])/g, () => (count('quotesFixed'), ': “'))
+    .replace(/«([^«»”<]*)”/g, (m, t) => (count('quotesFixed'), `“${t}”`));
+  // A line break mid-sentence: the next line goes on in lower case (not an email or web address)
+  out = out.replace(/([^>.!?:;”"\s])\s*<br\s*\/?>\s*(?=([a-z][^\s<]*))/g, (m, c, next) => {
+    if (/[@/]|\.\w/.test(next)) return m;
+    count('hardWrapsJoined');
+    return `${c} `;
+  });
+  // Bullets typed as paragraphs ("– Private placement successfully closed", "• …") are a list; "o" sub-items typed
+  // after one ("• Our main propositions are:" / "o Real-time seismic …") nest under it
+  const bulletRun = (marker, min) => new RegExp(`(?:<p>${marker}\\s+(?:(?!<\\/?p\\b)[^])*?<\\/p>\\s*){${min},}`, 'g');
+  const itemsOf = (run, marker) => [...run.matchAll(new RegExp(`<p>${marker}\\s+([^]*?)<\\/p>`, 'g'))].map((x) => `<li>${x[1].trim()}</li>`);
+  out = out.replace(bulletRun('[–•·▪-]', 2), (m) => (count('bulletRunsToLists'), `<ul>${itemsOf(m, '[–•·▪-]').join('')}</ul>\n`));
+  out = out.replace(/<\/li><\/ul>\s*((?:<p>o\s+(?=[A-Z])(?:(?!<\/?p\b)[^])*?<\/p>\s*)+)/g, (m, run) => {
+    count('subListsNested');
+    return `<ul>${itemsOf(run, 'o').join('')}</ul></li></ul>\n`;
+  });
+  // A paragraph broken mid-sentence: 6+ words without closing punctuation and the next starts in lower case, or any
+  // paragraph that stops on a word a sentence can't end on ("…operations of the company are" / "NOK 7.2 million.")
+  const ENDS_OPEN = /\b(a|an|the|of|to|and|or|in|on|for|with|is|are|was|were|by|at|from|as|that|which|has|have|will|be|our|its|their|this|than|per|nok|usd|eur)$/i;
+  // Each paragraph boundary is checked on its own, so a paragraph left as it is can still join the next one
+  out = out.replace(/<\/p>\s*<p>(?![^\s<]*@)(?=(.))/g, (m, first, at, str) => {
+    const open = str.lastIndexOf('<p>', at);
+    const a = open < 0 ? '' : str.slice(open + 3, at);
+    if (!a || /<\/?p\b/.test(a)) return m;
+    const t = plain(a);
+    if (words(t) < 4 || /@|https?:/.test(t)) return m;
+    const lower = /[a-z]/.test(first) && words(t) >= 6 && !/[.!?:;”"»)]$/.test(t);
+    if (!lower && !ENDS_OPEN.test(t)) return m;
+    count('brokenParagraphsJoined');
+    return ' ';
+  });
+  // Editorial corrections the rules can't make safely: each fixes one post's quote marks or line break, found by a
+  // phrase only that post has (the replacement no longer contains it, so this runs once)
+  for (const [find, replace] of CORRECTIONS) {
+    if (!out.includes(find)) continue;
+    out = out.replace(find, replace);
+    count('editorialCorrections');
+  }
+  return out;
+}
+const CORRECTIONS = [
+  // close-to-1000-days…: the quote's opening mark, and its second half
+  ['<p>The hardest part was proving it could be done,” Alendal concluded. We have done that. Now it’s about scaling it.</p>', '<p>“The hardest part was proving it could be done,” Alendal concluded. “We have done that. Now it’s about scaling it.”</p>'],
+  // reach-subsea-australia-awarded…: the closing mark
+  ['providing us with greater control over future plans</p>', 'providing us with greater control over future plans.”</p>'],
+  // reach-subsea-asa-q2-2023…: a quote block with a cite needs no marks; this one had only the closing one
+  ['very positive market outlook for the coming years,”</p>', 'very positive market outlook for the coming years.</p>'],
+  // annual-report-and-sustainability-report: the closing mark
+  ['reduce emissions with 90-100 percent.</p>', 'reduce emissions with 90-100 percent.”</p>'],
+  // contract-awards-2: a closing mark mid-sentence
+  ['benefits of our high speed survey ROVs” and that some 300', 'benefits of our high speed survey ROVs and that some 300'],
+  // contract-for-viking-neptun: two lines broken before a capital or a figure
+  ['performed by Reach Subsea and Eidesvik</p>\n<p>Offshore for Technip', 'performed by Reach Subsea and Eidesvik Offshore for Technip'],
+  ['as part of the</p>\n<p>3-year contract', 'as part of the 3-year contract'],
+  // new-contract-2: the vessel's name quoted inside the quote, and "Says"
+  ['from “Edda Fonn” together with Østensjø.” Says Jostein', 'from ‘Edda Fonn’ together with Østensjø,” says Jostein'],
+  // new-contract-for-dina-star: the quote's second paragraph opens, and closes before "says"
+  ['<p>Reach will under this contract display', '<p>“Reach will under this contract display'],
+  ['on board to market. “Says Kåre', 'on board to market,” says Kåre'],
+  // contract-awards-and-increased-fleet…: the quote opens after "Troll field.", vessel names inside it in single marks
+  ['Troll field.”Through our cooperation with our experienced partner within survey, MMT, around “Stril Explorer” Reach', 'Troll field. “Through our cooperation with our experienced partner within survey, MMT, around ‘Stril Explorer’ Reach'],
+  ['<p>“Dina Star” is offered to new and existing customers', '<p>“Dina Star is offered to new and existing customers'],
+  ['from early season of 2014.” says CEO', 'from early season of 2014,” says CEO'],
+  // octio-awarded…, …deep-cygnus…, financial-report-for-4q-2021…: a quote's second paragraph opens
+  ['<p>The Australian monitoring contract is another strong credential', '<p>“The Australian monitoring contract is another strong credential'],
+  ['operators worldwide” said Leon', 'operators worldwide,” said Leon'],
+  ['<p>Deep Cygnus is a vessel that fits nicely', '<p>“Deep Cygnus is a vessel that fits nicely'],
+  ['<p>The emergence of new industries is also gathering pace, as reflected by the recent “ScotWind”', '<p>“The emergence of new industries is also gathering pace, as reflected by the recent ‘ScotWind’'],
+];
+
 // One pass can uncover another (a split paragraph turns out to be a label), so run until nothing changes
-export function cleanStory(html, report = {}) {
+export function cleanStory(html, report = {}, featured = '') {
   let out = html;
   for (let i = 0; i < 4; i++) {
     // The parser's tree can give the clean-up something new to do (a balanced boilerplate), so both repeat
-    const next = validMarkup(releaseTidy(cleanOnce(out, report), report), report);
+    const next = validMarkup(polish(releaseTidy(cleanOnce(out, report), report), featured, report), report);
     if (next === out) break;
     out = next;
   }
@@ -359,7 +447,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const report = {};
   let changed = 0;
   for (const p of posts) {
-    const next = cleanStory(p.content, report);
+    const next = cleanStory(p.content, report, p.image?.large);
     if (next !== p.content) changed++;
     p.content = next;
   }
