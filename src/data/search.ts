@@ -24,6 +24,7 @@ import { cultureIntro } from './culture';
 import { whyWorkHero } from './why-work';
 import { privacyPolicy } from './legal';
 import { contactIntro } from './contact';
+import { pressHero } from './press';
 import { shortDate } from '../lib/dates';
 
 export type SearchType = 'page' | 'project' | 'news' | 'report' | 'publication' | 'faq' | 'person' | 'asset';
@@ -108,6 +109,7 @@ const pages: SearchEntry[] = [
   page('Our culture', '/careers/our-culture/', 'Careers', cultureIntro.lead, 'values people'),
   page('Life at Reach', '/careers/life-at-reach/', 'Careers', lifeHero.lead, 'offices crew offshore'),
   page('Reach Newsroom', '/newsroom/', 'Newsroom', 'Stay up to date with Reach Subsea, from news and reports to the projects and operations shaping offshore services.', 'news press releases'),
+  page('Press & media', '/newsroom/press-media/', 'Newsroom', pressHero.lead, 'press kit media kit logo download brand colours pantone photos journalists'),
   page('Frequently asked questions', '/faq/', 'FAQ', 'Answers to what we are asked most, organised by topic.', 'faq questions help'),
   page('Contact', '/contact/', 'Contact', contactIntro.lead, 'contact us offices phone email address haugesund'),
   page(transparencyAct.title, transparencyAct.url, 'Company', transparencyAct.text, 'human rights supply chain apenhetsloven'),

@@ -2,13 +2,13 @@
 // Footer (docs/04 §17). Navy mode always, regardless of the page it sits on. Top row on the 12-col
 // grid: brand (4 cols: logo, tagline) + 4 link columns. Contact, LinkedIn and Facebook are text links under Get in touch
 // (Contact moved there from Company on 22 Sep 2026, Q75).
-// (2 cols each). Divider, then a legal row (copyright + Transparency Act + Privacy & Cookie Policy).
+// (2 cols each). Divider, then a legal row (copyright + Press & media + Privacy & Cookie Policy + Transparency Act).
 // Mobile: everything stacks (brand, then the 4 link columns, then the legal row).
 // Explore 3D World sits under Explore, after Projects (6 Oct 2026, Q112: its page left Services, Q108).
 import fs from 'node:fs';
 import path from 'node:path';
 import Eyebrow from './Eyebrow.astro';
-import { socialLinks, legalLinks, prototypeLinks, SHOW_EVENTS } from '../data/navigation';
+import { socialLinks, legalLinks, prototypeLinks, footerPressLink, SHOW_EVENTS } from '../data/navigation';
 import { worldPagePath } from '../data/world';
 
 interface FooterLink {
@@ -116,7 +116,7 @@ const logoInner = logoSvg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*
       <p class="text-caption">© 2027 Reach Subsea ASA. All rights reserved.</p>
       <ul class="site-footer__legal-links">
         {
-          [...prototypeLinks, ...legalLinks].map((link) => (
+          [...prototypeLinks, footerPressLink, ...legalLinks].map((link) => (
             <li>
               <a class="text-caption" href={link.url}>{link.label}</a>
             </li>

@@ -210,10 +210,11 @@ export const navSections: NavSection[] = [
     id: 'newsroom',
     label: 'Newsroom',
     href: '/newsroom/',
-    description: 'News, stock exchange announcements, events and press resources.',
+    description: 'News, reports and press resources.',
     overview: { label: 'All news', url: '/newsroom/' },
+    // "Stock exchange announcements" removed (Ross, 9 Oct 2026, Q164): no such page; releases are in the Newsroom and
+    // the official record is Newsweb (linked from the Investors overview)
     links: withoutHiddenEvents([
-      { label: 'Stock exchange announcements', href: '/newsroom/stock-exchange-announcements/' },
       { label: 'Events', href: '/newsroom/events/' },
       { label: 'Press & media', href: '/newsroom/press-media/' },
     ]),
@@ -283,6 +284,10 @@ export const socialLinks: { icon: string; label: string; href: string }[] = [
   { icon: 'brand-linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/company/reach-subsea/' },
   { icon: 'brand-facebook', label: 'Facebook', href: 'https://www.facebook.com/reachsubsea/' },
 ];
+
+/** Footer legal row, before the legal pages (Ross, 9 Oct 2026, Q162): the press page, where journalists look for it.
+ * In WordPress: the same `footer-legal` menu location, first item. */
+export const footerPressLink: NavLink = { label: 'Press & media', url: '/newsroom/press-media/' };
 
 export const legalLinks: NavLink[] = [
   { label: 'Privacy & Cookie Policy', url: '/privacy-policy/' },

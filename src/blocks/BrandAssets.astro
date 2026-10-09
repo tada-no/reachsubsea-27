@@ -1,0 +1,466 @@
+---
+// Brand assets · reach/brand-assets (9 Oct 2026, Newsroom › Press & media, Q162; outside the 14-block budget).
+// What a journalist needs to show the brand correctly, in one block:
+// - Logo, two full-width rows. First H4 "Logos" over Reach's own files, one set per version (full colour, one colour,
+//   icon), each a white tile and its navy negative with the version named once under the pair: from 1200 the three
+//   pairs sit in one row of six tiles, 600–1199 each pair stacks (white over navy) in three columns, below 600 each
+//   set is a row. Then the logo packs as file rows (format · use · size, cols 1–5) beside the usage rules (cols 7–12),
+//   both under an H4 on the same line; stacked below 600.
+// - Colours: one row of swatch cards per group. The fill is a theme palette token, never typed; the print values sit
+//   under the fill as label · value rows, so no value is printed on a colour (the PDF's swatches failed contrast).
+//   HEX copies on click: the label swaps for "Copied" in the same reserved slot, so nothing moves.
+//   5 across once the group is ≥ 990 wide (a 1100 viewport keeps the row; the card's padding drops to 12 so
+//   "CMYK 100, 95, 44, 55" stays on one line); narrower, each card turns into a row (fill beside the values, the values
+//   in two columns from 560).
+// Fields: sectionHeader, logos[] (label, kind logo | icon, light file, navy file), logoPacks[] (label, url, note,
+// size), logoRules[] (title, text), colourGroups[] (title, colours[] (name, token, hex, rgb, cmyk, pantone, ral?)).
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Link from '../components/Link.astro';
+import Icon from '../components/Icon.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+import type { BrandColourGroup, BrandLogo, LogoPack } from '../data/press';
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  logos?: BrandLogo[];
+  logoPacks?: LogoPack[];
+  logoRules?: { title: string; text: string }[];
+  colourGroups?: BrandColourGroup[];
+}
+
+const { sectionHeader, logos = [], logoPacks = [], logoRules = [], colourGroups = [], background = 'tint', spacing, anchor } = Astro.props;
+const titleId = sectionHeader ? makeId('brand-assets', sectionHeader.title) : undefined;
+const logoTitleId = makeId('brand-assets-logo', 'logo');
+const logosTitleId = makeId('brand-assets-logos', 'logos');
+const hasLogo = logos.length > 0 || logoPacks.length > 0 || logoRules.length > 0;
+
+const valueRows = (c: BrandColourGroup['colours'][number]) =>
+  [
+    { label: 'RGB', value: c.rgb },
+    { label: 'CMYK', value: c.cmyk },
+    { label: 'Pantone', value: c.pantone },
+    c.ral && { label: 'RAL', value: c.ral },
+  ].filter(Boolean) as { label: string; value: string }[];
+---
+
+{
+  (hasLogo || colourGroups.length > 0) && (
+    <BlockSection
+      slug="brand-assets"
+      root="brand-assets"
+      background={background}
+      spacing={spacing}
+      anchor={anchor}
+      labelledBy={titleId}
+      label={titleId ? undefined : 'Brand assets'}
+    >
+      <div class="block__body">
+        {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+
+        {hasLogo && (
+          <div class="brand-assets__logo">
+            {logos.length > 0 && (
+              <div class="brand-assets__part brand-assets__logos">
+                <h3 id={logosTitleId} class="text-h4">Logos</h3>
+                <ul class="brand-assets__sets" aria-labelledby={logosTitleId}>
+                  {logos.map((l) => {
+                    const name = l.kind === 'icon' ? 'Reach Subsea icon' : `Reach Subsea logo, ${l.label.toLowerCase()}`;
+                    return (
+                      <li>
+                        <figure class:list={['brand-assets__set', `brand-assets__set--${l.kind}`]}>
+                          <div class="brand-assets__pair">
+                            <div class="brand-assets__tile has-surface-light">
+                              <img src={l.light} alt={`${name}, for white and light backgrounds`} loading="lazy" decoding="async" />
+                            </div>
+                            <div class="brand-assets__tile has-surface-navy">
+                              <img src={l.navy} alt={`${name}, negative, for navy backgrounds and photos`} loading="lazy" decoding="async" />
+                            </div>
+                          </div>
+                          <figcaption class="brand-assets__set-label text-label">{l.label}</figcaption>
+                        </figure>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+            <div class="brand-assets__logo-text">
+              {logoPacks.length > 0 && (
+                <div class="brand-assets__part">
+                  <h3 id={logoTitleId} class="text-h4">Logo packs</h3>
+                  <ul class="brand-assets__packs" aria-labelledby={logoTitleId}>
+                    {logoPacks.map((p) => (
+                      <li class="brand-assets__pack">
+                        <Link label={p.label} href={p.url} action="file" context="logo pack, ZIP" download />
+                        <span class="brand-assets__pack-meta text-caption">
+                          {p.note} · ZIP, {p.size}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {logoRules.length > 0 && (
+                <div class="brand-assets__part">
+                  <h3 class="text-h4">Using the logo</h3>
+                  <ul class="brand-assets__rules">
+                    {logoRules.map((r) => (
+                      <li class="text-small">
+                        <strong>{r.title}.</strong> {r.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {colourGroups.map((group) => {
+          const groupId = makeId('brand-assets-colours', group.title);
+          return (
+            <div class="brand-assets__group">
+              <h3 id={groupId} class="text-h4">
+                {group.title}
+              </h3>
+              <ul class="brand-assets__swatches" aria-labelledby={groupId}>
+                {group.colours.map((c) => (
+                  <li class="brand-assets__swatch has-surface-light">
+                    <span class="brand-assets__fill" style={`--brand-assets-fill: var(--wp--preset--color--${c.token})`} aria-hidden="true" />
+                    <div class="brand-assets__values">
+                      <p class="brand-assets__name text-h5">{c.name}</p>
+                      <dl class="brand-assets__rows">
+                        <div class="brand-assets__row">
+                          <dt class="text-caption">HEX</dt>
+                          <dd class="text-caption">
+                            <button type="button" class="brand-assets__copy" data-copy={c.hex} aria-label={`Copy ${c.name} HEX ${c.hex}`}>
+                              <span class="brand-assets__copy-idle">
+                                {c.hex}
+                                <Icon name="copy" size={16} />
+                              </span>
+                              <span class="brand-assets__copy-done" aria-hidden="true">
+                                Copied
+                                <Icon name="check" size={16} />
+                              </span>
+                            </button>
+                          </dd>
+                        </div>
+                        {valueRows(c).map((r) => (
+                          <div class="brand-assets__row">
+                            <dt class="text-caption">{r.label}</dt>
+                            <dd class="text-caption">{r.value}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+        <p class="visually-hidden" role="status" data-brand-assets-status></p>
+      </div>
+    </BlockSection>
+  )
+}
+
+<script>
+  // HEX copy: one delegated listener for every Brand assets block on the page. Without the Clipboard API the value
+  // stays readable and selectable, so the button does nothing rather than fail.
+  document.addEventListener('click', async (event) => {
+    const button = (event.target as Element).closest<HTMLButtonElement>('.brand-assets__copy');
+    if (!button || !navigator.clipboard) return;
+    const value = button.dataset.copy ?? '';
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      return;
+    }
+    button.dataset.copied = '';
+    const status = button.closest('.brand-assets')?.querySelector<HTMLElement>('[data-brand-assets-status]');
+    if (status) status.textContent = `${value} copied`;
+    window.setTimeout(() => {
+      delete button.dataset.copied;
+      if (status) status.textContent = '';
+    }, 1600);
+  });
+</script>
+
+<style is:global>
+  /* ── Logo ── */
+  .brand-assets__logo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--xl);
+  }
+  .brand-assets__sets {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .brand-assets__set {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--12);
+    margin: 0;
+  }
+  .brand-assets__pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--wp--preset--spacing--8);
+  }
+  .brand-assets__tile {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 3 / 2;
+    border-radius: var(--wp--custom--radius--md);
+    background: var(--wp--custom--color--bg--default);
+  }
+  .brand-assets__tile.has-surface-navy {
+    background: var(--wp--preset--color--navy-800);
+  }
+  /* The logo at 60% of the tile, never under the brandpad's 110 minimum; the icon narrower to match its weight */
+  .brand-assets__tile img {
+    display: block;
+    width: 60%;
+    min-width: 110px;
+    height: auto;
+  }
+  .brand-assets__set--icon img {
+    width: 36%;
+    min-width: 64px;
+  }
+  .brand-assets__set-label {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .brand-assets__logo-text {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    row-gap: var(--wp--custom--stack--lg);
+    align-items: start;
+  }
+  .brand-assets__logo-text > :first-child {
+    grid-column: 1 / span 5;
+  }
+  .brand-assets__logo-text > :last-child {
+    grid-column: 7 / -1;
+  }
+  .brand-assets__logo-text > :only-child {
+    grid-column: 1 / span 6;
+  }
+  .brand-assets__part {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .brand-assets__packs,
+  .brand-assets__rules {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* File rows: the format beside its use and size, a rule between rows (label ↔ value) */
+  .brand-assets__pack {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--16);
+    padding-block: var(--wp--preset--spacing--8);
+  }
+  .brand-assets__pack + .brand-assets__pack {
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .brand-assets__pack-meta {
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+  }
+  .brand-assets__rules {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .brand-assets__rules strong {
+    color: var(--wp--custom--color--text--primary);
+    font-weight: var(--wp--custom--font-weight--bold);
+  }
+
+  /* ── Colours ── */
+  .brand-assets__group {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .brand-assets__swatches {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--wp--preset--spacing--16);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .brand-assets__swatch {
+    display: grid;
+    grid-template-columns: var(--wp--preset--spacing--64) minmax(0, 1fr);
+    gap: var(--wp--preset--spacing--16);
+    padding: var(--wp--preset--spacing--16);
+    border-radius: var(--wp--custom--radius--lg);
+    background: var(--wp--custom--color--bg--default);
+  }
+  /* A 1px inner rule on every fill, so the palest (Navy 100, Sage 50) still read as a shape on the white card */
+  .brand-assets__fill {
+    display: block;
+    min-height: var(--wp--preset--spacing--64);
+    border-radius: var(--wp--custom--radius--md);
+    background: var(--brand-assets-fill);
+    box-shadow: inset 0 0 0 1px var(--wp--custom--color--border--subtle);
+  }
+  .brand-assets__values {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+    min-width: 0;
+  }
+  .brand-assets__name {
+    margin: 0;
+  }
+  .brand-assets__rows {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: var(--wp--custom--grid--gutter);
+    margin: 0;
+  }
+  .brand-assets__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--wp--preset--spacing--8);
+    padding-block: var(--wp--preset--spacing--4);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .brand-assets__row dt {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .brand-assets__row dd {
+    margin: 0;
+    color: var(--wp--custom--color--text--primary);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+    white-space: nowrap;
+  }
+  /* Copy: both labels stacked in one cell, so the button keeps the wider one's width in either state */
+  .brand-assets__copy {
+    display: inline-grid;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+  .brand-assets__copy-idle,
+  .brand-assets__copy-done {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--wp--preset--spacing--4);
+  }
+  .brand-assets__copy .icon {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .brand-assets__copy-done {
+    visibility: hidden;
+    color: var(--wp--custom--color--text--accent);
+  }
+  .brand-assets__copy-done .icon {
+    color: currentColor;
+  }
+  .brand-assets__copy[data-copied] .brand-assets__copy-idle {
+    visibility: hidden;
+  }
+  .brand-assets__copy[data-copied] .brand-assets__copy-done {
+    visibility: visible;
+  }
+  .brand-assets__copy:hover .brand-assets__copy-idle {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .brand-assets__copy:focus-visible {
+    border-radius: var(--wp--custom--radius--xs);
+  }
+
+  /* Row cards: the fill beside the values, values in two columns */
+  @container (min-width: 560px) {
+    .brand-assets__swatch {
+      grid-template-columns: var(--wp--preset--spacing--160) minmax(0, 1fr);
+      gap: var(--wp--preset--spacing--24);
+    }
+    .brand-assets__rows {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  /* Five across: the fill on top */
+  @container (min-width: 990px) {
+    .brand-assets__swatches {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: var(--wp--custom--grid--gutter);
+    }
+    .brand-assets__swatch {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      gap: var(--wp--preset--spacing--16);
+      padding: var(--wp--preset--spacing--12);
+    }
+    .brand-assets__row {
+      gap: var(--wp--preset--spacing--4);
+    }
+    .brand-assets__fill {
+      aspect-ratio: 2 / 1;
+      min-height: 0;
+    }
+    .brand-assets__rows {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* 600–1199: three columns, each pair white over navy */
+  @media (max-width: 1199px) {
+    .brand-assets__pair {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 899px) {
+    .brand-assets__logo-text > :first-child {
+      grid-column: 1 / span 6;
+    }
+    .brand-assets__logo-text > :last-child {
+      grid-column: 7 / -1;
+    }
+  }
+  /* Phones: one set per row, its pair side by side; packs over rules */
+  @media (max-width: 599px) {
+    .brand-assets__sets {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .brand-assets__pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .brand-assets__logo-text {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .brand-assets__logo-text > :first-child,
+    .brand-assets__logo-text > :last-child {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

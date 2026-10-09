@@ -1,0 +1,98 @@
+---
+// Newsroom › Press & media (9 Oct 2026, Q162; the live URL is /press-media/, dev /company/who-we-are/press-media/:
+// both redirect here). Client PDF p28 / screens p57–58 for the order, the live page's content, the logo rules from
+// Reach's Stipl brandpad. Text hero on navy (child page; one Link, "Latest news", to the Newsroom: the PDF's
+// announcements list as cards only repeated the parent page and pushed the assets down, Ross 9 Oct 2026) · Brand
+// assets: logo packs and rules beside the two colourways, then the primary and secondary colours (tint) · Card grid 4
+// columns, image-top: the press photo sets, each asking the media team until its pack is uploaded (white) · Accordion
+// Split, topic `press` (tint) · CTA panel "Press enquiries", as on every story, with Jorunn Håvardsholm as the named
+// contact (the live page's; Ross) and one action only: with a contact card, two actions are too many (Sustainability
+// rule, docs/00) (tint). The PDF's separate media contact card is the CTA panel here (one contact,
+// said once). No subnav: the Newsroom's other children (Stock
+// exchange announcements, Events) aren't built.
+// Copy and data: src/data/press.ts.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import PageHero from '../../../blocks/PageHero.astro';
+import BrandAssets from '../../../blocks/BrandAssets.astro';
+import CardGrid from '../../../blocks/CardGrid.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { NEWSROOM } from '../../../data/news';
+import { pressHero, pressContact, brandAssets, brandColours, pressPhotos, pressImage, mediaEmail, mediaRequest } from '../../../data/press';
+import { faqsFor, faqHubHref } from '../../../data/faqs';
+import type { CardField } from '../../../lib/types';
+
+const base = import.meta.env.BASE_URL;
+
+const photoCards: CardField[] = pressPhotos.sets.map((set) => ({
+  media: 'image-top',
+  surface: 'white',
+  image: { src: pressImage(set.image.file), alt: set.image.alt, focalPoint: set.image.focalPoint },
+  title: set.title,
+  meta: [{ icon: 'photo', text: set.format }],
+  action: set.file
+    ? { label: 'Download', url: set.file, action: 'file', context: `${set.title} photos` }
+    : { label: 'Request photos', url: mediaRequest(`Press photos: ${set.title}`), context: `of ${set.title}` },
+}));
+---
+
+<BaseLayout title={pressHero.title} motion>
+  <Header current="newsroom" overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Newsroom', href: NEWSROOM }, { label: pressHero.title }]}
+      title={pressHero.title}
+      lead={pressHero.lead}
+      actions={[{ label: 'Latest news', url: NEWSROOM, type: 'link' }]}
+    />
+
+    <BrandAssets
+      anchor="brand-assets"
+      background="tint"
+      sectionHeader={{ eyebrow: brandAssets.eyebrow, title: brandAssets.title, intro: brandAssets.intro }}
+      logos={brandAssets.logos}
+      logoPacks={brandAssets.logoPacks}
+      logoRules={brandAssets.logoRules}
+      colourGroups={brandColours}
+    />
+
+    <CardGrid
+      anchor="press-photos"
+      layout="4-columns"
+      media="image-top"
+      surface="white"
+      background="white"
+      sectionHeader={{ eyebrow: pressPhotos.eyebrow, title: pressPhotos.title, intro: pressPhotos.intro }}
+      cards={photoCards}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about press coverage and media resources.',
+        action: { label: 'See all FAQs', url: faqHubHref('press') },
+      }}
+      layout="split"
+      source="faq"
+      topic="press"
+      background="tint"
+      items={faqsFor('press')}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="tint"
+      title="Press enquiries"
+      text="Our communications team answers questions from the media."
+      actions={[{ label: 'Email the media team', url: `mailto:${mediaEmail}` }]}
+      showContact
+      contact={pressContact}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

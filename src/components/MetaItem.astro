@@ -12,11 +12,30 @@ interface Props {
 }
 
 const { icon, text, href, as: Tag = 'div', class: className } = Astro.props;
+// An email may wrap before its "@" when the column is too narrow (9 Oct 2026, Press & media: a 34-character address
+// ran 27px out of the phone's contact card). <wbr> only adds a break opportunity: where it fits, nothing changes, and
+// a copied address has no extra character.
+const at = /^[^\s@]+@[^\s@]+$/.test(text) ? text.indexOf('@') : -1;
+const content = at > 0 ? [text.slice(0, at), text.slice(at)] : [text];
 ---
 
 <Tag class:list={['meta-item', 'text-small', className]}>
   <Icon name={icon} size={20} />
-  {href ? <a class="meta-item__link" href={href}>{text}</a> : <span>{text}</span>}
+  {
+    href ? (
+      <a class="meta-item__link" href={href}>
+        {content[0]}
+        {content[1] && <wbr />}
+        {content[1]}
+      </a>
+    ) : (
+      <span>
+        {content[0]}
+        {content[1] && <wbr />}
+        {content[1]}
+      </span>
+    )
+  }
 </Tag>
 
 <style is:global>

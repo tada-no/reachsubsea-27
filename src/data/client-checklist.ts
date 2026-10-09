@@ -72,6 +72,7 @@ export const checklistGroups: ChecklistGroup[] = [
       { n: 26, subject: 'Supporter WROV depth rating', text: 'The Supporter WROV depth rating.', pages: 'Subsea', status: 'open' },
       { n: 27, subject: 'News post dates', text: 'Dates for the 15 news posts whose date we could only estimate, and whether to keep the 11 undated posts (we suggest dropping them).', pages: 'Newsroom', status: 'open' },
       { n: 28, subject: 'Ocean Business 2027', text: 'Ocean Business 2027 details and the event web address.', pages: 'Home', status: 'open' },
+      { n: 67, subject: 'Brand colour print values', text: 'Two print values on the current Press & Media page look wrong: Primary navy\'s CMYK (9, 90, 30, 28 prints as a red-purple) and S3\'s Pantone (7443 C, the same as P3). Send the values from your brand manual.', pages: 'Press & media', status: 'open' },
     ],
   },
   {
@@ -87,6 +88,7 @@ export const checklistGroups: ChecklistGroup[] = [
       { n: 36, subject: 'Trainee programme link', text: 'Where the "Learn about the trainee programme" button should go: a new page or an existing one.', pages: 'Careers', status: 'open' },
       { n: 37, subject: 'Sponsorship portal', text: 'The sponsorship application portal address.', pages: 'Sponsorship', status: 'open' },
       { n: 38, subject: 'Current website addresses', text: 'Your current website addresses, so old links can be redirected to the new pages.', status: 'open' },
+      { n: 68, subject: 'Logo packs', text: 'Are the EPS, PNG and SVG logo packs from March 2023 still current? We link to them as they are. If not, send updated packs.', pages: 'Press & media', status: 'open' },
     ],
   },
   {
@@ -101,6 +103,8 @@ export const checklistGroups: ChecklistGroup[] = [
       { n: 45, subject: 'Q2 2026 webcast clip', text: 'The Q2 2026 webcast, for the CEO video clip.', pages: 'Home', status: 'open' },
       { n: 46, subject: 'News image backup', text: 'Optional: a backup of the news images that are broken on the current site.', pages: 'Newsroom', status: 'open' },
       { n: 47, subject: 'News photo alt text', text: 'Optional: short descriptions (alt text) for the news photos, for people using screen readers. None of the current posts have them.', pages: 'Newsroom', status: 'open' },
+      { n: 69, subject: 'Press photo packs', text: 'High-resolution photo packs for the press: vessels, ROVs and operations, Reach Remote, and leadership portraits. Until they arrive, each set has a Request photos link that emails the media team.', pages: 'Press & media', status: 'open' },
+      { n: 70, subject: 'Press video', text: 'Optional: video footage (b-roll) for the press, of the company and Reach Remote and of the leadership team. The design shows it, but there is no footage to offer yet.', pages: 'Press & media', status: 'open' },
     ],
   },
   {
@@ -113,6 +117,7 @@ export const checklistGroups: ChecklistGroup[] = [
       { n: 52, subject: 'Survey and Monitoring contacts', text: 'A named contact for Survey and one for Monitoring.', pages: 'Survey, Monitoring', status: 'open' },
       { n: 53, subject: 'Careers recruiter', text: 'Confirm the recruiter shown on the careers pages, Alexander Nygård Bakke.', pages: 'Careers', status: 'open' },
       { n: 54, subject: 'Visa and rotation answers', text: 'Permission to publish the visa sponsorship and rotation answers from the old dev site.', pages: 'Careers FAQ', status: 'open' },
+      { n: 71, subject: 'Named press contact', text: 'Should the Press & media page name a contact? The current page shows Jorunn Håvardsholm, Group Communications & Marketing Director, with her phone number. The design shows only media@reachsubsea.com, which is what we use.', pages: 'Press & media', status: 'done' },
     ],
   },
   {

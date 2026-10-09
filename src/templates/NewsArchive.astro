@@ -17,6 +17,7 @@ import Footer from '../components/Footer.astro';
 import BlockSection from '../components/BlockSection.astro';
 import Card from '../components/Card.astro';
 import FilterChip from '../components/FilterChip.astro';
+import Link from '../components/Link.astro';
 import Pagination from '../components/Pagination.astro';
 import { newsPosts, newsCategories, archivePages, archiveUrl, newsCard, categoryLabel } from '../data/news';
 
@@ -50,9 +51,12 @@ const chips = [
             </p>
           </div>
           <h2 class="visually-hidden">{heading}{page > 1 && `, page ${page} of ${total}`}</h2>
-          <nav class="news-archive__chips scroll-row" aria-label="Categories">
-            {chips.map((chip) => <FilterChip label={chip.label} count={chip.count} href={chip.href} selected={chip.selected} />)}
-          </nav>
+          <div class="news-archive__bar">
+            <nav class="news-archive__chips scroll-row" aria-label="Categories">
+              {chips.map((chip) => <FilterChip label={chip.label} count={chip.count} href={chip.href} selected={chip.selected} />)}
+            </nav>
+            <Link label="Press & media" href="/newsroom/press-media/" class="news-archive__press" />
+          </div>
         </div>
 
         {
@@ -110,12 +114,35 @@ const chips = [
   .news-archive__lead-text {
     color: var(--wp--custom--color--text--secondary);
   }
+  /* The chips, and Press & media at the far end of their row (Q162): the chips start where they always did */
+  /* Wraps as a whole: where chips and link don't fit one row (600–630), the link goes under the chips, never between */
+  .news-archive__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+  }
   .news-archive__chips {
     flex-wrap: wrap;
+    min-width: 0;
+  }
+  /* The link's 48 target is 8 taller than a chip: pull it in by 4 each side so the row stays chip-high */
+  .news-archive__press {
+    flex: none;
+    margin-block: -0.25em;
   }
   @media (max-width: 599px) {
+    .news-archive__press {
+      margin-block: 0;
+    }
+    .news-archive__bar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
     .news-archive__chips {
       flex-wrap: nowrap;
+      align-self: stretch;
     }
   }
 

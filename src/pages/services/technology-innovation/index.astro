@@ -31,14 +31,24 @@ const line = serviceLines.find((l) => l.id === 'technology')!;
 const monitoring = serviceLines.find((l) => l.id === 'monitoring')!;
 const services = navSections.find((s) => s.id === 'services')!;
 
-// The four in-house products, the PDF's wording. Relay is the data backbone under the other three.
+// The four in-house products, the PDF's wording. Order (Ross, 9 Oct 2026): Reach Horizon first, then Reach Remote (the
+// product in service, with a link to its page), Reach Pilot, and Reach Relay, the data backbone under the other three.
+//
+// Pictograms still to draw: each card shows a `needed-…` box until Ross picks a glyph. Suggestions from the
+// pictogram library (Figma 33:74, ref/SVG/icons-green-flat_<name>.svg), none used anywhere else on the site yet:
+// - Reach Horizon, the software platform for operations from shore: "settings screen" (a browser window with a cog);
+//   or "profile laptop" (a person working at a laptop) if the point is people ashore.
+// - Reach Pilot, perception and computer vision for ROV operators: "Eye settings" (an eye under a cog: machine vision);
+//   or plain "eye".
+// - Reach Relay, the secure offshore-to-shore data link: "satilite" (a satellite with a dish and signal); or
+//   "profile connect" (a network of nodes) if the point is the data backbone. "Padlock" says secure but not data.
 const productCards: CardField[] = [
   {
     media: 'pictogram-panel',
-    pictogram: 'needed-reach-pilot',
-    title: 'Reach Pilot',
+    pictogram: 'needed-reach-horizon',
+    title: 'Reach Horizon',
     description:
-      'A suite of perception and robotics applications giving ROV operators real-time situational awareness: a heads-up display, obstacle detection, pipeline tracking and computer-vision tools. It lays the foundations for autonomous ROV capability. In development since 2025, expanded through 2026.',
+      'Our in-house software platform, built for uncrewed operations and now adapted to support crewed vessels too, giving operators, surveyors and clients seamless access to data, operations and expertise from shore. No longer just a Reach Remote management tool, it is becoming a standalone product in its own right.',
   },
   {
     media: 'pictogram-panel',
@@ -46,13 +56,14 @@ const productCards: CardField[] = [
     title: 'Reach Remote',
     description:
       'Uncrewed vessels operated remotely from shore, holding the world-first AROS notation for autonomous and remotely operated ships. Reach Remote 1 has operated in the UK sector while controlled from Norway.',
+    action: { label: 'Meet Reach Remote', url: '/assets/reach-remote/', action: 'page' },
   },
   {
     media: 'pictogram-panel',
-    pictogram: 'needed-reach-horizon',
-    title: 'Reach Horizon',
+    pictogram: 'needed-reach-pilot',
+    title: 'Reach Pilot',
     description:
-      'Our in-house software platform, built for uncrewed operations and now adapted to support crewed vessels too, giving operators, surveyors and clients seamless access to data, operations and expertise from shore. No longer just a Reach Remote management tool, it is becoming a standalone product in its own right.',
+      'A suite of perception and robotics applications giving ROV operators real-time situational awareness: a heads-up display, obstacle detection, pipeline tracking and computer-vision tools. It lays the foundations for autonomous ROV capability. In development since 2025, expanded through 2026.',
   },
   {
     media: 'pictogram-panel',

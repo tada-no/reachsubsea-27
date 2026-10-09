@@ -67,6 +67,7 @@ export const faqTopics: FaqTopic[] = [
   faqGroups[0],
   { id: 'contact', label: 'Contact', parent: 'general', page: '/contact/' },
   { id: '3d-world', label: 'Explore 3D World', parent: 'general', page: '/3d-world/' },
+  { id: 'press', label: 'Press & media', parent: 'general', page: '/newsroom/press-media/' },
   faqGroups[1],
   { id: 'subsea', label: 'Subsea', parent: 'services', page: '/services/subsea/' },
   { id: 'survey', label: 'Survey', parent: 'services', page: '/services/survey/' },
@@ -162,11 +163,27 @@ export const faqs: Faq[] = [
     answer: `${people.value} people across our operations, offshore and onshore.`,
     topics: ['company'],
   },
+
+  // Press & media (PDF p28, Q162): the PDF's three questions. The third is investor-or-press below (primary topic
+  // Contact, topic press too); these two come first so the Press page opens on releases.
+  {
+    slug: 'press-releases',
+    question: 'Where can I find Reach Subsea’s press releases and announcements?',
+    answer:
+      'In our Newsroom, newest first. Stock exchange announcements are also published on Oslo Børs Newsweb, which holds the full regulatory disclosure history.',
+    topics: ['press'],
+  },
+  {
+    slug: 'media-kit',
+    question: 'Is there a brand or media kit?',
+    answer: `Yes. Our Press & media page has the logo as EPS, PNG and SVG packs, the rules for using it, and the brand colours with their HEX, RGB, CMYK and Pantone values. For photos, write to ${mailboxFor('media').email.label}.`,
+    topics: ['press'],
+  },
   {
     slug: 'investor-or-press',
     question: 'Who do I contact for investor or press inquiries specifically?',
     answer: `Each has its own address: ${mailboxFor('investors').email.label} for investor relations and ${mailboxFor('media').email.label} for press.`,
-    topics: ['contact'],
+    topics: ['contact', 'press'],
   },
 
   // Explore 3D World (PDF p29)

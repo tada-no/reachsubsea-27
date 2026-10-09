@@ -10,6 +10,38 @@ _No open questions right now._
 
 ## Answered log
 
+### Q164. Newsroom menu: "Stock exchange announcements" (9 Oct 2026)
+Context: Ross spotted it in the mobile menu's Newsroom group. In the menu data since 17 Sep (the brief's sitemap), but no page was ever built: a 404.
+- [x] Remove it (Recommended): the Newsroom group is Press & media (Events while hidden), with All news as its overview. Releases are in the Newsroom; the official record is Newsweb, linked from the Investors overview
+- [ ] ~~Link to Newsweb~~ · ~~Hide it behind a switch like Events~~
+
+**Answer:** removed.
+
+### Q163. Technology & Innovation: product order, Reach Remote link, pictogram suggestions (9 Oct 2026)
+Context: Ross, on the "Where we are investing now" cards: "Have the box first, add link in the Reach Remote box, Reach Pilot 3rd, Relay 4th, suggest in the comments for icons".
+- [x] Order: Reach Horizon · Reach Remote · Reach Pilot · Reach Relay (was Pilot, Remote, Horizon, Relay)
+- [x] Reach Remote card: Link "Meet Reach Remote" → `/assets/reach-remote/`, the label and URL the menu, footer and hero already use (the page itself isn't built yet)
+- [ ] Pictograms, suggested in the page's comments, all from the library (Figma 33:74) and unused on the site: Reach Horizon "settings screen" (or "profile laptop"), Reach Pilot "Eye settings" (or "eye"), Reach Relay "satilite" (or "profile connect"). Ross to pick; the `needed-…` boxes stay until then
+
+**Answer:** as ticked; pictograms open.
+
+### Q162. Press & media page (9 Oct 2026)
+Context: Ross: "connect to Reach Stipl or use what you have in the design system and build the Press & Media page, list anything you're missing". The Stipl connector's workspace had no Reach brandpad; Ross shared the brandpad (stipl.studio, read in his Chrome) and its public page (stipl.site/reach-subsea-1). It mirrors the design system (the site's tokens, Inter, the horizontal logo in two colourways, Guidelines for logo, colour, type, voice and imagery); its Media and Assets are empty, its logo pack holds two SVGs, and its CMYK values are converted from screen colours (no Pantone or RAL). The live Press & Media page (reachsubsea.no/press-media/, Mar 2025) has the EPS · PNG · SVG logo packs (still live) and every colour's HEX, RGB, CMYK, Pantone and RAL. Client PDF p28: hero, announcements, logo & colour swatches, four press-material cards (placeholders: two photo, two video), a media contact card, FAQ, CTA.
+- [x] Content from the live page (logo packs and print values); from Stipl only the clear space (10% of the shorter side). Stipl's computed CMYK not used
+- [x] ~~The site's one-colour logo in two colourways~~ → Reach's own files (Ross: "what about the green and navy logo?"): the packs lead with a full-colour logo, navy with the sage bar, and its negative, white with sage. Shown as six tiles in light | navy pairs (full colour and negative; ~~icons only after them~~ the all-navy and all-white one-colour logos, Ross: "keep all neg and all navy logos in"; the icon and its negative), from `public/images/brand/`. ~~Six tiles in three rows beside the text~~ → (Ross: "this can be laid out better") two full-width rows: three sets (Full colour · One colour · Icon), each a white | navy pair named once, one row of six tiles from 1200; then Logo packs beside Using the logo (242 and 240 tall at 1440, was a 570 text column against 850 of tiles), cropped from the live SVG pack (the black logo is there too, in the packs only), and the rules now say full colour first, one colour when only one is possible. The Stipl brandpad's "never recolour it in sage" contradicts the packs: to correct in Stipl. Open: the site header and footer use the one-colour logo
+- [x] New block **Brand assets** (docs/05 §2.31): the logo in both colourways beside the packs and rules; swatch cards with every value under the fill, never on it (the PDF's hex-on-fill failed contrast), fills from palette tokens, HEX copies in place without moving anything
+- [x] Press photos as a Card grid of four sets from the site's own photos (Vessels, ROVs & operations, Reach Remote, Leadership). The PDF hides a category until files exist; instead each card asks the media team ("Request photos", mailto with the set in the subject) until its pack is uploaded, then becomes Download. No video cards: no footage
+- [x] Media contact: the stories' "Press enquiries" CTA panel (Email the media team) with ~~no named person~~ Jorunn Håvardsholm, Group Communications & Marketing Director, as the named contact (Ross: "Jorunn can be the contact"; the live page's), checklist 71 done. One action only, Email the media team: "Contact us" went (Ross: "did we make a rule about having too many cta in this block?"; yes, the Sustainability rule: two actions plus a contact is too much). Her address ran 27px out of the phone card: Meta item now lets an email wrap before its "@" (`<wbr>`, nothing changes where it fits; Contact, Leadership, Investors, Life at Reach checked at 375)
+- [x] FAQ topic `press` (under General): the PDF's three questions, two new and Contact's investor-or-press (now topics contact + press)
+- [x] ~~Latest news, the three newest posts as cards~~ → a "Latest news" Link in the hero (Ross: "is there any point having these here?"; Claude agreed: they repeated the parent Newsroom and pushed the logo and colours ~800px down; the PDF had three text rows, not cards). The page opens on Logo & colours
+- [x] Where to find it (Ross picked): the Newsroom header, "Press & media" Link at the far end of the chip row (the chips and grid don't move: the link is pulled in 4px top and bottom so the row stays chip-high; 600–630 it drops under the chips, phones under them too), and the footer's legal row before Privacy & Cookie Policy (`footerPressLink`). Already in the mobile menu's Newsroom group and search
+- [x] Search entry; redirects from live `/press-media/` and dev `/company/who-we-are/press-media/` noted in the page header
+- [x] Checked 375 · 600 · 700 · 800 · 900 · 1000 · 1080–1095 · 1100 · 1150 · 1200 · 1300 · 1399 · 1440: no sideways scroll, no value wraps or overflows (CMYK "100, 95, 44, 55" was the tightest, fixed with padding 12 and gap 4 at five across), photo titles one height, copy state measured identical; production build matches dev
+- [ ] For Reach (client checklist 67–71): brand colour print values (Primary CMYK, S3 Pantone), logo packs still current, high-resolution press photo packs, optional press video
+- [ ] Figma after approval: Block/Brand assets (Desktop · Mobile), Swatch card component, page frame
+
+**Answer:** built; Reach items open.
+
 ### Q161. Client checklist on the prototype, answered by email (9 Oct 2026)
 Context: Ross wanted the "what we need from you" checklist open to Reach without a Claude sign-in (the Claude Doc needed one), linked from the footer next to Privacy & Cookie Policy.
 - [x] A page on the prototype + email (Recommended): `/client-checklist/` (prototype only, not for WordPress), the 66 items from the doc in its eight groups, numbered for good. Each row: number · text with its pages · status badge (Open · Received · Done) · "Answer by email", which opens a message to ross@tada.no with "Reach checklist <n>: <subject>". An "Email your answers" button covers several items in one message. Data: `src/data/client-checklist.ts` (statuses only, never the answers: the repo is public)
