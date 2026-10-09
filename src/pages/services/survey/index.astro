@@ -56,7 +56,7 @@ const fleetCards: CardField[] = [
     eyebrow: 'Survey & IMR vessel',
     title: 'Northern Maria',
     description: 'DP2 survey and ROV vessel with hull-mounted multibeam and sub-bottom profiler, plus towed sonar and UXO equipment.',
-    action: { label: 'View vessel', url: '/assets/northern-maria/', context: 'Northern Maria' },
+    action: { label: 'View vessel', url: '/assets/#vessels', context: 'Northern Maria' },
   },
   { media: 'stat', surface: 'navy', statValue: people.value, title: people.label },
   {
@@ -65,7 +65,7 @@ const fleetCards: CardField[] = [
     eyebrow: 'Survey ROV',
     title: 'Surveyor Interceptor',
     description: 'A sensor carrier for fast, stable survey.',
-    action: { label: 'View ROV', url: '/assets/surveyor-interceptor/', context: 'Surveyor Interceptor' },
+    action: { label: 'View ROV', url: '/assets/#rovs', context: 'Surveyor Interceptor' },
   },
   { media: 'stat', surface: 'white', statValue: countries.value, title: countries.label },
   {
@@ -74,7 +74,7 @@ const fleetCards: CardField[] = [
     eyebrow: 'Autonomous survey vehicle',
     title: 'DriX Orca 1 & 2',
     description: 'Hydrographic survey in shallow water, with multibeam.',
-    action: { label: 'View vehicles', url: '/assets/drix-orca-1-and-orca-2/', context: 'DriX Orca 1 & 2' },
+    action: { label: 'View vehicles', url: '/assets/#uncrewed', context: 'DriX Orca 1 & 2' },
   },
   {
     media: 'image-bg',
@@ -130,7 +130,7 @@ const subnavItems = [
       pictogram={line.pictogram}
       title="Crewed and uncrewed, one clear picture of the seabed"
       body={`<p>Our survey work spans four areas: seabed surveys, offshore cable, marine construction and rig and mooring support, each combining experienced survey crews with modern acquisition and processing systems.</p><p>We deploy crewed DP survey vessels and uncrewed surface vessels, both carrying ROVs and survey spreads, to acquire multibeam, sidescan sonar, sub-bottom profiler and positioning data. Clients get a verified picture of the seabed and structures before, during and after construction.</p>`}
-      actions={[{ label: 'Survey and monitoring equipment', url: '/assets/survey-monitoring-equipment/', action: 'page' }]}
+      actions={[{ label: 'Survey and monitoring equipment', url: '/assets/#equipment', action: 'page' }]}
       image={{ src: `${base}images/vessel-go-electra.jpg`, alt: 'Go Electra, a blue Reach Subsea survey vessel, alongside a quay', focalPoint: { x: 0.4, y: 0.55 } }}
     />
 

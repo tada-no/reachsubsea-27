@@ -5,8 +5,12 @@ import type { CardField, LinkField } from '../lib/types';
 import { worldPagePath, worldLabel } from './world';
 import { newsPosts, postUrl } from './news';
 import { shortDate } from '../lib/dates';
+import { projectSingles } from './projects';
 
 // The newest posts (8 Oct 2026, Newsroom, Q145): in WordPress the same query as the archive's lead
+// The menu's Latest project: the newest project with its own page (was a sample project with no page)
+const latestProject = [...projectSingles].sort((a, b) => (b.year ?? 0) - (a.year ?? 0))[0];
+
 const [latestPost] = newsPosts;
 const dotted = (iso: string) => iso.split('-').reverse().join('.');
 
@@ -127,8 +131,8 @@ export const navSections: NavSection[] = [
       media: 'none',
       surface: 'tint',
       eyebrow: 'Latest project',
-      title: 'Cable route survey, southern North Sea',
-      action: { label: 'Read project', url: '/projects/cable-route-survey-southern-north-sea/' },
+      title: latestProject.title,
+      action: { label: 'Read project', url: latestProject.url },
     },
   },
   {
@@ -229,10 +233,10 @@ export const siteMenu = {
   project: {
     media: 'image-bg',
     eyebrow: 'Latest project',
-    title: 'Cable route survey, southern North Sea',
-    description: 'Geophysical and geotechnical survey along a 140 km export cable corridor.',
-    image: { src: `${import.meta.env.BASE_URL}images/usv-drix-wind.jpg`, alt: 'Uncrewed survey vessel passing an offshore wind farm' },
-    action: { label: 'Read project', url: '/projects/cable-route-survey-southern-north-sea/' },
+    title: latestProject.title,
+    description: latestProject.field,
+    image: latestProject.image,
+    action: { label: 'Read project', url: latestProject.url },
   } satisfies CardField,
   news: newsPosts.slice(0, 3).map((p) => ({ date: dotted(p.date), title: p.title, href: postUrl(p) })),
   events: [
