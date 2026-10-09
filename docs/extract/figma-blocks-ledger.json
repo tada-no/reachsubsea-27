@@ -2364,5 +2364,15 @@
       "List item spacing (space/8): the News single frames show a story with no list, so it lives in the Article doc text only",
       "Breadcrumb header clearance and the lead → links-row gap: code-only fixes (frames have the header in flow and no links row)"
     ]
+  },
+  "phase4NewsroomQ156_9Oct": {
+    "date": "2026-10-09",
+    "context": "News polish (Q156): captions and tables at the prose measure.",
+    "components": {
+      "Article doc text 629:2636": "Q145–Q156; photos and embeds keep 880, tables and captions stop at 720."
+    },
+    "notInFigma": [
+      "Quote marks, joined paragraphs, bullet lists, repeated featured photos and title dashes are content fixes in src/data/news-posts.json (scripts/news-cleanup.mjs step 10); the frames show the cleaned text already"
+    ]
   }
 }
