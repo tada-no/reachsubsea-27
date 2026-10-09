@@ -2415,5 +2415,26 @@
       "Setting a text property on new instances left their textDecoration at NONE although the main had UNDERLINE: set it with setRangeTextDecoration on the main and each instance",
       "resize() on a new component reset its counter axis to FIXED: set counterAxisSizingMode AUTO after"
     ]
+  },
+  "phase4NewsroomQ159_9Oct": {
+    "date": "2026-10-09",
+    "context": "News single third critique fixes and the sitewide 720 measure (Q159). Ground truth: src/styles/base.css (.article), src/styles/tokens.css (--wp--custom--measure--prose 40em), src/blocks/KeyFigures.astro, src/components/ResultFigure.astro, src/templates/NewsSingle.astro.",
+    "components": {
+      "Key figures 669:2696 (new, Components / Article, after Article quote)": "Breakpoint=Desktop 669:2648 (720, width bound to container/prose; columns of Result figure instances, padding x space/24, 1px border/subtle between) · Breakpoint=Mobile 669:2672 (327, one column, space/16 rows, rule between). Caption Body/Small text/secondary; change lines text/secondary, arrow off",
+      "Result figure 465:9591 (was Result item, Blocks / Group/Parts)": "Renamed and described as the shared figure (code ResultFigure.astro): used by Block/Results band and Key figures",
+      "Article quote 629:2685": "Description: space/24 above and below at every width; one quote treatment (speaker in the cite, no marks; marks only when the speaker is named inside)",
+      "Article doc text 629:2636": "Q159 sentence appended"
+    },
+    "variables": {
+      "container/prose VariableID:642:22": "Stays 720; description: 40em in code, narrower with smaller text styles; stories, legal pages, project stories, FAQ answers"
+    },
+    "pageFrames": {
+      "News single 636:22930 / News single · Mobile 638:24070": "Quote wrappers 642:35357 / 642:35362 paddingTop bound to space/24 (mobile 16 → 24), renamed; quote text in the Q159 form (“…,” said Alendal. “…”, Show cite off). Featured image was already 3:2 and text already 720"
+    },
+    "notInFigma": [
+      "Key figures on a page frame: the News single frames show a story, not a results release; the block lives in Components / Article",
+      "Leads without the dateline, cite clean-ups and contact unlinking: content fixes in src/data/news-posts.json",
+      "Project story and FAQ answers at the measure: code-only (the Project single frame's story is already in the 7-column main column; Accordion item answers in Figma are short)"
+    ]
   }
 }
