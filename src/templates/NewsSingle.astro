@@ -221,10 +221,19 @@ const endParts = boilerplate ? split(boilerplate.replace(/<\/div>\s*$/, '')) : [
     line-clamp: 3;
     overflow: hidden;
   }
+  /* The featured photo is cropped to 3:2 (Q159): a portrait or square upload ran 1036–1249px tall and put the story a
+     screen and a half down. The figure clips to the radius, so the tint layer under a photo with transparent edges
+     shows no corners of its own */
+  .news-article__image {
+    overflow: hidden;
+    border-radius: var(--wp--custom--radius--lg);
+  }
   .news-article__image img {
     display: block;
     width: 100%;
     height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
     border-radius: var(--wp--custom--radius--lg);
     background-color: var(--wp--custom--color--bg--disabled);
   }

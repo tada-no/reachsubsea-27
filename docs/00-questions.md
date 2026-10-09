@@ -10,6 +10,18 @@ _No open questions right now._
 
 ## Answered log
 
+### Q159. News single: third critique fixes (9 Oct 2026)
+Context: the third critique of the story pages scored 24/36 (no P0, three P1: tall featured photos, a fixed measure that ran 85–91 characters, results leads cut to the dateline sentence). Ross picked all four groups of fixes and asked whether they carry over to the WordPress blocks. Done in base.css, NewsSingle and `scripts/news-cleanup.mjs` (steps 9–10, idempotent; 76 posts changed).
+- [x] Featured photo cropped to 3:2: a portrait or square upload ran 1036–1249px tall (OCTIO, the 2013 reports) and put the story a screen and a half down; now 587 at 1440
+- [x] Measure in em: `container/prose` 720px → 32em, ~68 characters a line in every text style at every width (Body 576 at 1440; captions and the boilerplate narrow with their type). Was 85–91 for Body, 102–106 for captions. The Privacy & Cookie Policy (Q157) uses the same article style and follows
+- [x] Release leads: the dateline ("Haugesund, 18 August 2026 –") leaves the lead, the date is in the meta (62); a dated lead under 25 words takes the next paragraph's opening sentences up to 50 words (23), so the 2Q 2026 lead now gives revenue and EBIT; 5 leads that had lost their style get it back
+- [x] Rhythm: lists, quotes and link rows step out 24 at every width (16 on phones before, the same as two paragraphs). A link row's first and last Link pull out by their 12 of target padding, so the row's text sits 24 from the paragraphs (was ~40 at 1440); targets stay 48
+- [x] One quote treatment (74 quote blocks): a quote block names its speaker in the cite and has no marks of its own. Marks round a whole quote go; a name and title left after the last sentence, or a closing ", said Jostein Alendal, CEO of Reach Subsea.", moves to the cite; a quote that names its speaker inside keeps marks round the quoted words ("…,” said Alendal. “…”); quotes inside paragraphs keep their marks. Missing full stops added (Beacon), cites carry none, 2 empty quote blocks removed
+- [x] Boilerplate names linked to /contact/ become plain text (5), which also fixes OCTIO's duplicate link and the comma inside "Jostein Alendal,"
+- [ ] Key-figures row for results releases: design pass next
+
+**Answer:** Photo crop + measure (Recommended), Release leads, Rhythm + quote consistency, Key-figures row for results.
+
 ### Q157. Privacy & Cookie Policy page (9 Oct 2026)
 Context: Ross: "Make Privacy & Cookie Policy page". Built from the live https://reachsubsea.no/privacy-policy/ (last modified 29 March 2023) in its own wording. Layout recorded in docs/05 §3.
 - [x] URL `/privacy-policy/`, the live one (as the Transparency Act keeps its live URL); the footer's and menu's legal link point there (was `/privacy-cookie-policy/`, which never existed). Title "Privacy & Cookie Policy", as the legal links name it

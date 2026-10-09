@@ -99,7 +99,7 @@
   --wp--custom--grid--columns: 12; /* 4 below 600px, set in base.css */
   --wp--style--global--wide-size: 1440px; /* container/wide (1600 → 1440, 17 Sep 2026: tighter measure, media still bleeds) */
   --wp--style--global--content-size: 880px; /* container/content */
-  --wp--custom--measure--prose: 720px; /* container/prose: running text in a story (Q153), ~80 characters at Body 18; its photos, tables and embeds keep 880 */
+  --wp--custom--measure--prose: 32em; /* container/prose: running text in a story (Q153; in em since Q159): ~68 characters a line in any text style, 576 for Body at 1440; photos and embeds keep 880 */
 
   /* ── Typography ───────────────────────────────────────────── */
   --wp--preset--font-family--inter: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;

@@ -133,7 +133,8 @@ function cleanOnce(html, report) {
     again = false;
     out = out.replace(/\s*<(h2|p)>([^<]*(?:<(?:strong|em)>[^<]*<\/(?:strong|em)>[^<]*)*)<\/\1>(\s*<\/div>)?\s*$/, (m, tag, inner, close = '') => {
       const t = plain(inner);
-      if (words(t) <= 8 && (/:$/.test(t) || BOILERPLATE.test(t))) {
+      // Not a line that carries its content after the colon ("please contact: Birgitte Wendelbo Johansen")
+      if (words(t) <= 8 && (/:$/.test(t) || BOILERPLATE.test(t)) && !/:\s*\S/.test(t)) {
         again = true;
         count('trailingLabelsRemoved');
         return close ? `\n${close.trim()}` : '';
@@ -314,26 +315,73 @@ function shortLinks(html, report) {
     .join('');
 }
 
-// 9. A long lead keeps its first sentence
+// 9. Leads (Q155, Q159). The dateline goes from the lead: the meta shows the date and the card already drops it
+// ("Haugesund, 18 August 2026 – "). A lead is whole sentences, at most 50 words: a long one keeps its opening sentences
+// and the rest is the next paragraph; one the dateline left short (under 25 words) takes the next paragraph's opening
+// sentences, so a results release leads with its figures (a lead short as written stays as it is). A release that lost its lead to the 45-word cut (Q155) and
+// opens with a dateline gets it back. No sentence end between 10 and 50 words: no lead.
 const ABBR = /\b(ltd|inc|no|mr|ms|dr|st|approx|nok|usd|eur|co|e\.g|i\.e|[a-z])\.$/i;
-function shortLead(html, report) {
-  return html.replace(/<p class="article-lead">([\s\S]*?)<\/p>/, (m, inner) => {
-    if (words(plain(inner)) <= 45) return m;
-    report.longLeads = (report.longLeads ?? 0) + 1;
-    for (const s of inner.matchAll(/[.!?](?=\s+[A-Z0-9“"])/g)) {
-      const head = inner.slice(0, s.index + 1);
+const MONTH_NAMES = 'january|february|march|april|may|june|july|august|september|october|november|december';
+const DATELINE_START = new RegExp(
+  String.raw`^\s*(?:(?:Haugesund|Oslo|Bergen|Stavanger|Aberdeen|Stockholm)(?:\s*\/\s*[A-Z]\w+)?,\s*)?(?:\d{1,2}\s*(?:st|nd|rd|th)?\.?\s+(?:${MONTH_NAMES}),?\s+20\d\d|\d{1,2}\.\d{1,2}\.20\d\d)\s*[:–—-]\s*`,
+  'i',
+);
+const LEAD_MAX = 50;
+// Where whole sentences end in an HTML string: not inside a tag or a quotation, not after an abbreviation
+const sentenceEnds = (html) =>
+  [...html.matchAll(/[.!?](?=\s+[A-Z0-9“"]|\s*$)/g)]
+    .map((s) => s.index + 1)
+    .filter((at) => {
+      const head = html.slice(0, at);
       const n0 = (re) => (head.match(re) ?? []).length;
-      // Not inside a tag or a quotation
       const balanced = ['a', 'em', 'strong'].every((t) => n0(new RegExp(`<${t}\\b`, 'g')) === n0(new RegExp(`</${t}>`, 'g'))) && n0(/“/g) === n0(/”/g);
-      if (ABBR.test(head) || !balanced) continue;
-      const n = words(plain(head));
-      if (n < 10) continue;
-      if (n > 45) break;
-      report.leadsCut = (report.leadsCut ?? 0) + 1;
-      return `<p class="article-lead">${head}</p>\n<p>${inner.slice(s.index + 1).trim()}</p>`;
+      return balanced && !ABBR.test(head);
+    });
+function leads(html, report) {
+  const count = (k) => (report[k] = (report[k] ?? 0) + 1);
+  let out = html;
+  // A release that opens with a dateline and runs to four paragraphs has a lead
+  if (!out.includes('article-lead') && (out.match(/<p>/g) ?? []).length >= 4) {
+    out = out.replace(/^\s*<p>((?:(?!<\/p>)[^])*?)<\/p>/, (m, inner) => (DATELINE_START.test(plain(inner)) && words(plain(inner)) > 12 ? (count('leadsRestored'), `<p class="article-lead">${inner}</p>`) : m));
+  }
+  return out.replace(/<p class="article-lead">([^]*?)<\/p>(\s*<p>([^]*?)<\/p>)?/, (m, lead, nextBlock = '', next = '') => {
+    let text = lead.replace(/&nbsp;/g, ' ');
+    const dated = DATELINE_START.test(text);
+    if (dated) {
+      text = text.replace(DATELINE_START, '');
+      text = text.charAt(0).toUpperCase() + text.slice(1);
+      count('leadDatelinesRemoved');
+    } else text = lead;
+    let rest = next;
+    // Short once its dateline went: take the next paragraph's opening sentences while the lead stays within 50 words
+    // (a lead that was short as written keeps the author's paragraph break)
+    if (dated && words(plain(text)) < 25 && rest) {
+      let take = 0;
+      for (const at of sentenceEnds(rest)) {
+        if (words(plain(text)) + words(plain(rest.slice(0, at))) > LEAD_MAX) break;
+        take = at;
+      }
+      if (take) {
+        text = `${text} ${rest.slice(0, take).trim()}`;
+        rest = rest.slice(take).trim();
+        count('leadsExtended');
+      }
     }
-    report.leadsDropped = (report.leadsDropped ?? 0) + 1;
-    return `<p>${inner}</p>`;
+    // Long: keep whole opening sentences, 10 to 50 words
+    if (words(plain(text)) > LEAD_MAX) {
+      const fit = sentenceEnds(text).filter((at) => words(plain(text.slice(0, at))) >= 10 && words(plain(text.slice(0, at))) <= LEAD_MAX).pop();
+      if (fit) {
+        rest = `${text.slice(fit).trim()}${rest ? ` ${rest}` : ''}`;
+        text = text.slice(0, fit);
+        count('leadsCut');
+      } else {
+        count('leadsDropped');
+        return `<p>${text}</p>${nextBlock ? nextBlock.replace(next, rest) : ''}`;
+      }
+    }
+    if (text === lead && rest === next) return m;
+    const after = rest ? `\n<p>${rest}</p>` : '';
+    return `<p class="article-lead">${text}</p>${nextBlock || rest !== next ? after : ''}`;
   });
 }
 
@@ -341,7 +389,7 @@ function releaseTidy(html, report) {
   const at = html.indexOf(BP);
   const story = at < 0 ? html : html.slice(0, at);
   const bp = at < 0 ? '' : html.slice(at);
-  return shortLinks(shortLead(releaseLinks(story, report), report) + boilerplateLabels(bp, report), report);
+  return shortLinks(leads(releaseLinks(story, report), report) + boilerplateLabels(bp, report), report);
 }
 
 // 10. Polish (Q156)
@@ -359,6 +407,74 @@ function polish(html, featured, report) {
     .replace(/“(?:\s|&nbsp;)*(<strong>)?([^“”<]{1,40}?)(<\/strong>)?(?:\s|&nbsp;)*“/g, (m, b = '', t, e = '') => (count('quotesFixed'), `“${b}${t}${e}”`))
     .replace(/:\s*”\s*(?=[A-Z])/g, () => (count('quotesFixed'), ': “'))
     .replace(/«([^«»”<]*)”/g, (m, t) => (count('quotesFixed'), `“${t}”`));
+  // Quote blocks (Q159): a quote block names its speaker in its cite and has no marks of its own. Marks round the
+  // whole quote go when there is a cite, and so does a trailing ", said <name>." the cite repeats. A block with no cite
+  // whose speaker is named inside ("…, said Alendal. It is …") gets marks round the quoted words, as running text
+  // would; a name and title left after the last sentence ("… efficiency. Jostein Alendal, CEO of Reach Subsea")
+  // becomes the cite. A quote that stops without punctuation gets its full stop.
+  out = out.replace(/<blockquote>\s*<\/blockquote>\s*/g, () => (count('emptyQuotesRemoved'), ''));
+  out = out.replace(/<blockquote>([^]*?)<\/blockquote>/g, (m, inner) => {
+    let cite = inner.match(/<cite>[^]*?<\/cite>/)?.[0] ?? '';
+    let paras = [...inner.replace(cite, '').matchAll(/<p>([^]*?)<\/p>/g)].map((x) => x[1].trim());
+    if (!paras.length) return m;
+    const all = () => plain(paras.join(' '));
+    const NAME_TITLE = String.raw`[A-Z][\w’-]+(?:\s[A-Z][\w’-]+){1,2},\s[^.<“”]+`;
+    if (!cite && paras.length > 1 && new RegExp(`^${NAME_TITLE}\\.?$`).test(paras[paras.length - 1])) {
+      // The name and title in a paragraph of their own
+      cite = `<cite>${paras.pop().replace(/\.$/, '')}</cite>`;
+    }
+    const last = paras.length - 1;
+    if (!cite && !/[“”]/.test(all())) {
+      // "…, said Jostein Alendal, CEO of Reach Subsea." at the end: the speaker with a title goes to the cite
+      // ("says CEO, Jostein Alendal." reads Name, title); a bare "said Alendal" stays in the text, with marks (below)
+      const said = paras[last].match(/^([^]+?),\s+(?:said|says)\s+([^“”<]+?)\.?$/);
+      const who = said?.[2].replace(/^([A-Z][\w ]*?),\s+([A-Z][\w’-]+(?:\s[A-Z][\w’-]+){1,2})$/, '$2, $1');
+      if (said && /^[A-Z][\w’-]+(?:\s[A-Z][\w’-]+){1,2},\s/.test(who)) {
+        paras[last] = `${said[1]}.`;
+        cite = `<cite>${who}</cite>`;
+      }
+    }
+    if (!cite) {
+      const tail = paras[last].match(/^([^]*[.!?])\s+([A-Z][\w’-]+(?:\s[A-Z][\w’-]+){1,2},\s[^.<“”]+)$/);
+      if (tail) {
+        paras[last] = tail[1];
+        cite = `<cite>${tail[2].trim()}</cite>`;
+      }
+    }
+    if (cite) {
+      const t = all();
+      const opens = (t.match(/“/g) ?? []).length;
+      const closes = (t.match(/”/g) ?? []).length;
+      if (closes === 1 && opens === paras.filter((p) => p.startsWith('“')).length && paras[0].startsWith('“') && /”[.,]?$/.test(paras[last])) {
+        paras = paras.map((p) => p.replace(/^“/, ''));
+        paras[last] = paras[last].replace(/,?”[.,]?$/, '.').replace(/([.!?])\.$/, '$1');
+      }
+      paras[last] = paras[last].replace(/,\s*(?:said|says)\s+[^.,“”<]+\.$/, '.');
+    } else if (!/[“”]/.test(all())) {
+      const ATTR = String.raw`(?:(?:said|says|concluded)\s+[A-Z][\w’-]+(?:\s[A-Z][\w’-]+)?|(?:he|she|[A-Z][\w’-]+)\s+(?:said|says|concluded))`;
+      paras = paras.map((p) =>
+        p.replace(new RegExp(String.raw`^([^]+?),\s+(${ATTR})\.(?:\s+([^]+))?$`), (x, q, attr, rest) => `“${q},” ${attr}.${rest ? ` “${rest.replace(/([.!?])?$/, (e) => e || '.')}”` : ''}`),
+      );
+    }
+    paras[last] = paras[last].replace(/,((?:<\/(?:em|strong)>)*)$/, '$1');
+    // A cite is a label, with no full stop of its own
+    cite = cite.replace(/(?:\s|&nbsp;)+<\/cite>$/, '</cite>').replace(/\.<\/cite>$/, '</cite>');
+    // and holds only the speaker: a note after a break ("<br>Ref. stock exchange announcement …") follows the quote
+    let note = '';
+    cite = cite.replace(/,?\s*<br>\s*([^]*?)\s*<\/cite>$/, (x, n) => ((note = `\n<p>${n}</p>`), '</cite>'));
+    if (!/[.!?…”"]$/.test(plain(paras[last]))) paras[last] = `${paras[last]}.`;
+    const next = `<blockquote>\n${paras.map((p) => `<p>${p}</p>`).join('\n')}${cite ? `\n${cite}` : ''}</blockquote>`+ note;
+    if (next.replace(/\s+/g, ' ').replace(/> </g, '><') === m.replace(/\s+/g, ' ').replace(/> </g, '><')) return m;
+    count('quoteBlocksTidied');
+    return next;
+  });
+  // In the boilerplate a name linked to the contact page is plain text: the Press enquiries panel under every story
+  // has the contact link, and two names went to the same page (Q159)
+  out = out.replace(/<a href="https?:\/\/(?:www\.)?reachsubsea\.(?:no|com)\/contact\/?">([^<]*)<\/a>/g, (m, t, at, str) => {
+    if (str.lastIndexOf('article-boilerplate', at) < 0) return m;
+    count('contactLinksUnwrapped');
+    return t.replace(/\s+$/, '');
+  });
   // A line break mid-sentence: the next line goes on in lower case (not an email or web address)
   out = out.replace(/([^>.!?:;”"\s])\s*<br\s*\/?>\s*(?=([a-z][^\s<]*))/g, (m, c, next) => {
     if (/[@/]|\.\w/.test(next)) return m;

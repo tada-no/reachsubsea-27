@@ -276,10 +276,16 @@ a {
    (rendered as Link components). In WordPress this is theme.json for the post content.
    Rhythm (Q153, after a taste + impeccable review): paragraphs 16 apart; lists step out to stack--md; the lead, photos,
    tables and embeds to stack--lg; quotes as lists (Q154); a heading opens a section at stack--xl and binds to what follows (8).
-   Running text stops at the prose measure (720, ~80 characters at Body 18); photos and embeds keep the 880 column, on
-   the same left edge. Tables and captions are text too and stop at 720 (Q156): the posts' tables have two columns, and
-   a caption ran to ~126 characters under an 880 photo. */
+   Running text stops at the prose measure; photos and embeds keep the 880 column, on the same left edge. Tables and
+   captions are text too and stop at the measure (Q156). The measure is in em (Q159): each text style keeps ~68
+   characters a line at every width (576 for Body at 1440, a caption 448, the boilerplate 512); a fixed 720 ran 85
+   characters at 1440 and 91 at 800 as the type stepped down. The column's own size is Body, so a list or quote
+   measures like a paragraph. */
+.prose.article {
+  font-size: var(--wp--preset--font-size--body);
+}
 .prose.article > :not(figure:not(.article-table)),
+.prose.article .article-boilerplate > *,
 .article figcaption {
   max-inline-size: var(--wp--custom--measure--prose);
 }
@@ -293,8 +299,10 @@ a {
 .article a {
   overflow-wrap: anywhere;
 }
+/* Lists, quotes and link rows step out 24 from the text at every width (Q159): at stack--md they were 16 on phones,
+   the same as two paragraphs, so they didn't step out at all */
 .article > :is(ul, ol) {
-  margin-block: var(--wp--custom--stack--md);
+  margin-block: var(--wp--preset--spacing--24);
 }
 /* Bullets that run to two lines need a little air between them, or a list reads as one block (Q154). Not a links
    row: its Links keep their own gap around 48px targets */
@@ -322,10 +330,11 @@ a {
 .prose.article h2 + * {
   margin-top: var(--wp--preset--spacing--8);
 }
-/* A quote steps out as far as a list (stack--md), not a photo's stack--lg: a story with several quotes broke into
-   islands (Q154, after the re-run critique) */
+/* A quote steps out as far as a list, not a photo's stack--lg: a story with several quotes broke into islands (Q154,
+   after the re-run critique). 24 at every width (Q159). A quote block names its speaker in the cite and has no quote
+   marks of its own; marks only where the speaker is named inside it (scripts/news-cleanup.mjs, Q159) */
 .article blockquote {
-  margin-block: var(--wp--custom--stack--md);
+  margin-block: var(--wp--preset--spacing--24);
   padding-left: var(--wp--preset--spacing--24);
   border-left: 2px solid var(--wp--custom--color--border--accent);
 }
@@ -407,9 +416,17 @@ a {
   flex-direction: column;
   align-items: flex-start;
   gap: var(--wp--preset--spacing--12);
-  margin-block: var(--wp--custom--stack--md);
+  margin-block: var(--wp--preset--spacing--24);
   padding-left: 0;
   list-style: none;
+}
+/* A Link's 48px target puts 12 of air above and below its label: the first and last pull out by that much, so the
+   row's text sits 24 from the paragraphs like a list, not ~40 (Q159). Its targets stay 48 */
+.article .article__links > :first-child {
+  margin-top: calc(var(--wp--preset--spacing--12) * -1);
+}
+.article .article__links > :last-child {
+  margin-bottom: calc(var(--wp--preset--spacing--12) * -1);
 }
 /* Press boilerplate (Q153): contacts, About Reach Subsea and the disclosure notice close a release in Body small,
    grey, after a section's gap: it belongs to the release but isn't the story. Its labels in navy */
