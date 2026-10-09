@@ -5,9 +5,11 @@
 // the dev site's copy stops at Q2 2025). Built fresh rather than from either:
 // - The dev site's 4 tabs (Quarterly · Annual · Sustainability · Misc), each with its own Latest card and a grid
 //   of 15px icon links, become three blocks, one per kind of document, each shaped by how it is used:
-//   1. Results archive (white): the quarter is what people look for, so years are tabs and a year is one row
-//      per quarter with labelled Report · Presentation · Webcast. The current year opens, so the latest results
-//      and the next date (with Add to calendar) are the first thing under the hero: no separate Latest card.
+//   1. Report shelf (white), "Quarterly results" (9 Oct 2026, Q160; was the Results archive, whose year tabs and
+//      dated rows read like the Financial calendar, Ross): the next results date as a dashed cover slot with Add
+//      to calendar, then the latest two quarters as their covers (Report · Presentation · Webcast), so the newest
+//      results are the first thing under the hero; then 2021–2025 one row per quarter and 2012–2020 (reports
+//      only) one row per year with Q1–Q4.
 //   2. Report shelf (tint): the three latest annual reports as their covers (rendered from page 1 of each PDF),
 //      then 2012–2022 as compact rows: Report · ESEF · the standalone sustainability report (2019–2022).
 //   3. File list (white): presentations and prospectuses outside the cycle, one dated row each.
@@ -30,7 +32,6 @@ import Header from '../../components/header/Header.astro';
 import Footer from '../../components/Footer.astro';
 import PageHero from '../../blocks/PageHero.astro';
 import SectionSubnav from '../../blocks/SectionSubnav.astro';
-import ResultsArchive from '../../blocks/ResultsArchive.astro';
 import ReportShelf from '../../blocks/ReportShelf.astro';
 import FileList from '../../blocks/FileList.astro';
 import Embed from '../../blocks/Embed.astro';
@@ -40,14 +41,14 @@ import { navSections } from '../../data/navigation';
 import {
   quarterlyReleases,
   nextRelease,
-  upcomingReleases,
   annualReports,
   sustainabilityReports,
   otherDocuments,
   formatDocDate,
 } from '../../data/reports';
 import type { FileListItem } from '../../blocks/FileList.astro';
-import type { ShelfArchiveRow } from '../../blocks/ReportShelf.astro';
+import type { ShelfArchiveRow, ShelfItem } from '../../blocks/ReportShelf.astro';
+import type { QuarterRelease } from '../../data/reports';
 import { faqsFor, faqHubHref } from '../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
@@ -62,14 +63,59 @@ const oms = { name: 'Oslo Market Solutions', domain: 'ir.oms.no' };
 
 const firstYear = Math.min(...quarterlyReleases.map((r) => r.year));
 
+// Quarterly results: three shelf slots, the next results date first (while it is still to come), then the newest
+// quarters that have a cover; every other quarter from 2021 is a row (Report · Presentation · Webcast), and the
+// report-only years before that one row each with Q1–Q4
+const COMPACT_BEFORE = 2021;
+const period = (r: QuarterRelease) => `Q${r.quarter} ${r.year}`;
+const nextShelf = nextRelease
+  ? { label: `Q${nextRelease.quarter} ${nextRelease.year}`, date: nextRelease.date, event: `Reach Subsea Q${nextRelease.quarter} ${nextRelease.year} results` }
+  : undefined;
+const nextIsAhead = Boolean(nextRelease && Date.parse(nextRelease.date) >= Date.parse(new Date().toISOString().slice(0, 10)));
+const quarterCovers = quarterlyReleases.filter((r) => r.cover && r.report).slice(0, nextIsAhead ? 2 : 3);
+const quarterSlots = (r: QuarterRelease) => [
+  r.report ? { label: 'Report', url: r.report, context: `${period(r)} report, PDF` } : undefined,
+  r.presentation ? { label: 'Presentation', url: r.presentation, context: `${period(r)} presentation, PDF` } : undefined,
+  r.webcast ? { label: 'Webcast', url: r.webcast, action: 'external' as const, context: `${period(r)} webcast` } : undefined,
+];
+const quarterItems: ShelfItem[] = quarterCovers.map((r) => ({
+  label: period(r),
+  href: r.report!,
+  title: `Quarterly report ${period(r)}`,
+  cover: r.cover!,
+  links: quarterSlots(r).filter((l) => l !== undefined),
+}));
+const quarterRows: ShelfArchiveRow[] = quarterlyReleases
+  .filter((r) => r.year >= COMPACT_BEFORE && !quarterCovers.includes(r))
+  .map((r) => ({ label: period(r), links: quarterSlots(r) }));
+const reportYears = [...new Set(quarterlyReleases.filter((r) => r.year < COMPACT_BEFORE).map((r) => r.year))];
+const yearRows: ShelfArchiveRow[] = reportYears.map((year) => ({
+  label: String(year),
+  links: ([1, 2, 3, 4] as const).map((q) => {
+    const r = quarterlyReleases.find((x) => x.year === year && x.quarter === q && x.report);
+    return r ? { label: `Q${q}`, url: r.report, context: `${year} report, PDF` } : undefined;
+  }),
+}));
+const quarterYears = quarterRows.map((r) => Number(r.label.slice(3)));
+
 // Annual reports: the covers for the years that have one (2023–2025), then every earlier year as one row with its
 // annual report, ESEF filing and standalone sustainability report (2019–2022) side by side
 const featuredAnnual = annualReports.filter((r) => r.cover);
+const annualItems: ShelfItem[] = featuredAnnual.map((r) => ({
+  label: String(r.year),
+  href: r.report,
+  title: `${r.title} ${r.year}`,
+  cover: r.cover!,
+  links: [
+    { label: 'Report', url: r.report, context: `${r.title} ${r.year}, PDF` },
+    ...(r.esef ? [{ label: 'ESEF', url: r.esef, context: `${r.title} ${r.year}, ESEF filing, ZIP` }] : []),
+  ],
+}));
 const earlierAnnual = annualReports.filter((r) => !r.cover);
 const annualArchive: ShelfArchiveRow[] = earlierAnnual.map((r) => {
   const s = sustainabilityReports.find((x) => x.year === r.year);
   return {
-    year: r.year,
+    label: String(r.year),
     links: [
       { label: 'Report', url: r.report, context: `${r.title} ${r.year}, PDF` },
       r.esef ? { label: 'ESEF', url: r.esef, context: `${r.title} ${r.year}, ESEF filing, ZIP` } : undefined,
@@ -110,16 +156,30 @@ const faqItems = faqsFor('reports');
 
     <SectionSubnav source="section-pages" label="Investors" items={subnavItems} current={page.href} />
 
-    <ResultsArchive
+    <ReportShelf
       background="white"
       sectionHeader={{
         title: 'Quarterly results',
         intro: 'The report, presentation and webcast for every quarter, newest first.',
         action: { label: 'Financial calendar', url: '/investors/financial-calendar/' },
       }}
-      releases={quarterlyReleases}
-      next={nextRelease}
-      upcoming={upcomingReleases}
+      next={nextIsAhead ? nextShelf : undefined}
+      items={quarterItems}
+      earlierLabel={`Earlier quarterly results, ${reportYears[reportYears.length - 1]}–${Math.max(...quarterYears)}`}
+      archives={[
+        {
+          title: `${Math.min(...quarterYears)}–${Math.max(...quarterYears)}`,
+          columns: ['Report', 'Presentation', 'Webcast'],
+          rows: quarterRows,
+          labelWidth: 'quarter',
+        },
+        {
+          title: `${reportYears[reportYears.length - 1]}–${reportYears[0]}`,
+          note: `Quarterly reports only. Presentations and webcasts start in ${COMPACT_BEFORE}.`,
+          columns: ['Q1', 'Q2', 'Q3', 'Q4'],
+          rows: yearRows,
+        },
+      ]}
     />
 
     <ReportShelf
@@ -128,11 +188,15 @@ const faqItems = faqsFor('reports');
         title: 'Annual reports',
         intro: `Every year since ${annualReports[annualReports.length - 1].year}. From 2023 the annual report includes our sustainability report.`,
       }}
-      featured={featuredAnnual}
-      archiveTitle={`${earlierAnnual[earlierAnnual.length - 1].year}–${earlierAnnual[0].year}`}
-      archiveNote="Sustainability reports were published on their own from 2019 to 2022."
-      columns={['Report', 'ESEF', 'Sustainability report']}
-      archive={annualArchive}
+      items={annualItems}
+      earlierLabel={`Earlier annual reports, ${earlierAnnual[earlierAnnual.length - 1].year}–${earlierAnnual[0].year}`}
+      archives={[
+        {
+          note: 'Sustainability reports were published on their own from 2019 to 2022.',
+          columns: ['Report', 'ESEF', 'Sustainability report'],
+          rows: annualArchive,
+        },
+      ]}
     />
 
     <FileList

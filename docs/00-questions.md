@@ -10,6 +10,16 @@ _No open questions right now._
 
 ## Answered log
 
+### Q160. Reports & presentations: quarterly results as a report shelf (9 Oct 2026)
+Context: Ross: the Quarterly results section "feels a bit like the financial calendar, can we make it similar to the annual reports section?" Claude agreed: the Date tiles, dashed future quarters and countdown were the Financial calendar's language. The Results archive is replaced by the Report shelf, generalised for both series.
+- [x] Covers: the latest 3 (Recommended), page 1 of each report as the annual covers; with the next date as the first slot that leaves Q2 and Q1 2026. Q1 2026 downloaded from the live site (Ross, yes), rendered to `public/images/reports/quarterly-report-2026-q1.jpg` and the PDF deleted; Q2 2026 from `ref/`. In WordPress the cover is the Document's featured image
+- [x] Earlier quarters as rows like the annual archive (Recommended): 2021–2025 one row per quarter, Report · Presentation · Webcast in fixed slots, two columns from 1040; 2012–2020 one row per year with Q1–Q4. No year tabs
+- [x] Next results date as a placeholder cover (Recommended): a cover-sized dashed outline with "Next results", 17 Nov 2026 and the countdown, then "Q3 2026" and Add to calendar; gone once the date passes. The later provisional quarters (Q4 2026) are left to the Financial calendar link
+- [x] Phones: quarter rows stack (label over links, one line at 375); covers go one per row under 600 in both shelves (first the quarterly ones, as Report · Presentation doesn't fit half a phone; then the annual ones too, Ross: Report · ESEF wrapped as well)
+- [x] Checked 375 · 600 · 640 · 800 · 900 · 1000 · 1100 · 1120 · 1200 · 1300 · 1440: no sideways scroll, rows one height, no link wraps, cover and next slot the same height. The section is longer than the tabbed version (2003 at 1440, was 948)
+- [x] Older reports in drawers (Ross: "the older reports both annual and quarter should be hidden in expandable draws, agree?"; Claude agreed: open, the quarterly section had grown from 948 to 2003 at 1440). Each shelf ends on one Link Expand, "Earlier quarterly results, 2012–2025" and "Earlier annual reports, 2012–2022" (stack/lg under the covers); it stays where it is and opens the rows below itself (measured: no move at 1440 or 375). Both sections are now 783 tall at 1440. The annual archive drops its "2012–2022" heading (the link says it) and keeps its note. Without JS the rows show
+- [ ] Remove `src/blocks/ResultsArchive.astro` and its Figma set once the page is approved; Figma for the shelf's Next slot and quarter rows then
+
 ### Q159. News single: third critique fixes (9 Oct 2026)
 Context: the third critique of the story pages scored 24/36 (no P0, three P1: tall featured photos, a fixed measure that ran 85–91 characters, results leads cut to the dateline sentence). Ross picked all four groups of fixes and asked whether they carry over to the WordPress blocks. Done in base.css, NewsSingle and `scripts/news-cleanup.mjs` (steps 9–10, idempotent; 76 posts changed).
 - [x] Featured photo cropped to 3:2: a portrait or square upload ran 1036–1249px tall (OCTIO, the 2013 reports) and put the story a screen and a half down; now 587 at 1440

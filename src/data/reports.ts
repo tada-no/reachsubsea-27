@@ -19,6 +19,25 @@ const base = import.meta.env.BASE_URL;
 const UP = 'https://reachsubsea.no/wp-content/uploads';
 const cast = (id: string) => `https://channel.royalcast.com/landingpage/hegnarmedia/${id}/`;
 
+export interface ReportCover {
+  src: string;
+  width: number;
+  height: number;
+}
+
+export interface PublishedReport {
+  year: number;
+  /** The title printed on the cover: "Annual report" to 2022, "Annual and sustainability report" from 2023. */
+  title: string;
+  report: string;
+  /** ESEF: the regulatory iXBRL filing of the annual report (ZIP), 2021 on. */
+  esef?: string;
+  /** Page 1 of the PDF, rendered 7 Oct 2026: the 2023–2025 landscape covers only (earlier years are listed
+   * without thumbnails, Ross 7 Oct 2026). */
+  cover?: ReportCover;
+}
+
+const landscape = (file: string): ReportCover => ({ src: `${base}images/reports/${file}`, width: 960, height: 540 });
 export type Quarter = 1 | 2 | 3 | 4;
 
 export interface QuarterRelease {
@@ -29,12 +48,14 @@ export interface QuarterRelease {
   report?: string;
   presentation?: string;
   webcast?: string;
+  /** Page 1 of the report, for the Report shelf's covers (the newest quarters only, rendered 9 Oct 2026). */
+  cover?: ReportCover;
 }
 
 /** Quarterly results, newest first. */
 export const quarterlyReleases: QuarterRelease[] = [
-  { year: 2026, quarter: 2, published: '2026-08-18', report: `${UP}/2026/08/Reach-Subsea-ASA-2Q-2026-Report.pdf`, presentation: `${UP}/2026/08/Reach-Subsea-ASA-2Q-2026-Presentation.pdf` },
-  { year: 2026, quarter: 1, published: '2026-05-05', report: `${UP}/2026/05/Reach-Subsea-ASA_1Q-2026-Report.pdf`, presentation: `${UP}/2026/05/Reach-Subsea-ASA_1Q-2026-Presentation.pdf` },
+  { year: 2026, quarter: 2, published: '2026-08-18', report: `${UP}/2026/08/Reach-Subsea-ASA-2Q-2026-Report.pdf`, presentation: `${UP}/2026/08/Reach-Subsea-ASA-2Q-2026-Presentation.pdf`, cover: landscape('quarterly-report-2026-q2.jpg') },
+  { year: 2026, quarter: 1, published: '2026-05-05', report: `${UP}/2026/05/Reach-Subsea-ASA_1Q-2026-Report.pdf`, presentation: `${UP}/2026/05/Reach-Subsea-ASA_1Q-2026-Presentation.pdf`, cover: landscape('quarterly-report-2026-q1.jpg') },
 
   { year: 2025, quarter: 4, published: '2026-02-12', report: `${UP}/2026/02/Reach-Subsea-ASA-4Q-2025-Report.pdf`, presentation: `${UP}/2026/02/Reach-Subsea-ASA-4Q-2025-Presentation.pdf` },
   { year: 2025, quarter: 3, published: '2025-11-18', report: `${UP}/2025/11/Reach-Subsea-ASA_3Q-2025-Report.pdf`, presentation: `${UP}/2025/11/Reach-Subsea-ASA_3Q-2025-Presentation.pdf`, webcast: cast('20251118_2') },
@@ -117,25 +138,6 @@ export const upcomingReleases = investorCalendar
     confirmed: m.confirmed,
   }));
 
-export interface ReportCover {
-  src: string;
-  width: number;
-  height: number;
-}
-
-export interface PublishedReport {
-  year: number;
-  /** The title printed on the cover: "Annual report" to 2022, "Annual and sustainability report" from 2023. */
-  title: string;
-  report: string;
-  /** ESEF: the regulatory iXBRL filing of the annual report (ZIP), 2021 on. */
-  esef?: string;
-  /** Page 1 of the PDF, rendered 7 Oct 2026: the 2023–2025 landscape covers only (earlier years are listed
-   * without thumbnails, Ross 7 Oct 2026). */
-  cover?: ReportCover;
-}
-
-const landscape = (file: string): ReportCover => ({ src: `${base}images/reports/${file}`, width: 960, height: 540 });
 const annual = (year: number, report: string, esef?: string): PublishedReport => ({
   year,
   title: year >= 2023 ? 'Annual and sustainability report' : 'Annual report',

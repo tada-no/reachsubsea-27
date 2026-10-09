@@ -1,48 +1,96 @@
 ---
 // Report shelf · reach/report-shelf (7 Oct 2026, Reports & presentations). The newest reports as their real covers,
-// then every earlier year as one compact row (second pass, Ross 7 Oct 2026: only the recent covers large, the rest
-// wrapped up neatly without thumbnails).
-// - Covers (`featured`, newest first): each opens its PDF in a new tab; under it the year and Link Small File
-//   "Report" (saves the PDF) and "ESEF" (the regulatory filing, ZIP). 1px edge, radius/md, 1.04 zoom on hover, as
-//   Media gallery Posters. 3 across from 900 (container); below, the newest spans the row and the next two share one.
-// - Earlier years (`archive`, newest first): one white row per year, the year (H5) then its files in fixed slots
-//   (`columns`, e.g. Report · ESEF · Sustainability report), as the report-only years in the Results archive. A
-//   missing file leaves its slot empty (an invisible copy of the link holds the width, so the slots line up down
-//   the list). Two columns from 1040 (container), newest down the left; one below; under 600 the year sits beside
-//   its links, which wrap and skip empty slots.
+// then the earlier ones as compact rows (second pass, Ross 7 Oct 2026: only the recent covers large, the rest
+// wrapped up neatly without thumbnails). One block for both of the page's report series (9 Oct 2026, Q160: the
+// quarterly results moved from the Results archive's dated, calendar-like rows to this shelf, Ross: "make it
+// similar to the annual reports section").
+// - Covers (`items`, newest first): page 1 of each PDF, opening it in a new tab; under it the period (H5: "2025",
+//   "Q2 2026") and its files as Link Small (Report · ESEF; Report · Presentation · Webcast). 1px edge, radius/md,
+//   1.04 zoom on hover, as Media gallery Posters. 3 across from 900 (container); at 600–899 the first spans the
+//   row and the next two share one; under 600 one per row (Ross, 9 Oct 2026: two to a phone row wrapped even
+//   Report · ESEF onto two lines).
+// - Next (`next`, optional): the first slot is the next report still to come, a dashed outline of a cover with no
+//   fill ("Next results", the date, "in 39 days"), then its period and Add to calendar (.ics), so the shelf reads
+//   next → latest → earlier. Below 900 it spans the row as a short dashed panel rather than an empty 16:9 box.
+//   Shown only while the date is today or later.
+// - Archives (`archives`, each newest first): an H3 (the range) and an optional Body/Small note, then one row per
+//   period, the label (H5) and its files in fixed slots (`columns`: Report · ESEF · Sustainability report; Report ·
+//   Presentation · Webcast; Q1–Q4). A missing file leaves its slot empty (an invisible copy of the link holds the
+//   width, so the slots line up down the list). Rows are white on tint and tint on white. Two columns from 1040
+//   (container), newest down the left; one below; under 600 the label sits beside its links, which wrap and skip
+//   empty slots. `labelWidth` "quarter" widens the label column for "Q4 2025".
+// - `earlierLabel` (optional) puts every archive in a drawer under one Link Expand ("Earlier annual reports,
+//   2012–2022"; Ross, 9 Oct 2026: the older reports hidden, so both shelves read covers first). The link stays where
+//   it is and the rows open below it, so nothing above moves. Without JS the rows show and the link doesn't.
 import BlockSection from '../components/BlockSection.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import Link from '../components/Link.astro';
 import { makeId } from '../lib/ids';
+import { icsHref } from '../lib/ics';
+import { shortDate } from '../lib/dates';
 import type { BlockFields, LinkField, SectionHeaderField } from '../lib/types';
-import type { PublishedReport } from '../data/reports';
+import type { ReportCover } from '../data/reports';
+
+export interface ShelfItem {
+  /** The period under the cover: "2025", "Q2 2026". */
+  label: string;
+  /** What the cover opens (the report PDF). */
+  href: string;
+  /** The cover link's accessible name: "Annual and sustainability report 2025". */
+  title: string;
+  cover: ReportCover;
+  links: LinkField[];
+}
+
+export interface ShelfNext {
+  label: string;
+  /** ISO date. */
+  date: string;
+  /** Calendar event title: "Reach Subsea Q3 2026 results". */
+  event: string;
+}
 
 export interface ShelfArchiveRow {
-  year: number;
-  /** One per `columns` entry, in that order; undefined = no file for that year. */
+  label: string;
+  /** One per `columns` entry, in that order; undefined = no file for that period. */
   links: (LinkField | undefined)[];
+}
+
+export interface ShelfArchive {
+  title?: string;
+  note?: string;
+  /** Slot labels ("Report", "ESEF", "Sustainability report"). */
+  columns: string[];
+  rows: ShelfArchiveRow[];
+  /** Label column: a year (80) or a quarter (96, "Q4 2025"). */
+  labelWidth?: 'year' | 'quarter';
 }
 
 interface Props extends BlockFields {
   sectionHeader?: SectionHeaderField;
-  /** Shown as covers. Each needs a `cover`. */
-  featured: PublishedReport[];
-  archiveTitle?: string;
-  archiveNote?: string;
-  /** Slot labels for the archive rows ("Report", "ESEF", "Sustainability report"). */
-  columns?: string[];
-  archive?: ShelfArchiveRow[];
+  items: ShelfItem[];
+  next?: ShelfNext;
+  archives?: ShelfArchive[];
+  /** Puts the archives in a drawer under this Link Expand label. */
+  earlierLabel?: string;
 }
 
-const { sectionHeader, featured, archiveTitle, archiveNote, columns = [], archive = [], background = 'tint', spacing, anchor } = Astro.props;
+const { sectionHeader, items, next, archives = [], earlierLabel, background = 'tint', spacing, anchor } = Astro.props;
 
 const titleId = sectionHeader ? makeId('report-shelf', sectionHeader.title) : undefined;
-const archiveId = archiveTitle ? makeId('report-shelf', archiveTitle) : undefined;
-const covers = featured.filter((r) => r.cover);
+const drawerId = makeId('report-shelf', `${sectionHeader?.title ?? 'reports'} earlier`);
+
+const DAY = 86_400_000;
+const today = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`);
+const daysUntil = (iso: string) => Math.round((Date.parse(`${iso}T00:00:00Z`) - today) / DAY);
+const upcoming = next && daysUntil(next.date) >= 0 ? next : undefined;
+const inDays = (n: number) => (n === 0 ? 'today' : n === 1 ? 'in 1 day' : `in ${n} days`);
+const shownArchives = archives.filter((a) => a.rows.length > 0);
+
 ---
 
 {
-  (covers.length > 0 || archive.length > 0) && (
+  (items.length > 0 || shownArchives.length > 0) && (
     <BlockSection
       slug="report-shelf"
       root="report-shelf"
@@ -56,63 +104,138 @@ const covers = featured.filter((r) => r.cover);
         {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
 
         <div class="report-shelf__main">
-          {covers.length > 0 && (
+          {(items.length > 0 || upcoming) && (
             <ul class="report-shelf__covers">
-              {covers.map((r) => (
-                <li class="shelf-item">
-                  <a class="shelf-item__cover" href={r.report} target="_blank" rel="noopener" aria-label={`${r.title} ${r.year} (PDF, opens in a new tab)`}>
-                    <img src={r.cover!.src} alt="" width={r.cover!.width} height={r.cover!.height} loading="lazy" decoding="async" />
-                  </a>
-                  <p class="shelf-item__year text-h5">{r.year}</p>
+              {upcoming && (
+                <li class="shelf-item shelf-item--next">
+                  <div class="shelf-item__slot">
+                    <div class="shelf-item__slot-inner">
+                      <p class="shelf-item__kicker text-eyebrow">Next results</p>
+                      <p class="shelf-item__date text-h3">{shortDate(upcoming.date)}</p>
+                      <p class="shelf-item__countdown text-small" data-countdown={upcoming.date}>
+                        {inDays(daysUntil(upcoming.date))}
+                      </p>
+                    </div>
+                  </div>
+                  <p class="shelf-item__year text-h5">{upcoming.label}</p>
                   <div class="shelf-item__links">
-                    <Link label="Report" href={r.report} action="file" size="small" context={`${r.title} ${r.year}, PDF`} download />
-                    {r.esef && <Link label="ESEF" href={r.esef} action="file" size="small" context={`${r.title} ${r.year}, ESEF filing, ZIP`} download />}
+                    <Link
+                      label="Add to calendar"
+                      href={icsHref(upcoming.event, upcoming.date)}
+                      action="file"
+                      size="small"
+                      context={`${upcoming.label} results`}
+                      download={`reach-subsea-${upcoming.date}.ics`}
+                    />
+                  </div>
+                </li>
+              )}
+              {items.map((r) => (
+                <li class="shelf-item">
+                  <a class="shelf-item__cover" href={r.href} target="_blank" rel="noopener" aria-label={`${r.title} (PDF, opens in a new tab)`}>
+                    <img src={r.cover.src} alt="" width={r.cover.width} height={r.cover.height} loading="lazy" decoding="async" />
+                  </a>
+                  <p class="shelf-item__year text-h5">{r.label}</p>
+                  <div class="shelf-item__links">
+                    {r.links.map((l) => (
+                      <Link
+                        label={l.label}
+                        href={l.url}
+                        action={l.action ?? 'file'}
+                        size="small"
+                        context={l.context}
+                        download={(l.action ?? 'file') === 'file' ? true : undefined}
+                      />
+                    ))}
                   </div>
                 </li>
               ))}
             </ul>
           )}
 
-          {archive.length > 0 && (
-            <section class="report-shelf__archive" aria-labelledby={archiveId} aria-label={archiveId ? undefined : 'Earlier years'}>
-              {(archiveTitle || archiveNote) && (
-                <div class="report-shelf__archive-head">
-                  {archiveTitle && (
-                    <h3 id={archiveId} class="text-h4">
-                      {archiveTitle}
-                    </h3>
-                  )}
-                  {archiveNote && <p class="text-small report-shelf__archive-note">{archiveNote}</p>}
-                </div>
-              )}
-              <ul class="report-shelf__rows" style={`--shelf-rows: ${Math.ceil(archive.length / 2)}; --shelf-cols: ${Math.max(1, columns.length)}`}>
-                {archive.map((row) => (
-                  <li class="shelf-row">
-                    <h4 class="shelf-row__year text-h5">{row.year}</h4>
-                    <div class="shelf-row__links">
-                      {columns.map((label, i) => {
-                        const l = row.links[i];
-                        return (
-                          <span class:list={['shelf-row__slot', !l && 'shelf-row__slot--empty']}>
-                            {l ? (
-                              <Link label={l.label} href={l.url} action={l.action ?? 'file'} size="small" context={l.context} download />
-                            ) : (
-                              <Link label={label} action="file" size="small" class="shelf-row__ghost" aria-hidden="true" tabindex="-1" />
-                            )}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
+          {shownArchives.length > 0 && (
+          <div class="report-shelf__earlier" data-shelf-earlier={earlierLabel ? '' : undefined}>
+          {earlierLabel && (
+            <Link label={earlierLabel} action="expand" size="small" class="report-shelf__toggle" aria-controls={drawerId} data-shelf-toggle />
+          )}
+          <div class="report-shelf__drawer" id={earlierLabel ? drawerId : undefined} hidden={earlierLabel ? true : undefined}>
+          {shownArchives.map((a) => {
+            const archiveId = a.title ? makeId('report-shelf', a.title) : undefined;
+            return (
+              <section class="report-shelf__archive" aria-labelledby={archiveId} aria-label={archiveId ? undefined : 'Earlier reports'}>
+                {(a.title || a.note) && (
+                  <div class="report-shelf__archive-head">
+                    {a.title && (
+                      <h3 id={archiveId} class="text-h4">
+                        {a.title}
+                      </h3>
+                    )}
+                    {a.note && <p class="text-small report-shelf__archive-note">{a.note}</p>}
+                  </div>
+                )}
+                <ul
+                  class:list={['report-shelf__rows', a.labelWidth === 'quarter' && 'report-shelf__rows--quarters']}
+                  style={`--shelf-rows: ${Math.ceil(a.rows.length / 2)}; --shelf-cols: ${Math.max(1, a.columns.length)}`}
+                >
+                  {a.rows.map((row) => (
+                    <li class="shelf-row">
+                      <h4 class="shelf-row__year text-h5">{row.label}</h4>
+                      <div class="shelf-row__links">
+                        {a.columns.map((label, i) => {
+                          const l = row.links[i];
+                          const action = l?.action ?? 'file';
+                          return (
+                            <span class:list={['shelf-row__slot', !l && 'shelf-row__slot--empty']}>
+                              {l ? (
+                                <Link label={l.label} href={l.url} action={action} size="small" context={l.context} download={action === 'file' ? true : undefined} />
+                              ) : (
+                                <Link label={label} action="file" size="small" class="shelf-row__ghost" aria-hidden="true" tabindex="-1" />
+                              )}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
+          </div>
+          </div>
           )}
         </div>
       </div>
     </BlockSection>
   )
 }
+
+<noscript>
+  <style>
+    .report-shelf__toggle { display: none !important; }
+    .report-shelf__drawer[hidden] { display: flex !important; }
+  </style>
+</noscript>
+
+<script>
+  // Earlier reports: the Link Expand opens the drawer below itself
+  document.querySelectorAll<HTMLButtonElement>('.report-shelf [data-shelf-toggle]').forEach((toggle) => {
+    const drawer = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+    if (!drawer) return;
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      toggle.setAttribute('aria-expanded', String(open));
+      drawer.hidden = !open;
+    });
+  });
+
+  // Countdown ("in 39 days") from the visitor's today, not the build date
+  document.querySelectorAll<HTMLElement>('.report-shelf [data-countdown]').forEach((el) => {
+    const now = new Date();
+    const days = Math.round((Date.parse(`${el.dataset.countdown}T00:00:00Z`) - Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())) / 86_400_000);
+    if (days >= 0) el.textContent = days === 0 ? 'today' : days === 1 ? 'in 1 day' : `in ${days} days`;
+  });
+</script>
 
 <style is:global>
   .report-shelf__main {
@@ -125,14 +248,19 @@ const covers = featured.filter((r) => r.cover);
   /* ── Covers ───────────────────────────────────────────────── */
   .report-shelf__covers {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--wp--custom--stack--lg) var(--wp--custom--grid--gutter);
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  .report-shelf__covers > :first-child {
-    grid-column: 1 / -1;
+  @container (min-width: 600px) {
+    .report-shelf__covers {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .report-shelf__covers > :first-child {
+      grid-column: 1 / -1;
+    }
   }
   @container (min-width: 900px) {
     .report-shelf__covers {
@@ -183,7 +311,63 @@ const covers = featured.filter((r) => r.cover);
     margin-top: calc(var(--wp--preset--spacing--4) - var(--wp--preset--spacing--12));
   }
 
-  /* ── Earlier years ────────────────────────────────────────── */
+  /* The next report: a cover's outline still to be filled (dashed border/strong, no fill, as the Investors' dated
+     rows mark what is still to come). Built as the cover is (a 1px edge round a 16:9 inner box), so the two are the
+     same height to the pixel. Narrow: a short panel across the row; from 900 a cover's box, the text centred in
+     its height */
+  .shelf-item__slot {
+    width: 100%;
+    border: 1px dashed var(--wp--custom--color--border--strong);
+    border-radius: var(--wp--custom--radius--md);
+  }
+  .shelf-item__slot-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--wp--preset--spacing--4);
+    padding: var(--wp--preset--spacing--24);
+  }
+  .shelf-item__kicker {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .shelf-item__date {
+    color: var(--wp--custom--color--text--primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .shelf-item__countdown {
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  @container (min-width: 900px) {
+    .shelf-item__slot-inner {
+      aspect-ratio: 16 / 9;
+      padding: var(--wp--preset--spacing--32);
+    }
+  }
+
+  /* ── Earlier reports ──────────────────────────────────────── */
+  /* The toggle sits under the covers (its 44px target's own padding is the air above the rows when open) */
+  .report-shelf__earlier,
+  .report-shelf__drawer {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--wp--custom--stack--xl);
+  }
+  .report-shelf__earlier[data-shelf-earlier] {
+    gap: var(--wp--custom--stack--md);
+  }
+  /* A closed drawer's link belongs to the shelf above it: stack/lg, not the archive's stack/xl (with the two
+     44px targets' padding, the labels sit 64 apart) */
+  .report-shelf__main:has(> [data-shelf-earlier]) {
+    gap: var(--wp--custom--stack--lg);
+  }
+  .report-shelf__toggle {
+    align-self: flex-start;
+  }
+  .report-shelf__drawer[hidden] {
+    display: none;
+  }
   .report-shelf__archive {
     display: flex;
     flex-direction: column;
@@ -198,24 +382,39 @@ const covers = featured.filter((r) => r.cover);
     color: var(--wp--custom--color--text--secondary);
   }
   .report-shelf__rows {
+    --shelf-label: 56px;
     display: grid;
     gap: var(--wp--preset--spacing--12) var(--wp--custom--grid--gutter);
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  /* Narrow (base): the year beside its links, which wrap; empty slots drop out */
+  /* Quarter rows on phones: "Q4 2025" over its links, which then fit one line (12 between them, as the links
+     under a cover) */
+  .report-shelf__rows--quarters .shelf-row {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--wp--preset--spacing--12) var(--wp--preset--spacing--16) 0;
+  }
+  .report-shelf__rows--quarters .shelf-row__links {
+    column-gap: var(--wp--preset--spacing--12);
+    margin-top: calc(-1 * var(--wp--preset--spacing--8));
+  }
+  /* Narrow (base): the label beside its links, which wrap; empty slots drop out. White rows on tint, tint on white */
   .shelf-row {
     display: grid;
-    grid-template-columns: 56px minmax(0, 1fr);
+    grid-template-columns: var(--shelf-label) minmax(0, 1fr);
     column-gap: var(--wp--preset--spacing--16);
     align-items: center;
     padding: var(--wp--preset--spacing--4) var(--wp--preset--spacing--16);
     border-radius: var(--wp--custom--radius--lg);
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  .report-shelf.has-surface-tint .shelf-row {
     background-color: var(--wp--custom--color--bg--default);
   }
   .shelf-row__year {
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
   .shelf-row__links {
     display: flex;
@@ -231,12 +430,22 @@ const covers = featured.filter((r) => r.cover);
   .shelf-row__ghost {
     visibility: hidden;
   }
-  /* From 600: one line per year, the slots in fixed columns (ghost copies keep every row's columns equal) */
+  /* From 600: one line per period, the slots in fixed columns (ghost copies keep every row's columns equal) */
   @container (min-width: 600px) {
-    .shelf-row {
-      grid-template-columns: var(--wp--preset--spacing--80) repeat(var(--shelf-cols), max-content);
+    .report-shelf__rows {
+      --shelf-label: var(--wp--preset--spacing--80);
+    }
+    .report-shelf__rows--quarters {
+      --shelf-label: var(--wp--preset--spacing--96);
+    }
+    .shelf-row,
+    .report-shelf__rows--quarters .shelf-row {
+      grid-template-columns: var(--shelf-label) repeat(var(--shelf-cols), max-content);
       column-gap: var(--wp--preset--spacing--32);
       padding: var(--wp--preset--spacing--8) var(--wp--preset--spacing--32);
+    }
+    .report-shelf__rows--quarters .shelf-row__links {
+      margin-top: 0;
     }
     .shelf-row__links {
       display: contents;
