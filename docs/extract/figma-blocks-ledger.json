@@ -2468,5 +2468,19 @@
       "No mobile page frames; the Search box, Seabed scan and Search panel have Mobile variants",
       "Query marks in excerpts (bg/accent-subtle + 2px border/accent underline) are described on Search result, not drawn"
     ]
+  },
+  "phase4ReportsQ160_9Oct": {
+    "date": "2026-10-09",
+    "context": "Reports & presentations Q160 pushed to Figma at Ross's request: quarterly results as a Report shelf, older reports in drawers, covers one per row on phones. Ground truth: src/blocks/ReportShelf.astro, src/pages/investors/reports-presentations.astro, src/data/reports.ts.",
+    "components": {
+      "Block/Report shelf 490:10568": "Variants Series=Annual | Quarterly x Breakpoint=Desktop | Mobile: Annual Desktop 490:10099 (renamed), Annual Mobile 490:10345 (renamed; covers one per row), Quarterly Desktop 682:37427 (new), Quarterly Mobile 682:38086 (new). New BOOLEAN property Open#682:10 (default false) shows each variant's Drawer under the Link Expand toggle. Annual drawer: the Files rows with the note, no heading; Quarterly drawer: archive '2021-2025' (Year row Quarter files, 10+10 on Desktop) and '2012-2020' (note, Year row Quarters, 5+4; 2012 Q4 only). Shelf items hug their height (Mobile items had been FILL and collapsed)",
+      "Shelf item 681:15565": "State=Cover 490:10086 | Next 681:15546 (dashed border/strong slot, Eyebrow 'Next results', date Heading/H3, countdown Body/Small; Add to calendar). Properties Period#681:1, Show link 2#681:2, Show link 3#681:3",
+      "Year row 485:9546": "New Layout=Quarter files: Desktop 682:15322, Mobile 682:15340 (stacked: label over links). Year text and Show link 1-3 wired to the set's properties",
+      "Page frame Reports & presentations 494:10132": "Results archive instance replaced by Report shelf Quarterly 683:39239 (Open off); the Annual instance 494:10497 now ends on its toggle"
+    },
+    "notInFigma": [
+      "Results archive set stays until the page is approved (Q160 open item)",
+      "The Next slot's countdown is a static 'in 39 days'; in code it runs from the visitor's today"
+    ]
   }
 }
