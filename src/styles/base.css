@@ -277,9 +277,9 @@ a {
    Rhythm (Q153, after a taste + impeccable review): paragraphs 16 apart; lists step out to stack--md; the lead, photos,
    tables and embeds to stack--lg; quotes as lists (Q154); a heading opens a section at stack--xl and binds to what follows (8).
    Running text stops at the prose measure; photos and embeds keep the 880 column, on the same left edge. Tables and
-   captions are text too and stop at the measure (Q156). The measure is in em (Q159): each text style keeps ~68
-   characters a line at every width (576 for Body at 1440, a caption 448, the boilerplate 512); a fixed 720 ran 85
-   characters at 1440 and 91 at 800 as the type stepped down. The column's own size is Body, so a list or quote
+   captions are text too and stop at the measure (Q156). The measure is 40em (Q159): 720 for Body at 1440 (Ross:
+   576 read narrow beside the 880 photo), and it narrows with each text style (the boilerplate 640, a caption 560) and
+   as Body steps down, where a fixed 720 ran 91 characters at 800. The column's own size is Body, so a list or quote
    measures like a paragraph. */
 .prose.article {
   font-size: var(--wp--preset--font-size--body);

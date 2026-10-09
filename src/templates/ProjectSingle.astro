@@ -190,6 +190,10 @@ const related = relatedProjects(project).map((p) => projectCard(p, 'tint'));
   .project-single__story {
     order: 4;
   }
+  /* Running text stops at the prose measure, as a news story's (720 at 1440, Q159) */
+  .project-single__story > * {
+    max-inline-size: var(--wp--custom--measure--prose);
+  }
   .project-single__spotlight {
     order: 5;
   }

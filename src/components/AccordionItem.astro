@@ -149,6 +149,11 @@ const panelId = `${id}-answer`;
     padding: 0 var(--wp--preset--spacing--24) var(--wp--preset--spacing--16);
     color: var(--wp--custom--color--text--secondary);
   }
+  /* An answer stops at the prose measure (640 at Body small), not the accordion's width: on the FAQ page it ran
+     ~100 characters a line (Q159) */
+  .faq-item__answer-content > * {
+    max-inline-size: var(--wp--custom--measure--prose);
+  }
   .faq-item__answer-content > * + * {
     margin-top: var(--wp--custom--stack--sm);
   }
