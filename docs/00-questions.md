@@ -18,6 +18,19 @@ Context: Ross asked whether stories with long titles should have a trimmed bread
 
 **Answer:** as ticked.
 
+### Q155. News bodies: boilerplate labels, results-release links, long leads (9 Oct 2026)
+Context: the second critique (Q154) found the press boilerplate's labels typed four ways, and results releases with a 60–115 word lead, the same report linked twice, raw webcast addresses and an empty link. Ross: "do the boilerplate and results release clean-ups next". Done in `scripts/news-cleanup.mjs` steps 7–9 (run by the import and on its own; idempotent), 114 of 189 posts changed.
+- [x] Boilerplate labels: every one is a bold line of its own, no colon (128), so every release ends the same way. A line that carries its content after the colon ("please contact: <name>") or the first line of a hand-wrapped sentence stays as written
+- [x] Webcast: "Webcast link: <address>" → a "Watch the webcast" link row (18)
+- [x] Downloads typed as paragraph lines or loose links → a file row, the "Download report and presentation here:" label dropped (26); a file already listed earlier in the post isn't listed again (18; one of them was labelled "Q3 2024 Report" on the Q4 release)
+- [x] Addresses typed as text or linked as themselves → short links: "reachsubsea.no", "newsweb.no", "hydro.gov.au/NHP" (84); empty links removed (4)
+- [x] Bold-only labels in the story ("Quarterly presentation", "CEO Letter") → headings (19); a heading repeated straight after itself goes
+- [x] Leads over 45 words keep their opening sentence (41: "Haugesund, 18 August 2026 – Reach Subsea ASA today announced its second-quarter and half-year 2026 results."), the figures follow as body text; 8 with no sentence end between 10 and 45 words lose the lead style. Not cut inside a quotation, a link or after an abbreviation
+- [x] Fix found on the way: Q154's 8px between list items also spread the Links in a file row apart; link rows are excluded
+- [ ] Later: caption and table measure, duplicate featured/inline photos, unbalanced quotes (Q154 minor list)
+
+**Answer:** as ticked.
+
 ### Q154. News single: second critique, breadcrumb fix, rhythm tweaks (9 Oct 2026)
 Context: Ross asked for the critique to be run again after Q153. It scored 24/36 (heuristic 9 n/a; first run 28/40). The drop was mostly a P0 that Q153 introduced: `spacing="sm"` on the story section let `.block.has-spacing-sm` take away the header clearance, so the breadcrumb sat under the fixed header. Also flagged: quotes and list items broke the text into islands, and More news at H2 matched the story's own title. Ross chose the rhythm tweaks; boilerplate and results-release clean-ups and the minor polish wait.
 - [x] Breadcrumb clears the header again; the story's bottom padding (section/sm) is set on `.news-article`, not with `spacing="sm"`

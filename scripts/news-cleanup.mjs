@@ -10,6 +10,16 @@
 //   6. valid markup (8 Oct 2026, Q143 HTML validator): an email or www. address typed without its scheme gets mailto: or
 //      https://, other links whose href isn't a URL (a date typed into the link field) are unwrapped, and a body whose tags don't balance (unclosed <div>, <p> inside <em>, a link inside a link) is
 //      re-serialised by an HTML5 parser, as a browser would read it. Bodies that are already valid stay byte for byte
+//   7. boilerplate labels (9 Oct 2026, Q155): "About Reach Subsea", "For more information please contact:" and the like
+//      come typed four ways (bold or not, own line or joined to the text with <br>); each becomes a bold paragraph
+//      of its own, without the colon, so every release ends the same way
+//   8. release links (Q155): "Webcast link: <address>" becomes a "Watch the webcast" link row; download links typed
+//      as lines of a paragraph ("Download report and presentation here:<br><a>Report</a><br><a>…") or loose at the
+//      top level become a link row; a file already in an earlier row isn't listed twice; empty links go; an address
+//      typed or linked as itself becomes a short link ("reachsubsea.no"); a bold-only label in the story
+//      ("Quarterly presentation") is a heading, as in step 3, and a heading repeated straight after itself goes
+//   9. a lead longer than 45 words (Q155) keeps its opening sentence(s), at least 10 words and at most 45; the rest is
+//      the next paragraph. When no sentence end falls in that range the paragraph stays body text, with no lead
 // Each is a migration step too (docs/09 §News). Idempotent: running it twice changes nothing.
 // Usage: node scripts/news-cleanup.mjs   (applies it to src/data/news-posts.json and prints what changed)
 import fs from 'node:fs';
@@ -183,12 +193,159 @@ function validMarkup(html, report) {
   return out;
 }
 
+// 7–9. Labels, links and leads (Q155). The story and its boilerplate are handled apart: a bold paragraph is a label
+// in both, but only the story's become headings
+const BP = '<div class="article-boilerplate">';
+// A label, not a line that carries its content after a colon ("please contact: <name>") or the first line of a
+// sentence wrapped by hand ("This information is subject of the disclosure<br>requirements …")
+const isLabel = (html, rest = '') => {
+  const t = plain(html);
+  if (!t || words(t) > 8 || /@|\d{3}/.test(t) || /:\s*\S/.test(t) || /^this information\b/i.test(t) || /^[a-z]/.test(plain(rest))) return false;
+  return /^<strong>[\s\S]*<\/strong>$/.test(html.trim()) || /:$/.test(t) || BOILERPLATE.test(t) || /^about\b/i.test(t);
+};
+const boldLabel = (html) => `<p><strong>${label(plain(html))}</strong></p>`;
+// A web address as a link label: the host, and the path when it is short ("hydro.gov.au/NHP")
+const shortUrl = (u) => {
+  try {
+    const x = new URL(/^www\./i.test(u) ? `https://${u}` : u);
+    const host = x.hostname.replace(/^www\./, '');
+    const full = host + (x.pathname + x.search).replace(/\/$/, '');
+    return full.length <= 40 ? full : host;
+  } catch {
+    return u;
+  }
+};
+const URL_TEXT = /\b((?:https?:\/\/|www\.)[^\s<]*[^\s<.,;:!?)”"'])/g;
+const ROW = (links) => `<ul class="article-links">${links.map(([href, text]) => `<li><a href="${href}">${text}</a></li>`).join('')}</ul>`;
+
+function boilerplateLabels(bp, report) {
+  const count = (k) => (report[k] = (report[k] ?? 0) + 1);
+  return bp.replace(/<p>((?:(?!<\/p>)[\s\S])*?)<\/p>/g, (m, inner) => {
+    const [first, ...rest] = inner.split(/\s*<br\s*\/?>\s*/);
+    if (!isLabel(first, rest[0] ?? '')) return m;
+    const next = boldLabel(first);
+    const body = rest.filter((r) => plain(r)).join('<br>');
+    if (!body && next === m) return m;
+    count('boilerplateLabels');
+    return body ? `${next}\n<p>${body}</p>` : next;
+  });
+}
+
+function releaseLinks(story, report) {
+  const count = (k) => (report[k] = (report[k] ?? 0) + 1);
+  let out = story;
+  // Empty links (a webcast address whose text was pasted into the next link)
+  out = out.replace(/<a href="[^"]*">\s*<\/a>/g, () => (count('emptyLinksRemoved'), ''));
+  // "Webcast link: <address>" (or "Link:" before a webcast host) → a link row; anything after it in the paragraph
+  // stays a paragraph
+  const WEBCAST = /companywebcast|royalcast|qcnl\.tv/;
+  out = out.replace(/<p>(Webcast link|Link):\s*(?:<br\s*\/?>\s*)?(?:<a href="([^"]+)">[^<]*<\/a>|(https?:\/\/[^\s<]+))\s*([\s\S]*?)<\/p>/g, (m, lead, href, bare, rest) => {
+    if (lead === 'Link' && !WEBCAST.test(href ?? bare)) return m;
+    count('webcastLinks');
+    return ROW([[href ?? bare, 'Watch the webcast']]) + (plain(rest) ? `\n<p>${rest.trim()}</p>` : '');
+  });
+  // Download links typed as the lines of a paragraph → a link row; a label ending ":" before them goes (the row's
+  // file links say it), a closing sentence stays a paragraph
+  out = out.replace(/<p>((?:(?!<\/p>)[\s\S])*?<br\s*\/?>(?:(?!<\/p>)[\s\S])*?)<\/p>/g, (m, inner) => {
+    const lines = inner.split(/\s*<br\s*\/?>\s*/).filter((l) => plain(l));
+    const isFile = (l) => /^<a href="[^"]+\.pdf(\?[^"]*)?">[^<]+<\/a>$/i.test(l.trim());
+    let i = 0;
+    if (!isFile(lines[0])) {
+      if (!/:$/.test(plain(lines[0])) || words(plain(lines[0])) > 8) return m;
+      i = 1;
+    }
+    const files = [];
+    while (i < lines.length && isFile(lines[i])) files.push(lines[i++]);
+    if (!files.length) return m;
+    const tail = lines.slice(i).join('<br>');
+    count('downloadRows');
+    const row = ROW(files.map((l) => [l.match(/href="([^"]+)"/)[1], plain(l)]));
+    return row + (plain(tail) ? `\n<p>${tail}</p>` : '');
+  });
+  // A link left loose at the top level (not in a paragraph) → a link row
+  out = out.replace(/(^|\n)<a href="([^"]+)">\s*([^<]*?)\s*<\/a>(?=\n|$)/g, (m, nl, href, text) => (count('looseLinksToRows'), `${nl}${ROW([[href, text]])}`));
+  // A file already in an earlier row isn't listed again: its item goes, and a row left empty
+  const seen = new Set();
+  const once = (href) => !seen.has(href) && seen.add(href);
+  out = out.replace(/<ul class="article-links">([\s\S]*?)<\/ul>/g, (m, items) => {
+    const kept = items.replace(/<li><a href="([^"]+)">[\s\S]*?<\/a><\/li>/g, (li, h) => (once(h) ? li : (count('duplicateLinksRemoved'), '')));
+    return kept.includes('<li>') ? `<ul class="article-links">${kept}</ul>` : '';
+  });
+  out = out.replace(/\n{2,}/g, '\n');
+  // A bold-only label in the story is a heading, as step 3's typed labels
+  out = out.replace(/<p><strong>([^<]*)<\/strong><\/p>/g, (m, t) => {
+    const x = plain(t);
+    if (!x || words(x) > 7 || /[.!?]$/.test(x) || MONTH.test(x) || BOILERPLATE.test(x)) return m;
+    count('labelsToHeadings');
+    return `<h2>${isCaps(x) ? sentenceCase(label(x)) : label(x)}</h2>`;
+  });
+  // The same heading twice in a row
+  out = out.replace(/<h2>([^<]*)<\/h2>\s*<h2>\1<\/h2>/g, (m, t) => (count('repeatedHeadings'), `<h2>${t}</h2>`));
+  return out;
+}
+
+// Addresses typed as text, or linked with themselves as the label, become short links (story and boilerplate)
+function shortLinks(html, report) {
+  const count = (k) => (report[k] = (report[k] ?? 0) + 1);
+  let inA = false;
+  let inFrame = false;
+  return html
+    .split(/(<[^>]+>)/)
+    .map((part) => {
+      if (part.startsWith('<')) {
+        if (/^<a\b/i.test(part)) inA = true;
+        else if (/^<\/a>/i.test(part)) inA = false;
+        else if (/^<iframe\b/i.test(part)) inFrame = true;
+        else if (/^<\/iframe>/i.test(part)) inFrame = false;
+        return part;
+      }
+      if (inFrame) return part;
+      if (inA) {
+        const t = part.trim();
+        if (/^(https?:\/\/|www\.)\S+$/.test(t) && shortUrl(t) !== t) return (count('urlLabelsShortened'), part.replace(t, shortUrl(t)));
+        return part;
+      }
+      return part.replace(URL_TEXT, (u) => (count('bareUrlsLinked'), `<a href="${/^www\./i.test(u) ? `https://${u}` : u}">${shortUrl(u)}</a>`));
+    })
+    .join('');
+}
+
+// 9. A long lead keeps its first sentence
+const ABBR = /\b(ltd|inc|no|mr|ms|dr|st|approx|nok|usd|eur|co|e\.g|i\.e|[a-z])\.$/i;
+function shortLead(html, report) {
+  return html.replace(/<p class="article-lead">([\s\S]*?)<\/p>/, (m, inner) => {
+    if (words(plain(inner)) <= 45) return m;
+    report.longLeads = (report.longLeads ?? 0) + 1;
+    for (const s of inner.matchAll(/[.!?](?=\s+[A-Z0-9“"])/g)) {
+      const head = inner.slice(0, s.index + 1);
+      const n0 = (re) => (head.match(re) ?? []).length;
+      // Not inside a tag or a quotation
+      const balanced = ['a', 'em', 'strong'].every((t) => n0(new RegExp(`<${t}\\b`, 'g')) === n0(new RegExp(`</${t}>`, 'g'))) && n0(/“/g) === n0(/”/g);
+      if (ABBR.test(head) || !balanced) continue;
+      const n = words(plain(head));
+      if (n < 10) continue;
+      if (n > 45) break;
+      report.leadsCut = (report.leadsCut ?? 0) + 1;
+      return `<p class="article-lead">${head}</p>\n<p>${inner.slice(s.index + 1).trim()}</p>`;
+    }
+    report.leadsDropped = (report.leadsDropped ?? 0) + 1;
+    return `<p>${inner}</p>`;
+  });
+}
+
+function releaseTidy(html, report) {
+  const at = html.indexOf(BP);
+  const story = at < 0 ? html : html.slice(0, at);
+  const bp = at < 0 ? '' : html.slice(at);
+  return shortLinks(shortLead(releaseLinks(story, report), report) + boilerplateLabels(bp, report), report);
+}
+
 // One pass can uncover another (a split paragraph turns out to be a label), so run until nothing changes
 export function cleanStory(html, report = {}) {
   let out = html;
   for (let i = 0; i < 4; i++) {
     // The parser's tree can give the clean-up something new to do (a balanced boilerplate), so both repeat
-    const next = validMarkup(cleanOnce(out, report), report);
+    const next = validMarkup(releaseTidy(cleanOnce(out, report), report), report);
     if (next === out) break;
     out = next;
   }

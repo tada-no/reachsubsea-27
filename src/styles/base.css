@@ -291,8 +291,9 @@ a {
 .article > :is(ul, ol) {
   margin-block: var(--wp--custom--stack--md);
 }
-/* Bullets that run to two lines need a little air between them, or a list reads as one block (Q154) */
-.prose.article li + li {
+/* Bullets that run to two lines need a little air between them, or a list reads as one block (Q154). Not a links
+   row: its Links keep their own gap around 48px targets */
+.prose.article :is(ul, ol):not(.article__links) > li + li {
   margin-top: var(--wp--preset--spacing--8);
 }
 /* Lead (Q147): the opening paragraph of a longer story, Lead size in navy against the grey body. Navy, not the
