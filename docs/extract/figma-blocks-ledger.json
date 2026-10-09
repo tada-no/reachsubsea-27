@@ -2282,5 +2282,49 @@
     "gotchas": [
       "Auto layout has one gap per frame: a rhythm with different steps (lead → stack/lg, heading → stack/xl, heading → text 8) is built from wrapper frames with bound paddingTop, not spacer rectangles"
     ]
+  },
+  "phase4Projects8Oct": {
+    "date": "2026-10-08",
+    "context": "Project single and Projects archive (Q149, Q150). Ground truth: src/templates/ProjectSingle.astro, src/templates/ProjectsArchive.astro, src/components/SpecRow.astro, src/components/LocatorMap.astro, src/data/projects.ts.",
+    "components": {
+      "Spec row 644:15332 (now a set)": "Default 131:128 (unchanged, 74 instances intact) and Stacked 644:15333: UI/Label text/accent over Body text/primary, gap 4, no padding, no rule",
+      "Components / Project doc frame 648:2655": "Row 648:2660 holds the project parts",
+      "Project facts 648:2661": "Key facts panel: bg/tint, padding stack/lg, Stacked Spec rows stack/md apart (Client, Location, Period, Service, Vessels)",
+      "Locator map 648:2680": "2:1 tile, bg/tint water, radius/lg; land 648:2682 (sage/200, Natural Earth 1:110m, Mercator 150 deg wide), pin 648:2683 (12 navy dot, bg/tint + border/accent rings). Code pulses the pin (3.2s, still under reduced motion)",
+      "Project spotlight 648:2687": "Archive spotlight panel on bg/tint; Title, Text properties",
+      "Place popup 648:2696": "Archive map popup, 320 wide: list 648:2699 of the place's projects, close 648:2703",
+      "Block/Stats band: Count=5, Style=Feature, Breakpoint=Mobile 649:35859 (new variant)": "Lead stat over a 2x2 grid",
+      "Block/Stats band Feature variants 253:4782, 440:15138, 444:7853": "Section header visibility relinked to 'Show section header#169:0' (was hidden and unlinked)",
+      "Breadcrumb Ends on=Link 624:2623, 624:2635": "Level 1, Level 2, Current, Level 2 group visibility and Parent properties relinked"
+    },
+    "pageFrames": {
+      "Pages / Project single 649:23731": "Article header (breadcrumb ends on Projects), photo 649:23800 with the photo tint, story + Project facts + Locator map, Stats band 649:23856 (Count=5, 4th stat hidden), related Feed 649:23883, CTA 649:24108, footer 649:24144",
+      "Pages / Project single · Mobile 649:35884": "Facts and map after the story; stats 649:35946 (new Mobile Feature variant), feed 649:36006, CTA 649:36200, footer 649:36234",
+      "Pages / Projects 651:24259": "Intro beside the dot map stage 651:24311 (dots 651:24313, Map marker Cluster pins 651:24314/24320/24326/24332), results 652:24324: Filter chips 652:24325, grid 652:24351 (12 Card Image top Tint, 3 across), Show more 652:24773, CTA 652:24781, footer 652:24817",
+      "Pages / Projects · Mobile 654:24673": "Header 654:24674, intro 654:24685, tall map 654:24688 (stage 654:24689, 8 from the edges, 4 cluster markers), results 654:24716 (chips in one clipped scroll row, 12 cards one column, Show more), CTA 654:25028, footer 654:25064"
+    },
+    "images": {
+      "reach-remote-bow": "52143b9d3cec91d0339c3fc17e1e16e72a6e8f70",
+      "project-ormen-lange": "eaf885e635b003946cbe6f3e5c24ba5773085abf",
+      "project-pipeline-ormen-lange": "0bfabb31aa55ba089a51938cd50849b98caae8a0",
+      "scarborough-rr2": "0e15ac873ecb99d549889a8dcb1b3a0aa4c9d3e8",
+      "u864-recovery": "2ce670a4d1f9d86f678094948c24f0a31229e619",
+      "black-sea-jarstein": "07d75631f61a39e0784917b737d6efbc36af388e",
+      "counteract": "76bf54dfd18c09a763baee911f86d5d4bf66b17c",
+      "gassco": "27361ee5fdddf4e447ece995edfae5857cd4cd1a",
+      "scarborough-commissioning": "c62ba94b9c53db10bc5205510eae47d9c7b2ffda",
+      "fpso": "7becc5609577898505c461f05a8fb6826e3a1c7a",
+      "u864-wreck-model": "202f38f51c94dd0fe544397f066c42a184cc5d9d",
+      "troll-boulder": "12362247ea564d429ffdf0596a895bf26fb063b2",
+      "gwatch-equinor": "90e4dc27c14de60d1bd3ebc60f806642474d757e",
+      "depthwatch-shell": "cc9e5a23537a63a3bc10b922cf55ad2fbb605683"
+    },
+    "gotchas": [
+      "setBoundVariable('strokes', null) throws: clear strokes with strokes = []",
+      "combineAsVariants appends the set at the end of an auto-layout parent: re-insert it at the right index",
+      "upload_assets can't target instance sublayers: upload to the page, apply the fill by imageHash, delete the staging frames",
+      "Card instances cloned into a hugging column collapse (card HUG, Content FILL is circular): set Content to HUG too",
+      "Setting Breakpoint on a block instance resets its overridden text: set the variant first, then the copy"
+    ]
   }
 }
