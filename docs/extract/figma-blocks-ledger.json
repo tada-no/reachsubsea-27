@@ -2395,5 +2395,25 @@
       "No mobile page frame (as the Transparency Act); the Article section stacks the same at every width",
       "Footer 125:3011: legal links reordered to match code (navigation.ts legalLinks): Privacy & Cookie Policy first, then Transparency Act, in Desktop (row 125:2950) and Mobile (row 125:3008); every page frame follows through its instance"
     ]
+  },
+  "phase4ProjectsMapClarity9Oct": {
+    "date": "2026-10-09",
+    "context": "Projects map clarity after the critique (commit d8ec382). Ground truth: src/templates/ProjectsArchive.astro.",
+    "components": {
+      "Popup project 667:27456 (new, Components page 12:24, beside Place popup)": "One project row in a Place popup: Photo frame 64x48 (radius/sm, image fill) centred beside Title (Body/Small, text/primary, underlined; TEXT property Title#667:0). Title only, no year or work type (Ross)",
+      "Place popup 648:2696": "Kicker (count eyebrow) removed (Ross: the marker and rows already count); title 'Ormen Lange'; List gap and top padding space/12 holding 3 Popup project instances 667:27459, 667:27462, 667:27465; Close at y 18, centred on the H5 line; popup and list hug (320x284, as the build); Pointer moved to the new foot"
+    },
+    "pages": {
+      "Projects desktop 651:24259": "Map holder 660:25070 gap space/12 with the Unmapped note 667:36868 (Body/Caption, text/secondary) under the map; map frame 651:24311 clips its land dots",
+      "Projects · Mobile 654:24673": "Map frame 654:24688 edge to edge (side padding 0), map 654:24689 375x300 and clipped; Unmapped note wrapper 667:36869 (padding space/12 top, grid/margin sides) with text 667:36870"
+    },
+    "assets": {
+      "project-ormen-lange.jpg": "db7717fbd81744c764594265088dae66280aca8d",
+      "project-pipeline-ormen-lange.jpg": "bf2de2c4e1ec094578849b5ee16c744ba9a81dbe"
+    },
+    "gotchas": [
+      "Setting a text property on new instances left their textDecoration at NONE although the main had UNDERLINE: set it with setRangeTextDecoration on the main and each instance",
+      "resize() on a new component reset its counter axis to FIXED: set counterAxisSizingMode AUTO after"
+    ]
   }
 }
