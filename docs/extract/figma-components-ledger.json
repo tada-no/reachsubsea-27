@@ -286,7 +286,8 @@
         "Investors": "121:2062",
         "Careers": "121:2263",
         "Newsroom": "121:2463"
-      }
+      },
+      "update9Oct": "Strip is a Menu strip instance (visible bound to Show strip). Newsroom example: Events link hidden, description without events, card = latest post (5 Oct 2026 · 1 min read, Deep Cygnus, no badge). Projects example card = the latest project (U-864)."
     },
     "Site menu panel": {
       "id": "122:2417",
@@ -296,7 +297,8 @@
         "Breakpoint=Desktop": "122:1867",
         "Breakpoint=1200": "122:2143"
       },
-      "phase4Notes": "17 Sep 2026 (Q49, done prior to this session, verified in it): reimagined per SiteMenuPanel.astro — no longer a flat sitemap. 3-column Main (Column/Links: Menu link/Large Projects, Newsroom, Events, FAQ · Card instance for the featured project · Column/Feeds: Section/Reach Newsroom + Section/Events) plus a Strip (Contact link + 3D World button). Starts at 1200 in code (900–1199 now uses the Mobile menu instead)."
+      "phase4Notes": "17 Sep 2026 (Q49, done prior to this session, verified in it): reimagined per SiteMenuPanel.astro — no longer a flat sitemap. 3-column Main (Column/Links: Menu link/Large Projects, Newsroom, Events, FAQ · Card instance for the featured project · Column/Feeds: Section/Reach Newsroom + Section/Events) plus a Strip (Contact link + 3D World button). Starts at 1200 in code (900–1199 now uses the Mobile menu instead).",
+      "update9Oct": "Events link and Events feed removed (SHOW_EVENTS off in code); the middle Card is one Latest news card (Deep Cygnus photo, '5 Oct 2026', Read story) in place of the latest project; Reach Newsroom rows are the three stories after it; large-link notes as navigation.ts; strip = Menu strip instance. Both variants."
     },
     "Menu accordion": {
       "id": "123:2521",
@@ -310,7 +312,8 @@
     },
     "Mobile menu panel": {
       "id": "123:2522",
-      "type": "COMPONENT"
+      "type": "COMPONENT",
+      "update9Oct": "Order as desktop: Services, Assets, Company, Investors, Careers, Projects, Newsroom, then FAQ (666:2644, Menu accordion without chevron) and Contact. The old utility block (links, phone/email, social icons) became a bg/tint Strip (666:2649) with a full-width Menu world button, then Links: Menu link L2 instances with the external icon (Open positions, LinkedIn, Facebook; left inset removed) and the legal links stacked. Drawn at 375 (one column); 600–899 and 900–1199 arrangements are in the doc description."
     },
     "Search panel": {
       "id": "124:2645",
@@ -330,7 +333,8 @@
         "Mobile": "125:2953"
       },
       "notes": "Navy mode on each variant; Mobile also sets Layout/Typography Mobile modes. No component properties: link text is edited in place.",
-      "update8OctFinalAudit": "Brought to src/components/Footer.astro (sweep8OctFinalAudit): Brand = Logo + Tagline (Heading/H4 'Transforming the way we work in the ocean.', 'in the ocean.' text/accent, width 204 Desktop / 170 Mobile = the code's 14ch; Desktop Brand fills the row height, space-between, so the tagline sits level with the longest column's foot); the Social icon buttons removed (LinkedIn and Facebook are text links under Get in touch). Columns are Footer column 621:2544 instances in the code's order: Services & Assets (Subsea, Survey, Monitoring, Fleet overview, Reach Remote), Company (About us, Leadership & Board, HSEQ, Sustainability), Explore (Projects, Explore 3D World, Investors, Careers, Newsroom, Events, FAQ), Get in touch (Contact, post@reachsubsea.com, LinkedIn, Facebook). Desktop columns fixed 192 (2 of 12 cols); Mobile two Rows of two (FILL). Legal: 1px border/subtle top hairline, padding-top space/32. Desktop 1440x529, Mobile 375x845."
+      "update8OctFinalAudit": "Brought to src/components/Footer.astro (sweep8OctFinalAudit): Brand = Logo + Tagline (Heading/H4 'Transforming the way we work in the ocean.', 'in the ocean.' text/accent, width 204 Desktop / 170 Mobile = the code's 14ch; Desktop Brand fills the row height, space-between, so the tagline sits level with the longest column's foot); the Social icon buttons removed (LinkedIn and Facebook are text links under Get in touch). Columns are Footer column 621:2544 instances in the code's order: Services & Assets (Subsea, Survey, Monitoring, Fleet overview, Reach Remote), Company (About us, Leadership & Board, HSEQ, Sustainability), Explore (Projects, Explore 3D World, Investors, Careers, Newsroom, Events, FAQ), Get in touch (Contact, post@reachsubsea.com, LinkedIn, Facebook). Desktop columns fixed 192 (2 of 12 cols); Mobile two Rows of two (FILL). Legal: 1px border/subtle top hairline, padding-top space/32. Desktop 1440x529, Mobile 375x845.",
+      "update9Oct": "Explore column without Events (Link 6 = FAQ, Show link 7 off) in both variants."
     },
     "Media toggle": {
       "id": "365:2391",
@@ -472,6 +476,19 @@
       "position": "Components / Site menu panel 122:1862 > Group/Parts (moved from page level, 8 Oct 2026, sweep8OctFinalAudit)",
       "props": "Meta, Title",
       "note": "Site menu Newsroom item; 15 instances in Site menu panel 122:2417."
+    },
+    "Menu world button": {
+      "id": "665:2676",
+      "type": "COMPONENT",
+      "position": "Components / Site menu panel 122:1862 > Group/Parts",
+      "props": "Label (TEXT)",
+      "note": "9 Oct 2026: the 3D World entry in every menu (.menu-world): navy (Navy mode), radius/md, space/24 · space/16 padding, UI/Button small label, Icon/world (the code's cube-3d-sphere has no library glyph). Hugs in the Menu strip; in the Mobile menu it fills the width with primaryAxisAlign SPACE_BETWEEN set on the instance."
+    },
+    "Menu strip": {
+      "id": "665:2677",
+      "type": "COMPONENT",
+      "position": "Components / Site menu panel 122:1862 > Group/Parts",
+      "note": "9 Oct 2026: the strip at the foot of every Mega menu panel and the Site menu panel (.mega-menu__strip / .site-menu__strip): Link Small 'Contact us' left, Menu world button right, bg/tint, grid/margin sides, space/16 top and bottom. Replaced the old strips (Mega: three strip links; Site menu: phone, email, social, legal). Instances: 665:2687 (Site menu Desktop), 665:2696 (Site menu 1200), 665:2705 (Mega menu panel, visible bound to Show strip)."
     }
   },
   "ledgers": {
