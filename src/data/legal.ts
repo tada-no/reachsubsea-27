@@ -9,8 +9,7 @@
 // still add one). Not covered: the videos, maps, share data and social feed that load only when a visitor asks
 // (Consent placeholder, docs/05 §2.13).
 //
-// WordPress: a Page with core blocks. Each section is a core Group (block style "Legal section") holding a Heading
-// and its Paragraphs; the theme sets the heading beside the text. Last updated = the page's modified date.
+// WordPress: a Page with core Heading and Paragraph blocks. Last updated = the page's modified date.
 
 export interface LegalSection {
   title: string;

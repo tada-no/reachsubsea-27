@@ -2,11 +2,11 @@
 // Privacy & Cookie Policy (9 Oct 2026, Q157), the legal page linked from the footer's and the menu's legal row. It
 // keeps the live URL (/privacy-policy/), as the Transparency Act keeps /transparency-act/, outside any section: no
 // subnav. The live policy in its own wording (src/data/legal.ts).
-// Text hero on navy, as the Transparency Act (Q57). The policy's seven short sections sit heading beside text on the
-// 12-column grid (heading cols 1–4, text from col 5 to the prose measure), so the questions read down one column and
-// the text starts on a grid line, not in a centred 880 column off the hero's left edge. Below 900 the text follows
-// its heading. The live "Contact us" closes it as the CTA panel.
-// WordPress: core blocks (docs/05 §0 Budget); each section a Group with the "Legal section" block style.
+// Text hero on navy, as the Transparency Act (Q57). The policy is core content in the article style (base.css .article,
+// as a news story): headings above their text, running text at the prose measure (720). The column starts on the
+// container's left edge, under the hero title, not centred. (Headings beside the text on the grid were tried first:
+// the eye had to cross a 400 px gap for every section, Ross, 9 Oct 2026.) The live "Contact us" closes it as the CTA panel.
+// WordPress: core Heading + Paragraph blocks (docs/05 §0 Budget), the template's content column left-justified.
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/header/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -32,15 +32,13 @@ const id = (title: string) => `privacy-${title.toLowerCase().replace(/[^a-z0-9]+
     />
 
     <BlockSection slug="legal" root="legal" background="white" label={p.title}>
-      <div class="legal__sections">
+      <div class="prose article">
         {
           p.sections.map((s) => (
-            <section class="legal__section" aria-labelledby={id(s.title)}>
-              <h2 id={id(s.title)} class="legal__title text-h4">
-                {s.title}
-              </h2>
-              <div class="prose legal__body" set:html={s.body} />
-            </section>
+            <Fragment>
+              <h2 id={id(s.title)}>{s.title}</h2>
+              <Fragment set:html={s.body} />
+            </Fragment>
           ))
         }
       </div>
@@ -57,40 +55,3 @@ const id = (title: string) => `privacy-${title.toLowerCase().replace(/[^a-z0-9]+
   </main>
   <Footer />
 </BaseLayout>
-
-<style>
-  .legal__sections {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wp--custom--stack--xl);
-  }
-  /* Heading cols 1–4, text cols 5–12 up to the prose measure, top-aligned (Split media Beside, with the wider text
-     column long copy needs) */
-  .legal__section {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--wp--custom--grid--gutter);
-    row-gap: var(--wp--preset--spacing--8);
-    align-items: start;
-  }
-  .legal__title {
-    grid-column: 1 / span 4;
-    color: var(--wp--custom--color--text--primary);
-    text-wrap: balance;
-  }
-  .legal__body {
-    grid-column: 5 / -1;
-    max-inline-size: var(--wp--custom--measure--prose);
-  }
-  .legal__body :global(a) {
-    overflow-wrap: anywhere;
-  }
-  @media (max-width: 899px) {
-    .legal__sections {
-      gap: var(--wp--custom--stack--lg);
-    }
-    .legal__section > * {
-      grid-column: 1 / -1;
-    }
-  }
-</style>
