@@ -1,0 +1,126 @@
+---
+// Search box (docs/04 §10c, 9 Oct 2026, Q158): the site search form, shared by the header's Search panel (§16), the
+// Search results page and the 404. The big sibling of the in-page Search field (§10b): 56 tall (64 from 900), Lead
+// text, 1px border/strong, radius/md, search icon, a clear button once there is text (its space kept, so nothing
+// moves), and the Search button from 900 (Enter submits below that). It submits `s` to the results page.
+// In WordPress: get_search_form() with this markup (searchform.php), action home_url('/'), so it lands on search.php.
+import Icon from './Icon.astro';
+import IconButton from './IconButton.astro';
+import Button from './Button.astro';
+
+interface Props {
+  id: string;
+  value?: string;
+  /** Read by screen readers; the placeholder carries the visible hint. */
+  label?: string;
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { id, value = '', label = 'Search reachsubsea.com', class: className, ...attrs } = Astro.props;
+---
+
+<form class:list={['search-box', className]} action="/search/" method="get" role="search" data-search-box {...attrs}>
+  <label class="visually-hidden" for={id}>{label}</label>
+  <Icon name="search" size={24} class="search-box__icon" />
+  <input
+    class="search-box__field"
+    id={id}
+    type="search"
+    name="s"
+    value={value}
+    placeholder={label}
+    autocomplete="off"
+    enterkeyhint="search"
+    data-search-field
+  />
+  <IconButton icon="x" label="Clear search" type="button" variant="ghost" size="small" class="search-box__clear" data-search-clear data-off={value ? undefined : ''} />
+  <Button label="Search" type="submit" class="search-box__submit" />
+</form>
+
+<style is:global>
+  .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--12);
+    height: 56px;
+    padding-inline: var(--wp--preset--spacing--16);
+    background-color: var(--wp--custom--color--bg--default);
+    border: 1px solid var(--wp--custom--color--border--strong);
+    border-radius: var(--wp--custom--radius--md);
+  }
+  .search-box__icon {
+    flex: none;
+    color: var(--wp--custom--color--icon--primary);
+  }
+  .search-box__field {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    appearance: none;
+    font-size: var(--wp--preset--font-size--lead);
+    line-height: var(--wp--custom--line-height--lead);
+    color: var(--wp--custom--color--text--primary);
+  }
+  /* The whole box takes the focus ring, not the bare input inside it */
+  .search-box__field:focus-visible {
+    outline: none;
+  }
+  .search-box:has(.search-box__field:focus-visible) {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 2px;
+  }
+  .search-box__field::placeholder {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .search-box__field::-webkit-search-cancel-button {
+    display: none;
+  }
+  .search-box__clear {
+    flex: none;
+  }
+  /* Kept in the row while empty, so the field and the button never shift as you type */
+  .search-box__clear[data-off] {
+    visibility: hidden;
+  }
+  .search-box__submit {
+    display: none;
+    flex: none;
+  }
+  @media (min-width: 900px) {
+    .search-box {
+      height: 64px;
+    }
+    .search-box__submit {
+      display: inline-flex;
+    }
+  }
+</style>
+
+<script>
+  // Clear button: shown once there is text; clearing empties the field and keeps focus in it
+  document.querySelectorAll<HTMLFormElement>('[data-search-box]').forEach((box) => {
+    const field = box.querySelector<HTMLInputElement>('[data-search-field]');
+    const clear = box.querySelector<HTMLElement>('[data-search-clear]');
+    if (!field || !clear) return;
+    const sync = () => clear.toggleAttribute('data-off', field.value === '');
+    field.addEventListener('input', sync);
+    clear.addEventListener('click', () => {
+      field.value = '';
+      sync();
+      field.focus();
+    });
+    // An empty search goes nowhere
+    box.addEventListener('submit', (event) => {
+      if (field.value.trim() === '') {
+        event.preventDefault();
+        field.focus();
+      }
+    });
+    sync();
+  });
+</script>

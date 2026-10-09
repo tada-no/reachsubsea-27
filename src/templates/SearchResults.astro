@@ -1,0 +1,293 @@
+---
+// Search results template (9 Oct 2026, Q158): WordPress search.php, the page the header's Search panel submits to
+// (/search/?s=…; in WordPress /?s=… on home_url). Not a block: the query fills it.
+// Laid out like the Newsroom and Projects archives (Q148): no Page hero, the title on white under the solid header,
+// then the Search box (docs/04 §10c) holding the query, the type chips the header spec asked for (All · Pages ·
+// Projects · News · Reports · Publications · FAQs · People · Fleet, each with its count, types with none left out),
+// the count line, and the results as a reading list of Search result rows (docs/04 §10d), 10 at a time with Show
+// more. Beside them from 1100 (cols 10–12; below them under 1100): the Search panel's Popular links and the contact
+// line, so a search that finds nothing still has somewhere to go.
+// Chips are links (?s=…&type=project) as on the Newsroom (Q145), so any filtered list can be shared; the script
+// takes the click in place (no reload) and keeps the URL in step. The field never moves: chips, count and list
+// all sit below it, and the chip row keeps its height while counts change.
+// Prototype: results come from /search-index.json and src/lib/search.ts in the browser; WordPress renders them
+// server-side with the same ranking (docs/09).
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/header/Header.astro';
+import Footer from '../components/Footer.astro';
+import BlockSection from '../components/BlockSection.astro';
+import SearchBox from '../components/SearchBox.astro';
+import SearchResult from '../components/SearchResult.astro';
+import SearchHelp from '../components/SearchHelp.astro';
+import FilterChip from '../components/FilterChip.astro';
+import Button from '../components/Button.astro';
+import { searchTypes } from '../data/search';
+
+// Each type's singular label, for the row eyebrows the script fills
+const labels = JSON.stringify(Object.fromEntries(searchTypes.map((t) => [t.id, t.single])));
+---
+
+<BaseLayout title="Search · Reach Subsea">
+  <Header />
+  <main id="main">
+    <BlockSection slug="search-results" root="search-results" background="white" labelledBy="search-results-title" data-search-results data-labels={labels}>
+      <div class="search-results__columns">
+        <div class="search-results__main">
+          <div class="search-results__head">
+            <h1 id="search-results-title" class="search-results__title text-h2">Search</h1>
+            <SearchBox id="search-results-field" data-search-results-form />
+          </div>
+
+          <nav class="search-results__chips scroll-row" aria-label="Result types" data-search-chips>
+            <FilterChip label="All" count="0" href="/search/" selected data-type="" hidden />
+            {searchTypes.map((t) => <FilterChip label={t.label} count="0" href="/search/" data-type={t.id} hidden />)}
+          </nav>
+
+          <h2 class="visually-hidden" data-search-heading>Results</h2>
+          <p class="search-results__summary text-small" aria-live="polite" data-search-summary>
+            Search pages, projects, news, reports, people and the fleet.
+          </p>
+
+          <ol class="search-results__list" data-search-list></ol>
+          <template data-result-template><SearchResult /></template>
+
+          <div class="search-results__more" data-search-more hidden>
+            <Button label="Show more results" variant="outline" data-search-more-button />
+          </div>
+
+          <div class="search-results__empty" data-search-empty hidden>
+            <p class="text-body">Try a shorter or broader word, or check the spelling. Names and places work too.</p>
+          </div>
+
+          <noscript>
+            <p class="text-body">Search needs JavaScript in this prototype. The Popular links and Contact still work.</p>
+          </noscript>
+        </div>
+
+        <SearchHelp class="search-results__aside" />
+      </div>
+    </BlockSection>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style is:global>
+  /* Opens the page under the fixed solid header: clear the bar (72 / 96), then a short gap, as the archives */
+  .search-results.block {
+    padding-top: calc(72px + var(--wp--custom--stack--xl));
+  }
+  @media (min-width: 1200px) {
+    .search-results.block {
+      padding-top: calc(96px + var(--wp--custom--stack--xl));
+    }
+  }
+  .search-results__columns {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--section--sm);
+  }
+  .search-results__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    min-width: 0;
+    max-width: var(--wp--style--global--content-size);
+  }
+  .search-results__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+  }
+  .search-results__title {
+    color: var(--wp--custom--color--text--primary);
+  }
+  /* One chip row, 40 tall whether or not it has chips yet, so the count and list start in the same place */
+  .search-results__chips {
+    flex-wrap: wrap;
+    min-height: 40px;
+  }
+  .search-results__chips .filter-chip[hidden] {
+    display: none;
+  }
+  .search-results__summary {
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .search-results__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+    padding-top: var(--wp--preset--spacing--8);
+  }
+  .search-results__list:empty {
+    display: none;
+  }
+  .search-results__more {
+    padding-top: var(--wp--preset--spacing--8);
+  }
+  .search-results__more[hidden],
+  .search-results__empty[hidden] {
+    display: none;
+  }
+
+  @media (min-width: 1100px) {
+    .search-results__columns {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--wp--custom--grid--gutter);
+      align-items: start;
+    }
+    .search-results__main {
+      grid-column: 1 / span 7;
+      max-width: none;
+    }
+    /* Four columns for the help panels until 1400: at three, the email ran out of its panel at 1100 */
+    .search-results__aside {
+      grid-column: 9 / -1;
+    }
+  }
+  @media (min-width: 1400px) {
+    .search-results__main {
+      grid-column: 1 / span 8;
+    }
+    .search-results__aside {
+      grid-column: 10 / -1;
+    }
+  }
+  @media (max-width: 599px) {
+    .search-results__chips {
+      flex-wrap: nowrap;
+    }
+  }
+</style>
+
+<script>
+  import { search, terms as termsOf, type SearchHit } from '../lib/search';
+  import { loadIndex, renderResult } from '../lib/search-dom';
+  import type { SearchType } from '../data/search';
+
+  const PER_PAGE = 10;
+  const root = document.querySelector<HTMLElement>('[data-search-results]');
+
+  if (root) {
+    const form = root.querySelector<HTMLFormElement>('[data-search-results-form]')!;
+    const field = form.querySelector<HTMLInputElement>('[data-search-field]')!;
+    const chips = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-search-chips] [data-type]'));
+    const summary = root.querySelector<HTMLElement>('[data-search-summary]')!;
+    const heading = root.querySelector<HTMLElement>('[data-search-heading]')!;
+    const list = root.querySelector<HTMLOListElement>('[data-search-list]')!;
+    const template = root.querySelector<HTMLTemplateElement>('[data-result-template]')!;
+    const more = root.querySelector<HTMLElement>('[data-search-more]')!;
+    const moreButton = root.querySelector<HTMLButtonElement>('[data-search-more-button]')!;
+    const empty = root.querySelector<HTMLElement>('[data-search-empty]')!;
+    const searchPath = new URL(form.action).pathname;
+
+    const single = JSON.parse(root.dataset.labels ?? '{}') as Record<SearchType, string>;
+
+    let hits: SearchHit[] = [];
+    let shown = 0;
+    let words: string[] = [];
+
+    const urlFor = (q: string, type: string) => {
+      const params = new URLSearchParams({ s: q });
+      if (type) params.set('type', type);
+      return `${searchPath}?${params}`;
+    };
+    const quote = (q: string) => `“${q}”`;
+    const plural = (n: number) => `${n} result${n === 1 ? '' : 's'}`;
+
+    function showMore(focusFirst = false) {
+      const next = hits.slice(shown, shown + PER_PAGE);
+      next.forEach((hit, i) => {
+        const row = renderResult(template, hit, words, single);
+        list.appendChild(row);
+        if (focusFirst && i === 0) row.querySelector<HTMLElement>('a')?.focus();
+      });
+      shown += next.length;
+      more.hidden = shown >= hits.length;
+    }
+
+    async function run(push = false) {
+      const params = new URLSearchParams(location.search);
+      const q = (params.get('s') ?? '').trim();
+      const type = params.get('type') ?? '';
+      field.value = q;
+      field.dispatchEvent(new Event('input'));
+      document.title = q ? `${quote(q)} · Search · Reach Subsea` : 'Search · Reach Subsea';
+      list.replaceChildren();
+      shown = 0;
+      empty.hidden = true;
+      more.hidden = true;
+
+      if (!q) {
+        chips.forEach((chip) => (chip.hidden = true));
+        summary.textContent = 'Search pages, projects, news, reports, people and the fleet.';
+        if (!push) field.focus();
+        return;
+      }
+
+      let index;
+      try {
+        index = await loadIndex();
+      } catch {
+        summary.textContent = 'Search is unavailable right now. The Popular links and Contact still work.';
+        return;
+      }
+      const result = search(index, q);
+      words = termsOf(q);
+      const counts = new Map<string, number>();
+      result.hits.forEach((h) => counts.set(h.type, (counts.get(h.type) ?? 0) + 1));
+      const active = type && counts.get(type) ? type : '';
+
+      chips.forEach((chip) => {
+        const t = chip.dataset.type ?? '';
+        const n = t ? (counts.get(t) ?? 0) : result.hits.length;
+        chip.hidden = n === 0 || (t === '' && counts.size < 2);
+        chip.href = urlFor(q, t);
+        const count = chip.querySelector<HTMLElement>('.filter-chip__count');
+        const value = chip.querySelector<HTMLElement>('.filter-chip__count-value');
+        if (count) count.dataset.reserve = `(${n})`;
+        if (value) value.textContent = String(n);
+        if (t === active) chip.setAttribute('aria-current', 'page');
+        else chip.removeAttribute('aria-current');
+      });
+
+      hits = active ? result.hits.filter((h) => h.type === active) : result.hits;
+      const label = active ? chips.find((c) => c.dataset.type === active)?.querySelector('.filter-chip__label')?.textContent : '';
+      if (hits.length === 0) {
+        summary.textContent = `No results for ${quote(q)}.`;
+        empty.hidden = false;
+      } else if (result.partial) {
+        summary.textContent = `Nothing matches every word of ${quote(q)}. ${plural(hits.length)} for some of them.`;
+      } else {
+        summary.textContent = `${plural(hits.length)} for ${quote(q)}${label ? ` in ${label}` : ''}.`;
+      }
+      heading.textContent = label ? `${label} results` : 'Results';
+      showMore();
+    }
+
+    // Chips: filter in place and keep the URL shareable
+    chips.forEach((chip) =>
+      chip.addEventListener('click', (event) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+        event.preventDefault();
+        if (chip.getAttribute('aria-current') === 'page') return;
+        history.pushState(null, '', chip.href);
+        run(true);
+      }),
+    );
+
+    // A new search from the page's own box: no reload, the type filter resets
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const q = field.value.trim();
+      if (!q) return;
+      history.pushState(null, '', urlFor(q, ''));
+      run(true);
+    });
+
+    moreButton.addEventListener('click', () => showMore(true));
+    window.addEventListener('popstate', () => run(true));
+    run();
+  }
+</script>

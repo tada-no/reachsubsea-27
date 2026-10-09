@@ -1,0 +1,85 @@
+---
+// Search help (9 Oct 2026, Q158): the side column of the Search results and 404 templates. The Search panel's
+// Popular links (the same editor-set list, docs/04 §16), then a contact line for when nothing fits. Two groups,
+// stacked in the column from 1100, side by side at 600–1099 (under the results), stacked on phones.
+// Each group is a bg/tint panel (Ross, 9 Oct 2026), radius/lg and space/32 padding as a Card (24 on phones), so
+// the column reads as help beside the results rather than more of the list.
+// In WordPress: the `search-popular` menu location and the site's phone and email options.
+import Eyebrow from './Eyebrow.astro';
+import Link from './Link.astro';
+import MetaItem from './MetaItem.astro';
+import { contactDetails, popularSearchLinks } from '../data/navigation';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<aside class:list={['search-help', className]} aria-label="Search help">
+  {
+    popularSearchLinks.length > 0 && (
+      <div class="search-help__group">
+        <Eyebrow text="Popular" tone="muted" />
+        <ul class="search-help__links">
+          {popularSearchLinks.map((link) => (
+            <li>
+              <Link label={link.label} href={link.url} action={link.external ? 'external' : 'page'} size="small" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+  <div class="search-help__group">
+    <Eyebrow text="Can’t find it?" tone="muted" />
+    <p class="search-help__text text-small">Call or email us and we’ll point you to the right person.</p>
+    <ul class="search-help__contact">
+      <MetaItem as="li" icon="phone" text={contactDetails.phone.label} href={contactDetails.phone.href} />
+      <MetaItem as="li" icon="mail" text={contactDetails.email.label} href={contactDetails.email.href} />
+    </ul>
+  </div>
+</aside>
+
+<style is:global>
+  .search-help {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--grid--gutter);
+    min-width: 0;
+  }
+  .search-help__group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--12);
+    padding: var(--wp--preset--spacing--32);
+    background-color: var(--wp--custom--color--bg--tint);
+    border-radius: var(--wp--custom--radius--lg);
+  }
+  .search-help__links,
+  .search-help__contact {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+  }
+  .search-help__contact {
+    gap: var(--wp--preset--spacing--8);
+  }
+  .search-help__text {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  @media (max-width: 599px) {
+    .search-help__group {
+      padding: var(--wp--preset--spacing--24);
+    }
+  }
+  @media (min-width: 600px) and (max-width: 1099px) {
+    .search-help {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--wp--custom--grid--gutter);
+    }
+  }
+</style>

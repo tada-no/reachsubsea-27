@@ -1,0 +1,250 @@
+---
+// 404 template (9 Oct 2026, Q158): WordPress 404.php. Most 404s after launch will be old reachsubsea.no links the
+// redirect map missed, so the page reads the broken address and offers what it most likely meant.
+// 1. Navy band (no Page hero: the picture is the point, and the template, not an editor, fills it), built to feel
+//    like the Photo hero (Ross, 9 Oct 2026): navy/900 ground, the hero height, and one column pinned to the bottom:
+//    the H1 "Page not found" set as an eyebrow, the Seabed scan's "404" as the visual headline, one subhead and a
+//    button home. The scan's dot field fills the band as the photo does, under a scrim like the photo's (fades from
+//    both sides and the bottom, an ellipse under the copy, the bar under the header), so the dots fade in towards
+//    the top right and the copy sits on solid navy; the digits sit above the scrim. The survey readout became the subhead's first sentence ("We surveyed this spot to a depth of 404 m
+//    and found nothing."). The H1 stays text: the dot 404 is a picture.
+// 2. White: "Search the site" with the Search box, holding the words guessed from the address so one press searches
+//    them; under it "Were you looking for one of these?" with up to three Search result rows for those words (the
+//    address's last part first, then all of it); Search help beside (Popular links, contact). With no good guess
+//    the box is empty and the rows don't show. The rows come last, so arriving with the index moves nothing above.
+// In WordPress the guess runs server-side: the same path words (src/lib/search.ts termsFromPath) through the search
+// query, top three, printed with the search-result template part. The status stays 404.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/header/Header.astro';
+import Footer from '../components/Footer.astro';
+import BlockSection from '../components/BlockSection.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Button from '../components/Button.astro';
+import SeabedScan from '../components/SeabedScan.astro';
+import SearchBox from '../components/SearchBox.astro';
+import SearchResult from '../components/SearchResult.astro';
+import SearchHelp from '../components/SearchHelp.astro';
+import { searchTypes } from '../data/search';
+
+const base = import.meta.env.BASE_URL;
+const labels = JSON.stringify(Object.fromEntries(searchTypes.map((t) => [t.id, t.single])));
+---
+
+<BaseLayout title="Page not found · Reach Subsea">
+  <Header overlay />
+  <main id="main">
+    <BlockSection slug="not-found" root="not-found" background="navy" labelledBy="not-found-title">
+      <div class="not-found__scrim" aria-hidden="true"></div>
+      <div class="not-found__band">
+        <h1 id="not-found-title" class="not-found__title text-eyebrow">Page not found</h1>
+        <SeabedScan class="not-found__scan" />
+        <p class="not-found__lead text-lead">
+          We surveyed this spot to a depth of 404&nbsp;m and found nothing. The page may have moved when we rebuilt the site, or the
+          address may be mistyped.
+        </p>
+        <div class="not-found__actions">
+          <Button label="Go to the home page" href={base} variant="primary" />
+        </div>
+      </div>
+    </BlockSection>
+
+    <BlockSection slug="not-found-help" root="not-found-help" background="white" labelledBy="not-found-help-title" data-not-found data-labels={labels}>
+      <div class="not-found-help__columns">
+        <div class="not-found-help__main">
+          <h2 id="not-found-help-title" class="text-h3">Search the site</h2>
+          <SearchBox id="not-found-field" data-guess-form />
+          <div class="not-found-help__guesses" data-guesses hidden>
+            <Eyebrow text="Were you looking for one of these?" tone="muted" />
+            <ol class="not-found-help__list" data-guess-list></ol>
+          </div>
+          <template data-result-template><SearchResult /></template>
+        </div>
+        <SearchHelp class="not-found-help__aside" />
+      </div>
+    </BlockSection>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style is:global>
+  /* Opens the page under the fixed header (transparent over the navy, as the Page hero): clear the bar (72 / 96),
+     then a short gap. The navy/900 ground of the Photo and navy Text heroes; the band clips the scan's dot field */
+  .not-found.block {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: min(140vw, 640px);
+    padding-top: calc(72px + var(--wp--custom--stack--xl));
+    background-color: var(--wp--preset--color--navy-900);
+  }
+  /* The site's one hero height from 900 (as the Photo and Text heroes, Ross 7 Oct 2026), the copy at the bottom */
+  @media (min-width: 900px) {
+    .not-found.block {
+      min-height: clamp(640px, 47.2vw, 800px);
+    }
+  }
+  @media (min-width: 1200px) {
+    .not-found.block {
+      padding-top: calc(96px + var(--wp--custom--stack--xl));
+    }
+  }
+  /* Over the dots, under the digits and copy: the Photo hero's scrim recipe. Solid under the header bar and fading
+     below it; fades in from both sides (longer on the copy side) and from the bottom; an ellipse from the
+     bottom-left corner carries the copy. The dots read clearest top right, as the photo's subject does */
+  .not-found__scrim {
+    --bar: 72px;
+    --fade-left: 30%;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(to bottom, var(--wp--preset--color--navy-900) var(--bar), transparent calc(var(--bar) + var(--wp--preset--spacing--96))),
+      linear-gradient(to right, var(--wp--preset--color--navy-900) 0%, transparent var(--fade-left)),
+      linear-gradient(to left, var(--wp--preset--color--navy-900) 0%, transparent 20%),
+      linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, transparent 40%),
+      radial-gradient(ellipse 85% 75% at 0% 100%, color-mix(in srgb, var(--wp--preset--color--navy-900) 92%, transparent) 0%, color-mix(in srgb, var(--wp--preset--color--navy-900) 70%, transparent) 45%, transparent 100%);
+  }
+  @media (min-width: 1200px) {
+    .not-found__scrim {
+      --bar: 96px;
+    }
+  }
+  /* Wide screens: the left fade and ellipse keep their 1240-based sizes, as the Photo hero's, so the copy's ground
+     doesn't darken as the window widens */
+  @media (min-width: 1241px) {
+    .not-found__scrim {
+      --fade-left: calc(1240px * 0.3);
+    }
+  }
+  .not-found__band {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--custom--stack--md);
+  }
+  .not-found__title,
+  .not-found__lead,
+  .not-found__actions {
+    position: relative;
+    z-index: 2;
+  }
+  .not-found__title {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .not-found__scan {
+    align-self: stretch;
+    margin-block: var(--wp--preset--spacing--16);
+  }
+  .not-found__lead {
+    max-width: var(--wp--style--global--content-size);
+    color: var(--wp--custom--color--text--primary);
+  }
+
+  .not-found-help__columns {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--section--sm);
+  }
+  .not-found-help__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+    min-width: 0;
+    max-width: var(--wp--style--global--content-size);
+  }
+  .not-found-help__guesses {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+    padding-top: var(--wp--preset--spacing--8);
+  }
+  .not-found-help__guesses[hidden] {
+    display: none;
+  }
+  .not-found-help__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--lg);
+  }
+  @media (min-width: 1100px) {
+    .not-found-help__columns {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--wp--custom--grid--gutter);
+      align-items: start;
+    }
+    .not-found-help__main {
+      grid-column: 1 / span 7;
+      max-width: none;
+    }
+    /* Four columns for the help panels until 1400: at three, the email ran out of its panel at 1100 */
+    .not-found-help__aside {
+      grid-column: 9 / -1;
+    }
+  }
+  @media (min-width: 1400px) {
+    .not-found-help__main {
+      grid-column: 1 / span 8;
+    }
+    .not-found-help__aside {
+      grid-column: 10 / -1;
+    }
+  }
+</style>
+
+<script>
+  import { search, terms as termsOf, termsFromPath, type SearchHit } from '../lib/search';
+  import { loadIndex, renderResult } from '../lib/search-dom';
+  import type { SearchType } from '../data/search';
+
+  const root = document.querySelector<HTMLElement>('[data-not-found]');
+  // A guess has to match in a title or its search terms, not only somewhere in a story's body
+  const MIN_SCORE = 12;
+
+  async function guess() {
+    if (!root) return;
+    const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+    const path = location.pathname.startsWith(base) ? location.pathname.slice(base.length) : location.pathname;
+    const candidates = termsFromPath(path);
+    if (candidates.length === 0) return;
+    let index;
+    try {
+      index = await loadIndex();
+    } catch {
+      return;
+    }
+    // The address's last part on its own, then all of it; whole matches first, then strong partial ones
+    let picked: { q: string; hits: SearchHit[] } | null = null;
+    for (const q of candidates) {
+      const { hits, partial } = search(index, q);
+      const strong = hits.filter((h) => h.score >= MIN_SCORE);
+      if (strong.length && !partial) {
+        picked = { q, hits: strong };
+        break;
+      }
+    }
+    if (!picked) {
+      const q = candidates.at(-1)!;
+      const hits = search(index, q).hits.filter((h) => h.score >= MIN_SCORE);
+      if (hits.length) picked = { q, hits };
+    }
+    if (!picked) return;
+
+    const labels = JSON.parse(root.dataset.labels ?? '{}') as Record<SearchType, string>;
+    const template = root.querySelector<HTMLTemplateElement>('[data-result-template]')!;
+    const list = root.querySelector<HTMLOListElement>('[data-guess-list]')!;
+    const words = termsOf(picked.q);
+    list.replaceChildren(...picked.hits.slice(0, 3).map((hit) => renderResult(template, hit, words, labels)));
+    root.querySelector<HTMLElement>('[data-guesses]')!.hidden = false;
+    const field = root.querySelector<HTMLInputElement>('[data-guess-form] [data-search-field]');
+    if (field && !field.value) {
+      field.value = picked.q;
+      field.dispatchEvent(new Event('input'));
+    }
+  }
+
+  guess();
+</script>

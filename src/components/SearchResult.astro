@@ -1,0 +1,102 @@
+---
+// Search result (docs/04 §10d, 9 Oct 2026, Q158): one row of the Search results list and the 404's "Were you looking
+// for" list. A reading-list row like the Publications list (Q91), no media, so every type keeps one structure:
+// eyebrow (type · context, text/accent as a card's), the title as the link (H5, the whole row is its target, an
+// external or download icon after it when the link leaves the site), then up to two lines of excerpt in Body/Small
+// text/secondary, with the query's words marked as the FAQ search marks them (in the excerpt only: the title is a
+// link, and marking every "Reach" in a list of titles was noise).
+// Rendered empty inside a <template> and filled by the page's script in the prototype; in WordPress search.php
+// prints it per post (template-parts/search-result.php).
+import Icon from './Icon.astro';
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  href?: string;
+  excerpt?: string;
+}
+
+const { eyebrow = '', title = '', href = '#', excerpt = '' } = Astro.props;
+---
+
+<li class="search-result" data-search-result>
+  <p class="search-result__eyebrow text-eyebrow" data-slot="eyebrow">{eyebrow}</p>
+  <h3 class="search-result__title text-h5">
+    <a class="search-result__link" href={href} data-slot="link"
+      ><span data-slot="title">{title}</span><span class="visually-hidden" data-slot="note"></span><span class="search-result__icon" data-icon="external"
+        ><Icon name="arrow-up-right" size={16} /></span
+      ><span class="search-result__icon" data-icon="file"><Icon name="download" size={16} /></span></a
+    >
+  </h3>
+  <p class="search-result__excerpt text-small" data-slot="excerpt">{excerpt}</p>
+</li>
+
+<style is:global>
+  .search-result {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    min-width: 0;
+  }
+  .search-result__eyebrow {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .search-result__title {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .search-result__link {
+    color: inherit;
+    text-decoration: none;
+  }
+  /* The whole row is the link's target, as a card's stretched link */
+  .search-result__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .search-result__link:hover [data-slot='title'],
+  .search-result__link:focus-visible [data-slot='title'] {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+  .search-result__link:focus-visible {
+    outline: none;
+  }
+  .search-result:has(.search-result__link:focus-visible) {
+    outline: 2px solid var(--wp--custom--color--border--focus);
+    outline-offset: 4px;
+    border-radius: var(--wp--custom--radius--sm);
+  }
+  .search-result__icon {
+    display: none;
+    margin-inline-start: 0.25em;
+    vertical-align: -0.1em;
+    color: var(--wp--custom--color--icon--accent);
+  }
+  .search-result__icon svg {
+    display: inline;
+  }
+  .search-result[data-link='external'] [data-icon='external'],
+  .search-result[data-link='file'] [data-icon='file'] {
+    display: inline;
+  }
+  .search-result__excerpt {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .search-result__excerpt:empty {
+    display: none;
+  }
+  /* Query words: the accent-subtle ground with an accent underline, colour and weight unchanged (as FAQ index) */
+  .search-result mark {
+    background-color: var(--wp--custom--color--bg--accent-subtle);
+    color: inherit;
+    box-shadow: inset 0 -2px 0 var(--wp--custom--color--border--accent);
+  }
+</style>
