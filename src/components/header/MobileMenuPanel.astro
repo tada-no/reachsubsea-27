@@ -7,8 +7,8 @@
 // desktop menu strip, full bleed (6 Oct 2026, Q114): a bg/tint band holding the navy 3D World button at full width,
 // the same button as every Mega menu and the Site menu (Q112: below 900 the 3D World had no menu entry). Then
 // (Q113) one 2-column grid of small links in the accordion children's style (48px rows, Body/Body text/secondary,
-// ↗ on external links): Open positions · LinkedIn · Facebook; then the legal links in the same columns. From 900
-// they sit on one row, the legal links on the right.
+// ↗ on external links): Open positions · LinkedIn · Facebook, then the legal links: one column on phones, three
+// across from 600 (legal links on the row below), one row from 900 with the legal links on the right.
 // "Contact us" went: it repeated the Contact row.
 import Icon from '../Icon.astro';
 import MenuAccordion from './MenuAccordion.astro';
@@ -113,37 +113,50 @@ const sections = [...navSections].sort((a, b) => order.indexOf(a.id) - order.ind
   }
   /* Small links and legal links share two columns: the first as wide as its longest link (Privacy & Cookie Policy
      never wraps), the second takes the rest, so both groups line up */
+  /* Small links (Ross, 9 Oct 2026): one column on phones; 600–899 three across with the legal links on their own
+     row under the first two; 900–1199 one row, the legal links pushed right */
   .mobile-menu__links {
-    display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
-    column-gap: var(--wp--custom--grid--gutter);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     margin-top: var(--wp--custom--stack--md);
   }
   .mobile-menu__utility,
   .mobile-menu__legal {
-    display: contents;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
   .mobile-menu__legal li {
     margin-top: var(--wp--custom--stack--sm);
   }
-  /* The legal links start their own row, whatever the count of small links above (odd since FAQ became a row) */
-  .mobile-menu__legal li:first-child {
-    grid-column: 1;
-  }
   .mobile-menu__legal a {
     color: var(--wp--custom--color--text--secondary);
   }
-  /* 900–1199 (Ross, 9 Oct 2026): one row, the small links on the left and the legal links pushed right; below 900
-     the row doesn't fit (it needs ~760) and the links stack in the two columns above */
+  @media (min-width: 600px) and (max-width: 899px) {
+    .mobile-menu__links {
+      display: grid;
+      grid-template-columns: repeat(3, max-content);
+      column-gap: var(--wp--custom--grid--gutter);
+    }
+    .mobile-menu__utility,
+    .mobile-menu__legal {
+      display: contents;
+    }
+    .mobile-menu__legal li:first-child {
+      grid-column: 1;
+    }
+  }
   @media (min-width: 900px) {
     .mobile-menu__links {
-      display: flex;
+      flex-direction: row;
       align-items: center;
       column-gap: var(--wp--custom--grid--gutter);
     }
     .mobile-menu__utility,
     .mobile-menu__legal {
-      display: flex;
+      flex-direction: row;
+      align-items: center;
       column-gap: var(--wp--custom--grid--gutter);
     }
     .mobile-menu__legal {
