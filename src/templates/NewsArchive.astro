@@ -189,15 +189,18 @@ const chips = [
       container: news-card / inline-size;
     }
   }
+  /* Scoped to .news-archive so they outrank Card's own .card and .card__media rules whatever the stylesheet order: the
+     production build loads Card's CSS after this page's, and at equal weight the lead card stacked with a full-width
+     photo (Ross, 9 Oct 2026) */
   @container news-card (min-width: 640px) {
-    .card--media-image-top {
+    .news-archive .card--media-image-top {
       flex-direction: row;
     }
-    .card--media-image-top .card__media {
+    .news-archive .card--media-image-top .card__media {
       flex: 0 0 50%;
       aspect-ratio: 3 / 2;
     }
-    .card--media-image-top .card__content {
+    .news-archive .card--media-image-top .card__content {
       flex: 1;
       min-width: 0;
       justify-content: center;
