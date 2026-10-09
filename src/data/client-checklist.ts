@@ -37,7 +37,7 @@ export const checklistGroups: ChecklistGroup[] = [
       { n: 2, subject: 'Privacy & Cookie Policy', text: "Update your Privacy & Cookie Policy. We moved the current one (March 2023) across as it is, but it describes contact forms and Facebook Pixels the new site doesn't have. It also leaves out the videos, maps, share data and LinkedIn feed, and names no legal basis under GDPR. Send new wording and we'll use it as written.", pages: 'Privacy & Cookie Policy', status: 'open' },
       { n: 3, subject: 'Cookie consent tool', text: 'Choose a cookie consent tool and approve its wording. Videos, the share graph and maps load only after consent.', status: 'open' },
       { n: 4, subject: 'Photo rights', text: 'Confirm you have the rights to use every photo on the site at launch, including photos of people.', status: 'open' },
-      { n: 5, subject: '3D World hosting', text: 'Agree where the 3D World will be hosted, on a server Reach owns.', status: 'open' },
+      { n: 5, subject: '3D World hosting', text: 'Agree where the 3D World will be hosted, on a server Reach owns.', status: 'done' },
       { n: 6, subject: 'Benefits package', text: 'Send the benefits package.', pages: 'Why work with us', status: 'open' },
       { n: 7, subject: 'Transparency Act wording', text: "Have your legal adviser check the Transparency Act wording. It currently describes a Californian law rather than Norway's Åpenhetsloven.", pages: 'Transparency Act', status: 'open' },
     ],
