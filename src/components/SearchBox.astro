@@ -66,13 +66,17 @@ const { id, value = '', label = 'Search reachsubsea.com', class: className, ...a
     line-height: var(--wp--custom--line-height--lead);
     color: var(--wp--custom--color--text--primary);
   }
-  /* The whole box takes the focus ring, not the bare input inside it */
+  /* Focus in the field shows as a text field's own state, not the keyboard ring (Ross, 9 Oct 2026: a field takes
+     focus on a click too, and opening the Search panel puts the caret in it, so the green ring read as a keyboard
+     highlight). The border darkens to text/primary and doubles to 2 px with an inset shadow, so nothing moves.
+     The Clear and Search buttons inside keep the site's focus ring */
+  .search-box__field:focus,
   .search-box__field:focus-visible {
     outline: none;
   }
-  .search-box:has(.search-box__field:focus-visible) {
-    outline: 2px solid var(--wp--custom--color--border--focus);
-    outline-offset: 2px;
+  .search-box:has(.search-box__field:focus) {
+    border-color: var(--wp--custom--color--text--primary);
+    box-shadow: inset 0 0 0 1px var(--wp--custom--color--text--primary);
   }
   .search-box__field::placeholder {
     color: var(--wp--custom--color--text--secondary);
