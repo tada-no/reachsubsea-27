@@ -771,7 +771,7 @@ Context: Ross and the developer want the world to launch in an iframe with the s
 - [x] Notes for the 3D World chat: `docs/prompts/3d-world-embed.md`
 - [ ] Launch in place on the landing page (scroll conflict, too small)
 
-**Answer:** as ticked. Waiting on the world: `?zone`, the Escape message, `_top` links, the WordPress content, publishing v59, and a Reach-owned host that allows framing.
+**Answer:** as ticked. Waiting on the world: `?zone`, the Escape message, `_top` links, the WordPress content, publishing v59, and the Tada host (client checklist 5) allowing framing.
 
 ### Q95. Explore 3D World landing page (6 Oct 2026, Services)
 Context: client screens PDF p28–29 draw a Services page for the 3D World: hero with Launch and "Discuss your project", three cards over the hero's edge (How it works, Best viewed on, a photo), four zone cards with DRAFT badges and the PDF's own draft names, the 500+ / 9 / 2 modes stats band, Related services, FAQ, CTA. The Design Reference (p13) calls it a landing page for the real tool. Ross: build it. Built to Claude's lean recommendation.
@@ -794,7 +794,7 @@ Context: the world's info panels, zone texts, careers route and links are hard-c
 - [x] The website's zone names (Embed block, any zone cards) read the same WordPress zones, so the site and the world can't disagree
 - [ ] Inside WordPress: a plugin route at `/3d-world/` with the content inlined (Claude's first suggestion; not chosen)
 
-**Answer:** as ticked. API contract, CORS and caching in docs/09 §7. Still open: the final host and owner. The Explore 3D World landing page followed (Q95).
+**Answer:** as ticked. API contract, CORS and caching in docs/09 §7. **Host decided (9 Oct 2026, client checklist 5):** Tada's servers, not a Reach-owned host. The Explore 3D World landing page followed (Q95).
 
 ### Q93. Filter chip counts in brackets (6 Oct 2026)
 Context: Ross: "2025–26  7" is confusing; brackets? And why wasn't it caught? Agreed: a bare count after a label that is itself a number reads as part of it. Missed because the counts were checked by measurement (update, no jump), never read as text in chip form; in the rail they sat in their own column.

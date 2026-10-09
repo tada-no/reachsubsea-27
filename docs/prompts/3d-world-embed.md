@@ -74,7 +74,7 @@ The website's zone cards list each zone's clickable assets. Two pins still have 
 ### 7. Host, headers, publishing
 
 - **Publish v59.** The public demo is v58.
-- **Move to a Reach-owned host** (`world.reachsubsea.com` proposed) off the personal `tada-no` GitHub account. It's static files, so any host works.
+- **Move to Tada's servers** (decided 9 Oct 2026, client checklist 5; not a Reach-owned host) off the personal `tada-no` GitHub account. It's static files, so any host works.
 - **Framing headers.** The host must let reachsubsea.com frame it:
   - `Content-Security-Policy: frame-ancestors 'self' https://www.reachsubsea.com https://reachsubsea.com` (plus staging and localhost for testing);
   - no `X-Frame-Options: DENY` or `SAMEORIGIN`.
