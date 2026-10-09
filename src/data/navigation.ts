@@ -266,7 +266,6 @@ export const getInTouch: MenuLinkItem[] = [
 /** Mobile menu utility block below the accordion (docs/04 §16 Mobile menu panel). */
 export const mobileUtility: NavLink[] = [
   { label: 'Open positions', url: 'https://hr-manager.net/reachsubsea', action: 'external', external: true },
-  { label: 'FAQ', url: '/faq/' },
 ];
 
 export const contactDetails = {

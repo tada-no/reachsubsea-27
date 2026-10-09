@@ -1,11 +1,13 @@
 ---
 // Mobile menu panel (docs/04 §16): what the hamburger opens below 900px. Modal, full height under
 // the header (the menu icon becomes `x`), scroll-locked. Menu accordion rows, one open at a time
-// (the current section starts open); Contact is the last row, a plain link (no chevron, no panel). Then the
+// (the current section starts open). The bar's sections come first, then Projects and Newsroom, then FAQ and
+// Contact as plain rows (no chevron, no panel): the same grouping as desktop, where Projects, Newsroom and FAQ
+// sit in the Site menu apart from the bar (Ross, 9 Oct 2026). Then the
 // desktop menu strip, full bleed (6 Oct 2026, Q114): a bg/tint band holding the navy 3D World button at full width,
 // the same button as every Mega menu and the Site menu (Q112: below 900 the 3D World had no menu entry). Then
 // (Q113) one 2-column grid of small links in the accordion children's style (48px rows, Body/Body text/secondary,
-// ↗ on external links): Open positions · FAQ · LinkedIn · Facebook; then the legal links in the same columns.
+// ↗ on external links): Open positions · LinkedIn · Facebook; then the legal links in the same columns.
 // "Contact us" went: it repeated the Contact row.
 import Icon from '../Icon.astro';
 import MenuAccordion from './MenuAccordion.astro';
@@ -18,6 +20,8 @@ interface Props {
 }
 
 const { id, open = false, current } = Astro.props;
+const order = ['services', 'assets', 'company', 'investors', 'careers', 'projects', 'newsroom'];
+const sections = [...navSections].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
 // The current section starts expanded (docs/04 §16), in its usual place: the order never changes
 // from page to page, so people can find a section where they last saw it.
 ---
@@ -25,9 +29,12 @@ const { id, open = false, current } = Astro.props;
 <div class="mobile-menu" id={id} role="dialog" aria-modal="true" aria-label="Menu" hidden={!open}>
   <div class="mobile-menu__body">
     <div class="container mobile-menu__accordions">
-      {navSections.map((section) => <MenuAccordion section={section} open={open && section.id === current} />)}
+      {sections.map((section) => <MenuAccordion section={section} open={open && section.id === current} />)}
       <div class="menu-accordion">
-        <a class="mobile-menu__contact text-h5" href="/contact/">Contact</a>
+        <a class="mobile-menu__contact text-h5" href="/faq/" aria-current={current === 'faq' ? 'page' : undefined}>FAQ</a>
+      </div>
+      <div class="menu-accordion">
+        <a class="mobile-menu__contact text-h5" href="/contact/" aria-current={current === 'contact' ? 'page' : undefined}>Contact</a>
       </div>
     </div>
     <div class="mobile-menu__strip">
@@ -117,6 +124,10 @@ const { id, open = false, current } = Astro.props;
   }
   .mobile-menu__legal li {
     margin-top: var(--wp--custom--stack--sm);
+  }
+  /* The legal links start their own row, whatever the count of small links above (odd since FAQ became a row) */
+  .mobile-menu__legal li:first-child {
+    grid-column: 1;
   }
   .mobile-menu__legal a {
     color: var(--wp--custom--color--text--secondary);
