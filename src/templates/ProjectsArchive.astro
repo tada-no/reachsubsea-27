@@ -3,7 +3,8 @@
 // fills it. Every Project, newest first (undated last), filtered in place by service.
 // Built to feel unlike the Newsroom (Ross: "think about the UI… a bit different to the Newsroom"). News is about
 // when, so the Newsroom leads with its newest story and dates every card. Projects are about where and what, so this
-// page leads with where: the title and intro sit beside the brand dot map with a pin per place, the service chips
+// page leads with where: under the title and intro, the brand dot map with a pin per place sits beside the latest
+// project (9 Oct 2026), the service chips
 // head the list, and the cards carry work type, year and place instead of a date and an excerpt. Chips filter the map and the grid
 // together (?service=, the Projects menu's links); a pin opens its place's projects on the map; hovering a card
 // lights its pin, and a pin lights its cards.
@@ -19,8 +20,8 @@ import BlockSection from '../components/BlockSection.astro';
 import Card from '../components/Card.astro';
 import FilterChip from '../components/FilterChip.astro';
 import DotMap from '../components/DotMap.astro';
+import DotMapZoom from '../components/DotMapZoom.astro';
 import Button from '../components/Button.astro';
-import Icon from '../components/Icon.astro';
 import IconButton from '../components/IconButton.astro';
 import CtaBand from '../blocks/CtaBand.astro';
 import { projects, projectCard, type ProjectRef } from '../data/projects';
@@ -52,6 +53,12 @@ const summary = `Map of ${places.size} project locations, among them ${[...place
   .map((pl) => pl.name)
   .join(', ')}. Every project is in the list below.`;
 const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
+
+// The latest project beside the map (9 Oct 2026, Ross: "similar to the region map on the home"), one per chip: the
+// newest in the chosen service. It leaves the grid while it is shown, so a chip's count is the card plus the grid.
+const latest = chips
+  .map((c) => ({ value: c.value, project: list.find((p) => !c.value || p.service === c.value) }))
+  .filter((l): l is { value: string; project: ProjectRef } => Boolean(l.project));
 ---
 
 <BaseLayout title="Projects · Reach Subsea" motion>
@@ -67,12 +74,17 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
             </p>
           </div>
 
+          {/* One row under the intro (Ross, 9 Oct 2026), as the home page's Live operations toolbar: the chips filter all
+              three below them (the map, the latest project and the list), the zoom pill at the end of the row */}
+          <div class="projects-archive__toolbar">
+            <div class="projects-archive__chips" role="group" aria-label="Filter projects by service">
+              {chips.map((c) => <FilterChip label={c.label} count={c.count} selected={c.value === ''} data-value={c.value} />)}
+            </div>
+            <DotMapZoom class="projects-archive__zoom" data-projects-archive-zoom />
+          </div>
+
           <div class="projects-archive__stage">
             <DotMap class="projects-archive__map" points={points} summary={summary} labels data-projects-archive-map="" />
-            <button type="button" class="projects-archive__all text-button-sm" data-projects-archive-all hidden>
-              <Icon name="arrow-back-up" size={18} />
-              All places
-            </button>
             {/* A place's projects, pinned to the map when its marker is clicked (hidden until then) */}
             {
               [...places.values()].map((pl) => (
@@ -96,18 +108,24 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
               ))
             }
           </div>
+
+          <div class="projects-archive__latest">
+            {
+              latest.map((l) => (
+                <div class:list={['projects-archive__latest-item', l.value !== '' && 'is-off']} data-latest={l.value} data-project={l.project.url} data-place={placeId(l.project) || undefined} inert={l.value !== ''}>
+                  <Card {...projectCard(l.project, 'tint')} badge={{ label: 'Latest', tone: 'accent' }} headingLevel="h2" />
+                </div>
+              ))
+            }
+          </div>
         </div>
 
         <div class="projects-archive__results">
           <h2 class="visually-hidden">Project list</h2>
-          {/* One row of chips for the map and the list (Q150): beside the intro they wrapped at 1440 */}
-          <div class="projects-archive__chips scroll-row" role="group" aria-label="Filter projects by service">
-            {chips.map((c) => <FilterChip label={c.label} count={c.count} selected={c.value === ''} data-value={c.value} />)}
-          </div>
           <ul class="projects-archive__grid">
             {
               list.map((p) => (
-                <li class="projects-archive__cell" data-service={p.service} data-place={placeId(p) || undefined}>
+                <li class:list={['projects-archive__cell', p === latest[0]?.project && 'is-latest']} data-service={p.service} data-project={p.url} data-place={placeId(p) || undefined}>
                   <Card {...projectCard(p, 'tint')} headingLevel="h3" />
                 </li>
               ))
@@ -142,12 +160,15 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
     const stage = figure.parentElement!;
     const chips = [...root.querySelectorAll<HTMLButtonElement>('.projects-archive__chips .filter-chip')];
     const cells = [...root.querySelectorAll<HTMLElement>('.projects-archive__cell')];
+    const latest = [...root.querySelectorAll<HTMLElement>('[data-latest]')];
+    /** Everything a pin lights: the latest card and the grid's cards */
+    const lit = [...latest, ...cells];
     const more = root.querySelector<HTMLElement>('[data-projects-archive-more]')!;
-    const allButton = root.querySelector<HTMLButtonElement>('[data-projects-archive-all]')!;
     const announce = root.querySelector<HTMLElement>('[data-projects-archive-announce]');
     const say = (text: string) => announce && (announce.textContent = text);
     const popupFor = (id: string) => root.querySelector<HTMLElement>(`[data-place-popup="${id}"]`);
     const phone = window.matchMedia('(max-width: 599px)');
+    const wide = window.matchMedia('(min-width: 1200px)');
     const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
 
     const known = new Set(chips.map((c) => c.dataset.value ?? ''));
@@ -161,6 +182,7 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
     const countAt = (id: string) => cells.filter((c) => c.dataset.place === id && matches(c)).length;
 
     const dotMap = createDotMap(figure, {
+      controls: root.querySelector<HTMLElement>('[data-projects-archive-zoom]'),
       maxZoom: 6,
       fitMaxZoom: 5,
       clusterMaxZoom: 5,
@@ -171,14 +193,19 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
       countOf: countAt,
       announce: say,
       onSelect: (id) => open(openId === id ? null : id),
-      onHover: (ids, on) => cells.forEach((c) => c.dataset.place && ids.includes(c.dataset.place) && c.classList.toggle('is-hover', on)),
-      onView: (home) => {
-        allButton.hidden = home;
-      },
+      onHover: (ids, on) => lit.forEach((c) => c.dataset.place && ids.includes(c.dataset.place) && c.classList.toggle('is-hover', on)),
     });
 
     function render() {
-      const hits = cells.filter(matches);
+      // The chip's latest project beside the map (from 1200; below, it stays first in the grid); the grid shows the rest
+      const top = latest.find((l) => (l.dataset.latest ?? '') === service) ?? latest[0];
+      latest.forEach((l) => {
+        l.classList.toggle('is-off', l !== top);
+        l.inert = l !== top;
+      });
+      cells.forEach((c) => c.classList.toggle('is-latest', c.dataset.project === top?.dataset.project));
+      const pulled = wide.matches ? top?.dataset.project : undefined;
+      const hits = cells.filter((c) => matches(c) && c.dataset.project !== pulled);
       cells.forEach((c) => (c.hidden = true));
       hits.forEach((c, i) => (c.hidden = i >= shown));
       more.hidden = hits.length <= shown;
@@ -202,7 +229,7 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
           was.classList.remove('is-docked');
           was.hidden = true;
         } else dotMap.hideOverlay();
-        cells.forEach((c) => c.classList.remove('is-active'));
+        lit.forEach((c) => c.classList.remove('is-active'));
       }
       openId = id;
       dotMap.setActive(id);
@@ -212,7 +239,7 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
         popup.classList.add('is-docked');
         popup.hidden = false;
       } else dotMap.showOverlay(id, popup);
-      cells.forEach((c) => c.classList.toggle('is-active', c.dataset.place === id && !c.hidden));
+      lit.forEach((c) => c.classList.toggle('is-active', c.dataset.place === id && !c.hidden && !c.classList.contains('is-off')));
       popup.focus({ preventScroll: true });
       say(`${popup.querySelector('.projects-archive__popup-title')?.textContent ?? ''}: ${popup.querySelector('[data-place-count]')?.textContent ?? ''} shown on the map`);
     }
@@ -228,7 +255,8 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
         if (service) url.searchParams.set('service', service);
         else url.searchParams.delete('service');
         history.replaceState(null, '', url);
-        const n = render();
+        render();
+        const n = cells.filter(matches).length;
         say(`${plural(n)}${service ? `, ${chip.querySelector('.filter-chip__label')?.textContent}` : ''}`);
         return;
       }
@@ -237,23 +265,18 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
         shown += page;
         render();
         // Focus the first new card's link, so keyboard users carry on where the list grew
-        cells.filter(matches)[from]?.querySelector<HTMLElement>('a')?.focus();
+        cells.filter((c) => matches(c) && !c.hidden)[from]?.querySelector<HTMLElement>('a')?.focus();
         return;
       }
       if (target.closest('[data-place-popup-close]')) open(null);
-      else if (stage.contains(target) && openId && !target.closest('.dot-map__marker, .projects-archive__popup, [data-projects-archive-all]')) open(null);
+      else if (stage.contains(target) && openId && !target.closest('.dot-map__marker, .projects-archive__popup')) open(null);
     });
     root.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && openId) open(null);
     });
-    allButton.addEventListener('click', () => {
-      open(null);
-      dotMap.fitHome();
-      say('Map showing all places');
-    });
 
     // A card lights its pin
-    cells.forEach((cell) => {
+    lit.forEach((cell) => {
       const id = cell.dataset.place;
       if (!id) return;
       const hover = (on: boolean) => dotMap.setHover(on ? [id] : []);
@@ -263,6 +286,7 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
       cell.addEventListener('focusout', () => hover(false));
     });
 
+    wide.addEventListener('change', () => render());
     render();
   }
 
@@ -274,16 +298,32 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
   .projects-archive {
     padding-top: calc(72px + var(--wp--custom--stack--xl));
   }
+  /* Intro, toolbar, then what it filters: stack/lg after the lead, space/32 under the toolbar (Ross, 9 Oct 2026; the
+     home page's Live operations toolbar has the same) */
   .projects-archive__top {
     display: flex;
     flex-direction: column;
-    gap: var(--wp--custom--stack--lg);
   }
   .projects-archive__intro {
     display: flex;
     flex-direction: column;
     gap: var(--wp--preset--spacing--12);
     max-width: var(--wp--style--global--content-size);
+    margin-bottom: var(--wp--custom--stack--lg);
+  }
+  .projects-archive__toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16);
+    margin-bottom: var(--wp--preset--spacing--32);
+  }
+  .projects-archive__zoom {
+    margin-inline-start: auto;
+  }
+  /* Clusters show their count only (Ross, 9 Oct 2026: "do we need 15 projects written out?"); the words stay in the
+     announcements. A single place keeps its name */
+  .projects-archive__map .dot-map__marker--cluster .dot-map__marker-label {
+    display: none;
   }
   .projects-archive__title,
   .projects-archive__lead {
@@ -293,40 +333,13 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
     display: flex;
     flex-wrap: wrap;
     gap: var(--wp--preset--spacing--8);
+    min-width: 0;
   }
 
   /* ── Map ──────────────────────────────────────────────── */
   .projects-archive__stage {
     position: relative;
   }
-  /* "All places": outline button look, top right of the map, only while zoomed in (as Offices map) */
-  .projects-archive__all {
-    position: absolute;
-    top: var(--wp--preset--spacing--16);
-    right: var(--wp--preset--spacing--16);
-    z-index: 2;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--wp--preset--spacing--8);
-    height: 40px;
-    padding-inline: var(--wp--preset--spacing--16);
-    border-radius: var(--wp--custom--radius--full);
-    background-color: var(--wp--custom--color--bg--default);
-    color: var(--wp--custom--color--action--outline--fg);
-    box-shadow: inset 0 0 0 2px var(--wp--custom--color--action--outline--border);
-    transition: background-color 160ms var(--wp--custom--motion--easing);
-  }
-  .projects-archive__all:hover {
-    background-color: var(--wp--custom--color--action--outline--bg-hover);
-  }
-  .projects-archive__all:focus-visible {
-    outline: 2px solid var(--wp--custom--color--border--focus);
-    outline-offset: 2px;
-  }
-  .projects-archive__all[hidden] {
-    display: none;
-  }
-
   /* A place's projects on the map: a small white panel above the pin, as the Offices map's address card */
   .projects-archive__popup {
     position: relative;
@@ -398,6 +411,31 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
     right: var(--wp--preset--spacing--12);
   }
 
+  /* ── Latest project ───────────────────────────────────── */
+  /* From 1200 only: the grid's card as it is (Ross, 9 Oct 2026: "the first card should be like the others") with a
+     "Latest" badge. Below 1200 a full-width card would carry a 600-tall photo, so the latest stays first in the grid
+     (.is-latest, hidden there from 1200) */
+  .projects-archive__latest {
+    display: none;
+  }
+  /* One card per chip in the same cell; the others keep their space (hidden, not removed), so the box is always the
+     tallest card's height and a chip never moves the chips under it */
+  .projects-archive__latest-item {
+    grid-area: 1 / 1;
+    display: grid;
+    border-radius: var(--wp--custom--radius--lg);
+    transition: box-shadow 200ms var(--wp--custom--motion--easing);
+  }
+  .projects-archive__latest-item.is-off {
+    visibility: hidden;
+  }
+  .projects-archive__latest-item.is-hover {
+    box-shadow: 0 0 0 2px var(--wp--custom--color--border--strong);
+  }
+  .projects-archive__latest-item.is-active {
+    box-shadow: 0 0 0 2px var(--wp--custom--color--border--accent);
+  }
+
   /* ── Cards ────────────────────────────────────────────── */
   .projects-archive__results {
     display: flex;
@@ -445,17 +483,30 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
       grid-template-columns: minmax(0, 1fr);
     }
   }
+  /* Phones, as Live operations: the chips scroll sideways and fade into the zoom pill, pinned at the end */
   @media (max-width: 599px) {
+    .projects-archive__toolbar {
+      gap: var(--wp--preset--spacing--8);
+    }
     .projects-archive__chips {
+      flex: 1;
       flex-wrap: nowrap;
+      overflow-x: auto;
+      margin-inline-start: calc(-1 * var(--wp--preset--spacing--16));
+      padding-inline: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+      scrollbar-width: none;
+      mask-image: linear-gradient(to right, black calc(100% - var(--wp--preset--spacing--32)), transparent);
+    }
+    .projects-archive__chips::-webkit-scrollbar {
+      display: none;
+    }
+    .projects-archive__chips > * {
+      flex: none;
     }
     .projects-archive__map {
       /* Edge to edge on phones (DotMap sets the 5:4 frame), as the Offices map */
       margin-inline: calc(-1 * var(--wp--preset--spacing--16));
       border-radius: 0;
-    }
-    .projects-archive__all {
-      right: 0;
     }
     .projects-archive__popup.is-docked {
       position: absolute;
@@ -469,7 +520,8 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
     }
   }
 
-  /* Desktop: the intro and chips beside the map, the map the larger part (where the work is) */
+  /* Desktop (9 Oct 2026): the title and lead across the top, the chips, then the map (cols 1–8) beside the latest
+     project (cols 9–12), the two the same height, as the home page's Live operations */
   @media (min-width: 1200px) {
     .projects-archive {
       padding-top: calc(96px + var(--wp--custom--stack--xl));
@@ -477,14 +529,36 @@ const plural = (n: number) => `${n} ${n === 1 ? 'project' : 'projects'}`;
     .projects-archive__top {
       display: grid;
       grid-template-columns: repeat(12, minmax(0, 1fr));
+      /* Intro · toolbar · map: the card's extra height goes to the map's row, so the chips stay level with its top */
+      grid-template-rows: auto auto 1fr;
       column-gap: var(--wp--custom--grid--gutter);
-      align-items: center;
+      align-items: stretch;
     }
     .projects-archive__intro {
-      grid-column: 1 / span 5;
+      grid-column: 1 / span 7;
     }
+    /* As Live operations: the toolbar over the map's columns (its zoom at the map's edge), the latest project
+       beside both, its top level with the chips */
+    .projects-archive__toolbar {
+      grid-column: 1 / span 8;
+      grid-row: 2;
+    }
+    /* The card is a grid card (3:2 photo), so it is taller than the 2:1 map (a shape its framing needs). The map has
+       no box of its own, so it sits centred in the space beside the card under the toolbar */
     .projects-archive__stage {
-      grid-column: 6 / span 7;
+      grid-column: 1 / span 8;
+      grid-row: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .projects-archive__latest {
+      grid-column: 9 / span 4;
+      grid-row: 2 / span 2;
+      display: grid;
+    }
+    .projects-archive__cell.is-latest {
+      display: none;
     }
   }
 </style>

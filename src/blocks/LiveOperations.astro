@@ -477,7 +477,8 @@ const typeOf = (type: string) => assetTypes.find((t) => t.key === type)!;
     display: flex;
     align-items: center;
     gap: var(--wp--preset--spacing--16);
-    margin-bottom: var(--wp--preset--spacing--24);
+    /* space/32 under the chips, as the Projects archive (Ross, 9 Oct 2026; was space/24) */
+    margin-bottom: var(--wp--preset--spacing--32);
   }
   .live-ops__filters {
     display: flex;
