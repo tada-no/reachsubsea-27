@@ -1,9 +1,9 @@
 ---
 // Search panel (docs/04 §16): modal with scrim, opened from the header Search icon. One field (the shared Search
-// box, docs/04 §10c, Q158) that submits to the Search results page, plus 4–6 editor-set "Popular" links (a row at
-// ≥900, a list on mobile). Live suggestions are a later phase (docs/extract/header-recommendation.md §3.6).
+// box, docs/04 §10c, Q158) that submits to the Search results page, plus 4–6 editor-set Popular links (a row at
+// ≥900, a list on mobile), unlabelled (Ross, 9 Oct 2026: the "Popular" eyebrow wasn't needed; the list keeps the name
+// for screen readers). Live suggestions are a later phase (docs/extract/header-recommendation.md §3.6).
 import SearchBox from '../SearchBox.astro';
-import Eyebrow from '../Eyebrow.astro';
 import Link from '../Link.astro';
 import { popularSearchLinks } from '../../data/navigation';
 
@@ -21,8 +21,7 @@ const { id, open = false } = Astro.props;
     {
       popularSearchLinks.length > 0 && (
         <div class="search-panel__popular">
-          <Eyebrow text="Popular" />
-          <ul class="search-panel__links">
+          <ul class="search-panel__links" aria-label="Popular pages">
             {popularSearchLinks.map((link) => (
               <li>
                 <Link label={link.label} href={link.url} action={link.external ? 'external' : 'page'} size="small" />
@@ -46,11 +45,9 @@ const { id, open = false } = Astro.props;
     box-shadow: var(--wp--preset--shadow--lg);
     padding-block: var(--wp--preset--spacing--32);
   }
+  /* The links' own 12 of target padding makes up the rest: their text sits 24 under the box */
   .search-panel__popular {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wp--preset--spacing--12);
-    margin-top: var(--wp--preset--spacing--24);
+    margin-top: var(--wp--preset--spacing--12);
   }
   .search-panel__links {
     display: flex;
