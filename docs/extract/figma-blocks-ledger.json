@@ -2374,5 +2374,26 @@
     "notInFigma": [
       "Quote marks, joined paragraphs, bullet lists, repeated featured photos and title dashes are content fixes in src/data/news-posts.json (scripts/news-cleanup.mjs step 10); the frames show the cleaned text already"
     ]
+  },
+  "phase4PrivacyPolicyQ157_9Oct": {
+    "date": "2026-10-09",
+    "context": "Privacy & Cookie Policy (Q157) pushed to Figma at Ross's request. Ground truth: src/pages/privacy-policy.astro, src/data/legal.ts, src/styles/base.css (.article).",
+    "components": {
+      "Article section 666:37036 (new, Components / Article 629:2632)": "core/heading (H2 shown as Heading/H4, text/primary) + up to three core/paragraph (Body, text/secondary, stack/sm apart), space/8 between; paddingTop stack/xl, width container/prose. Heading#666:0, Paragraph 1#666:1, Paragraph 2#666:2, Paragraph 3#666:3, Show paragraph 2#666:4, Show paragraph 3#666:5. Bold lead-ins and links are text-style overrides on the instance. Cloned from the News single raw section",
+      "Article doc text 629:2636": "Adds the section and the legal-page use (column on the container's left edge, not centred)"
+    },
+    "pageFrames": {
+      "Privacy & Cookie Policy": {
+        "id": "666:37038",
+        "x": 61180,
+        "source": "src/pages/privacy-policy.astro",
+        "sections": "Header overlay · Page hero Text 666:37040 (eyebrow Updated March 2023; breadcrumb Home › Privacy & Cookie Policy) · no subnav · Privacy policy section 666:37285 (white, section padding + container margins bound; Body 666:37286 = seven Article section instances 666:37287 … 666:37323, the first with paddingTop 0) · CTA panel 666:37043 (white; Show contact off) · Footer"
+      },
+      "News single 636:22930 / News single · Mobile 638:24070": "Raw Section frames (642:35358, 642:35363) replaced by Article section instances 666:37329 / 666:37335 (Mobile: width unbound, FILL); heights unchanged (344 / 272)"
+    },
+    "notInFigma": [
+      "No mobile page frame (as the Transparency Act); the Article section stacks the same at every width",
+      "Footer component lists Transparency Act before Privacy & Cookie Policy; code (navigation.ts legalLinks) has Privacy first: pre-existing, not changed here"
+    ]
   }
 }
