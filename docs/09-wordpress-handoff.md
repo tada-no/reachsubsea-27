@@ -150,7 +150,7 @@ Shared field shapes (`src/lib/types.ts`): **SectionHeader** = eyebrow, title, in
 3. **Fix the single-source breach** (Home bento `750+`) and sweep for others: "An 18 MB scene" is typed on three pages and should be one setting.
 4. **Write the redirect map.** The brief assigned it to us (Q4). It does not exist as a file: redirects are scattered across page header comments and docs/00 (Company, Careers, Subsea). It needs the live and dev URL lists and a crawl, and it decides slugs that `services.ts` and `projects.ts` currently mark as placeholders.
 5. ~~Decide language.~~ **Decided (Q68): English only.**
-6. **Name the 3D World's host and owner**, get it to the embed contract (§7), and build the content API (§7.1) before the WordPress build reaches the embed block.
+6. **Set up the 3D World on Tada's servers** (host decided 9 Oct 2026, client checklist 5), get it to the embed contract (§7), and build the content API (§7.1) before the WordPress build reaches the embed block.
 7. **Strip prototype-only code** (§6) as part of the handoff, not after.
 
 ---
@@ -201,13 +201,13 @@ Shared field shapes (`src/lib/types.ts`): **SectionHeader** = eyebrow, title, in
 - **Framing:** if the world moves off GitHub Pages it must not send `X-Frame-Options: DENY|SAMEORIGIN` or a restrictive `frame-ancestors`, and the WordPress site's CSP must allow `frame-src` for the world origin.
 - **Third-party runtime dependencies:** three.js 0.160 and its Draco decoder load from `cdn.jsdelivr.net`, and Inter from Google Fonts. Self-hosting would remove both (and the consent question).
 - **Cache-busting:** bump `RELEASE` (currently `v48`) in the HTML on every change to `src/` or `glb/`.
-- **Publishing is manual and personal:** `Publish demo.command` force-builds a `gh-pages` commit and pushes it. The repo (`tada-no/reach-world`) is private, the Pages site is public, and the site currently lives under the `tada-no` GitHub account. It needs a proper owner and host before launch.
+- **Publishing is manual and personal:** `Publish demo.command` force-builds a `gh-pages` commit and pushes it. The repo (`tada-no/reach-world`) is private, the Pages site is public, and the site currently lives under the `tada-no` GitHub account. It moves to Tada's servers before launch (client checklist 5).
 - **Content that needs a developer to change (today):** the zones and pin copy, the careers stop wording (still marked "Draft text, Reach to confirm") and the HR-Manager URL live in the world's source, not in WordPress. Q94 moves all of it to WordPress, served over the API below.
 - **Legacy:** the live WordPress `/3d-world/` embeds `world.reachsubsea.com`, a Unity build, which this replaces. `/3d-world/` becomes the landing page (Q108), so its URL needs no redirect; the subdomain still needs a decision.
 - **Untested:** iPhone Safari, hybrid touchscreen laptops (they match `any-pointer: coarse` and lose in-place launch), and whether scrolling the page over a launched iframe is trapped by the orbit controls.
 
 **Recommended work in the world repo before the WordPress embed is built:**
-Superseded by the brief for the 3D World chat, `docs/prompts/3d-world-embed.md` (6 Oct 2026): read `?zone=1–4`; post `reach-world:release-focus` on a final Escape; `target="_top"` for site links; `?embed=1` keeps Full screen; content from the WordPress API (§7.1); real names for "Vessel 1/2"; publish v59; a Reach-owned host that allows framing by reachsubsea.com (`frame-ancestors`); self-host three.js, Draco and Inter.
+Superseded by the brief for the 3D World chat, `docs/prompts/3d-world-embed.md` (6 Oct 2026): read `?zone=1–4`; post `reach-world:release-focus` on a final Escape; `target="_top"` for site links; `?embed=1` keeps Full screen; content from the WordPress API (§7.1); real names for "Vessel 1/2"; publish v59; a host on Tada's servers (client checklist 5) that allows framing by reachsubsea.com (`frame-ancestors`); self-host three.js, Draco and Inter.
 
 ### 7.1 Content from WordPress over an API (Q94, 6 Oct 2026)
 
@@ -252,7 +252,7 @@ Superseded by the brief for the 3D World chat, `docs/prompts/3d-world-embed.md` 
 - **Images:** shown as plain `<img>` in the info panels, so no CORS is needed on uploads. If an image is ever used as a WebGL texture, uploads need `Access-Control-Allow-Origin` too. Serve a medium size (about 800 px wide), not the original.
 - **Not in the API:** nothing private, no drafts (published posts only), no user data.
 
-**Still open:** the world's final host and owner (§7 above). The Explore 3D World landing page (`/3d-world/`, Q95, Q108) reads the same zones.
+**Host:** Tada's servers (client checklist 5, 9 Oct 2026). The Explore 3D World landing page (`/3d-world/`, Q95, Q108) reads the same zones.
 
 ---
 
