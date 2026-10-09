@@ -162,13 +162,14 @@ const summary = (group: FleetGroup) => {
     background-color: transparent;
     border: 2px solid var(--wp--custom--color--text--primary);
   }
-  /* One highlight channel: a hovered or focused group lights its own markers */
+  /* One highlight channel: a hovered or keyboard-focused group lights its own markers (:focus-visible, so a
+     clicked link doesn't leave its group lit after the pointer moves on) */
   .fleet-register__group:hover .fleet-register__unit,
-  .fleet-register__group:focus-within .fleet-register__unit {
+  .fleet-register__group:has(:focus-visible) .fleet-register__unit {
     background-color: var(--wp--custom--color--icon--accent);
   }
   .fleet-register__group:hover .fleet-register__unit--joining,
-  .fleet-register__group:focus-within .fleet-register__unit--joining {
+  .fleet-register__group:has(:focus-visible) .fleet-register__unit--joining {
     background-color: transparent;
     border-color: var(--wp--custom--color--icon--accent);
   }

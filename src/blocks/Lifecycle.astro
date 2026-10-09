@@ -399,8 +399,9 @@ const show = layout === 'focus' ? focusCells.length > 0 : resolved.length > 0;
     display: none;
   }
 
-  /* The one highlight channel: a hovered or focused row's markers turn accent */
-  .lifecycle__row:is(:hover, :focus-within) .lifecycle__marker {
+  /* The one highlight channel: a hovered or keyboard-focused row's markers turn accent (:focus-visible, so a
+     click doesn't leave the row lit after the pointer moves on) */
+  .lifecycle__row:is(:hover, :has(:focus-visible)) .lifecycle__marker {
     background-color: var(--wp--custom--color--icon--accent);
     scale: 1.25;
   }
