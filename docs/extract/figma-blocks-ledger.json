@@ -2326,5 +2326,26 @@
       "Card instances cloned into a hugging column collapse (card HUG, Content FILL is circular): set Content to HUG too",
       "Setting Breakpoint on a block instance resets its overridden text: set the variant first, then the copy"
     ]
+  },
+  "phase4ProjectsTop9Oct": {
+    "date": "2026-10-09",
+    "context": "Projects archive top reworked as the home page's Live operations (commit 902e5ce). Ground truth: src/templates/ProjectsArchive.astro, src/blocks/LiveOperations.astro, src/components/DotMapZoom.astro.",
+    "components": {
+      "Map zoom 659:36675 (new, Components / Group/Parts 617:17519)": "The shared - / + pill (DotMapZoom.astro), made from the Live operations toolbar's loose Controls frames",
+      "Map marker set (461:8979 Cluster Left)": "New boolean Show label#659:0 (default on) on the Label layer of every variant; the archive's clusters set it off (count only)",
+      "Block/Live operations 269:4810": "Toolbar Controls replaced by Map zoom instances (Live 659:36678, Stale 659:36685); Main gap toolbar to map space/24 -> space/32 (VariableID:9:28)"
+    },
+    "pageFrames": {
+      "Pages / Projects 651:24259": "Top 651:24307 now vertical: Intro (cols 1-7) then Map row 660:25060: Toolbar + map 660:25061 (Toolbar 660:25062 = Filter chips 652:24325 + Map zoom 660:25063; map holder 660:25070 with the stage 651:24311 rescaled to 864x432, clusters Show label off) beside the latest Card 652:24353 (Image top Tint, Show badge, 'Latest', 592 tall as the grid cards). Grid re-flowed without U-864, ASUMO card 660:25075 added as the 12th",
+      "Pages / Projects · Mobile 654:24673": "Toolbar 660:25114 (chips clipped + Map zoom 660:25115) between the intro and the map, map paddingTop space/32, clusters Show label off; the grid keeps U-864 first (below 1200 the latest stays in the grid)"
+    },
+    "images": {
+      "rov-zeerov-gwatch (ASUMO)": "5fda97cdb5a51474f013162069785ef10fc39ef1"
+    },
+    "gotchas": [
+      "Turning a HORIZONTAL auto layout VERTICAL keeps primaryAxisAlignItems SPACE_BETWEEN, which ignores itemSpacing: reset it to MIN",
+      "A frame that was FIXED height stays FIXED (and clips) after its layout changes: set layoutSizingVertical HUG",
+      "Hiding a Left label moves the pin inside the marker: record each pin's centre first, then re-place the marker on it"
+    ]
   }
 }
