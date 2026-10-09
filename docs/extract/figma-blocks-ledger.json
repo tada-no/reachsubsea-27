@@ -2393,7 +2393,7 @@
     },
     "notInFigma": [
       "No mobile page frame (as the Transparency Act); the Article section stacks the same at every width",
-      "Footer component lists Transparency Act before Privacy & Cookie Policy; code (navigation.ts legalLinks) has Privacy first: pre-existing, not changed here"
+      "Footer 125:3011: legal links reordered to match code (navigation.ts legalLinks): Privacy & Cookie Policy first, then Transparency Act, in Desktop (row 125:2950) and Mobile (row 125:3008); every page frame follows through its instance"
     ]
   }
 }
