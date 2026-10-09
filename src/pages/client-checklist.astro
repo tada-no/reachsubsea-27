@@ -1,0 +1,251 @@
+---
+// Client checklist (prototype only, not for WordPress; Ross, 9 Oct 2026): what Reach still has to send, confirm or
+// decide before launch, open to the client without a Claude sign-in. Linked from the footer's legal row.
+// Text hero on navy, then one white section: a short how-to with the counts and an "Email your answers" button, then
+// the groups. Each group is an H2 (Heading/H3 look) with an optional line, and a numbered list of rows:
+// - Wide (container ≥ 760): number · text with its pages under it (at most the prose measure) · status · Answer by
+//   email, the last two in columns shared down the group (subgrid), so the badges and links line up. A 1px
+//   border/subtle rule between rows.
+// - Narrow: number beside the text, then status and the email link in one row under it.
+// Answer by email opens a message to Ross with "Reach checklist <n>: <subject>" (src/data/client-checklist.ts); the
+// morning sync task moves the statuses. A done item keeps its link's space, so the columns don't shift.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/header/Header.astro';
+import Footer from '../components/Footer.astro';
+import PageHero from '../blocks/PageHero.astro';
+import BlockSection from '../components/BlockSection.astro';
+import Badge from '../components/Badge.astro';
+import Button from '../components/Button.astro';
+import MetaItem from '../components/MetaItem.astro';
+import {
+  checklistGroups,
+  checklistEmail,
+  checklistUpdated,
+  checklistMailto,
+  type ChecklistStatus,
+} from '../data/client-checklist';
+import type { BadgeTone } from '../lib/types';
+
+const base = import.meta.env.BASE_URL;
+const items = checklistGroups.flatMap((g) => g.items);
+const count = (s: ChecklistStatus) => items.filter((i) => i.status === s).length;
+const updated = new Date(checklistUpdated).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+const STATUS: Record<ChecklistStatus, { label: string; tone: BadgeTone; icon?: string }> = {
+  open: { label: 'Open', tone: 'neutral' },
+  received: { label: 'Received', tone: 'accent' },
+  done: { label: 'Done', tone: 'success', icon: 'check' },
+};
+const groupId = (title: string) => `checklist-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+---
+
+<BaseLayout title="What we need from you · Reach Subsea">
+  <Header overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Client checklist' }]}
+      eyebrow="Website review"
+      title="What we need from you"
+      lead="What Reach still has to send, confirm or decide before launch."
+    />
+
+    <BlockSection slug="client-checklist" root="client-checklist" background="white" label="Client checklist">
+      <div class="client-checklist__body">
+        <div class="client-checklist__intro">
+          <p class="text-lead">
+            Answer by email, one item at a time or several in one message. Each item's link starts an email with its number
+            in the subject. We mark an item Received when your answer arrives, and Done once it is on the site.
+          </p>
+          <ul class="client-checklist__counts text-small">
+            <li><strong>{items.length}</strong> items</li>
+            <li><strong>{count('received')}</strong> received</li>
+            <li><strong>{count('done')}</strong> done</li>
+            <li>Checked {updated}</li>
+          </ul>
+          <div class="client-checklist__actions">
+            <Button label="Email your answers" href={checklistMailto()} variant="primary" leadingIcon="mail" />
+            <MetaItem icon="mail" text={checklistEmail} href={`mailto:${checklistEmail}`} as="span" />
+          </div>
+        </div>
+
+        {
+          checklistGroups.map((group) => (
+            <section class="client-checklist__group" aria-labelledby={groupId(group.title)}>
+              <div class="client-checklist__head">
+                <h2 id={groupId(group.title)} class="text-h3">
+                  {group.title}
+                </h2>
+                {group.intro && <p class="text-body client-checklist__note">{group.intro}</p>}
+              </div>
+              <ol class="client-checklist__rows text-body">
+                {group.items.map((item) => (
+                  <li class:list={['client-checklist__row', `is-${item.status}`]}>
+                    <span class="client-checklist__n text-label" aria-hidden="true">
+                      {item.n}
+                    </span>
+                    <div class="client-checklist__text">
+                      <p class="text-body">
+                        <span class="visually-hidden">Item {item.n}: </span>
+                        {item.text}
+                      </p>
+                      {item.pages && <p class="client-checklist__pages text-caption">{item.pages}</p>}
+                    </div>
+                    <Badge label={STATUS[item.status].label} tone={STATUS[item.status].tone} icon={STATUS[item.status].icon} class="client-checklist__status" />
+                    <MetaItem
+                      icon="mail"
+                      text="Answer by email"
+                      href={checklistMailto(item)}
+                      as="span"
+                      class:list={['client-checklist__email', item.status === 'done' && 'is-off']}
+                    />
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))
+        }
+      </div>
+    </BlockSection>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style is:global>
+  .client-checklist__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--section--sm);
+    container-type: inline-size;
+  }
+  .client-checklist__intro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--custom--stack--md);
+    max-width: var(--wp--style--global--content-size);
+  }
+  .client-checklist__counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--24);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .client-checklist__counts strong {
+    color: var(--wp--custom--color--text--primary);
+  }
+  .client-checklist__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+    margin-top: var(--wp--preset--spacing--8);
+  }
+
+  .client-checklist__group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--md);
+  }
+  .client-checklist__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--8);
+  }
+  .client-checklist__note {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .client-checklist__rows {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Narrow (base): number beside the text; status and email under the text */
+  .client-checklist__row {
+    display: grid;
+    grid-template-columns: var(--wp--preset--spacing--32) minmax(0, 1fr);
+    grid-template-areas: 'n text' '. meta';
+    column-gap: var(--wp--preset--spacing--8);
+    row-gap: var(--wp--preset--spacing--12);
+    align-items: center;
+    padding-block: var(--wp--preset--spacing--16);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .client-checklist__row:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .client-checklist__n {
+    grid-area: n;
+    align-self: start;
+    /* Label on the body's first line */
+    line-height: var(--wp--custom--line-height--body);
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .client-checklist__text {
+    grid-area: text;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    max-width: var(--wp--custom--measure--prose);
+  }
+  .client-checklist__text .text-body {
+    color: var(--wp--custom--color--text--primary);
+    text-wrap: pretty;
+  }
+  .client-checklist__pages {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .client-checklist__status {
+    grid-area: meta;
+  }
+  /* Narrow: badge and link share the meta row */
+  .client-checklist__email {
+    grid-area: meta;
+    justify-self: end;
+  }
+  .client-checklist__email.is-off {
+    visibility: hidden;
+  }
+  .client-checklist__row.is-done .client-checklist__text .text-body {
+    color: var(--wp--custom--color--text--secondary);
+  }
+
+  /* Wide: number · text · status · email, the last two in columns shared down the group */
+  @container (min-width: 760px) {
+    .client-checklist__rows {
+      /* The text keeps the prose measure (40em of Body: the list is set in Body so the em matches) and the status
+         follows it, so the eye doesn't cross an empty gap */
+      grid-template-columns: var(--wp--preset--spacing--32) minmax(0, var(--wp--custom--measure--prose)) max-content max-content;
+      justify-content: start;
+      column-gap: var(--wp--preset--spacing--32);
+    }
+    .client-checklist__row {
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      grid-template-areas: none;
+      column-gap: var(--wp--preset--spacing--32);
+      align-items: start;
+    }
+    .client-checklist__n,
+    .client-checklist__text,
+    .client-checklist__status,
+    .client-checklist__email {
+      grid-area: auto;
+    }
+    /* Scoped under the row: the build may put Meta item's own align-items after this rule */
+    .client-checklist__row .client-checklist__email {
+      justify-self: start;
+      /* One Body line tall, the Body small text centred in it: on the item's first line */
+      min-height: var(--wp--custom--line-height--body);
+      align-items: center;
+    }
+  }
+</style>

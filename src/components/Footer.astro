@@ -8,7 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import Eyebrow from './Eyebrow.astro';
-import { socialLinks, legalLinks, SHOW_EVENTS } from '../data/navigation';
+import { socialLinks, legalLinks, prototypeLinks, SHOW_EVENTS } from '../data/navigation';
 import { worldPagePath } from '../data/world';
 
 interface FooterLink {
@@ -116,7 +116,7 @@ const logoInner = logoSvg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*
       <p class="text-caption">© 2027 Reach Subsea ASA. All rights reserved.</p>
       <ul class="site-footer__legal-links">
         {
-          legalLinks.map((link) => (
+          [...prototypeLinks, ...legalLinks].map((link) => (
             <li>
               <a class="text-caption" href={link.url}>{link.label}</a>
             </li>

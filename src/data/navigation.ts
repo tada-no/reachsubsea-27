@@ -289,6 +289,10 @@ export const legalLinks: NavLink[] = [
   { label: 'Transparency Act', url: '/transparency-act/' },
 ];
 
+/** Prototype only, not for WordPress (Ross, 9 Oct 2026): the client checklist page (/client-checklist/, answered by
+ * email, no sign-in), linked in the footer's legal row while the prototype is in review. */
+export const prototypeLinks: NavLink[] = [{ label: 'Client checklist', url: '/client-checklist/' }];
+
 /** Search panel "Popular" quick links (editor-set, docs/04 §16 Search panel). */
 export const popularSearchLinks: NavLink[] = [
   { label: 'Fleet overview', url: '/assets/' },

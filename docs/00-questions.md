@@ -10,6 +10,13 @@ _No open questions right now._
 
 ## Answered log
 
+### Q161. Client checklist on the prototype, answered by email (9 Oct 2026)
+Context: Ross wanted the "what we need from you" checklist open to Reach without a Claude sign-in (the Claude Doc needed one), linked from the footer next to Privacy & Cookie Policy.
+- [x] A page on the prototype + email (Recommended): `/client-checklist/` (prototype only, not for WordPress), the 66 items from the doc in its eight groups, numbered for good. Each row: number · text with its pages · status badge (Open · Received · Done) · "Answer by email", which opens a message to ross@tada.no with "Reach checklist <n>: <subject>". An "Email your answers" button covers several items in one message. Data: `src/data/client-checklist.ts` (statuses only, never the answers: the repo is public)
+- [x] Footer legal row: "Client checklist" before Privacy & Cookie Policy (`prototypeLinks` in navigation.ts); remove both at launch
+- [x] The weekday sync task now reads ross@tada.no for "Reach checklist" emails from @reachsubsea.com: answered items go to Received in a daily status PR, and a fix PR sets its item to Done. The Claude Doc is no longer linked
+- [x] Checked 375–1440 (13 widths): no sideways scroll, badges and email links in one column per group, both on the item's first line; the text keeps the 720 prose measure
+
 ### Q160. Reports & presentations: quarterly results as a report shelf (9 Oct 2026)
 Context: Ross: the Quarterly results section "feels a bit like the financial calendar, can we make it similar to the annual reports section?" Claude agreed: the Date tiles, dashed future quarters and countdown were the Financial calendar's language. The Results archive is replaced by the Report shelf, generalised for both series.
 - [x] Covers: the latest 3 (Recommended), page 1 of each report as the annual covers; with the next date as the first slot that leaves Q2 and Q1 2026. Q1 2026 downloaded from the live site (Ross, yes), rendered to `public/images/reports/quarterly-report-2026-q1.jpg` and the PDF deleted; Q2 2026 from `ref/`. In WordPress the cover is the Document's featured image
@@ -18,7 +25,8 @@ Context: Ross: the Quarterly results section "feels a bit like the financial cal
 - [x] Phones: quarter rows stack (label over links, one line at 375); covers go one per row under 600 in both shelves (first the quarterly ones, as Report · Presentation doesn't fit half a phone; then the annual ones too, Ross: Report · ESEF wrapped as well)
 - [x] Checked 375 · 600 · 640 · 800 · 900 · 1000 · 1100 · 1120 · 1200 · 1300 · 1440: no sideways scroll, rows one height, no link wraps, cover and next slot the same height. The section is longer than the tabbed version (2003 at 1440, was 948)
 - [x] Older reports in drawers (Ross: "the older reports both annual and quarter should be hidden in expandable draws, agree?"; Claude agreed: open, the quarterly section had grown from 948 to 2003 at 1440). Each shelf ends on one Link Expand, "Earlier quarterly results, 2012–2025" and "Earlier annual reports, 2012–2022" (stack/lg under the covers); it stays where it is and opens the rows below itself (measured: no move at 1440 or 375). Both sections are now 783 tall at 1440. The annual archive drops its "2012–2022" heading (the link says it) and keeps its note. Without JS the rows show
-- [ ] Remove `src/blocks/ResultsArchive.astro` and its Figma set once the page is approved; Figma for the shelf's Next slot and quarter rows then
+- [x] Figma (9 Oct 2026): Report shelf gains Series=Quarterly (Desktop · Mobile) and an Open property for the drawer; Shelf item State=Next; Year row Layout=Quarter files; Annual variants end on their toggle with covers one per row on Mobile; the page frame uses the Quarterly shelf (ledger `phase4ReportsQ160_9Oct`)
+- [ ] Remove `src/blocks/ResultsArchive.astro` and its Figma set once the page is approved
 
 ### Q159. News single: third critique fixes (9 Oct 2026)
 Context: the third critique of the story pages scored 24/36 (no P0, three P1: tall featured photos, a fixed measure that ran 85–91 characters, results leads cut to the dateline sentence). Ross picked all four groups of fixes and asked whether they carry over to the WordPress blocks. Done in base.css, NewsSingle and `scripts/news-cleanup.mjs` (steps 9–10, idempotent; 76 posts changed).
