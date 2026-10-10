@@ -2531,5 +2531,64 @@
       "The pictogram loops (code only, Pictogram.astro)",
       "The Tint card hover turning White (Q166) is not drawn; the Card set has no hover state for it"
     ]
+  },
+  "phase4ReachRemoteQ167_11Oct": {
+    "date": "2026-10-11",
+    "context": "Reach Remote page (Q167) pushed to Figma at Ross's request. Ground truth: src/pages/assets/reach-remote/index.astro, src/blocks/ModelStage.astro, src/blocks/SystemChain.astro, src/data/reach-remote.ts.",
+    "variables": {
+      "alpha/navy-88 VariableID:720:26420": "Primitives, rgb 27 29 59 at 0.88: the Model stage's fact cards and dimension labels over the picture (CSS --wp--custom--color--alpha--navy-88)"
+    },
+    "components": {
+      "Components / Model stage and System chain 723:2840": "Doc frame on Components (x 0, y 69650)",
+      "Model stage/Fact card 723:2846": "alpha/navy-88, radius/md, space/16 space/24, 275 wide (resize per card); Name (UI/Eyebrow, icon/accent) and Line (Body/Small, text/on-overlay) text properties; Navy mode",
+      "Model stage/Marker 723:2849": "8 px white, 2 px alpha/navy-64 outside stroke",
+      "Model stage/Leader 723:2851": "1 px white with a 1 px alpha/navy-64 edge; stretch and rotate per instance",
+      "Model stage/Dimension line 723:2852": "Run (1.5 px white round dots every 5, stretches) + Tick A / Tick B (12 px); stretch to the length and rotate per instance",
+      "Model stage/Dimension label 723:2856": "Label text property, UI/Label on an alpha/navy-88 pill (space/4 space/8, radius/sm)",
+      "Model stage/Chapter dot 723:2862": "State=Default 723:2858 (6 px, 40%) | Current 723:2860 (8 px, full), 24 px target",
+      "Model stage/Tour nav 723:2863": "Six Chapter dots + Skip tour (UI/Label, 72%), space-between; FILL in the block",
+      "System chain/Node 723:2931": "Breakpoint=Desktop 723:2879 (96 disc over the words, text max 380) | Mobile 723:2905 (64 disc beside the words, text padding-top 16); Title, Text, Pictogram (instance swap) properties",
+      "System chain/Link 723:2938": "Align=Center 723:2932 (space/24 between eyebrow and line, the connector passes between) | Start 723:2935 (phones); Label, Text properties",
+      "Card text Strip tiles": "added to Card set 103:1110: Media=None, Surface=Accent, Size=Strip 727:18725 and Size=Strip mobile 727:18730 (Title over Description, space/16 space/24, top aligned); for Card grid Strip text tiles (partners)"
+    },
+    "blocks": {
+      "Block/Model stage 725:16051": "Doc frame 'Blocks / Model stage' 725:15902 (x -10768). View=Hero, Breakpoint=Desktop 725:15907 (1440x900) | Hero Mobile 725:15946 (375x812, nav in a navy strip) | Chapter Desktop 725:15972 | Chapter Mobile 725:16011 (deck chapter: Drone deck card, 23.9 m and 8.0 m dimension lines, first dot current). Stills are frames of the live three.js stage (11 Oct 2026, headless Chrome on the GPU, overlays hidden): Still 725:15908, 725:15947, 725:15973, 725:16012",
+      "Block/System chain 726:16319": "Doc frame 'Blocks / System chain' 726:15997. Breakpoint=Desktop 726:16002 (Section header, three Nodes FILL with grid/gutter, dotted Connector 2 px every 6 behind the discs, Link Center on it between the first two) | Mobile 726:16160 (one column, vertical Connector, Link Start in a Link row with 88 left padding); Navy mode",
+      "Stats band Count=4 Feature": "added to set 169:2557: Count=4, Style=Feature, Breakpoint=Desktop 727:16143 (lead + three figures, two rules) | Mobile 727:16154 (figures 2 x 2 under the lead, no rules). 'Blocks / Stats band' 167:2491 grew, so the 21 doc frames below it in that column moved down 1054",
+      "Split media Spec table rows 7–8": "set 166:2339 gains BOOLEAN 'Show rows 7–8#727:38' (two more Spec rows in 162:2180, 162:2217, 164:2299, 164:2335)",
+      "Accordion items 4–6": "set 175:2673 gains BOOLEAN 'Show items 4–6#728:0' (three more items, closed, in all four variants)"
+    },
+    "pageFrame": {
+      "id": "727:38784",
+      "name": "Reach Remote",
+      "x": 13120,
+      "y": 18563,
+      "height": 7828,
+      "source": "src/pages/assets/reach-remote/index.astro",
+      "sections": {
+        "Header (overlay; Assets current)": "727:38785",
+        "Model stage Hero Desktop (breadcrumb Home › Assets › Reach Remote)": "727:38831",
+        "Section subnav (Assets; Reach Remote active)": "727:38861",
+        "System chain Desktop, More than a vessel (navy)": "727:38879",
+        "Split media Spec table End, The vessel in numbers (8 rows, Brochure (PDF) as the text column's link, table heading hidden)": "727:38940",
+        "Stats band Feature Count=4, track record (tint)": "727:38977",
+        "Split media Image End, Four levels of oversight (ROC image, brochure p5)": "727:39051",
+        "Card grid 4 columns, the four levels (Card None Tint, eyebrow 01–04, joined: top padding 0; cards hug at 244, 'Direct control' held at two lines)": "727:39072",
+        "Card grid Strip, built with partners (text tiles)": "727:39151",
+        "Feed grid Grid, where Reach Remote has worked (tint; the three project cards' content and photos from the Projects frame, White cards, row 2 hidden, no Load more)": "727:39168",
+        "Statement Quote (a Reach Remote client, Q2 2026 report)": "727:39357",
+        "Split media Image End, What's next (tint; top-down 3 and 4 photo from the Assets bento)": "727:39367",
+        "Accordion Split, six Reach Remote FAQs": "727:39388",
+        "CTA panel (white Assets panel; one action, no contact card)": "729:27795",
+        "Footer": "727:39434"
+      }
+    },
+    "notInFigma": [
+      "The tour itself: the scroll-driven camera, the cards rising, the lines growing, the hand-off (the block after the tour sliding over the stage). Figma shows the opening frame and one chapter stop",
+      "What's next: the Split media has one action slot; the site's second link (Why invest) is not drawn",
+      "The spec table's compressed layout on this page (labels at their own width, 8 px rows) is a page override in code; the frame uses the block's 50/50 rows",
+      "No mobile page frame yet (every block has its Mobile variant)",
+      "Fact card label positions on phones can sit over the 8.0 m figure, as in code (open in Q167)"
+    ]
   }
 }
