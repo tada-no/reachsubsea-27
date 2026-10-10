@@ -203,6 +203,8 @@ export function mountStage(stage: HTMLElement) {
 
   const draco = new DRACOLoader();
   draco.setDecoderPath(`${base}draco/`);
+  // Start the decoder now, so its download and compile run while the vessel downloads (the block preloads both)
+  draco.preload();
   const loader = new GLTFLoader();
   loader.setDRACOLoader(draco);
 
@@ -319,6 +321,10 @@ export function mountStage(stage: HTMLElement) {
     const ms = Math.round(performance.now() - t0);
     if (status) status.textContent = `Vessel · 950 KB · ${ms.toLocaleString('en-GB')} ms`;
     stage.classList.remove('is-loading');
+    // Then the ROV and TMS in the background, once the page is idle
+    const idle = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    if (idle) idle(() => void loadLaunch(true), { timeout: 3000 });
+    else setTimeout(() => void loadLaunch(true), 1500);
   }
 
   // ── Moonpool: the real hull has no housing box; it opens in the hull bottom between the two gondola walls,
@@ -373,11 +379,17 @@ export function mountStage(stage: HTMLElement) {
     root.position.sub(c);
     into.add(root);
   }
-  function loadLaunch() {
-    if (launchLoading) return launchLoading;
-    launchLoading = (async () => {
+  /** `quiet`: fetched in the background once the vessel is in, so the launch is ready by the time the tour gets there;
+   *  the loading readout shows only if the visitor reaches the launch while it is still on its way */
+  let launchShown = false;
+  function loadLaunch(quiet = false) {
+    if (!quiet && !launchShown && !launchLoaded) {
+      launchShown = true;
       if (status) status.textContent = 'Loading the ZeeROV and TMS…';
       stage.classList.add('is-loading');
+    }
+    if (launchLoading) return launchLoading;
+    launchLoading = (async () => {
       const [rov, tms] = await Promise.all([loader.loadAsync(`${base}models/rov-zeerov.glb`), loader.loadAsync(`${base}models/etms.glb`)]);
       satin(rov.scene);
       satin(tms.scene);
@@ -391,7 +403,7 @@ export function mountStage(stage: HTMLElement) {
       cage.rotation.y = -2.258;
       tmsHolder.add(cage);
       launchLoaded = true;
-      if (status) status.textContent = 'ZeeROV 1,159 KB · TMS 588 KB';
+      if (status && launchShown) status.textContent = 'ZeeROV 1,159 KB · TMS 588 KB';
       stage.classList.remove('is-loading');
     })();
     return launchLoading;

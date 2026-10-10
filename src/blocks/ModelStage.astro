@@ -51,9 +51,14 @@ const {
   skipTo = 'rr-after',
 } = Astro.props;
 const base = import.meta.env.BASE_URL;
+// The vessel and the Draco decoder start downloading with the page, not after three.js has loaded and run
+const root = base.replace(/\/?$/, '/');
 ---
 
 <section class="wp-block-reach-model-stage model-stage" data-tour aria-label={label}>
+  <link rel="preload" href={`${root}models/reach-remote-lod1.glb`} as="fetch" crossorigin="anonymous" />
+  <link rel="preload" href={`${root}draco/draco_wasm_wrapper.js`} as="fetch" crossorigin="anonymous" />
+  <link rel="preload" href={`${root}draco/draco_decoder.wasm`} as="fetch" crossorigin="anonymous" />
   <div class="model-stage__pin" data-tour-pin>
     <div class="model-stage__stage has-surface-navy" data-stage data-level={level} data-scene={scene} data-base={base}>
       <canvas class="model-stage__canvas" aria-hidden="true"></canvas>

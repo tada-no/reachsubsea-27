@@ -65,16 +65,35 @@ export function resizeHullLogo({THREE, hull, ...opts}){
     if(Math.max(fp[a * 3 + 1], fp[b * 3 + 1], fp[c * 3 + 1]) < -0.5) continue;
     sub.push(a, b, c);
   }
-  const pg = new THREE.BufferGeometry();
-  pg.setAttribute('position', new THREE.BufferAttribute(fp, 3)); pg.setIndex(sub); pg.computeBoundingSphere();
-  const pm = new THREE.Mesh(pg, new THREE.MeshBasicMaterial({side: THREE.DoubleSide})); pm.updateMatrixWorld(true);
-  const ray = new THREE.Raycaster(), ro = new THREE.Vector3(), rd = new THREE.Vector3();
+  // The probe rays all run along z, so a ray at (x, y) can only hit triangles whose (x, y) footprint covers that
+  // point: bucket the triangles in a 2D grid over (x, y) and test only the probe's cell, nearest hit wins (the same
+  // hit and face normal as a Raycaster against the whole set, in a few ms instead of ~1.4 s; website, 10 Oct 2026)
+  const CELL = 0.25, cells = new Map(), key = (i, j) => i * 100003 + j;
+  for(let k = 0; k < sub.length; k += 3){
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for(let q = 0; q < 3; q++){ const a = sub[k + q] * 3; x0 = Math.min(x0, fp[a]); x1 = Math.max(x1, fp[a]); y0 = Math.min(y0, fp[a + 1]); y1 = Math.max(y1, fp[a + 1]); }
+    for(let i = Math.floor(x0 / CELL); i <= Math.floor(x1 / CELL); i++) for(let j = Math.floor(y0 / CELL); j <= Math.floor(y1 / CELL); j++){
+      const c = key(i, j); let l = cells.get(c); if(!l) cells.set(c, l = []); l.push(k);
+    }
+  }
+  const ray = new THREE.Ray(), ro = new THREE.Vector3(), rd = new THREE.Vector3(), hit = new THREE.Vector3();
+  const ta = new THREE.Vector3(), tb = new THREE.Vector3(), tc3 = new THREE.Vector3();
+  const corner = (t, k) => t.set(fp[sub[k] * 3], fp[sub[k] * 3 + 1], fp[sub[k] * 3 + 2]);
   const probe = (x, y, s) => {
-    ray.set(ro.set(x, y, s * 30), rd.set(0, 0, -s)); ray.far = 40;
-    const h = ray.intersectObject(pm, false)[0];
-    if(!h) return null;
-    const n = h.face.normal.clone(); if(n.z * s < 0) n.negate();
-    return {p: h.point, n};
+    ray.set(ro.set(x, y, s * 30), rd.set(0, 0, -s));
+    const list = cells.get(key(Math.floor(x / CELL), Math.floor(y / CELL)));
+    if(!list) return null;
+    let best = null, bestD = Infinity;
+    for(const k of list){
+      if(!ray.intersectTriangle(corner(ta, k), corner(tb, k + 1), corner(tc3, k + 2), false, hit)) continue;
+      const d = ro.distanceTo(hit);
+      if(d > 40 || d >= bestD) continue;
+      bestD = d;
+      best = {p: hit.clone(), n: THREE.Triangle.getNormal(ta, tb, tc3, new THREE.Vector3())};
+    }
+    if(!best) return null;
+    if(best.n.z * s < 0) best.n.negate();
+    return best;
   };
 
   let moved = 0;
@@ -92,7 +111,6 @@ export function resizeHullLogo({THREE, hull, ...opts}){
   }
   P.needsUpdate = true; if(N) N.needsUpdate = true;
   geo.computeBoundingSphere(); geo.computeBoundingBox();
-  pg.dispose();
   geo.userData.logoResized = true;
   return {changed: true, sides: Object.keys(sides).length, moved};
 }

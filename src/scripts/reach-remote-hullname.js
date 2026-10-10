@@ -386,15 +386,35 @@ export function createBowImo({THREE, hull, text = 'IMO 9972191', ...opts}){
     if(Math.max(pos[a * 3] * bowSign, pos[b * 3] * bowSign, pos[c * 3] * bowSign) < stemX * bowSign - S.len * 0.5) continue;
     sub.push(a, b, c);
   }
-  const pgeo = new THREE.BufferGeometry();
-  pgeo.setAttribute('position', S.posAttr); pgeo.setAttribute('normal', S.nrmAttr); pgeo.setIndex(sub); pgeo.computeBoundingSphere();
-  const pmesh = new THREE.Mesh(pgeo, new THREE.MeshBasicMaterial({side: THREE.DoubleSide})); pmesh.updateMatrixWorld(true);
-  const ray = new THREE.Raycaster(), ro = new THREE.Vector3(), rd = new THREE.Vector3(-bowSign, 0, 0);
+  // The rays all run along x, so a ray at (z, y) can only hit triangles whose (z, y) footprint covers that point:
+  // bucket the triangles in a 2D grid and test only the probe's cell, nearest hit wins (the same hit and face normal
+  // as a Raycaster against the whole set, in a few ms instead of ~250; website, 10 Oct 2026)
+  const CELL = 0.25, cells = new Map(), key = (i, j) => i * 100003 + j;
+  for(let k = 0; k < sub.length; k += 3){
+    let z0 = Infinity, z1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for(let q = 0; q < 3; q++){ const a = sub[k + q] * 3; z0 = Math.min(z0, pos[a + 2]); z1 = Math.max(z1, pos[a + 2]); y0 = Math.min(y0, pos[a + 1]); y1 = Math.max(y1, pos[a + 1]); }
+    for(let i = Math.floor(z0 / CELL); i <= Math.floor(z1 / CELL); i++) for(let j = Math.floor(y0 / CELL); j <= Math.floor(y1 / CELL); j++){
+      const c = key(i, j); let l = cells.get(c); if(!l) cells.set(c, l = []); l.push(k);
+    }
+  }
+  const ray = new THREE.Ray(), ro = new THREE.Vector3(), rd = new THREE.Vector3(-bowSign, 0, 0), hit = new THREE.Vector3();
+  const ta = new THREE.Vector3(), tb = new THREE.Vector3(), tc = new THREE.Vector3();
+  const corner = (t, k) => t.set(pos[sub[k] * 3], pos[sub[k] * 3 + 1], pos[sub[k] * 3 + 2]);
   const probe = (z, y) => {
-    ray.set(ro.set(stemX + bowSign * 20, y, z), rd); ray.far = 20 + S.len * 0.5;
-    const h = ray.intersectObject(pmesh, false)[0]; if(!h) return null;
-    const n = h.face.normal.clone(); if(n.x * bowSign < 0) n.negate();
-    return {p: h.point.clone(), n};
+    ray.set(ro.set(stemX + bowSign * 20, y, z), rd);
+    const far = 20 + S.len * 0.5, list = cells.get(key(Math.floor(z / CELL), Math.floor(y / CELL)));
+    if(!list) return null;
+    let best = null, bestD = Infinity;
+    for(const k of list){
+      if(!ray.intersectTriangle(corner(ta, k), corner(tb, k + 1), corner(tc, k + 2), false, hit)) continue;
+      const d = ro.distanceTo(hit);
+      if(d > far || d >= bestD) continue;
+      bestD = d;
+      best = {p: hit.clone(), n: THREE.Triangle.getNormal(ta, tb, tc, new THREE.Vector3())};
+    }
+    if(!best) return null;
+    if(best.n.x * bowSign < 0) best.n.negate();
+    return best;
   };
 
   // the panel: the LOWEST run (at least 0.3 m tall) of forward-facing hits set back at least 2 m from the stem, i.e.
@@ -474,7 +494,6 @@ export function createBowImo({THREE, hull, text = 'IMO 9972191', ...opts}){
   const m = new THREE.Mesh(geo, mat);
   m.name = 'bowImo'; m.userData.isHullName = true; m.receiveShadow = true;
   m.onBeforeRender = () => { if(hm.envMapIntensity !== undefined) mat.envMapIntensity = hm.envMapIntensity; };
-  pgeo.dispose();
   const g = new THREE.Group(); g.name = 'bowImo:' + text; g.add(m);
   g.userData = {isHullName: true, isBowImo: true, text, options: o, mesh: m, capHeight: cap, panel: {x: best.x, y0: best.y0, y1: best.y1, half},
     dispose(){ geo.dispose(); mat.dispose(); tex.dispose(); }};
