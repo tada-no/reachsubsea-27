@@ -2506,6 +2506,20 @@
       "Tech & Innovation pictogram picks (Horizon settings-screen 658:30054, Pilot reach pilot 658:30341, Relay satilite 658:30201) not yet on the cards"
     ]
   },
+  "phase4PressReviewFixes_9Oct": {
+    "date": "2026-10-09",
+    "context": "Review of phase4PressMediaQ162_9Oct against the code (Ross: review, then fix them all). Ground truth: src/blocks/BrandAssets.astro, src/blocks/PageHero.astro (Text hero), src/blocks/CtaBand.astro, src/data/press.ts.",
+    "components": {
+      "Pack row 689:2854": "Both variants hug their height: 64 (space/8 + the 48 Link target + space/8; Following 65 with its rule), as the code; they were fixed at 40 and the rules cut under the labels",
+      "Block/Page hero 141:827, Style=Text": "Takes the Photo hero's layout and height (Ross 7 Oct 2026: one hero height): Desktop 138:317 fixed 680, content bottom-aligned (y 308-584 with the eyebrow), Breadcrumb 138:319 moved out of Content and pinned absolute at 64, 120; Mobile 138:375 fixed 525 (code min(140vw, 640px) at 375), Breadcrumb 138:377 at 24, 96. Every Text hero instance on the Pages page (13 frames) set to 680",
+      "CTA band Style=Panel Desktop 246:9087": "Contact card 448:16531 400 wide (was 360), as the code's card column; long roles and emails no longer clip",
+      "Page frame Press & media 690:38034": "Photo cards carry the press sets' own photos (Olympic Zeus, Supporter ROV launch, Reach Remote, Jostein Alendal; CROP at press.ts focal points); they showed the Careers photos",
+      "Blocks page": "The 8 doc frames below Blocks / Report shelf 490:10081 moved down 954 (the Quarterly variants had grown it over Blocks / File list)"
+    },
+    "notInFigma": [
+      "Navy Text hero ground: code uses navy/900 (as the Photo hero); the Figma Text variants keep bg/default"
+    ]
+  },
   "phase4TechProductsQ163_9Oct": {
     "date": "2026-10-09",
     "context": "Technology & Innovation page frame brought in line with the code (Q163): the four products as Icon cards, Ross's library pictograms, order Horizon, Remote, Relay, Pilot, the PDF's full wording. Ground truth: src/pages/services/technology-innovation/index.astro.",

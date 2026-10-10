@@ -183,15 +183,15 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-tabl
             </p>
           </div>
           <div class="embed__toolbar" hidden={state !== 'loaded'}>
-            <Link label="Open full screen" href={fullScreenUrl} action={worldInSite ? 'page' : 'external'} size="small" />
             <IconButton icon="x" label="Exit 3D World" variant="ghost" size="small" data-embed-action="exit" />
           </div>
           <div class="embed__panel" hidden={state === 'loaded'}>
             {eyebrow && <Eyebrow text={eyebrow} />}
             <h2 class="embed__title text-h2">{title}</h2>
             {text && <p class="embed__text text-body">{text}</p>}
-            {/* One action (17 Sep 2026). "Open full screen" lives in the toolbar once the scene runs;
-                touch devices, where Launch is hidden, get the zone links and the mobile layout's link. */}
+            {/* One action (17 Sep 2026). Launch fills the window under the site header (Ross, 9 Oct 2026), so the
+                toolbar has only Exit; touch devices, where Launch is hidden, get the zone links and the mobile
+                layout's link to the full-page world. */}
             <div class="embed__actions">
               <Button label="Launch 3D World" variant="primary" type="button" data-embed-action="launch" />
             </div>
@@ -447,6 +447,25 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-tabl
     border-radius: var(--wp--custom--radius--md);
     background-color: var(--wp--custom--color--bg--overlay);
   }
+  /* Launched (Ross, 9 Oct 2026: "launch full page but with site header still there"): the stage leaves the
+     page flow and fills the window under the fixed header (--header-offset, set by the header: 72 once
+     scrolled), square-cornered. The page behind stops scrolling and keeps its place; the script holds the
+     block's height while the stage is out of flow, so nothing behind moves, and Exit (or Esc) puts it back.
+     The header shows even if it had slid away on the scroll down. */
+  .embed.is-expanded .embed__frame {
+    display: block;
+    position: fixed;
+    inset: var(--header-offset, 72px) 0 0 0;
+    z-index: 40;
+    aspect-ratio: auto;
+    border-radius: 0;
+  }
+  html.has-world-open {
+    overflow: hidden;
+  }
+  html.has-world-open .site-header {
+    transform: none;
+  }
   .embed__panel {
     left: var(--wp--preset--spacing--48);
     bottom: var(--wp--preset--spacing--48);
@@ -655,10 +674,24 @@ const heightStyle = `--embed-h-desktop: ${frameHeight.desktop}px; --embed-h-tabl
       root.dataset.embedState = 'loaded';
       loopToggle?.setAttribute('hidden', '');
       syncLoop();
+      expand(true);
       iframeEl.focus();
     });
 
+    // Full page under the header: hold the block's height while the stage is out of flow
+    const slot = frame.parentElement;
+    function expand(open: boolean) {
+      if (open && slot) slot.style.minHeight = `${slot.offsetHeight}px`;
+      root.classList.toggle('is-expanded', open);
+      document.documentElement.classList.toggle('has-world-open', open);
+      if (!open && slot) slot.style.minHeight = '';
+    }
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && root.classList.contains('is-expanded')) exitBtn?.click();
+    });
+
     exitBtn?.addEventListener('click', () => {
+      expand(false);
       iframeEl?.remove();
       iframeEl = null;
       mock?.setAttribute('hidden', '');
