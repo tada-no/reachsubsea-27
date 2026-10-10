@@ -75,6 +75,7 @@ export const faqTopics: FaqTopic[] = [
   { id: 'technology', label: 'Technology & Innovation', parent: 'services', page: '/services/technology-innovation/' },
   { id: 'research', label: 'Research & Publications', parent: 'services', page: '/services/technology-innovation/research-publications/' },
   faqGroups[2],
+  { id: 'reach-remote', label: 'Reach Remote', parent: 'assets', page: '/assets/reach-remote/' },
   faqGroups[3],
   { id: 'leadership', label: 'Leadership & Board', parent: 'company', page: '/company/leadership-board/' },
   { id: 'hseq', label: 'HSEQ', parent: 'company', page: '/company/hseq/' },
@@ -100,6 +101,7 @@ const [established, people, offices, officeCountries, countries, fleet, newbuild
   'newbuilds',
 ]);
 const [traineeSince] = pickFigures(['trainee-since']);
+const [fuelSaving] = pickFigures(['fuel-saving']);
 const joinAnd = (items: string[]) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items.join(''));
 const mailboxFor = (id: string) => mailboxes.find((m) => m.id === id)!;
 const longDate = (iso: string) =>
@@ -350,6 +352,50 @@ export const faqs: Faq[] = [
     answer:
       'Both. Most of the active fleet is chartered from partners such as Olympic Subsea, Havila Shipping and Solstad Maritime, while Reach Remote 1–4 and the DriX vehicles are owned and operated by Reach Subsea.',
     topics: ['assets'],
+  },
+
+  // Reach Remote (Q167, 10 Oct 2026): the client PDF p11's first question, then the plan's five. Sources: the brochure
+  // (REA25 2595 170: p3, p5, p8–9, p11), the Perth ROC brochure, the Q2 2026 report p18–19
+  {
+    slug: 'what-is-reach-remote',
+    question: 'What is Reach Remote?',
+    answer:
+      'Our uncrewed vessel platform: the vessels themselves, Reach Remote 1 and 2, our onshore remote operations centres, and Reach Horizon, our software platform, working together as one way of delivering subsea services. Two more vessels, Reach Remote 3 and 4, are being built.',
+    topics: ['reach-remote'],
+  },
+  {
+    slug: 'reach-remote-crew',
+    question: 'Is anyone on board Reach Remote?',
+    answer:
+      'No. Reach Remote is uncrewed by design. The master, navigator, ROV pilots and surveyors all work from shore, and the vessel stays at sea for at least 30 days at a time.',
+    topics: ['reach-remote'],
+  },
+  {
+    slug: 'reach-remote-control',
+    question: 'Where is Reach Remote operated from?',
+    answer:
+      'From our remote operations centres in Haugesund, Norway, and Perth, Australia, over several redundant links: VSAT, Starlink, Iridium, maritime broadband radio, 5G and Ceragon Pointlink. Operators can work at four levels of oversight, from monitoring the vessel as it runs its mission to taking direct control.',
+    topics: ['reach-remote'],
+  },
+  {
+    slug: 'reach-remote-rov',
+    question: 'What can Reach Remote’s ROV do?',
+    answer:
+      'Reach Remote carries a ZEEROV, a fully electric work-class ROV rated to 2,000 m with 115 kW of power and a 600 kg payload, launched through the hull with its tether management system. It carries out the same inspection, survey and light intervention work as the ROVs on our crewed vessels, and can stay submerged for up to 30 days.',
+    topics: ['reach-remote'],
+  },
+  {
+    slug: 'reach-remote-certification',
+    question: 'How is Reach Remote certified?',
+    answer:
+      'Reach Remote holds DNV’s AROS notation for autonomous and remotely operated ships, a world first, and has sailing permits in Norway, the UK and Australia. Our Perth remote operations centre is the first DNV-certified one in the Southern Hemisphere.',
+    topics: ['reach-remote'],
+  },
+  {
+    slug: 'reach-remote-savings',
+    question: 'What does an uncrewed vessel save?',
+    answer: `Fuel, emissions and risk. Reach Remote uses up to ${fuelSaving.value} less fuel than a crewed vessel doing the same work, and nobody has to travel offshore or work on deck in rough weather for that scope.`,
+    topics: ['reach-remote'],
   },
 
   // Leadership & Board (PDF p33): answers built from people.ts

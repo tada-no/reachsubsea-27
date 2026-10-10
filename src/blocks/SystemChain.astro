@@ -1,0 +1,254 @@
+---
+// System chain · reach/system-chain (docs/05 §2.33; Q167, 10 Oct 2026). Three parts of one system on one line, each
+// a node (a library pictogram in a disc, an H3 and two lines), joined by a dotted connector, with the link that ties
+// them named on the connector between the first two. Reach Remote's "More than a vessel": the vessel · the ROC ·
+// Reach Horizon, with Reach Relay on the connector (the client PDF p11's three-part model, its wording).
+//
+// The connector is dotted as the tour's dimension lines are, so the block that slides over the Model stage picks up
+// its drawing. Motion: when the chain is a quarter in view the connector draws left to right, each node lands
+// (scale, no fade) as it arrives, its words rising out of a clip, and the link's label lands halfway to the second
+// node; still under reduced motion and without JS. Below 900 the nodes stack, the connector down the left through
+// the discs, the label in the text column between the first two nodes.
+// Fields: `sectionHeader`, `nodes[]` (pictogram, title, text; 2–4), `link` (label, text), `background`.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Pictogram from '../components/Pictogram.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+
+export interface ChainNode {
+  pictogram: string;
+  title: string;
+  text: string;
+}
+
+interface Props extends BlockFields {
+  sectionHeader?: SectionHeaderField;
+  nodes: ChainNode[];
+  /** Named on the connector between the first and second node */
+  link?: { label: string; text?: string };
+}
+
+const { sectionHeader, nodes, link, background = 'navy', spacing, anchor } = Astro.props;
+const titleId = sectionHeader?.title ? makeId('system-chain', sectionHeader.title) : undefined;
+---
+
+{
+  nodes.length > 0 && (
+    <BlockSection slug="system-chain" root="system-chain" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId}>
+      <div class="block__body">
+        {sectionHeader && <SectionHeader {...sectionHeader} id={titleId} />}
+        <div class="system-chain__chain" style={`--sc-count: ${nodes.length}`} data-system-chain>
+          <span class="system-chain__rail" aria-hidden="true" />
+          {nodes.map((n, i) => (
+            <>
+              <div class="system-chain__node" style={`--sc-i: ${i}`}>
+                <span class="system-chain__mark">
+                  <Pictogram name={n.pictogram} size={64} />
+                </span>
+                <div class="system-chain__text">
+                  <h3 class="system-chain__title text-h4">{n.title}</h3>
+                  <p class="system-chain__body text-body">{n.text}</p>
+                </div>
+              </div>
+              {i === 0 && link && (
+                <p class="system-chain__link">
+                  <span class="system-chain__link-label text-eyebrow">{link.label}</span>
+                  {link.text && <span class="system-chain__link-text text-small">{link.text}</span>}
+                </p>
+              )}
+            </>
+          ))}
+        </div>
+      </div>
+    </BlockSection>
+  )
+}
+
+<style is:global>
+  /* Geometry: the disc (96, 64 on phones) sits at each column's start; the connector runs through the discs'
+     centres, from the first to the last. Columns share the grid's gutter. */
+  .system-chain__chain {
+    --sc-mark: 96px;
+    --sc-gap: var(--wp--custom--grid--gutter);
+    --sc-col: calc((100% - (var(--sc-count) - 1) * var(--sc-gap)) / var(--sc-count));
+    --sc-step: 0.5s;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--sc-count), minmax(0, 1fr));
+    column-gap: var(--sc-gap);
+  }
+  .system-chain__node {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--wp--preset--spacing--24);
+    min-width: 0;
+  }
+  .system-chain__mark {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: var(--sc-mark);
+    height: var(--sc-mark);
+    border: 1px solid var(--wp--custom--color--border--default);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  .system-chain__text {
+    display: grid;
+    gap: var(--wp--preset--spacing--8);
+    max-width: 36ch;
+  }
+  .system-chain__title,
+  .system-chain__body {
+    margin: 0;
+  }
+  .system-chain__body {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* The connector: round dots every 6 px (as the tour's dimension lines) */
+  .system-chain__rail {
+    position: absolute;
+    top: calc(var(--sc-mark) / 2 - 1px);
+    left: calc(var(--sc-mark) / 2);
+    width: calc((var(--sc-count) - 1) * (var(--sc-col) + var(--sc-gap)));
+    height: 2px;
+    background-image: radial-gradient(circle, var(--wp--custom--color--text--primary) 1px, transparent 1.25px);
+    background-size: 6px 2px;
+    background-repeat: repeat-x;
+    transform-origin: left center;
+  }
+  /* The link's label sits on the connector, halfway between the first two discs */
+  .system-chain__link {
+    position: absolute;
+    z-index: 1;
+    top: calc(var(--sc-mark) / 2);
+    left: calc((var(--sc-mark) + var(--sc-col) + var(--sc-gap)) / 2);
+    transform: translate(-50%, -50%);
+    display: grid;
+    justify-items: center;
+    gap: var(--wp--preset--spacing--4);
+    /* Narrow enough that the dots run out on both sides (at least 48 each), so it reads as a label on a line */
+    width: max-content;
+    max-width: min(18ch, calc(var(--sc-col) + var(--sc-gap) - var(--sc-mark) - var(--wp--preset--spacing--96)));
+    margin: 0;
+    padding: var(--wp--preset--spacing--8) var(--wp--preset--spacing--16);
+    border: 1px solid var(--wp--custom--color--border--default);
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--custom--color--bg--default);
+    text-align: center;
+  }
+  .system-chain__link-label {
+    color: var(--wp--custom--color--text--accent);
+  }
+  .system-chain__link-text {
+    color: var(--wp--custom--color--text--secondary);
+    line-height: var(--wp--custom--line-height--tight);
+  }
+
+  /* Draw-in: the connector runs across, each disc lands as it arrives, the words rise out of a clip */
+  html.js .system-chain__rail {
+    transition: transform calc(var(--sc-step) * (var(--sc-count) - 1)) linear;
+  }
+  html.js .system-chain__mark,
+  html.js .system-chain__link {
+    transition: scale 0.4s var(--wp--custom--motion--ease-out);
+  }
+  html.js .system-chain__text {
+    transition:
+      clip-path 0.6s var(--wp--custom--motion--ease-out),
+      translate 0.6s var(--wp--custom--motion--ease-out);
+  }
+  html.js .system-chain__node .system-chain__mark,
+  html.js .system-chain__node .system-chain__text {
+    transition-delay: calc(var(--sc-i) * var(--sc-step));
+  }
+  html.js .system-chain__link {
+    transition-delay: calc(var(--sc-step) / 2);
+  }
+  html.js .system-chain__chain:not(.is-drawn) .system-chain__rail {
+    transform: scaleX(0);
+  }
+  html.js .system-chain__chain:not(.is-drawn) .system-chain__mark,
+  html.js .system-chain__chain:not(.is-drawn) .system-chain__link {
+    scale: 0;
+  }
+  html.js .system-chain__chain:not(.is-drawn) .system-chain__text {
+    clip-path: inset(0 0 100% 0);
+    translate: 0 var(--wp--preset--spacing--16);
+  }
+
+  /* Below 900: one column, the disc beside the words, the connector down the left through the discs' centres */
+  @media (max-width: 899px) {
+    .system-chain__chain {
+      --sc-mark: 64px;
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--wp--preset--spacing--32);
+    }
+    .system-chain__node {
+      grid-template-columns: var(--sc-mark) minmax(0, 1fr);
+      column-gap: var(--wp--preset--spacing--24);
+    }
+    .system-chain__mark .pictogram {
+      width: 48px;
+      height: 48px;
+    }
+    /* Words start level with the disc's centre line, less the title's half line */
+    .system-chain__text {
+      padding-top: var(--wp--preset--spacing--16);
+    }
+    .system-chain__rail {
+      top: calc(var(--sc-mark) / 2);
+      bottom: 0;
+      left: calc(var(--sc-mark) / 2 - 1px);
+      width: 2px;
+      height: auto;
+      background-size: 2px 6px;
+      background-repeat: repeat-y;
+      transform-origin: center top;
+    }
+    /* The connector ends at the last disc: the ground covers it below that disc's centre */
+    .system-chain__node:last-of-type::after {
+      content: '';
+      position: absolute;
+      top: calc(var(--sc-mark) / 2);
+      bottom: 0;
+      left: 0;
+      width: var(--sc-mark);
+      background-color: var(--wp--custom--color--bg--default);
+    }
+    .system-chain__link {
+      position: relative;
+      top: auto;
+      left: auto;
+      transform: none;
+      justify-self: start;
+      justify-items: start;
+      max-width: calc(100% - var(--sc-mark) - var(--wp--preset--spacing--24));
+      margin-left: calc(var(--sc-mark) + var(--wp--preset--spacing--24));
+      text-align: start;
+    }
+    html.js .system-chain__chain:not(.is-drawn) .system-chain__rail {
+      transform: scaleY(0);
+    }
+  }
+</style>
+
+<script>
+  // Draw each chain on first view (content is visible without JS)
+  const chains = [...document.querySelectorAll<HTMLElement>('[data-system-chain]')];
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-drawn');
+          io.unobserve(entry.target);
+        }),
+      { threshold: 0.25 },
+    );
+    chains.forEach((chain) => io.observe(chain));
+  } else chains.forEach((chain) => chain.classList.add('is-drawn'));
+</script>

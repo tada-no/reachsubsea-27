@@ -110,9 +110,16 @@ const trioImages = media === 'image-top' && layout === '3-columns' && cards.leng
           {eyebrow && <p class="card-grid__eyebrow text-eyebrow">{eyebrow}</p>}
           <ul class="card-grid__list card-grid__list--strip">
             {cards.map((card) => (
-              <li class="card-grid__tile">
+              <li class:list={['card-grid__tile', !card.pictogram && 'card-grid__tile--text']}>
                 {card.pictogram && <Pictogram name={card.pictogram} size={64} />}
-                <span class="card-grid__tile-label">{card.title}</span>
+                {card.description ? (
+                  <span class="card-grid__tile-text">
+                    <span class="card-grid__tile-label">{card.title}</span>
+                    <span class="card-grid__tile-note text-small">{card.description}</span>
+                  </span>
+                ) : (
+                  <span class="card-grid__tile-label">{card.title}</span>
+                )}
               </li>
             ))}
           </ul>
@@ -622,6 +629,20 @@ const trioImages = media === 'image-top' && layout === '3-columns' && cards.leng
     line-height: var(--wp--custom--line-height--tight);
     font-weight: var(--wp--custom--font-weight--medium);
     color: var(--wp--custom--color--text--primary);
+  }
+  /* Text only (10 Oct 2026, Reach Remote partners: names, no logos): even padding, the name over one short note
+     (what the partner does), tiles in a row aligned to the top */
+  .card-grid__tile--text {
+    align-items: flex-start;
+    padding: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+  }
+  .card-grid__tile-text {
+    display: grid;
+    gap: var(--wp--preset--spacing--4);
+    min-width: 0;
+  }
+  .card-grid__tile-note {
+    color: var(--wp--custom--color--text--secondary);
   }
   @media (max-width: 1199px) {
     .card-grid__list--strip {

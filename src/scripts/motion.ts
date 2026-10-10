@@ -134,6 +134,8 @@ function initCountUp() {
     if (!Number.isFinite(target)) return [];
     // A bare year ("2008") is a date, not a quantity: counting up to it reads as a glitch.
     if (!match[1] && !match[3] && target >= 1900 && target <= 2100) return [];
+    // Nor is a ratio ("24/7"): "0/7 … 24/7" reads as a count of something else.
+    if (match[3].startsWith('/')) return [];
     // Reserve the final width so neighbours never shift while the digits run.
     el.style.minWidth = `${el.getBoundingClientRect().width}px`;
     el.style.display = 'inline-block';

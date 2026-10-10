@@ -1,0 +1,224 @@
+---
+// Assets › Reach Remote (10 Oct 2026, Q165, Q167; client PDF p11 / screens p23–25). The concept, technology and
+// capabilities behind our uncrewed operations, told as the client PDF frames it: the vessel + the onshore remote
+// operations centre (ROC) + Reach Horizon, not just a vessel. Built for a client weighing an uncrewed spread, an
+// investor sizing up the Reach Remote business and anyone curious what "nobody on board" means.
+//
+// The hero is the Model stage (§2.32): the 3D World's Reach Remote at sea, pinned for a six-chapter walk-around
+// scrubbed by the scroll, deck to keel to ROV, exactly as approved on /reach-remote-review/ (commit 18476e1). The
+// navy "More than a vessel" chain slides up over the stage as the launch ends, the subnav arriving with it, then:
+// the vessel in numbers (every chapter's rows, since the stage carries only names and one line) · the track record
+// figures · four levels of oversight · partners · projects · a client's words · what's next (3 & 4, the carve-out) ·
+// FAQ · contact. Sources: the brochure (ref/reach remote/REA25 2595 170, p3–11), the Perth ROC brochure, the Q2 2026
+// report p17–25, the client PDF's Reach Remote screens (oversight levels and the three-part model in its wording).
+// Left out of the PDF's plan: the stats strip over the hero (nothing overlaps the hero), the "Technology onboard" cards
+// (the tour is that section), the "Explore 3D World" card (the stage is the 3D World's model), the chip row.
+// Redirects to this page: live /assets/reach-remote/ and /assets/reach-remote-1-2/, dev /assets/reach-remote-1|2/,
+// /company/assets/remote-vessels/ and /services/reach-remote/* (docs/05 §3 Assets overview).
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/header/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import ModelStage from '../../../blocks/ModelStage.astro';
+import SectionSubnav from '../../../blocks/SectionSubnav.astro';
+import SystemChain from '../../../blocks/SystemChain.astro';
+import SpecGroups from '../../../blocks/SpecGroups.astro';
+import StatsBand from '../../../blocks/StatsBand.astro';
+import SplitMedia from '../../../blocks/SplitMedia.astro';
+import CardGrid from '../../../blocks/CardGrid.astro';
+import FeedGrid from '../../../blocks/FeedGrid.astro';
+import Statement from '../../../blocks/Statement.astro';
+import Accordion from '../../../blocks/Accordion.astro';
+import CtaBand from '../../../blocks/CtaBand.astro';
+import { navSections } from '../../../data/navigation';
+import { pickFigures } from '../../../data/key-figures';
+import { projects, projectCard } from '../../../data/projects';
+import { assets } from '../../../data/assets';
+import { reachRemoteChapters, reachRemoteDims, reachRemoteSpecGroups } from '../../../data/reach-remote';
+import type { CardField } from '../../../lib/types';
+import { faqsFor, faqHubHref } from '../../../data/faqs';
+
+const base = import.meta.env.BASE_URL;
+const section = navSections.find((s) => s.id === 'assets')!;
+const page = section.links.find((l) => l.href === '/assets/reach-remote/')!;
+const subnavItems = [
+  { label: 'Overview', href: section.href },
+  ...section.links.map((l) => ({ label: l.label, href: l.href })),
+];
+const [relay] = pickFigures(['relay-speed']);
+const rr12 = assets.find((a) => a.slug === 'reach-remote-1-2')!;
+
+// More than a vessel (client PDF p11 / screens p24, its wording, shortened to two lines a node). Pictograms (Ross,
+// 10 Oct 2026): the vessel its own glyph, the ROC the library's "profile laptop" (new here), Reach Horizon the
+// "settings-screen" it has on Technology & Innovation (same meaning). Reach Relay is the link, named on the connector.
+const chain = [
+  {
+    pictogram: 'reach-remote',
+    title: 'The vessel',
+    text: 'Reach Remote 1 and 2, purpose-built uncrewed surface vessels carrying the same ROV and survey spreads as our crewed fleet.',
+  },
+  {
+    pictogram: 'profile-laptop',
+    title: 'The ROC',
+    text: 'Our remote operations centres in Haugesund and Perth: the master, navigator, ROV pilots and surveyors, around the clock.',
+  },
+  {
+    pictogram: 'settings-screen',
+    title: 'Reach Horizon',
+    text: 'The software platform connecting it all, built to run uncrewed missions and now supporting our crewed fleet too.',
+  },
+];
+
+// Four levels of oversight (brochure p10's four names; the client PDF screens p24's one line each)
+const oversight = [
+  { title: 'Monitor and observe', text: 'The vessel runs its mission autonomously while the ROC watches.' },
+  { title: 'Control and support', text: 'The ROC adjusts mission parameters and supports the onboard systems.' },
+  { title: 'Operate and overrule', text: 'The ROC actively operates the vessel and can overrule automated decisions.' },
+  { title: 'Direct control', text: 'Full manual command from shore, as if piloting from the bridge.' },
+];
+
+// Built with partners (brochure p3–4 and p9; the client PDF names the first two). Names only, no logos.
+const partners: CardField[] = [
+  { title: 'Kongsberg Maritime', description: 'Vessel design, launch and recovery, hull sensors' },
+  { title: 'Massterly', description: 'Remote and autonomous vessel control' },
+  { title: 'Kystdesign', description: 'The ZEEROV and its E-TMS' },
+  { title: 'DNV', description: 'AROS notation and ROC certification' },
+];
+
+// Where it has worked: Feed grid Projects, vessels = Reach Remote 1 or 2, newest first (5 projects; the newest 3)
+const projectItems = projects
+  .filter((p) => p.vessels?.some((v) => v.startsWith('Reach Remote')))
+  .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
+  .slice(0, 3)
+  .map((p) => projectCard(p, 'white'));
+
+const faqItems = faqsFor('reach-remote');
+---
+
+<BaseLayout title="Reach Remote · Reach Subsea" motion>
+  <Header current="assets" overlay />
+  <main id="main" class="reach-remote-page">
+    <ModelStage
+      eyebrow="Uncrewed surface vessel"
+      title="Reach Remote"
+      lead="A 24-metre vessel with nobody on board, flying a work-class ROV from a control room on shore."
+      breadcrumb={[{ label: 'Home', href: base }, { label: 'Assets', href: section.href }, { label: page.label }]}
+      chapters={reachRemoteChapters}
+      dims={reachRemoteDims}
+      skipTo="more-than-a-vessel"
+    />
+
+    <SectionSubnav source="section-pages" label="Assets" items={subnavItems} current={page.href} />
+
+    <SystemChain
+      anchor="more-than-a-vessel"
+      background="navy"
+      sectionHeader={{
+        eyebrow: 'More than a vessel',
+        title: 'The vessel, the ROC and Reach Horizon, working as one',
+        intro: 'Together they are a different way of delivering subsea services, not just a different type of vessel.',
+      }}
+      nodes={chain}
+      link={{ label: 'Reach Relay', text: `Data link, up to ${relay.value} faster` }}
+    />
+
+    <SpecGroups
+      anchor="specifications"
+      background="white"
+      sectionHeader={{
+        eyebrow: 'Specifications',
+        title: 'The vessel in numbers',
+        action: rr12.specSheet,
+      }}
+      groups={reachRemoteSpecGroups}
+    />
+
+    <StatsBand
+      anchor="track-record"
+      style="feature"
+      featureKey="uncrewed-days"
+      background="tint"
+      animate
+      stats={pickFigures(['uncrewed-days', 'fuel-saving', 'rr-around-the-clock', 'rr-sailing-permits'])}
+    />
+
+    <SplitMedia
+      anchor="oversight"
+      background="white"
+      media="image"
+      position="end"
+      eyebrow="Operated from shore"
+      title="Four levels of oversight, one remote operations centre"
+      body={`<p>Every mission runs through the ROC, over redundant links to the vessel. At every level a person stays in the loop: collaborative systems that combine human reasoning with intelligent automation.</p>`}
+      items={oversight}
+      image={{ src: `${base}images/reach-remote-roc.jpg`, alt: 'An operator at a remote operations centre, wall screens showing the sea ahead, the vessel’s systems and its radar', focalPoint: { x: 0.55, y: 0.5 } }}
+    />
+
+    <CardGrid
+      anchor="partners"
+      background="white"
+      layout="strip"
+      eyebrow="Built with partners"
+      cards={partners}
+    />
+
+    <FeedGrid
+      anchor="projects"
+      source="projects"
+      columns={3}
+      background="tint"
+      sectionHeader={{
+        title: 'Where Reach Remote has worked',
+        action: { label: 'All projects', url: '/projects/' },
+      }}
+      items={projectItems}
+      showLoadMore={false}
+    />
+
+    <Statement
+      anchor="in-their-words"
+      style="quote"
+      background="white"
+      quote="This is a small step for survey, but one giant leap for marine operations."
+      name="A Reach Remote client"
+      role="Quoted in our Q2 2026 report"
+    />
+
+    <SplitMedia
+      anchor="whats-next"
+      background="tint"
+      media="image"
+      position="end"
+      eyebrow="What's next"
+      title="Reach Remote 3 and 4, and a company of its own"
+      body={`<p>Two more vessels are being built at Kongsberg Maritime, with support from the EU Innovation Fund, for delivery in the second half of 2027.</p><p>As our Q2 2026 report sets out, work continues to make Reach Remote a standalone company, combining its operations, ROV services and the Reach Horizon platform, with Reach Horizon also developed as software in its own right.</p>`}
+      actions={[
+        { label: 'Build and funding update', url: '/assets/reach-remote/3-4/', action: 'page' },
+        { label: 'Why invest', url: '/investors/why-invest/', action: 'page' },
+      ]}
+      image={{ src: `${base}images/usv-reach-remote-3-4.jpg`, alt: 'Reach Remote seen from directly above at sea', focalPoint: { x: 0.5, y: 0.5 } }}
+    />
+
+    <Accordion
+      sectionHeader={{
+        title: 'Frequently asked questions',
+        intro: 'Answers about how Reach Remote works.',
+        action: { label: 'See all FAQs', url: faqHubHref('reach-remote') },
+      }}
+      layout="split"
+      source="faq"
+      topic="reach-remote"
+      background="white"
+      items={faqItems}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="white"
+      title="Would you like to know more?"
+      text="Reach out to us today."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

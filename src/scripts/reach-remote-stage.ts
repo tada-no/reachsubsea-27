@@ -1112,10 +1112,11 @@ export function mountStage(stage: HTMLElement) {
         snapLine();
       });
     });
-    tourRoot.querySelector<HTMLElement>('[data-tour-skip]')?.addEventListener('click', (e) => {
+    const skip = tourRoot.querySelector<HTMLAnchorElement>('[data-tour-skip]');
+    skip?.addEventListener('click', (e) => {
       e.preventDefault();
-      // to the block that slides over the stage, so what follows the tour is at the top of the screen
-      const after = document.getElementById('rr-after');
+      // to the block that slides over the stage (the link's own target), so what follows the tour is at the top of the screen
+      const after = document.getElementById(decodeURIComponent(skip.hash.slice(1)));
       window.scrollTo({ top: (after ? after.getBoundingClientRect().top : tourRoot.getBoundingClientRect().bottom) + window.scrollY, behavior });
     });
     // Spec rows light their marker, and only that (one highlight channel)
@@ -1154,8 +1155,10 @@ export function mountStage(stage: HTMLElement) {
   const slider = document.querySelector<HTMLInputElement>('[data-stage-launch]');
   slider?.addEventListener('input', () => setLaunch(Number(slider.value) / 100));
 
-  // The scene the page's chips start on (the tour opens at sea; the plain render test on the studio)
-  applyScene((document.querySelector('[data-stage-scene][aria-pressed="true"]')?.getAttribute('data-stage-scene') as SceneName | null) ?? 'studio');
+  // The scene the page's chips start on, else the block's own (`data-scene`; the Model stage opens at sea)
+  applyScene(
+    ((document.querySelector('[data-stage-scene][aria-pressed="true"]')?.getAttribute('data-stage-scene') ?? stage.dataset.scene) as SceneName | undefined) ?? 'studio',
+  );
   void loadVessel();
   // Review page only: a handle for checking placement from the browser console
   (window as unknown as { __rr: unknown }).__rr = { THREE, camera, holder, SEA, scene, controls, createHullName, renderer, pbrMats, cur, goal, measureTour, get current() { return current; } };

@@ -24,6 +24,11 @@ export const keyFigures: StatField[] = [
   // Design Reference PDF p15 (Technology & Innovation), from the 2Q 2026 Report: Reach Remote's fuel saving against a crewed vessel, and Reach Relay's speed against the third-party link it replaced (6 Oct 2026)
   { key: 'fuel-saving', value: '90%', label: 'Fuel saving versus a crewed vessel, up to' },
   { key: 'relay-speed', value: '25x', label: 'Faster than the third-party solution it replaces, up to' },
+  // Q2 2026 report p18 (Reach Remote's track record), for the Reach Remote page's stats band (Q167, 10 Oct 2026):
+  // "24/7 operations around the clock" and "sailing permits secured across Norway, the UK and Australia". Labels kept
+  // short: the Feature band never wraps a label, so three long ones beside the lead overflow below 1200
+  { key: 'rr-around-the-clock', value: '24/7', label: 'Operated from shore' },
+  { key: 'rr-sailing-permits', value: '3', label: 'Countries with sailing permits', note: 'Norway, the UK and Australia' },
   // Client PDF p36 (Sustainability stats bar and the Environmental pillar): the Paris-aligned 2030 target (7 Oct 2026)
   { key: 'ghg-target', value: '45%', label: 'GHG emission cut targeted by 2030' },
   // Live /careers/ Trainees block ("Since 2013 … each trainee who successfully completes their final exams

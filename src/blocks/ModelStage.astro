@@ -1,0 +1,579 @@
+---
+// Model stage · reach/model-stage (docs/05 §2.32; Q165, Q167). A page hero that is a live 3D model: the 3D World's
+// Reach Remote at sea, pinned while its chapters scroll past (deck to keel to ROV), one continuous camera pan
+// scrubbed by the scroll. Built on /reach-remote-review/ (build step 1) and lifted here unchanged for the page.
+//
+// Live (JS, no reduced motion): the stage is `position: sticky` the viewport's height (the header over its top, as on
+// the photo heroes) and a runway of chapters scrolls behind it; the scroll position drives the camera, the pinned
+// name line, the fact cards, the dimension lines and the dots (src/scripts/reach-remote-stage.ts, "The tour"). The
+// runway holds the pin one band past the launch, and the block after this one starts one band early (margin-top
+// minus one band, painted over the pin), so the next content slides up over the stage as the launch ends rather
+// than a cut to a blank viewport. "Skip tour" scrolls to `skipTo`, the id of the block that slides over.
+// Not live: the chapters are the content and read as rows under a still stage, text beside spec rows.
+//
+// Fields: hero (eyebrow, title, lead; breadcrumb from the page), model (level), scene (sea · studio), chapters[]
+// (eyebrow, title, text, specs[], points[]), dims[]. Camera keys and anchors are developer presets per model.
+// Three.js is bundled on the page that uses this block only.
+import Breadcrumb, { type BreadcrumbItem } from '../components/Breadcrumb.astro';
+import SpecRow from '../components/SpecRow.astro';
+import type { TourChapter, TourDimension } from '../data/reach-remote';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  breadcrumb?: BreadcrumbItem[];
+  /** h1 when the stage is the page hero; the review page, which has its own h1, passes h2 */
+  titleLevel?: 'h1' | 'h2';
+  chapters: TourChapter[];
+  dims?: TourDimension[];
+  /** The scene the stage opens on (the review page's chips can switch it) */
+  scene?: 'sea' | 'studio';
+  /** Model detail level (public/models/reach-remote-lod0–2.glb) */
+  level?: 0 | 1 | 2;
+  /** The tour's accessible name */
+  label?: string;
+  /** Where "Skip tour" lands: the id of the block after the tour (the one that slides over the stage) */
+  skipTo?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  lead,
+  breadcrumb = [],
+  titleLevel: Title = 'h1',
+  chapters,
+  dims = [],
+  scene = 'sea',
+  level = 1,
+  label = `${title} walk-around`,
+  skipTo = 'rr-after',
+} = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<section class="wp-block-reach-model-stage model-stage" data-tour aria-label={label}>
+  <div class="model-stage__pin" data-tour-pin>
+    <div class="model-stage__stage has-surface-navy" data-stage data-level={level} data-scene={scene} data-base={base}>
+      <canvas class="model-stage__canvas" aria-hidden="true"></canvas>
+      <div class="model-stage__scrim"></div>
+      <div class="model-stage__top-scrim"></div>
+      {breadcrumb.length > 0 && <Breadcrumb items={breadcrumb} class="model-stage__breadcrumb" />}
+      <div class="model-stage__hero container" data-stage-hero>
+        <p class="text-eyebrow">{eyebrow}</p>
+        <Title class="model-stage__title text-h1">{title}</Title>
+        {lead && <p class="model-stage__lead text-lead">{lead}</p>}
+      </div>
+      <div class="model-stage__points" data-tour-points aria-hidden="true">
+        <svg class="model-stage__dims" aria-hidden="true">
+          {dims.map((d) => (
+            <g class="model-stage__dim" data-dim data-dim-id={d.id} data-chapter={d.chapter} data-order={d.order} data-a={d.a.join(',')} data-b={d.b.join(',')}>
+              <line class="model-stage__dim-line" data-dim-line />
+              <line class="model-stage__dim-line" data-dim-tick="a" />
+              <line class="model-stage__dim-line" data-dim-tick="b" />
+            </g>
+          ))}
+        </svg>
+        {dims.map((d) => (
+          <span class="model-stage__dim-label text-label" data-dim-label={d.id}>{d.label}</span>
+        ))}
+        {chapters.map((c, ci) =>
+          c.points.map((p, pi) => (
+            <div
+              class="model-stage__point"
+              data-point
+              data-point-id={p.id}
+              data-chapter={ci + 1}
+              data-anchor={typeof p.anchor === 'string' ? p.anchor : p.anchor.join(',')}
+              data-dx={p.dx}
+              data-dy={p.dy}
+              data-side={p.side ?? 'right'}
+              data-order={pi}
+            >
+              <div class="model-stage__point-body">
+                <span class="model-stage__leader" data-point-leader></span>
+                <span class="model-stage__marker"></span>
+                <span class="model-stage__card" data-point-label>
+                  <span class="model-stage__card-name text-eyebrow">{p.label}</span>
+                  <span class="model-stage__card-line text-small">{p.line}</span>
+                </span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+      <p class="model-stage__status text-small" data-stage-status aria-live="polite">Loading…</p>
+    </div>
+    <div class="model-stage__panel">
+      <nav class="model-stage__nav" aria-label="Tour progress">
+        <ol class="model-stage__ticks">
+          {chapters.map((c) => (
+            <li>
+              <button class="model-stage__tick" type="button" data-tour-tick><span class="visually-hidden">{c.title}</span></button>
+            </li>
+          ))}
+        </ol>
+        <a class="model-stage__skip text-label" href={`#${skipTo}`} data-tour-skip>Skip tour<span class="visually-hidden">, to what follows it</span></a>
+      </nav>
+    </div>
+  </div>
+
+  <ol class="model-stage__runway">
+    <li class="model-stage__chapter model-stage__chapter--hero" data-tour-chapter="hero" style="--runs: 0.25"></li>
+    {chapters.map((c) => (
+      <li class="model-stage__chapter" data-tour-chapter={c.id} data-cam={c.cam?.join(',')} style={`--runs: ${c.runs ?? 1}`} id={`rr-${c.id}`}>
+        <div class="model-stage__chapter-text">
+          <p class="text-eyebrow">{c.eyebrow}</p>
+          <h2 class="text-h3">{c.title}</h2>
+          <p class="text-body">{c.text}</p>
+        </div>
+        <dl class="model-stage__chapter-specs">
+          {c.specs.map((s) => (
+            <SpecRow label={s.label} value={s.value} />
+          ))}
+        </dl>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<script>
+  import '../scripts/reach-remote-stage.ts';
+</script>
+
+<style is:global>
+  /* One band: the viewport (never under 640), the pin's height and the overlap of the block that follows */
+  .model-stage {
+    --rr-band: max(640px, 100vh);
+    --rr-run: clamp(360px, 55vh, 560px);
+    position: relative;
+    /* Its own stacking context, so the pin (z-index 1, over the runway) never paints over the blocks after it */
+    z-index: 0;
+  }
+  @supports (height: 100svh) {
+    .model-stage {
+      --rr-band: max(640px, 100svh);
+    }
+  }
+
+  /* The stage: navy ground with a soft lighter centre, the canvas over it, hero text in the content column */
+  .model-stage__stage {
+    --rr-name-top: var(--wp--preset--spacing--40);
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: var(--wp--preset--color--navy-900);
+    background-image: radial-gradient(ellipse 70% 60% at 58% 55%, var(--wp--preset--color--navy-800), transparent 70%);
+  }
+  /* The stage's own ground only matters for the studio; at sea the scene paints the sky */
+  .model-stage__stage.is-at-sea {
+    background-image: none;
+  }
+  .model-stage__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: pan-y;
+    cursor: grab;
+  }
+  .model-stage__canvas:active {
+    cursor: grabbing;
+  }
+  .model-stage__hero {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: var(--wp--preset--spacing--64);
+    display: grid;
+    gap: var(--wp--preset--spacing--16);
+    pointer-events: none;
+  }
+  /* At sea the text sits on daylight: a navy scrim rises from the stage's foot, like the photo heroes' tint */
+  .model-stage__scrim {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 70%;
+    background-image: linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, transparent 100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .model-stage__stage.is-at-sea .model-stage__scrim {
+    opacity: 0.85;
+    transition: opacity 0.6s var(--wp--custom--motion--ease-in-out);
+  }
+  /* On the tour the cards carry the words, so the picture keeps its daylight to the foot */
+  .model-stage.is-live .model-stage__stage.is-at-sea.is-touring .model-stage__scrim {
+    opacity: 0.35;
+  }
+  .model-stage__title {
+    max-width: 18ch;
+    margin: 0;
+    transform-origin: left top;
+    transform: scale(calc(1 - var(--rr-rise, 0) * 0.3));
+  }
+  /* On the tour the eyebrow and title ride up to the stage's top and stay (scroll-driven: --rr-rise 0 → 1 over
+     the first chapter's first half, --rr-rise-px measured by the script), the title at 70%; the lead fades */
+  .model-stage.is-live .model-stage__hero {
+    transform: translateY(calc(-1 * var(--rr-rise, 0) * var(--rr-rise-px, 0px)));
+  }
+  .model-stage.is-live .model-stage__lead,
+  .model-stage.is-live .model-stage__breadcrumb {
+    opacity: calc(1 - min(1, var(--rr-rise, 0) * 2));
+  }
+  /* Eyebrows on the stage: the stronger sage (icon/accent), text/accent on navy is too pale over the picture */
+  .model-stage__stage .text-eyebrow {
+    color: var(--wp--custom--color--icon--accent);
+  }
+  .model-stage__top-scrim {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 32%;
+    background-image: linear-gradient(to bottom, var(--wp--preset--color--navy-900), transparent);
+    opacity: calc(var(--rr-rise, 0) * 0.7);
+    pointer-events: none;
+  }
+  .model-stage__lead {
+    max-width: 34ch;
+    margin: 0;
+    color: var(--wp--custom--color--text--secondary);
+  }
+  /* The breadcrumb sits at the stage's top under the header, where the photo heroes put it (72 / 96 + 24: fixed
+     values rather than --header-offset, which shrinks on scroll and would nudge the crumbs) */
+  .model-stage__breadcrumb {
+    position: absolute;
+    top: calc(72px + var(--wp--preset--spacing--24));
+    left: var(--wp--style--root--padding-left);
+    right: var(--wp--style--root--padding-right);
+    z-index: 1;
+  }
+  @media (min-width: 1200px) {
+    .model-stage__breadcrumb {
+      top: calc(96px + var(--wp--preset--spacing--24));
+    }
+  }
+  .model-stage__status {
+    position: absolute;
+    right: var(--wp--style--root--padding-right);
+    bottom: var(--wp--preset--spacing--16);
+    margin: 0;
+    min-width: 20ch;
+    text-align: right;
+    color: var(--wp--custom--color--text--secondary);
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+  }
+  /* On the tour the readout only shows while something loads */
+  .model-stage.is-live .model-stage__stage:not(.is-loading) .model-stage__status {
+    visibility: hidden;
+  }
+  @media (max-width: 899px) {
+    .model-stage__stage {
+      --rr-name-top: var(--wp--preset--spacing--24);
+      aspect-ratio: 4 / 5;
+    }
+    .model-stage__hero {
+      bottom: var(--wp--preset--spacing--48);
+    }
+  }
+
+  /* ── The tour ──────────────────────────────────────────────────────────────────────────────── */
+  .model-stage__pin {
+    position: relative;
+  }
+  /* Live (JS, no reduced motion): the pin holds the stage for the runway's length. Every chapter owns one run of
+     scroll, the launch two. */
+  .model-stage.is-live .model-stage__pin {
+    position: sticky;
+    top: 0;
+    /* Above the runway's chapters (positioned, later in the DOM), which would otherwise take the dots' clicks */
+    z-index: 1;
+    height: var(--rr-band);
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    overflow: hidden;
+  }
+  .model-stage.is-live .model-stage__stage {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+  .model-stage__runway {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  /* The runway starts under the pin's top and runs two bands past its last chapter: one so the launch plays out,
+     one while the next block slides over the stage */
+  .model-stage.is-live .model-stage__runway {
+    margin-top: calc(var(--rr-band) * -1);
+    padding-bottom: calc(var(--rr-band) * 2);
+  }
+  .model-stage.is-live .model-stage__chapter {
+    position: relative;
+    min-height: calc(var(--rr-run) * var(--runs, 1));
+    padding: 0;
+    border: 0;
+  }
+  /* While live the runway's copy is the accessible text */
+  .model-stage.is-live .model-stage__chapter > * {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* The block after the tour starts one band early, over the pinned stage (the runway's last band), so as the
+     launch ends it slides up over the picture with the ROV still in it; the pin releases once it is covered. The
+     first element after the tour that isn't a script (block scripts and the subnav's docking sentinel can sit
+     there), so whatever follows moves up together. `:where` keeps it from outranking the next block's own rules. */
+  :where(.model-stage.is-live ~ :not(script):not(.model-stage ~ :not(script) ~ *)) {
+    margin-top: calc(-1 * max(640px, 100vh));
+  }
+  @supports (height: 100svh) {
+    :where(.model-stage.is-live ~ :not(script):not(.model-stage ~ :not(script) ~ *)) {
+      margin-top: calc(-1 * max(640px, 100svh));
+    }
+  }
+
+  /* Progress: one dot per chapter bottom left and "Skip tour" bottom right, nothing else on the stage */
+  .model-stage__panel {
+    display: none;
+  }
+  .model-stage.is-live .model-stage__panel {
+    display: block;
+  }
+  .model-stage__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--16);
+  }
+  .model-stage__ticks {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .model-stage__tick {
+    display: grid;
+    place-items: center;
+    width: var(--wp--preset--spacing--24);
+    height: var(--wp--preset--spacing--24);
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .model-stage__tick::before {
+    content: '';
+    display: block;
+    width: var(--wp--preset--spacing--8);
+    height: var(--wp--preset--spacing--8);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--preset--color--white);
+    opacity: 0.4;
+    transform: scale(0.75);
+    transition:
+      opacity 0.4s var(--wp--custom--motion--ease-out),
+      transform 0.4s var(--wp--custom--motion--ease-out);
+  }
+  .model-stage__tick.is-current::before {
+    opacity: 1;
+    transform: none;
+  }
+  .model-stage__tick:hover::before {
+    opacity: 0.8;
+  }
+  .model-stage__tick:focus-visible {
+    outline: 2px solid var(--wp--custom--color--icon--accent);
+    outline-offset: 2px;
+  }
+  /* The panel has no navy surface class (it is a bare row on the stage), so the skip names its own colour */
+  .model-stage__skip {
+    color: var(--wp--custom--color--text--on-overlay);
+    opacity: 0.72;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: opacity var(--wp--custom--motion--duration-fast) var(--wp--custom--motion--ease-out);
+  }
+  .model-stage__skip:hover,
+  .model-stage__skip:focus-visible {
+    opacity: 1;
+  }
+  @media (min-width: 900px) {
+    /* The hero's stack sits above the dots row */
+    .model-stage.is-live .model-stage__hero {
+      bottom: var(--wp--preset--spacing--96);
+    }
+    .model-stage.is-live .model-stage__panel {
+      position: absolute;
+      left: var(--wp--style--root--padding-left);
+      right: var(--wp--style--root--padding-right);
+      bottom: var(--wp--preset--spacing--40);
+      z-index: 2;
+    }
+  }
+  /* Under 900: the picture takes the band, the dots are a strip under it (the hero's words stay on the picture) */
+  @media (max-width: 899px) {
+    .model-stage.is-live .model-stage__pin {
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+    .model-stage.is-live .model-stage__panel {
+      background-color: var(--wp--preset--color--navy-900);
+      padding: var(--wp--preset--spacing--8) var(--wp--style--root--padding-right) var(--wp--preset--spacing--8) var(--wp--style--root--padding-left);
+    }
+    .model-stage.is-live .model-stage__status {
+      display: none;
+    }
+  }
+
+  /* Dimension lines, as a technical drawing: the figure lands at the midpoint first, then a dotted white line
+     runs out from it to both ends with the scroll (--rr-draw 0 → 1 from the script), the end ticks landing as it
+     gets there; the whole goes out with the cards (--rr-reveal) */
+  .model-stage__dims {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .model-stage__dim {
+    opacity: var(--rr-reveal, 0);
+  }
+  .model-stage__dim-line {
+    stroke: var(--wp--preset--color--white);
+    stroke-width: 1;
+    filter: drop-shadow(0 0 1px var(--wp--custom--color--alpha--navy-64));
+  }
+  /* The run: round dots every 5 px (zero-length dashes with round caps; the script keeps the pitch) */
+  .model-stage__dim-line[data-dim-line] {
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-dasharray: 0 5;
+  }
+  .model-stage__dim-line[data-dim-tick] {
+    opacity: clamp(0, (var(--rr-draw, 0) - 0.9) * 10, 1);
+  }
+  .model-stage__dim-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%);
+    padding: var(--wp--preset--spacing--4) var(--wp--preset--spacing--8);
+    border-radius: var(--wp--custom--radius--sm);
+    background-color: var(--wp--custom--color--alpha--navy-88);
+    color: var(--wp--custom--color--text--on-overlay);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    opacity: calc(var(--rr-reveal, 0) * clamp(0, var(--rr-draw, 0) / 0.3, 1));
+    visibility: hidden;
+  }
+  .model-stage__dim-label.is-on {
+    visibility: visible;
+  }
+  /* Fact cards: the brochure's labels on the model. Marker, leader and card land together */
+  .model-stage__points {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .model-stage__point {
+    position: absolute;
+    left: 0;
+    top: 0;
+    visibility: hidden;
+  }
+  .model-stage__point.is-on {
+    visibility: visible;
+  }
+  /* The card rises and fades in with the scroll (--rr-reveal 0 → 1 from the script), one motion with the camera */
+  .model-stage__point-body {
+    position: relative;
+    width: 26ch;
+    opacity: var(--rr-reveal, 0);
+    transform: translateY(calc((1 - var(--rr-reveal, 0)) * var(--wp--preset--spacing--12)));
+  }
+  .model-stage__marker {
+    position: absolute;
+    left: -4px;
+    top: -4px;
+    width: var(--wp--preset--spacing--8);
+    height: var(--wp--preset--spacing--8);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--preset--color--white);
+    box-shadow: 0 0 0 2px var(--wp--custom--color--alpha--navy-64);
+  }
+  .model-stage__leader {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 1px;
+    background-color: var(--wp--preset--color--white);
+    box-shadow: 0 0 0 1px var(--wp--custom--color--alpha--navy-64);
+    transform-origin: 0 0;
+  }
+  .model-stage__card {
+    position: absolute;
+    left: var(--rr-dx, 28px);
+    top: var(--rr-dy, -22px);
+    transform: translateY(-50%);
+    display: grid;
+    gap: var(--wp--preset--spacing--4);
+    max-width: 26ch;
+    padding: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--custom--color--alpha--navy-88);
+    color: var(--wp--custom--color--text--on-overlay);
+  }
+  .model-stage.is-solid-card .model-stage__card {
+    background-color: var(--wp--preset--color--navy-900);
+  }
+  .model-stage__card.is-left {
+    transform: translate(-100%, -50%);
+  }
+  .model-stage__card.is-below {
+    transform: translate(-50%, 0);
+  }
+  @media (max-width: 599px) {
+    /* Phones: one card per chapter, the first in its list */
+    .model-stage__point:not([data-order='0']) {
+      display: none;
+    }
+  }
+
+  /* Not live: the chapters read as rows under the stage, text beside the spec rows */
+  .model-stage__chapter {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    row-gap: var(--wp--preset--spacing--24);
+    padding: var(--wp--preset--spacing--48) var(--wp--style--root--padding-right) var(--wp--preset--spacing--48) var(--wp--style--root--padding-left);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .model-stage__chapter--hero {
+    display: none;
+  }
+  .model-stage.is-live .model-stage__chapter--hero {
+    display: block;
+  }
+  .model-stage__chapter-text {
+    grid-column: 1 / span 6;
+    display: grid;
+    gap: var(--wp--preset--spacing--12);
+    align-content: start;
+  }
+  .model-stage__chapter-specs {
+    grid-column: 8 / span 5;
+    margin: 0;
+  }
+  @media (max-width: 899px) {
+    .model-stage__chapter-text,
+    .model-stage__chapter-specs {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

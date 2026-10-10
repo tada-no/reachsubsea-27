@@ -58,7 +58,9 @@ const STAT_STAGGER = 160;
 // between (7 Oct 2026, Sustainability then Company). Content-width figures with the spare width in the gaps put
 // the first figure on the left edge, the last on the right and the middle ones floating, so the row had no
 // shared left edge; with two figures half the panel was one gap.
-const rowColumns = rest.map(() => 'minmax(max-content, 1fr)').join(' var(--rule-gap) ');
+// A figure's column never narrows below its label on one line (--row-min, max-content), unless the band is too narrow
+// for that: then the script marks it tight and the labels wrap (10 Oct 2026, Reach Remote and Technology at 800).
+const rowColumns = rest.map(() => 'minmax(var(--row-min, max-content), 1fr)').join(' var(--rule-gap) ');
 ---
 
 {
@@ -210,6 +212,17 @@ const rowColumns = rest.map(() => 'minmax(max-content, 1fr)').join(' var(--rule-
     color: var(--wp--custom--color--text--secondary);
     white-space: nowrap;
   }
+  /* Tight (set by the script only where the figures' one-line labels would run past the panel): the columns may
+     narrow to their longest word and the labels wrap, balanced. A band that fits is untouched. */
+  .stats-band__feature.is-tight .stats-band__rows {
+    --row-min: min-content;
+    /* Labels now wrap to different line counts, so the figures share a top line instead of a baseline */
+    align-items: start;
+  }
+  .stats-band__feature.is-tight .stats-band__row-label {
+    white-space: normal;
+    text-wrap: balance;
+  }
   /* Rows rise in sequence beside the lead; the lead itself pops rather than rises — it's the hero
      figure in its own navy tile, not one more item in the row, so it reads as switching on first
      instead of queuing with the rest (17 Sep 2026). */
@@ -324,3 +337,25 @@ const rowColumns = rest.map(() => 'minmax(max-content, 1fr)').join(' var(--rule-
     }
   }
 </style>
+
+<script>
+  // Feature bands: wrap the row labels only where they don't fit on one line (measured untight, on every resize)
+  const features = [...document.querySelectorAll<HTMLElement>('.stats-band__feature')];
+  const fit = (f: HTMLElement) => {
+    f.classList.remove('is-tight');
+    f.classList.toggle('is-tight', f.scrollWidth > f.clientWidth + 1);
+  };
+  features.forEach(fit);
+  if ('ResizeObserver' in window) {
+    const last = new WeakMap<Element, number>();
+    const ro = new ResizeObserver((entries) =>
+      entries.forEach((e) => {
+        const w = Math.round(e.contentRect.width);
+        if (last.get(e.target) === w) return;
+        last.set(e.target, w);
+        fit(e.target as HTMLElement);
+      }),
+    );
+    features.forEach((f) => ro.observe(f));
+  }
+</script>
