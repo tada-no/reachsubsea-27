@@ -55,18 +55,17 @@ export interface TourDimension {
   b: [number, number, number];
 }
 
-/** The brochure's main particulars (REA25 2595 170, A5, p11), as two groups under the tour: size, and at sea */
-export const reachRemoteSize: TourSpec[] = [
+/** The vessel in numbers (Ross, 10 Oct 2026: one short spec table, not eight groups): the brochure's key particulars
+ *  (REA25 2595 170, A5, p3, p6, p9, p11). The finer detail rides on the model's fact cards and stays in the brochure. */
+export const reachRemoteKeySpecs: TourSpec[] = [
   { label: 'Length', value: '23.9 m' },
   { label: 'Breadth', value: '8.0 m' },
-  { label: 'Draught', value: '5.5 m max' },
-  { label: 'Gross tonnage', value: '230' },
-];
-export const reachRemoteAtSea: TourSpec[] = [
   { label: 'Max speed', value: '11 knots' },
-  { label: 'Service speed', value: '9 knots' },
-  { label: 'Endurance', value: 'Min. 30 days' },
-  { label: 'DP limits', value: '3.5 m Hs, 20 m/s wind' },
+  { label: 'Endurance', value: 'Min. 30 days at sea' },
+  { label: 'ROV', value: 'ZEEROV, 115 kW electric' },
+  { label: 'ROV depth rating', value: '2,000 m' },
+  { label: 'Hull survey depth', value: 'To 500 m' },
+  { label: 'Autonomy', value: 'IMO degree three, no crew' },
 ];
 
 /** Dimension lines drawn on the model at the deck chapter */
@@ -174,12 +173,4 @@ export const reachRemoteChapters: TourChapter[] = [
       { id: 'rov', label: 'ZEEROV', line: '115 kW electric, rated to 2,000 m', anchor: 'rov', dx: 80, dy: 64 },
     ],
   },
-];
-
-/** The numbers under the tour: size and at sea, then each chapter's three rows (the facts that left the stage).
- *  Eight groups, so the rows fill: four across from 1200, two from 600. */
-export const reachRemoteSpecGroups = [
-  { title: 'Size', specs: reachRemoteSize },
-  { title: 'At sea', specs: reachRemoteAtSea },
-  ...reachRemoteChapters.map((c) => ({ title: c.title, specs: c.specs, fromTour: true })),
 ];

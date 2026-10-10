@@ -7,8 +7,8 @@
 // The hero is the Model stage (§2.32): the 3D World's Reach Remote at sea, pinned for a six-chapter walk-around
 // scrubbed by the scroll, deck to keel to ROV, exactly as approved on /reach-remote-review/ (commit 18476e1). The
 // navy "More than a vessel" chain slides up over the stage as the launch ends, the subnav arriving with it, then:
-// the vessel in numbers (every chapter's rows, since the stage carries only names and one line) · the track record
-// figures · four levels of oversight · partners · projects · a client's words · what's next (3 & 4, the carve-out) ·
+// the vessel in numbers (one short spec table: the key particulars; the detail rides on the fact cards) · the track
+// record figures · four levels of oversight (a short split, then the levels as one numbered row) · partners · projects · a client's words · what's next (3 & 4, the carve-out) ·
 // FAQ · contact. Sources: the brochure (ref/reach remote/REA25 2595 170, p3–11), the Perth ROC brochure, the Q2 2026
 // report p17–25, the client PDF's Reach Remote screens (oversight levels and the three-part model in its wording).
 // Left out of the PDF's plan: the stats strip over the hero (nothing overlaps the hero), the "Technology onboard" cards
@@ -21,7 +21,6 @@ import Footer from '../../../components/Footer.astro';
 import ModelStage from '../../../blocks/ModelStage.astro';
 import SectionSubnav from '../../../blocks/SectionSubnav.astro';
 import SystemChain from '../../../blocks/SystemChain.astro';
-import SpecGroups from '../../../blocks/SpecGroups.astro';
 import StatsBand from '../../../blocks/StatsBand.astro';
 import SplitMedia from '../../../blocks/SplitMedia.astro';
 import CardGrid from '../../../blocks/CardGrid.astro';
@@ -33,7 +32,7 @@ import { navSections } from '../../../data/navigation';
 import { pickFigures } from '../../../data/key-figures';
 import { projects, projectCard } from '../../../data/projects';
 import { assets } from '../../../data/assets';
-import { reachRemoteChapters, reachRemoteDims, reachRemoteSpecGroups } from '../../../data/reach-remote';
+import { reachRemoteChapters, reachRemoteDims, reachRemoteKeySpecs } from '../../../data/reach-remote';
 import type { CardField } from '../../../lib/types';
 import { faqsFor, faqHubHref } from '../../../data/faqs';
 
@@ -68,12 +67,13 @@ const chain = [
   },
 ];
 
-// Four levels of oversight (brochure p10's four names; the client PDF screens p24's one line each)
-const oversight = [
-  { title: 'Monitor and observe', text: 'The vessel runs its mission autonomously while the ROC watches.' },
-  { title: 'Control and support', text: 'The ROC adjusts mission parameters and supports the onboard systems.' },
-  { title: 'Operate and overrule', text: 'The ROC actively operates the vessel and can overrule automated decisions.' },
-  { title: 'Direct control', text: 'Full manual command from shore, as if piloting from the bridge.' },
+// Four levels of oversight (brochure p10's four names; the client PDF screens p24's one line each), as one numbered row
+// under a short split (Ross, 10 Oct 2026: as a list beside the photo the column ran far past it)
+const oversight: CardField[] = [
+  { title: 'Monitor and observe', description: 'The vessel runs its mission autonomously while the ROC watches.' },
+  { title: 'Control and support', description: 'The ROC adjusts mission parameters and supports the onboard systems.' },
+  { title: 'Operate and overrule', description: 'The ROC actively operates the vessel and can overrule automated decisions.' },
+  { title: 'Direct control', description: 'Full manual command from shore, as if piloting from the bridge.' },
 ];
 
 // Built with partners (brochure p3–4 and p9; the client PDF names the first two). Names only, no logos.
@@ -121,15 +121,15 @@ const faqItems = faqsFor('reach-remote');
       link={{ label: 'Reach Relay', text: `Data link, up to ${relay.value} faster` }}
     />
 
-    <SpecGroups
+    <SplitMedia
       anchor="specifications"
       background="white"
-      sectionHeader={{
-        eyebrow: 'Specifications',
-        title: 'The vessel in numbers',
-        action: rr12.specSheet,
-      }}
-      groups={reachRemoteSpecGroups}
+      media="spec-table"
+      eyebrow="Specifications"
+      title="The vessel in numbers"
+      body={`<p>A 24-metre hull built around a work-class ROV and its survey sensors, with nobody on board.</p>`}
+      specs={reachRemoteKeySpecs}
+      specFile={rr12.specSheet}
     />
 
     <StatsBand
@@ -147,10 +147,21 @@ const faqItems = faqsFor('reach-remote');
       media="image"
       position="end"
       eyebrow="Operated from shore"
-      title="Four levels of oversight, one remote operations centre"
-      body={`<p>Every mission runs through the ROC, over redundant links to the vessel. At every level a person stays in the loop: collaborative systems that combine human reasoning with intelligent automation.</p>`}
-      items={oversight}
+      title="Four levels of oversight"
+      body={`<p>Every mission runs through the remote operations centre, over redundant links to the vessel, with a person in the loop at every level.</p>`}
       image={{ src: `${base}images/reach-remote-roc.jpg`, alt: 'An operator at a remote operations centre, wall screens showing the sea ahead, the vessel’s systems and its radar', focalPoint: { x: 0.55, y: 0.5 } }}
+    />
+
+    <CardGrid
+      anchor="oversight-levels"
+      background="white"
+      joined
+      ariaLabel="The four levels of oversight"
+      layout="4-columns"
+      media="none"
+      surface="tint"
+      numbered
+      cards={oversight}
     />
 
     <CardGrid
@@ -222,3 +233,13 @@ const faqItems = faqsFor('reach-remote');
   </main>
   <Footer />
 </BaseLayout>
+
+<style is:global>
+  /* The four levels read as one row: each name takes two lines at every width (a short measure breaks
+     "Monitor and / observe"; "Direct control", which fits on one, keeps the second line's room), so the descriptions
+     start level across the row (one structure per card) */
+  .reach-remote-page #oversight-levels .card__title {
+    max-width: 11ch;
+    min-height: 2lh;
+  }
+</style>
