@@ -11,13 +11,15 @@ interface Props {
   href?: string;
   stacked?: boolean;
   class?: string;
+  /** Any other attribute lands on the row (a data attribute that ties the row to something else on the page) */
+  [key: `data-${string}`]: string | undefined;
 }
 
-const { label, value, href, stacked = false, class: className } = Astro.props;
+const { label, value, href, stacked = false, class: className, ...rest } = Astro.props;
 const hasSlot = Astro.slots.has('default');
 ---
 
-<div class:list={['spec-row', stacked && 'spec-row--stacked', className]}>
+<div class:list={['spec-row', stacked && 'spec-row--stacked', className]} {...rest}>
   <dt class:list={['spec-row__label', stacked ? 'text-label' : 'text-small']}>{label}</dt>
   <dd class:list={['spec-row__value', stacked ? 'text-body' : 'text-small']}>
     {hasSlot ? <slot /> : href ? <a href={href}>{value}</a> : value}

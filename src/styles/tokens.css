@@ -49,6 +49,7 @@
   --wp--custom--color--alpha--navy-12: rgb(27 29 59 / 0.12);
   --wp--custom--color--alpha--navy-16: rgb(27 29 59 / 0.16);
   --wp--custom--color--alpha--navy-64: rgb(27 29 59 / 0.64);
+  --wp--custom--color--alpha--navy-88: rgb(27 29 59 / 0.88); /* cards over a picture (the Reach Remote fact cards, Q167) */
 
   /* ── Spacing presets (px scale, 8px grid) ─────────────────── */
   --wp--preset--spacing--0: 0px;

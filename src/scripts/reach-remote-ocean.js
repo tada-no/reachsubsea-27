@@ -334,21 +334,25 @@ vec3 gerstner(vec2 p, out vec3 nrm){
           if(hd<9.0) col=mix(col,vec3(0.84,0.88,0.90),waterlineFoam(vW.xz,hd,normalize(dl+vec2(1e-4)),vH)*0.62);
         }
       }else{
-        float nf=smoothstep(130.0,30.0,dist);
-        vec3 Nu=normalize(vN+dN*rd*(0.02+0.67*nf));
+        float nf=smoothstep(260.0,40.0,dist);
+        vec3 Nu=normalize(vN+dN*rd*(0.05+0.95*nf));
         float up=clamp(dot(-Nu,V),0.0,1.0);
         float ct=0.661;
-        float win=smoothstep(ct-0.13,ct+0.18,up);
+        float win=smoothstep(ct-0.2,ct+0.22,up);
         float sw=sqrt(max(0.0,1.0-up*up));
         float sa=min(1.0,sw*1.334);
         vec3 hdir=normalize(vec3(-V.x,0.0,-V.z)+vec3(1e-5));
         vec3 air=normalize(hdir*sa+vec3(0.0,sqrt(max(0.0,1.0-sa*sa)),0.0));
         vec3 window=skyColor(air);
-        vec3 mirror=uFogCol*(0.55+0.55*pow(up,2.0));
+        vec3 mirror=uFogCol*(0.42+0.5*pow(up,2.0));
         col=mix(mirror,window*0.90,win);
+        // Light patches drifting over the underside (the world's caustic look), so it reads as moving water, not glass
+        vec2 cw=vW.xz*0.16+vec2(0.31,0.17)*uTime*0.55;
+        float ca=fbm3(cw)*0.6+fbm3(cw*2.3-vec2(0.21,0.43)*uTime*0.7)*0.4;
+        col*=0.78+0.75*smoothstep(0.34,0.72,ca)*nf;
         float sd=max(dot(air,uSun),0.0);
         col+=vec3(0.42,0.66,0.78)*pow(sd,2.5)*0.75*win;
-        col*=1.0+clamp((dN.x+dN.z)*0.9,-0.20,0.28)*nf;
+        col*=1.0+clamp((dN.x+dN.z)*1.6,-0.32,0.42)*nf;
         float glint=pow(max(dot(reflect(-V,Nu),uSun),0.0),36.0);
         col+=vec3(0.90,0.96,1.00)*glint*0.45*win*nf;
         col+=vec3(0.30,0.55,0.62)*pow(up,9.0)*0.22;
@@ -389,12 +393,15 @@ vec3 gerstner(vec2 p, out vec3 nrm){
   oceanRing.onBeforeRender = oceanFollowCam;
 
   // ---- the water column: colours, backdrop dome, lights (reach-world/src/lighting.js) -----------
-  const C_UP_S = new THREE.Color(0x8fdcf2);
-  const C_UP_D = new THREE.Color(0x3d9fc8);
-  const C_MID_S = new THREE.Color(0x2f9cc2);
-  const C_MID_D = new THREE.Color(0x155f88);
-  const C_DN_S = new THREE.Color(0x12455f);
-  const C_DN_D = new THREE.Color(0x082a40);
+  // The world's water column, pulled towards the brand navy (navy-900 #1b1d3b) the deeper it goes, so the stage's
+  // blues are the site's (Ross, 10 Oct 2026); the surface light keeps its daylight cyan
+  const NAVY = new THREE.Color(0x1b1d3b);
+  const C_UP_S = new THREE.Color(0x8fdcf2).lerp(NAVY, 0.1);
+  const C_UP_D = new THREE.Color(0x3d9fc8).lerp(NAVY, 0.25);
+  const C_MID_S = new THREE.Color(0x2f9cc2).lerp(NAVY, 0.32);
+  const C_MID_D = new THREE.Color(0x155f88).lerp(NAVY, 0.42);
+  const C_DN_S = new THREE.Color(0x12455f).lerp(NAVY, 0.45);
+  const C_DN_D = new THREE.Color(0x082a40).lerp(NAVY, 0.5);
   const C_GND_S = new THREE.Color(0xb9c8c2);
   const C_GND_D = new THREE.Color(0x5f7a7c);
   const colUp = new THREE.Color();

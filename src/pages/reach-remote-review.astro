@@ -3,12 +3,160 @@
 // site's navy, next to the brochure's studio renders? If it does, the Reach Remote page opens on this stage and
 // pins it for a scroll-driven walk-around of the vessel's features. Model: public/models/reach-remote-lod0–2.glb
 // (reach-world/glb, Draco). Viewer: src/scripts/reach-remote-stage.ts. Brochure renders: public/review/.
+//
+// The tour (9 Oct 2026, Q167): the stage is pinned and six chapters scroll past behind it, deck to keel to ROV.
+// Each chapter carries its camera key (`cam`: distance, elevation, azimuth in the launch's convention where
+// 0 = starboard beam and +π/2 = ahead of the bow, the target on the hull in the holder's frame with the waterline
+// at y = 0 and the bow at +X, and the composition shift), its text and spec rows, and its points: the brochure
+// p7's labels, each anchored to a place on the model. The last chapter is the launch scrubber, driven by the
+// same scroll. Without JS or with reduced motion the chapters read as a plain list under the stage (`?static=1`
+// shows that fallback for review).
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/header/Header.astro';
 import Footer from '../components/Footer.astro';
 import FilterChip from '../components/FilterChip.astro';
+import SpecRow from '../components/SpecRow.astro';
 
 const base = import.meta.env.BASE_URL;
+
+interface Point {
+  id: string;
+  /** The card's eyebrow (the feature) and its one short line (the fact) */
+  label: string;
+  line: string;
+  /** Holder frame (x along the hull, bow +X; y above the waterline; z to starboard), or `tms` / `rov` for the launch's moving parts */
+  anchor: [number, number, number] | 'tms' | 'rov';
+  /** Label offset from the marker, px */
+  dx?: number;
+  dy?: number;
+  /** The side the card prefers (it still moves when that side runs off the stage) */
+  side?: 'left' | 'right';
+}
+interface Chapter {
+  id: string;
+  eyebrow: string;
+  title: string;
+  text: string;
+  /** dist, elev, az, tx, ty, tz, shift. The launch chapter has none: the launch's own camera takes over */
+  cam?: [number, number, number, number, number, number, number];
+  runs?: number;
+  specs: { label: string; value: string; point?: string }[];
+  points: Point[];
+}
+
+/** The brochure's main particulars (REA25 2595 170, A5): the size group under the tour */
+const particulars = [
+  { label: 'Length', value: '23.9 m' },
+  { label: 'Breadth', value: '8.0 m' },
+  { label: 'Max speed', value: '11 knots' },
+  { label: 'Endurance', value: 'Min. 30 days' },
+];
+/** Dimension lines drawn on the model at the deck chapter (holder frame endpoints, the label at the midpoint) */
+const dims = [
+  { id: 'length', chapter: 1, order: 0, label: '23.9 m', a: [-11.95, 0.3, -5.8], b: [11.95, 0.3, -5.8] },
+  { id: 'breadth', chapter: 1, order: 1, label: '8.0 m', a: [7.5, 2.6, -4.3], b: [7.5, 2.6, 4.3] },
+];
+
+// Measured on the model (9 Oct 2026, holder frame): hull x −13.4 (stern) … +13.4 (bow); deckhouse roof 4.4 m above the
+// waterline from x −5 to +6; foredeck and aft deck 2.0 m; the forward lattice mast with the radar at x ≈ 7.3 (9–10.3 m up);
+// the satellite dome at x ≈ −5.5 (10.6 m up); the A-frame over the stern at x ≈ −6.5 (8.7 m up). Under the hull, from
+// reach-remote-propulsion.js: thrusters at x +9.1 and −8.5 with hubs 0.85 m under the keel (keel −2.1); the gondola from
+// x −4.35 to +4.15 with its pods 2.95 m under the keel and the profiler bar across its front at y −4.6.
+const chapters: Chapter[] = [
+  {
+    id: 'deck',
+    eyebrow: 'Deck, drone and tools',
+    title: 'Drone and tools on deck',
+    text: 'A drone on the foredeck, tool garages for the ROV’s skids, and a launch system rated for three-metre seas.',
+    cam: [45, 0.55, 2.45, 3, 3, 0, 0.1],
+    specs: [
+      { label: 'Drone', value: 'Foredeck capacity', point: 'drone' },
+      { label: 'Tool garages', value: 'Two, for mission skids' },
+      { label: 'Launch system', value: '8.6 t lift, seas to 3 m' },
+    ],
+    points: [{ id: 'drone', label: 'Drone deck', line: 'Foredeck capacity for a drone', anchor: [9.5, 3.0, 0], dx: 28, dy: -32, side: 'left' }],
+  },
+  {
+    id: 'connected',
+    eyebrow: 'Communications and awareness',
+    title: 'Always connected',
+    text: 'Redundant carriers keep the vessel in touch, and radar, cameras and AIS give shore the bridge’s view.',
+    cam: [40, 0.22, 2.97, 2, 7, 0, 0.08],
+    specs: [
+      { label: 'Carriers', value: 'VSAT, Starlink ×2, Iridium, MBR, 5G, Pointlink', point: 'dome' },
+      { label: 'Awareness', value: 'Radar, PTZ camera, AIS', point: 'radar' },
+      { label: 'Positioning', value: 'Dual Seapath 380, DPS i4' },
+    ],
+    points: [
+      { id: 'dome', label: 'Satellite dome', line: 'VSAT, Starlink, Iridium, 5G', anchor: [-5.5, 10.6, 0], dx: 28, dy: -24 },
+      { id: 'radar', label: 'Radar and antennas', line: 'Radar, PTZ camera, AIS', anchor: [7.3, 10.3, 0], dx: 28, dy: -24 },
+    ],
+  },
+  {
+    id: 'onboard',
+    eyebrow: 'Run from shore',
+    title: 'Nobody on board',
+    text: 'The master, navigator, ROV pilots and surveyors work from remote operations centres in Haugesund and Perth.',
+    cam: [52, 0.25, 3.58, 0, 3, 0, 0.14],
+    specs: [
+      { label: 'Run from', value: 'Control rooms in Haugesund and Perth', point: 'shore' },
+      { label: 'Autonomy', value: 'IMO degree three' },
+      { label: 'Class', value: 'AROS notation, a world first' },
+    ],
+    points: [
+      { id: 'shore', label: 'Run from shore', line: 'Control rooms in Haugesund and Perth', anchor: [0, 4.6, -3.6], dx: 28, dy: -30 },
+      { id: 'lars-1', label: 'Launch and recovery', line: '8.6 t lift, seas to 3 m', anchor: [-6.5, 8.5, 0], dx: 28, dy: -20 },
+    ],
+  },
+  {
+    id: 'power',
+    eyebrow: 'Power and propulsion',
+    title: 'Hybrid power',
+    text: 'Batteries and variable-speed gensets drive two azimuth thrusters, on up to 90% less fuel than a crewed vessel.',
+    cam: [50, -0.32, 3.87, 0, -2, 0, 0.14],
+    specs: [
+      { label: 'Batteries', value: '2 × 369 kWh' },
+      { label: 'Gensets', value: '2 × 441 kW' },
+      { label: 'Thrusters', value: '2 × 350 kW azimuth', point: 'thruster-fwd' },
+    ],
+    points: [
+      { id: 'thruster-fwd', label: 'Azimuth thruster', line: '2 × 350 kW', anchor: [9.1, -2.95, 0], dx: 28, dy: 24 },
+      { id: 'thruster-aft', label: 'Hybrid plant', line: '2 × 369 kWh, 2 × 441 kW', anchor: [-3, -1.6, -3.9], dx: 28, dy: -40 },
+    ],
+  },
+  {
+    id: 'sensors',
+    eyebrow: 'Survey sensors under the hull',
+    title: 'Sensors in the keel',
+    text: 'Multibeam and sub-bottom sensors in the gondola map the seabed to 500 m with no ROV in the water.',
+    cam: [27, -0.8, 4.4, 0, -3.5, 0, 0.1],
+    specs: [
+      { label: 'Multibeam', value: 'Dual EM2040', point: 'mbes' },
+      { label: 'Sub-bottom', value: 'Topas PS120', point: 'sbp' },
+      { label: 'Positioning', value: 'HiPAP 502' },
+    ],
+    points: [
+      { id: 'mbes', label: 'Multibeam', line: 'Dual EM2040', anchor: [-0.1, -4.95, -2.45], dx: 28, dy: 24 },
+      { id: 'sbp', label: 'Sub-bottom profiler', line: 'Topas PS120', anchor: [3.6, -4.6, 0], dx: 28, dy: -24 },
+    ],
+  },
+  {
+    id: 'launch',
+    eyebrow: 'Through the moonpool',
+    title: 'The ROV goes to work',
+    text: 'The TMS and ZEEROV lower out through the hull, then the electric work-class ROV flies off on its tether.',
+    runs: 2,
+    specs: [
+      { label: 'ROV', value: 'ZEEROV, 115 kW electric', point: 'rov' },
+      { label: 'Depth rating', value: '2,000 m' },
+      { label: 'Tether', value: '330 m from the E-TMS', point: 'tms' },
+    ],
+    points: [
+      { id: 'tms', label: 'E-TMS', line: '330 m tether', anchor: 'tms', dx: 72, dy: -56 },
+      { id: 'rov', label: 'ZEEROV', line: '115 kW electric, rated to 2,000 m', anchor: 'rov', dx: 80, dy: 64 },
+    ],
+  },
+];
 
 const views = [
   { value: 'cover', label: 'Cover (port bow)' },
@@ -37,31 +185,143 @@ const brochure = [
   <Header />
   <main id="main" class="rr-review">
     <div class="rr-review__intro container">
-      <h1 class="text-h3">Reach Remote: model render test</h1>
+      <h1 class="text-h3">Reach Remote: the walk-around</h1>
       <p class="text-body">
-        The 3D World's Reach Remote model, two ways: the studio navy of the brochure, and at sea in the 3D World itself, its sky, swell, waterline
-        foam, water column and light, ported from the world's own code. Drag to orbit; at sea the hull rides the swell. It carries its name and the
-        moonpool housing, and the launch scrubber stands in for scroll: the TMS and ZeeROV are lowered out of the housing, the camera dips under the surface and follows them
-        down, and the ROV flies out on its tether. Compare with the brochure renders below.
+        The 3D World's Reach Remote at sea, pinned while six chapters scroll past: the deck, the mast, the foredeck, then under the water
+        to the thrusters and the survey gondola, and finally the ZeeROV launch. Scroll to walk round it; the brochure's labels appear on the
+        model as each chapter arrives, and hovering a spec row lights its marker. The controls below the tour switch the scene, the sea
+        state and the camera feel (follows the scroll, or snaps to each chapter).
       </p>
     </div>
 
-    <section class="rr-stage has-surface-navy" data-stage data-level="1" data-base={base} aria-label="Reach Remote 3D model">
-      <canvas class="rr-stage__canvas"></canvas>
-      <div class="rr-stage__scrim"></div>
-      <div class="rr-stage__hero container" data-stage-hero>
-        <p class="text-eyebrow color-accent">Uncrewed surface vessel</p>
-        <h2 class="text-h1">Reach Remote</h2>
-        <p class="text-lead">A 24-metre vessel with nobody on board, flying a work-class ROV from a control room on shore.</p>
+    <section class="rr-tour" data-tour aria-label="Reach Remote walk-around">
+      <div class="rr-tour__pin" data-tour-pin>
+        <div class="rr-stage has-surface-navy" data-stage data-level="1" data-base={base}>
+          <canvas class="rr-stage__canvas" aria-hidden="true"></canvas>
+          <div class="rr-stage__scrim"></div>
+          <div class="rr-stage__top-scrim"></div>
+          <div class="rr-stage__hero container" data-stage-hero>
+            <p class="text-eyebrow color-accent">Uncrewed surface vessel</p>
+            <h2 class="text-h1">Reach Remote</h2>
+            <p class="text-lead">A 24-metre vessel with nobody on board, flying a work-class ROV from a control room on shore.</p>
+          </div>
+          <div class="rr-points" data-tour-points aria-hidden="true">
+            <svg class="rr-dims" aria-hidden="true">
+              {dims.map((d) => (
+                <g class="rr-dim" data-dim data-dim-id={d.id} data-chapter={d.chapter} data-order={d.order} data-a={d.a.join(',')} data-b={d.b.join(',')}>
+                  <line class="rr-dim__line" data-dim-line />
+                  <line class="rr-dim__line" data-dim-tick="a" />
+                  <line class="rr-dim__line" data-dim-tick="b" />
+                </g>
+              ))}
+            </svg>
+            {dims.map((d) => (
+              <span class="rr-dim__label text-label" data-dim-label={d.id}>{d.label}</span>
+            ))}
+            {chapters.map((c, ci) =>
+              c.points.map((p, pi) => (
+                <div
+                  class="rr-point"
+                  data-point
+                  data-point-id={p.id}
+                  data-chapter={ci + 1}
+                  data-anchor={typeof p.anchor === 'string' ? p.anchor : p.anchor.join(',')}
+                  data-dx={p.dx}
+                  data-dy={p.dy}
+                  data-side={p.side ?? 'right'}
+                  data-order={pi}
+                >
+                  <div class="rr-point__body">
+                    <span class="rr-point__leader" data-point-leader></span>
+                    <span class="rr-point__marker"></span>
+                    <span class="rr-point__label" data-point-label>
+                      <span class="rr-point__name text-eyebrow color-accent">{p.label}</span>
+                      <span class="rr-point__line text-small">{p.line}</span>
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <p class="rr-stage__status text-small" data-stage-status aria-live="polite">Loading…</p>
+        </div>
+        <div class="rr-tour__panel">
+          <nav class="rr-tour__nav" aria-label="Tour progress">
+            <ol class="rr-tour__ticks">
+              {chapters.map((c) => (
+                <li>
+                  <button class="rr-tour__tick" type="button" data-tour-tick><span class="visually-hidden">{c.title}</span></button>
+                </li>
+              ))}
+            </ol>
+            <a class="rr-tour__skip text-label" href="#rr-after" data-tour-skip>Skip tour</a>
+          </nav>
+        </div>
       </div>
-      <p class="rr-stage__status text-small" data-stage-status aria-live="polite">Loading…</p>
+
+      <ol class="rr-tour__runway">
+        <li class="rr-tour__chapter rr-tour__chapter--hero" data-tour-chapter="hero" style="--runs: 0.25"></li>
+        {chapters.map((c) => (
+          <li class="rr-tour__chapter" data-tour-chapter={c.id} data-cam={c.cam?.join(',')} style={`--runs: ${c.runs ?? 1}`} id={`rr-${c.id}`}>
+            <div class="rr-tour__chapter-text">
+              <p class="text-eyebrow">{c.eyebrow}</p>
+              <h2 class="text-h3">{c.title}</h2>
+              <p class="text-body">{c.text}</p>
+            </div>
+            <dl class="rr-tour__chapter-specs">
+              {c.specs.map((s) => (
+                <SpecRow label={s.label} value={s.value} />
+              ))}
+            </dl>
+          </li>
+        ))}
+      </ol>
+    </section>
+    <section id="rr-after" class="rr-numbers has-surface-navy" aria-labelledby="rr-numbers-title">
+      <div class="rr-numbers__inner container">
+      <h2 id="rr-numbers-title" class="text-h3">The vessel in numbers</h2>
+      <div class="rr-numbers__groups">
+        <div class="rr-numbers__group">
+          <h3 class="text-h5">The vessel</h3>
+          <dl class="rr-numbers__rows">
+            {particulars.map((sp) => (
+              <SpecRow label={sp.label} value={sp.value} />
+            ))}
+          </dl>
+        </div>
+        {chapters.map((c) => (
+          <div class="rr-numbers__group">
+            <h3 class="text-h5">{c.title}</h3>
+            <dl class="rr-numbers__rows">
+              {c.specs.map((sp) => (
+                <SpecRow label={sp.label} value={sp.value} />
+              ))}
+            </dl>
+          </div>
+        ))}
+      </div>
+      </div>
     </section>
 
     <div class="rr-review__controls container">
       <div class="rr-review__group">
+        <p class="text-eyebrow">Camera feel</p>
+        <div class="rr-review__chips">
+          <FilterChip label="Follows the scroll" selected data-stage-feel="follow" />
+          <FilterChip label="Snaps per chapter" data-stage-feel="snap" />
+        </div>
+      </div>
+      <div class="rr-review__group">
+        <p class="text-eyebrow">Fact cards</p>
+        <div class="rr-review__chips">
+          <FilterChip label="Navy at 88%" selected data-stage-card="overlay" />
+          <FilterChip label="Solid navy" data-stage-card="solid" />
+        </div>
+      </div>
+      <div class="rr-review__group">
         <p class="text-eyebrow">Scene</p>
         <div class="rr-review__chips">
-          {scenes.map((v) => <FilterChip label={v.label} selected={v.value === 'studio'} data-stage-scene={v.value} />)}
+          {scenes.map((v) => <FilterChip label={v.label} selected={v.value === 'sea'} data-stage-scene={v.value} />)}
         </div>
       </div>
       <div class="rr-review__group">
@@ -77,12 +337,8 @@ const brochure = [
           <FilterChip label="Sky only (the world)" data-stage-mirror="off" />
         </div>
       </div>
-      <div class="rr-review__group rr-review__group--wide">
-        <label class="text-eyebrow" for="rr-launch">ZeeROV launch (scroll stand-in) · <span class="rr-review__chapter" data-stage-chapter>Ready</span></label>
-        <input class="rr-review__range" id="rr-launch" type="range" min="0" max="100" value="0" step="0.5" data-stage-launch />
-      </div>
       <div class="rr-review__group">
-        <p class="text-eyebrow">View</p>
+        <p class="text-eyebrow">Hero view</p>
         <div class="rr-review__chips">
           {views.map((v) => <FilterChip label={v.label} selected={v.value === 'cover'} data-stage-view={v.value} />)}
         </div>
@@ -95,6 +351,7 @@ const brochure = [
           <FilterChip label="Off" data-stage-spin="off" />
         </div>
       </div>
+      <p class="rr-review__note text-small">Launch chapter: <span class="rr-review__chapter" data-stage-chapter>Ready</span></p>
     </div>
 
     <section class="rr-review__brochure container" aria-label="Brochure renders for comparison">
@@ -168,9 +425,39 @@ const brochure = [
   }
   .rr-stage.is-at-sea .rr-stage__scrim {
     opacity: 0.85;
+    transition: opacity 0.6s var(--wp--custom--motion--ease-in-out);
   }
-  .rr-stage__hero > * {
+  /* On the tour the card carries the words, so the picture keeps its daylight to the foot */
+  .rr-tour.is-live .rr-stage.is-at-sea.is-touring .rr-stage__scrim {
+    opacity: 0.35;
+  }
+  .rr-stage__hero .text-h1 {
     max-width: 18ch;
+    transform-origin: left top;
+    transform: scale(calc(1 - var(--rr-rise, 0) * 0.3));
+  }
+  /* On the tour the eyebrow and title ride up to the stage's top and stay (scroll-driven: --rr-rise 0 → 1 over
+     the first chapter's first half, --rr-rise-px measured by the script), the title at half size; the lead fades */
+  .rr-stage {
+    --rr-name-top: var(--wp--preset--spacing--40);
+  }
+  .rr-tour.is-live .rr-stage__hero {
+    transform: translateY(calc(-1 * var(--rr-rise, 0) * var(--rr-rise-px, 0px)));
+  }
+  .rr-tour.is-live .rr-stage__hero .text-lead {
+    opacity: calc(1 - min(1, var(--rr-rise, 0) * 2));
+  }
+  /* Eyebrows on the stage: the stronger sage (icon/accent), text/accent on navy is too pale over the picture */
+  .rr-stage .text-eyebrow {
+    color: var(--wp--custom--color--icon--accent);
+  }
+  .rr-stage__top-scrim {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 32%;
+    background-image: linear-gradient(to bottom, var(--wp--preset--color--navy-900), transparent);
+    opacity: calc(var(--rr-rise, 0) * 0.7);
+    pointer-events: none;
   }
   .rr-stage__hero .text-lead {
     max-width: 34ch;
@@ -187,12 +474,369 @@ const brochure = [
     font-variant-numeric: tabular-nums;
     pointer-events: none;
   }
+  /* On the tour the readout only shows while something loads; the loaded sizes are review chrome, not page content */
+  .rr-tour.is-live .rr-stage:not(.is-loading) .rr-stage__status {
+    visibility: hidden;
+  }
   @media (max-width: 899px) {
     .rr-stage {
+      --rr-name-top: var(--wp--preset--spacing--24);
       aspect-ratio: 4 / 5;
     }
     .rr-stage__hero {
       bottom: var(--wp--preset--spacing--48);
+    }
+  }
+  /* The stage's own ground only matters for the studio; at sea the scene paints the sky */
+  .rr-stage.is-at-sea {
+    background-image: none;
+  }
+
+  /* ── The tour ──────────────────────────────────────────────────────────────────────────────── */
+  .rr-tour {
+    position: relative;
+  }
+  .rr-tour__pin {
+    position: relative;
+  }
+  /* Live (JS, no reduced motion): the pin holds the stage for the runway's length. The band is the viewport (the
+     header overlays its top, as on the photo heroes); every chapter owns one run of scroll, the launch two. */
+  .rr-tour.is-live,
+  .rr-tour.is-live ~ .rr-numbers {
+    --rr-band: max(640px, 100vh);
+    --rr-run: clamp(360px, 55vh, 560px);
+  }
+  @supports (height: 100svh) {
+    .rr-tour.is-live,
+    .rr-tour.is-live ~ .rr-numbers {
+      --rr-band: max(640px, 100svh);
+    }
+  }
+  .rr-tour.is-live .rr-tour__pin {
+    position: sticky;
+    top: 0;
+    /* Above the runway's chapters (positioned, later in the DOM), which would otherwise take the clicks meant for
+       the dots and the skip */
+    z-index: 1;
+    height: var(--rr-band);
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    overflow: hidden;
+  }
+  .rr-tour.is-live .rr-stage {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+  .rr-tour__runway {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  /* The runway starts under the pin's top and runs one band past its last chapter, so the pin holds (and the
+     launch plays out) until that chapter's run is spent */
+  .rr-tour.is-live .rr-tour__runway {
+    margin-top: calc(var(--rr-band) * -1);
+    padding-bottom: calc(var(--rr-band) * 2);
+  }
+  .rr-tour.is-live .rr-tour__chapter {
+    position: relative;
+    min-height: calc(var(--rr-run) * var(--runs, 1));
+    padding: 0;
+    border: 0;
+  }
+  /* While live the runway's copy is the accessible text; the panel shows it */
+  .rr-tour.is-live .rr-tour__chapter > * {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* The navy fade that hands the launch over to the next block */
+  /* The chapter panel: the hero's column (cols 1–5) over the stage from 900, under the stage on phones */
+  .rr-tour__panel {
+    display: none;
+  }
+  .rr-tour.is-live .rr-tour__panel {
+    display: block;
+  }
+  /* Progress: one dot per chapter and a short skip, bottom left, nothing else on the stage */
+  .rr-tour__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wp--preset--spacing--16);
+  }
+  .rr-tour__ticks {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .rr-tour__tick {
+    display: grid;
+    place-items: center;
+    width: var(--wp--preset--spacing--24);
+    height: var(--wp--preset--spacing--24);
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .rr-tour__tick::before {
+    content: '';
+    display: block;
+    width: var(--wp--preset--spacing--8);
+    height: var(--wp--preset--spacing--8);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--preset--color--white);
+    opacity: 0.4;
+    transform: scale(0.75);
+    transition:
+      opacity 0.4s var(--wp--custom--motion--ease-out),
+      transform 0.4s var(--wp--custom--motion--ease-out);
+  }
+  .rr-tour__tick.is-current::before {
+    opacity: 1;
+    transform: none;
+  }
+  .rr-tour__tick:hover::before {
+    opacity: 0.8;
+  }
+  .rr-tour__tick:focus-visible {
+    outline: 2px solid var(--wp--custom--color--icon--accent);
+    outline-offset: 2px;
+  }
+  /* The panel has no navy surface class any more (it is a bare row on the stage), so the skip names its own colour */
+  .rr-tour__skip {
+    color: var(--wp--custom--color--text--on-overlay);
+    opacity: 0.72;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: opacity var(--wp--custom--motion--duration-fast) var(--wp--custom--motion--ease-out);
+  }
+  .rr-tour__skip:hover,
+  .rr-tour__skip:focus-visible {
+    opacity: 1;
+  }
+  @media (min-width: 900px) {
+    /* The hero's stack sits above the dots row */
+    .rr-tour.is-live .rr-stage__hero {
+      bottom: var(--wp--preset--spacing--96);
+    }
+    .rr-tour.is-live .rr-tour__panel {
+      position: absolute;
+      left: var(--wp--style--root--padding-left);
+      right: var(--wp--style--root--padding-right);
+      bottom: var(--wp--preset--spacing--40);
+      z-index: 2;
+    }
+  }
+  /* Under 900: the picture takes the band, the card is a strip under it (the hero's words stay on the picture) */
+  @media (max-width: 899px) {
+    .rr-tour.is-live .rr-tour__pin {
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+    .rr-tour.is-live .rr-tour__panel {
+      background-color: var(--wp--preset--color--navy-900);
+      padding: var(--wp--preset--spacing--8) var(--wp--style--root--padding-right) var(--wp--preset--spacing--8) var(--wp--style--root--padding-left);
+    }
+    .rr-tour.is-live .rr-stage__status {
+      display: none;
+    }
+  }
+
+  /* Dimension lines, as a technical drawing: the figure lands at the midpoint first, then a dotted white line
+     runs out from it to both ends with the scroll (--rr-draw 0 → 1 from the script, both ends moving), the end
+     ticks landing as it gets there; the whole goes out with the cards (--rr-reveal) */
+  .rr-dims {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .rr-dim {
+    opacity: var(--rr-reveal, 0);
+  }
+  .rr-dim__line {
+    stroke: var(--wp--preset--color--white);
+    stroke-width: 1;
+    filter: drop-shadow(0 0 1px var(--wp--custom--color--alpha--navy-64));
+  }
+  /* The run: round dots every 5 px (zero-length dashes with round caps; the script keeps the pitch) */
+  .rr-dim__line[data-dim-line] {
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-dasharray: 0 5;
+  }
+  .rr-dim__line[data-dim-tick] {
+    opacity: clamp(0, (var(--rr-draw, 0) - 0.9) * 10, 1);
+  }
+  .rr-dim__label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%);
+    padding: var(--wp--preset--spacing--4) var(--wp--preset--spacing--8);
+    border-radius: var(--wp--custom--radius--sm);
+    background-color: var(--wp--custom--color--alpha--navy-88);
+    color: var(--wp--custom--color--text--on-overlay);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    opacity: calc(var(--rr-reveal, 0) * clamp(0, var(--rr-draw, 0) / 0.3, 1));
+    visibility: hidden;
+  }
+  .rr-dim__label.is-on {
+    visibility: visible;
+  }
+  /* Points: the brochure's labels on the model. Marker, leader and label land together (scale, no fade) */
+  .rr-points {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .rr-point {
+    position: absolute;
+    left: 0;
+    top: 0;
+    visibility: hidden;
+  }
+  .rr-point.is-on {
+    visibility: visible;
+  }
+  /* The card rises and fades in with the scroll (--rr-reveal 0 → 1 from the script), one motion with the camera */
+  .rr-point__body {
+    position: relative;
+    width: 26ch;
+    opacity: var(--rr-reveal, 0);
+    transform: translateY(calc((1 - var(--rr-reveal, 0)) * var(--wp--preset--spacing--12)));
+  }
+  .rr-point__marker {
+    position: absolute;
+    left: -4px;
+    top: -4px;
+    width: var(--wp--preset--spacing--8);
+    height: var(--wp--preset--spacing--8);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--preset--color--white);
+    box-shadow: 0 0 0 2px var(--wp--custom--color--alpha--navy-64);
+  }
+  .rr-point__leader {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 1px;
+    background-color: var(--wp--preset--color--white);
+    box-shadow: 0 0 0 1px var(--wp--custom--color--alpha--navy-64);
+    transform-origin: 0 0;
+  }
+  .rr-point__label {
+    position: absolute;
+    left: var(--rr-dx, 28px);
+    top: var(--rr-dy, -22px);
+    transform: translateY(-50%);
+    display: grid;
+    gap: var(--wp--preset--spacing--4);
+    max-width: 26ch;
+    padding: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
+    border-radius: var(--wp--custom--radius--md);
+    background-color: var(--wp--custom--color--alpha--navy-88);
+    color: var(--wp--custom--color--text--on-overlay);
+  }
+  .rr-tour.is-solid-card .rr-point__label {
+    background-color: var(--wp--preset--color--navy-900);
+  }
+  @media (max-width: 599px) {
+    /* Phones: one card per chapter, the first in its list */
+    .rr-point:not([data-order='0']) {
+      display: none;
+    }
+  }
+  .rr-point__label.is-left {
+    transform: translate(-100%, -50%);
+  }
+  .rr-point__label.is-below {
+    transform: translate(-50%, 0);
+  }
+
+  /* The numbers under the tour: one group per chapter, three across from 900, two from 600. Not live, the
+     runway rows carry the same facts beside their sentences, so the block stays out */
+  .rr-tour:not(.is-live) ~ .rr-numbers {
+    display: none;
+  }
+  /* Live, the block slides up over the pinned stage (the runway holds the pin one band longer; the block starts
+     one band early, above the stage), so the tour ends under the next content, not on a blank navy viewport */
+  .rr-numbers {
+    position: relative;
+    z-index: 3;
+  }
+  .rr-tour.is-live ~ .rr-numbers {
+    margin-top: calc(-1 * var(--rr-band));
+  }
+  .rr-numbers__inner {
+    display: grid;
+    gap: var(--wp--preset--spacing--32);
+    padding-block: var(--wp--preset--spacing--64);
+  }
+  .rr-numbers__groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--wp--preset--spacing--40) var(--wp--custom--grid--gutter);
+  }
+  .rr-numbers__group {
+    display: grid;
+    gap: var(--wp--preset--spacing--12);
+    align-content: start;
+  }
+  .rr-numbers__rows {
+    margin: 0;
+  }
+  .rr-numbers__rows .spec-row:first-child {
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  @media (max-width: 899px) {
+    .rr-numbers__groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 599px) {
+    .rr-numbers__groups {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Not live: the chapters read as rows under the stage, text beside the spec rows */
+  .rr-tour__chapter {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wp--custom--grid--gutter);
+    row-gap: var(--wp--preset--spacing--24);
+    padding: var(--wp--preset--spacing--48) var(--wp--style--root--padding-right) var(--wp--preset--spacing--48) var(--wp--style--root--padding-left);
+    border-top: 1px solid var(--wp--custom--color--border--subtle);
+  }
+  .rr-tour__chapter--hero {
+    display: none;
+  }
+  .rr-tour.is-live .rr-tour__chapter--hero {
+    display: block;
+  }
+  .rr-tour__chapter-text {
+    grid-column: 1 / span 6;
+    display: grid;
+    gap: var(--wp--preset--spacing--12);
+    align-content: start;
+  }
+  .rr-tour__chapter-specs {
+    grid-column: 8 / span 5;
+    margin: 0;
+  }
+  @media (max-width: 899px) {
+    .rr-tour__chapter-text,
+    .rr-tour__chapter-specs {
+      grid-column: 1 / -1;
     }
   }
 
@@ -211,25 +855,15 @@ const brochure = [
     flex-wrap: wrap;
     gap: var(--wp--preset--spacing--8);
   }
-  .rr-review__group--wide {
+  .rr-review__note {
     flex-basis: 100%;
-    max-width: 560px;
+    margin: 0;
+    color: var(--wp--custom--color--text--secondary);
   }
   .rr-review__chapter {
     display: inline-block;
     min-width: 7ch;
     color: var(--wp--custom--color--text--accent);
-  }
-  .rr-review__range {
-    width: 100%;
-    height: 48px;
-    margin: 0;
-    accent-color: var(--wp--preset--color--navy-800);
-    cursor: pointer;
-  }
-  /* The stage's own ground only matters for the studio; at sea the scene paints the sky */
-  .rr-stage.is-at-sea {
-    background-image: none;
   }
 
   .rr-review__brochure {
