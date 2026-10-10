@@ -352,6 +352,7 @@ export function createSternName({THREE, hull, text = 'REACH REMOTE 1', port = 'H
   pgeo.setIndex(null); pgeo.dispose();
   const g = new THREE.Group(); g.name = 'sternName:' + text; g.add(m);
   g.userData = {isHullName: true, isSternName: true, text, options: o, mesh: m, capHeight: c, transomTop: top,
+    marks: {top0: mark0, pitch, cap: 0.49 * c},   // v82: the side draft marks (createDraftMarks) line up with these
     dispose(){ geo.dispose(); mat.dispose(); tex.dispose(); }};
   return g;
 }
@@ -481,6 +482,103 @@ export function createBowImo({THREE, hull, text = 'IMO 9972191', ...opts}){
 }
 
 /* ---- helpers --------------------------------------------------------------------------------- */
+
+/* ---- side draft marks (v82) -------------------------------------------------------------------------
+   createDraftMarks({THREE, hull, top0, pitch, cap, ...opts}) -> THREE.Group
+
+   The draft scale painted down each side three times (Ross's photos of Reach Remote 1: near the bow, amidships
+   and close to the stern), 6M 8 6 4 2 5M 8 6 4 2 4M, top to bottom, crossing the boot-top into the red. The
+   marks read off the same keel datum as the transom's (createSternName), so pass its userData.marks: each
+   glyph's cap top is at top0 - i * pitch and it is `cap` tall; that puts 6M..5M level with the transom's and
+   carries on down to 4M (below the waterline, as on the real hull). Stations are fractions of the hull's
+   waterline length from the stem. Each glyph is its own small quad laid on the skin by side rays, so the column
+   follows the hull's curve. One 1024x64 alpha texture shared by every glyph, 1 draw call, ~130 triangles.
+*/
+export function createDraftMarks({THREE, hull, top0, pitch, cap, ...opts}){
+  const o = Object.assign({
+    // v83: midships moved forward with the full-size logo: just forward of SUBSEA's S on port (the photo), aft of its A on starboard
+    stations: [0.094, 0.498, 0.972], marks: ['6M', '8', '6', '4', '2', '5M', '8', '6', '4', '2', '4M'],
+    weight: 700, font: 'Inter, "Helvetica Neue", Helvetica, Arial, sans-serif', color: 0xd0d0d0, standoff: 0.015,
+    renderer: null, anisotropy: 8, bow: 0, hullName: 'reach_remote_lod1_1', frame: null,
+  }, opts);
+  const mesh = hull.isMesh ? hull : (hull.getObjectByName(o.hullName) || largestMesh(hull));
+  let frame = o.frame;
+  if(!frame){ frame = hull; if(hull.isMesh){ while(frame.parent && !frame.parent.isScene) frame = frame.parent; } }
+  frame.updateWorldMatrix(true, true);
+  const T = new THREE.Matrix4().copy(frame.matrixWorld).invert().multiply(mesh.matrixWorld);
+  const S = surfaceFor(THREE, mesh, T);
+  const bowSign = o.bow || S.bowSign, stemX = bowSign < 0 ? S.xmin : S.xmax, sternDir = -bowSign;
+
+  // texture: the distinct labels in a row of cells
+  const labels = [...new Set(o.marks)], cell = 112, cw = 1024, chh = 64;   // wide cells with gutters, so no glyph bleeds into the next at any mip level
+  const cv = document.createElement('canvas'); cv.width = cw; cv.height = chh;
+  const ctx = cv.getContext('2d'), fontAt = px => o.weight + ' ' + px + 'px ' + o.font;
+  ctx.font = fontAt(100);
+  const capRatio = (ctx.measureText('H').actualBoundingBoxAscent || 72) / 100, capPx = 36, px = capPx / capRatio;
+  const draw = () => {
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cw, chh); ctx.fillStyle = '#fff'; ctx.font = fontAt(px);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    labels.forEach((l, i) => ctx.fillText(l, (i + 0.5) * cell, (chh + capPx) / 2));
+  };
+  draw();
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.NoColorSpace; tex.generateMipmaps = true;
+  tex.minFilter = THREE.LinearMipmapLinearFilter; tex.magFilter = THREE.LinearFilter;
+  tex.anisotropy = o.renderer ? o.renderer.capabilities.getMaxAnisotropy() : o.anisotropy;
+  if(document.fonts && document.fonts.check && !document.fonts.check(fontAt(32))){
+    document.fonts.load(fontAt(32)).then(() => { draw(); tex.needsUpdate = true; }).catch(() => {});
+  }
+  const mpp = cap / capPx, qw = cell * mpp, qh = chh * mpp;      // one cell on the hull, metres
+
+  const positions = [], normals = [], uvs = [], index = [];
+  const yLo = top0 - (o.marks.length - 1) * pitch - qh, yHi = top0 + qh;
+  for(const side of [1, -1]){
+    for(const f of o.stations){
+      const xc = stemX + sternDir * f * S.len;
+      const probe = S.makeProbe(xc - 1.5, xc + 1.5, yLo - 0.5, yHi + 0.5, side);
+      const right = side;                                       // seen from outside on this side, screen-right is +x * side
+      o.marks.forEach((lab, i) => {
+        const k = labels.indexOf(lab), yc = top0 - i * pitch - cap / 2;
+        const corners = [];
+        for(const [du, dv] of [[0, 0], [1, 0], [1, 1], [0, 1]]){
+          const x = xc + right * (du - 0.5) * qw, y = yc + (dv - 0.5) * qh, hit = probe(x, y, side);
+          if(!hit) return;
+          corners.push({hit, u: (k + du) / labels.length * (labels.length * cell / cw), v: dv});
+        }
+        const base = positions.length / 3;
+        for(const c of corners){
+          positions.push(c.hit.p.x + c.hit.n.x * o.standoff, c.hit.p.y + c.hit.n.y * o.standoff, c.hit.p.z + c.hit.n.z * o.standoff);
+          normals.push(c.hit.n.x, c.hit.n.y, c.hit.n.z); uvs.push(c.u, c.v);
+        }
+        // wind so the front face points out of the hull
+        const P = j => new THREE.Vector3().fromArray(positions, (base + j) * 3);
+        const fn = new THREE.Vector3().crossVectors(P(1).sub(P(0)), P(2).sub(P(0)));
+        if(fn.z * side >= 0) index.push(base, base + 1, base + 2, base, base + 2, base + 3);
+        else index.push(base, base + 2, base + 1, base, base + 3, base + 2);
+      });
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geo.setIndex(index); geo.computeBoundingSphere();
+  const hm = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+  const mat = new THREE.MeshStandardMaterial({
+    color: o.color, alphaMap: tex, transparent: true, depthWrite: false,
+    roughness: hm.roughness !== undefined ? hm.roughness : 0.78, metalness: hm.metalness !== undefined ? hm.metalness : 0.06,
+    envMapIntensity: hm.envMapIntensity !== undefined ? hm.envMapIntensity : 1,
+    polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4,
+  });
+  mat.name = 'draftMarks';
+  const m = new THREE.Mesh(geo, mat);
+  m.name = 'draftMarks'; m.userData.isHullName = true; m.receiveShadow = true;
+  m.onBeforeRender = () => { if(hm.envMapIntensity !== undefined) mat.envMapIntensity = hm.envMapIntensity; };
+  const g = new THREE.Group(); g.name = 'draftMarks'; g.add(m);
+  g.userData = {isHullName: true, isDraftMarks: true, options: o, mesh: m, quads: index.length / 6,
+    dispose(){ geo.dispose(); mat.dispose(); tex.dispose(); }};
+  return g;
+}
 
 function largestMesh(root){
   let best = null, n = -1;
