@@ -235,6 +235,18 @@ const faqItems = faqsFor('reach-remote');
 </BaseLayout>
 
 <style is:global>
+  /* The vessel in numbers, compressed (Ross, 10 Oct 2026): the labels take their own width (one column for all
+     rows, so the values line up), the values follow a gap later instead of at the half, and the rows are tighter */
+  .reach-remote-page #specifications .split-media__specs {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: var(--wp--preset--spacing--48);
+  }
+  .reach-remote-page #specifications .spec-row {
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    padding-block: var(--wp--preset--spacing--8);
+  }
   /* The four levels read as one row: each name takes two lines at every width (a short measure breaks
      "Monitor and / observe"; "Direct control", which fits on one, keeps the second line's room), so the descriptions
      start level across the row (one structure per card) */

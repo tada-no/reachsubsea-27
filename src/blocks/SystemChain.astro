@@ -120,30 +120,31 @@ const titleId = sectionHeader?.title ? makeId('system-chain', sectionHeader.titl
     background-repeat: repeat-x;
     transform-origin: left center;
   }
-  /* The link's label sits on the connector, halfway between the first two discs */
+  /* The link is named on the connector between the first two discs, no box (Ross, 10 Oct 2026: the pill crowded the
+     first gap and left the second bare): its name just above the dots, its line just below, centred in the gap, so
+     the connector runs unbroken from the first disc to the last. A zero-height box on the line; the parts hang off it */
   .system-chain__link {
     position: absolute;
     z-index: 1;
     top: calc(var(--sc-mark) / 2);
-    left: calc((var(--sc-mark) + var(--sc-col) + var(--sc-gap)) / 2);
-    transform: translate(-50%, -50%);
-    display: grid;
-    justify-items: center;
-    gap: var(--wp--preset--spacing--4);
-    /* Narrow enough that the dots run out on both sides (at least 48 each), so it reads as a label on a line */
-    width: max-content;
-    max-width: min(18ch, calc(var(--sc-col) + var(--sc-gap) - var(--sc-mark) - var(--wp--preset--spacing--96)));
+    left: var(--sc-mark);
+    width: calc(var(--sc-col) + var(--sc-gap) - var(--sc-mark));
+    height: 0;
     margin: 0;
-    padding: var(--wp--preset--spacing--8) var(--wp--preset--spacing--16);
-    border: 1px solid var(--wp--custom--color--border--default);
-    border-radius: var(--wp--custom--radius--md);
-    background-color: var(--wp--custom--color--bg--default);
+  }
+  .system-chain__link-label,
+  .system-chain__link-text {
+    position: absolute;
+    inset-inline: var(--wp--preset--spacing--16);
     text-align: center;
+    text-wrap: balance;
   }
   .system-chain__link-label {
+    bottom: var(--wp--preset--spacing--12);
     color: var(--wp--custom--color--text--accent);
   }
   .system-chain__link-text {
+    top: var(--wp--preset--spacing--12);
     color: var(--wp--custom--color--text--secondary);
     line-height: var(--wp--custom--line-height--tight);
   }
@@ -223,11 +224,15 @@ const titleId = sectionHeader?.title ? makeId('system-chain', sectionHeader.titl
       position: relative;
       top: auto;
       left: auto;
-      transform: none;
-      justify-self: start;
-      justify-items: start;
-      max-width: calc(100% - var(--sc-mark) - var(--wp--preset--spacing--24));
+      display: grid;
+      gap: var(--wp--preset--spacing--4);
+      width: auto;
+      height: auto;
       margin-left: calc(var(--sc-mark) + var(--wp--preset--spacing--24));
+    }
+    .system-chain__link-label,
+    .system-chain__link-text {
+      position: static;
       text-align: start;
     }
     html.js .system-chain__chain:not(.is-drawn) .system-chain__rail {

@@ -145,9 +145,9 @@ const rowColumns = rest.map(() => 'minmax(var(--row-min, max-content), 1fr)').jo
     display: flex;
   }
 
-  /* Feature (17 Sep 2026): navy lead tile + figures in one panel. It wraps rather than breakpoints:
+  /* Feature (17 Sep 2026): navy lead tile + figures in one panel. Below 900 it wraps rather than breakpoints:
      the figures never shrink below their natural width, so the row stacks under the lead only when
-     it genuinely can't fit. Figures are content-width; spare space goes into the gaps, with each
+     it genuinely can't fit (from 900 the labels wrap instead, below). Figures are content-width; spare space goes into the gaps, with each
      rule centred in its gap. */
   .stats-band__feature {
     display: flex;
@@ -222,6 +222,18 @@ const rowColumns = rest.map(() => 'minmax(var(--row-min, max-content), 1fr)').jo
   .stats-band__feature.is-tight .stats-band__row-label {
     white-space: normal;
     text-wrap: balance;
+  }
+  /* From 900 the lead keeps its place beside the figures (Ross, 10 Oct 2026: a full-width navy lead over the row
+     read as a second block): the panel never wraps, and where the one-line labels would not fit, tight wraps them,
+     the lead's label too */
+  @media (min-width: 900px) {
+    .stats-band__feature {
+      flex-wrap: nowrap;
+    }
+    .stats-band__feature.is-tight .stats-band__lead-label {
+      white-space: normal;
+      text-wrap: balance;
+    }
   }
   /* Rows rise in sequence beside the lead; the lead itself pops rather than rises — it's the hero
      figure in its own navy tile, not one more item in the row, so it reads as switching on first
