@@ -129,7 +129,7 @@ const faqItems = faqsFor('reach-remote');
       title="The vessel in numbers"
       body={`<p>A 24-metre hull built around a work-class ROV and its survey sensors, with nobody on board.</p>`}
       specs={reachRemoteKeySpecs}
-      specFile={rr12.specSheet}
+      actions={rr12.specSheet ? [rr12.specSheet] : []}
     />
 
     <StatsBand
