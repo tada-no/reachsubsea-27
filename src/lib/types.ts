@@ -82,6 +82,10 @@ export interface CardField {
   size?: 'default' | 'featured';
   pictogram?: string;
   image?: ImageField;
+  /** Card grid Strip only: a partner's logo in place of the pictogram, shown in one colour (text/primary) through a
+   * mask; the title becomes the tile's hidden heading, `lead` its role (11 Oct 2026, Reach Remote partners).
+   * `width` and `height` are the file's own proportions. */
+  logo?: { src: string; width: number; height: number };
   /** Media `stat`: the figure, e.g. "750+". Pick it from the Key figures options page. */
   statValue?: string;
   eyebrow?: string;

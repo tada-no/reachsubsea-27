@@ -90,6 +90,13 @@ const trioText = media === 'none' && cards.length === 3;
 // 900–1199 left ~190–250px of text (titles to five lines, descriptions to eight), so 768–1199 is one column of
 // side-by-side cards, the image beside the text, as the pictogram-panel trio does.
 const trioImages = media === 'image-top' && layout === '3-columns' && cards.length === 3;
+// Strip logos: sized by area, not by height, so a long wordmark and a compact mark read at the same weight (each
+// about 4800 px², never taller than the 40 mark row). The file is a mask, painted text/primary in the CSS.
+const logoStyle = (logo: NonNullable<CardField['logo']>) => {
+  const ratio = logo.width / logo.height;
+  const height = Math.min(40, Math.sqrt(4800 / ratio));
+  return `--tile-logo: url('${logo.src}'); --tile-logo-w: ${Math.round(height * ratio)}px; --tile-logo-h: ${Math.round(height)}px`;
+};
 
 ---
 
@@ -107,9 +114,20 @@ const trioImages = media === 'image-top' && layout === '3-columns' && cards.leng
     >
       {strip ? (
         <div class="block__body card-grid__strip">
-          {eyebrow && <p class="card-grid__eyebrow text-eyebrow">{eyebrow}</p>}
-          <ul class="card-grid__list card-grid__list--strip">
-            {cards.map((card) => (
+          {sectionHeader ? <SectionHeader {...sectionHeader} id={titleId} /> : eyebrow && <p class="card-grid__eyebrow text-eyebrow">{eyebrow}</p>}
+          <ul class:list={['card-grid__list', 'card-grid__list--strip', cards.some((c) => c.logo) && 'card-grid__list--logos']}>
+            {cards.map((card) => card.logo ? (
+              <li class="card-grid__tile card-grid__tile--logo">
+                <h3 class="visually-hidden">{card.title}</h3>
+                <span class="card-grid__tile-mark">
+                  <span class="card-grid__tile-logo" aria-hidden="true" style={logoStyle(card.logo)} />
+                </span>
+                <span class="card-grid__tile-text">
+                  {card.lead && <span class="card-grid__tile-label">{card.lead}</span>}
+                  {card.description && <span class="card-grid__tile-note text-small">{card.description}</span>}
+                </span>
+              </li>
+            ) : (
               <li class:list={['card-grid__tile', !card.pictogram && 'card-grid__tile--text']}>
                 {card.pictogram && <Pictogram name={card.pictogram} size={64} />}
                 {card.description ? (
@@ -643,6 +661,52 @@ const trioImages = media === 'image-top' && layout === '3-columns' && cards.leng
   }
   .card-grid__tile-note {
     color: var(--wp--custom--color--text--secondary);
+  }
+  /* Logos (11 Oct 2026, Reach Remote partners, Ross: "more love/info"): under a Section header, each tile the
+     partner's logo on a 40 mark row (so the roles start level whatever the logo's shape), then its role and a
+     two-to-three-line note. One colour: the file is a mask painted text/primary, so no partner's brand colour
+     outshouts the page's. */
+  .card-grid__strip:has(> .section-header) {
+    gap: var(--wp--custom--stack--xl);
+  }
+  .card-grid__tile--logo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wp--preset--spacing--24);
+    padding: var(--wp--preset--spacing--32);
+  }
+  .card-grid__tile-mark {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: var(--wp--preset--spacing--40);
+  }
+  .card-grid__tile-logo {
+    display: block;
+    width: var(--tile-logo-w);
+    height: var(--tile-logo-h);
+    max-width: 100%;
+    background-color: var(--wp--custom--color--text--primary);
+    -webkit-mask: var(--tile-logo) left center / contain no-repeat;
+    mask: var(--tile-logo) left center / contain no-repeat;
+  }
+  .card-grid__tile--logo .card-grid__tile-text {
+    gap: var(--wp--preset--spacing--8);
+  }
+  /* Four across from 1320, as Card grid 4 columns: below it a quarter tile left the notes four lines deep */
+  @media (max-width: 1319px) {
+    .card-grid__list--strip.card-grid__list--logos {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 599px) {
+    .card-grid__list--strip.card-grid__list--logos {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .card-grid__list--strip .card-grid__tile--logo {
+      gap: var(--wp--preset--spacing--16);
+      padding: var(--wp--preset--spacing--24);
+    }
   }
   @media (max-width: 1199px) {
     .card-grid__list--strip {

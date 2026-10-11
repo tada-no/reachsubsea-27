@@ -39,8 +39,13 @@ interface Props {
   label?: string;
   /** Where "Skip tour" lands: the id of the block after the tour (the one that slides over the stage) */
   skipTo?: string;
-  /** A still of the hero frame, shown until the live model is in: landscape, and portrait for under 900 */
-  poster?: { landscape: string; portrait?: string };
+  /** Stills of the hero frame, rendered from the stage itself, shown until the live model is in. The stage frames
+   *  the vessel by its own rules (landscape: sized to the stage's height, a fixed share across; portrait: sized to its
+   *  width, lifted), so the stills are positioned by the same rules, not cropped (Ross, 11 Oct 2026: the still and the
+   *  first frame didn't line up). `landscape` is the widest still (the fallback); `steps` are narrower ones, each used
+   *  up to its `maxAspect` (viewport width / height), so the sky behind the vessel hardly shifts at the hand-off;
+   *  `portrait` for portrait screens. Each still must be at least as wide (as a ratio) as the screens it serves. */
+  poster?: { landscape: string; steps?: { maxAspect: string; src: string }[]; portrait?: string };
 }
 
 const {
@@ -58,13 +63,30 @@ const {
   poster,
 } = Astro.props;
 const base = import.meta.env.BASE_URL;
+// The stills, narrowest first: `media` picks the <source> (first match wins), `range` is the same band made exclusive
+// for its preload, so only the still that shows is fetched. The last is the widest (the <img> itself).
+const posterSources = (() => {
+  if (!poster) return [];
+  const list = [
+    ...(poster.portrait ? [{ maxAspect: '1/1', src: poster.portrait }] : []),
+    ...(poster.steps ?? []),
+  ];
+  const out: { src: string; media?: string; range?: string }[] = [];
+  let prev: string | undefined;
+  for (const p of list) {
+    const media = `(max-aspect-ratio: ${p.maxAspect})`;
+    out.push({ src: p.src, media, range: prev ? `(min-aspect-ratio: ${prev}) and ${media}` : media });
+    prev = p.maxAspect;
+  }
+  out.push({ src: poster.landscape, range: prev ? `(min-aspect-ratio: ${prev})` : undefined });
+  return out;
+})();
 // The vessel and the Draco decoder start downloading with the page, not after three.js has loaded and run
 const root = base.replace(/\/?$/, '/');
 ---
 
 <section class="wp-block-reach-model-stage model-stage" data-tour aria-label={label}>
-  {poster && <link rel="preload" href={poster.landscape} as="image" fetchpriority="high" media={poster.portrait ? '(min-width: 900px)' : undefined} />}
-  {poster?.portrait && <link rel="preload" href={poster.portrait} as="image" fetchpriority="high" media="(max-width: 899px)" />}
+  {posterSources.map((p) => <link rel="preload" href={p.src} as="image" fetchpriority="high" media={p.range} />)}
   <link rel="preload" href={`${root}models/reach-remote-lod1.glb`} as="fetch" crossorigin="anonymous" />
   <link rel="preload" href={`${root}draco/draco_wasm_wrapper.js`} as="fetch" crossorigin="anonymous" />
   <link rel="preload" href={`${root}draco/draco_decoder.wasm`} as="fetch" crossorigin="anonymous" />
@@ -73,7 +95,7 @@ const root = base.replace(/\/?$/, '/');
       {
         poster && (
           <picture class="model-stage__poster" aria-hidden="true">
-            {poster.portrait && <source media="(max-width: 899px)" srcset={poster.portrait} />}
+            {posterSources.slice(0, -1).map((p) => <source media={p.media} srcset={p.src} />)}
             <img src={poster.landscape} alt="" fetchpriority="high" decoding="async" />
           </picture>
         )
@@ -214,12 +236,38 @@ const root = base.replace(/\/?$/, '/');
   }
   /* The poster under the canvas; the canvas fades in over it once the vessel is in (is-ready), and the loading
      readout stays quiet meanwhile, since the vessel is already on screen */
-  .model-stage__poster img {
+  /* Placed by the stage's own framing (src/scripts/reach-remote-stage.ts, frameView), so the still and the first live
+     frame line up at any stage size: landscape, the still takes the stage's height and its vessel anchor (66% across:
+     the centre plus the cover view's 0.16 shift) sits 66% across the stage; portrait, it takes the stage's width and
+     its anchor (38% down: the centre less the 0.12 lift) sits 38% down. left 66% + translate −66% puts the still's own
+     66% on the stage's, whatever the still's width. If a stage is ever wider than its still, cover takes over. */
+  .model-stage__poster {
     position: absolute;
     inset: 0;
-    width: 100%;
+    overflow: hidden;
+    container-type: size;
+  }
+  .model-stage__poster img {
+    position: absolute;
+    top: 0;
+    left: 66%;
     height: 100%;
+    width: auto;
+    min-width: 100%;
+    max-width: none;
     object-fit: cover;
+    translate: -66% 0;
+  }
+  @container (aspect-ratio < 1) {
+    .model-stage__poster img {
+      top: 38%;
+      left: 0;
+      width: 100%;
+      height: auto;
+      min-width: 0;
+      min-height: 100%;
+      translate: 0 -38%;
+    }
   }
   .model-stage__stage[data-poster] .model-stage__canvas {
     transition: opacity var(--wp--custom--motion--duration-reveal) var(--wp--custom--motion--ease-out);

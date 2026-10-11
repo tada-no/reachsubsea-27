@@ -84,12 +84,34 @@ const oversight: CardField[] = [
   { title: 'Direct control', description: 'Full manual command from shore, as if piloting from the bridge.' },
 ];
 
-// Built with partners (brochure p3–4 and p9; the client PDF names the first two). Names only, no logos.
+// Built with partners (brochure p3–4, p6 and p9; the client PDF names the first two; DNV from the Q2 2026 report p18
+// and the Perth ROC brochure). Official logos from each partner's own site (11 Oct 2026), shown in one colour; the
+// role from the brochure's own split of the work.
 const partners: CardField[] = [
-  { title: 'Kongsberg Maritime', description: 'Vessel design, launch and recovery, hull sensors' },
-  { title: 'Massterly', description: 'Remote and autonomous vessel control' },
-  { title: 'Kystdesign', description: 'The ZEEROV and its E-TMS' },
-  { title: 'DNV', description: 'AROS notation and ROC certification' },
+  {
+    title: 'Kongsberg Maritime',
+    logo: { src: `${base}images/partners/kongsberg-maritime.svg`, width: 198, height: 22 },
+    lead: 'Vessel builder',
+    description: 'Designs and builds the vessels, their launch and recovery and hull sensors.',
+  },
+  {
+    title: 'Massterly',
+    logo: { src: `${base}images/partners/massterly.png`, width: 700, height: 201 },
+    lead: 'Remote operations',
+    description: 'Steers the vessels from shore and runs their remote and autonomous control.',
+  },
+  {
+    title: 'Kystdesign',
+    logo: { src: `${base}images/partners/kystdesign.svg`, width: 282, height: 91 },
+    lead: 'ROV and TMS',
+    description: 'Builds the electric ZEEROV and its E‑TMS, both controlled from shore.', // non-breaking hyphen
+  },
+  {
+    title: 'DNV',
+    logo: { src: `${base}images/partners/dnv.svg`, width: 98, height: 42 },
+    lead: 'Classification',
+    description: "Gave Reach Remote the world's first AROS notation and certifies our ROCs.",
+  },
 ];
 
 // Where it has worked: Feed grid Projects, vessels = Reach Remote 1 or 2, newest first (5 projects; the newest 3)
@@ -113,7 +135,16 @@ const faqItems = faqsFor('reach-remote');
       chapters={reachRemoteChapters}
       dims={reachRemoteDims}
       skipTo="specifications"
-      poster={{ landscape: `${base}images/reach-remote-stage-poster.jpg`, portrait: `${base}images/reach-remote-stage-poster-phone.jpg` }}
+      poster={{
+        portrait: `${base}images/reach-remote-stage-poster-phone.jpg`,
+        steps: [
+          { maxAspect: '4/3', src: `${base}images/reach-remote-stage-poster-4x3.jpg` },
+          { maxAspect: '8/5', src: `${base}images/reach-remote-stage-poster-16x10.jpg` },
+          { maxAspect: '9/5', src: `${base}images/reach-remote-stage-poster-9x5.jpg` },
+          { maxAspect: '2/1', src: `${base}images/reach-remote-stage-poster-2x1.jpg` },
+        ],
+        landscape: `${base}images/reach-remote-stage-poster-12x5.jpg`,
+      }}
     />
 
     <SectionSubnav source="section-pages" label="Assets" items={subnavItems} current={page.href} />
@@ -184,7 +215,10 @@ const faqItems = faqsFor('reach-remote');
       anchor="partners"
       background="white"
       layout="strip"
-      eyebrow="Built with partners"
+      sectionHeader={{
+        title: 'Built with partners',
+        intro: 'Industry leaders in remote and autonomous systems. We plan and run the subsea work.',
+      }}
       cards={partners}
     />
 

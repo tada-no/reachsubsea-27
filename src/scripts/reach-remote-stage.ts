@@ -324,6 +324,10 @@ export function mountStage(stage: HTMLElement) {
     const ms = Math.round(performance.now() - t0);
     if (status) status.textContent = `Vessel · 950 KB · ${ms.toLocaleString('en-GB')} ms`;
     stage.classList.remove('is-loading');
+    // The stills are rendered at scene time 0 (?poster, below), so the scene's one clock restarts here: the first frame
+    // that fades in over the still is the still (swell, water, clouds and the vessel's ride), and the motion carries
+    // on from it (Ross, 11 Oct 2026: the still and the first frame didn't line up)
+    clock.start();
     // Over the poster once the vessel has drawn (two frames: the one that renders it, then the fade)
     requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.add('is-ready')));
     // Then the ROV and TMS in the background, once the page is idle
@@ -642,10 +646,12 @@ export function mountStage(stage: HTMLElement) {
 
   // ── Frame loop ──────────────────────────────────────────────────────────────────────────────
   const clock = new THREE.Clock();
+  // ?poster holds the scene at time 0, for rendering the hero stills (ModelStage `poster`)
+  const posterMode = new URLSearchParams(location.search).has('poster');
   const _bob = [0, 0, 0];
   function frame() {
     const dt = Math.min(clock.getDelta(), 0.05);
-    const t = clock.elapsedTime;
+    const t = posterMode ? 0 : clock.elapsedTime;
     if (spin === 'sway') {
       holder.rotation.y = Math.sin(t * 0.21) * 0.07; // yaw ±4°
       if (sceneName === 'sea') {
@@ -1178,7 +1184,7 @@ export function mountStage(stage: HTMLElement) {
   );
   void loadVessel();
   // Review page only: a handle for checking placement from the browser console
-  (window as unknown as { __rr: unknown }).__rr = { THREE, camera, holder, SEA, scene, controls, createHullName, renderer, pbrMats, cur, goal, measureTour, get current() { return current; } };
+  (window as unknown as { __rr: unknown }).__rr = { THREE, camera, clock, holder, SEA, scene, controls, createHullName, renderer, pbrMats, cur, goal, measureTour, get current() { return current; } };
 }
 
 for (const stage of document.querySelectorAll<HTMLElement>('[data-stage]')) mountStage(stage);

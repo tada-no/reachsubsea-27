@@ -15,7 +15,6 @@ import IconButton from '../components/IconButton.astro';
 import { makeId } from '../lib/ids';
 import Eyebrow from '../components/Eyebrow.astro';
 import Link from '../components/Link.astro';
-import Icon from '../components/Icon.astro';
 import type { BlockFields, ImageField, LinkField, SectionHeaderField } from '../lib/types';
 
 interface QuoteItem {
@@ -113,7 +112,6 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     {
       isQuote ? (
         <figure class="statement__quote">
-          <Icon name="quote" size={40} class="statement__quote-icon" />
           {quote && <blockquote class="statement__quote-text text-h3">{quote}</blockquote>}
           {
             (name || role || photo) && (
@@ -185,12 +183,24 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     margin: 0;
     text-align: left;
   }
-  .statement__quote-icon {
-    color: var(--wp--custom--color--icon--accent);
-  }
+  /* Curly quote marks, as the quote cards: bold, accent-display, the opening one hung outside the text edge. Was a
+     40 outline quote icon above the text, which read as "99" (Ross, 11 Oct 2026). */
   .statement__quote-text {
     margin: 0;
     color: var(--wp--custom--color--text--primary);
+    quotes: '\201C' '\201D';
+    text-indent: -0.42em;
+  }
+  .statement__quote-text::before {
+    content: open-quote;
+  }
+  .statement__quote-text::after {
+    content: close-quote;
+  }
+  .statement__quote-text::before,
+  .statement__quote-text::after {
+    color: var(--wp--custom--color--text--accent-display);
+    font-weight: var(--wp--custom--font-weight--bold);
   }
   .statement__attribution {
     display: flex;
