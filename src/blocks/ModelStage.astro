@@ -11,7 +11,11 @@
 // than a cut to a blank viewport. "Skip tour" scrolls to `skipTo`, the id of the block that slides over.
 // Not live: the chapters are the content and read as rows under a still stage, text beside spec rows.
 //
-// Fields: hero (eyebrow, title, lead; breadcrumb from the page), model (level), scene (sea · studio), chapters[]
+// Poster: a still of the hero frame, rendered once from the stage (landscape, and portrait for phones), shows from
+// the first paint; the live canvas fades in over it once the vessel is in (Ross, 11 Oct 2026: the hero sat on empty
+// sea while the model loaded). Without JS or WebGL the poster is the stage.
+//
+// Fields: hero (eyebrow, title, lead; breadcrumb from the page), poster (landscape, portrait), model (level), scene (sea · studio), chapters[]
 // (eyebrow, title, text, specs[], points[]), dims[]. Camera keys and anchors are developer presets per model.
 // Three.js is bundled on the page that uses this block only.
 import Breadcrumb, { type BreadcrumbItem } from '../components/Breadcrumb.astro';
@@ -35,6 +39,8 @@ interface Props {
   label?: string;
   /** Where "Skip tour" lands: the id of the block after the tour (the one that slides over the stage) */
   skipTo?: string;
+  /** A still of the hero frame, shown until the live model is in: landscape, and portrait for under 900 */
+  poster?: { landscape: string; portrait?: string };
 }
 
 const {
@@ -49,6 +55,7 @@ const {
   level = 1,
   label = `${title} walk-around`,
   skipTo = 'rr-after',
+  poster,
 } = Astro.props;
 const base = import.meta.env.BASE_URL;
 // The vessel and the Draco decoder start downloading with the page, not after three.js has loaded and run
@@ -56,11 +63,21 @@ const root = base.replace(/\/?$/, '/');
 ---
 
 <section class="wp-block-reach-model-stage model-stage" data-tour aria-label={label}>
+  {poster && <link rel="preload" href={poster.landscape} as="image" fetchpriority="high" media={poster.portrait ? '(min-width: 900px)' : undefined} />}
+  {poster?.portrait && <link rel="preload" href={poster.portrait} as="image" fetchpriority="high" media="(max-width: 899px)" />}
   <link rel="preload" href={`${root}models/reach-remote-lod1.glb`} as="fetch" crossorigin="anonymous" />
   <link rel="preload" href={`${root}draco/draco_wasm_wrapper.js`} as="fetch" crossorigin="anonymous" />
   <link rel="preload" href={`${root}draco/draco_decoder.wasm`} as="fetch" crossorigin="anonymous" />
   <div class="model-stage__pin" data-tour-pin>
-    <div class="model-stage__stage has-surface-navy" data-stage data-level={level} data-scene={scene} data-base={base}>
+    <div class="model-stage__stage has-surface-navy" data-stage data-level={level} data-scene={scene} data-base={base} data-poster={poster ? '' : undefined}>
+      {
+        poster && (
+          <picture class="model-stage__poster" aria-hidden="true">
+            {poster.portrait && <source media="(max-width: 899px)" srcset={poster.portrait} />}
+            <img src={poster.landscape} alt="" fetchpriority="high" decoding="async" />
+          </picture>
+        )
+      }
       <canvas class="model-stage__canvas" aria-hidden="true"></canvas>
       <div class="model-stage__scrim"></div>
       <div class="model-stage__top-scrim"></div>
@@ -142,6 +159,14 @@ const root = base.replace(/\/?$/, '/');
     ))}
   </ol>
 </section>
+<!-- The live layout from the first paint, on the same test as the stage script, so the stage doesn't switch from the
+     list layout to the pinned one when that script arrives -->
+<script is:inline>
+  (() => {
+    const tour = document.currentScript.previousElementSibling;
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches && !new URLSearchParams(location.search).has('static')) tour.classList.add('is-live');
+  })();
+</script>
 
 <script>
   import '../scripts/reach-remote-stage.ts';
@@ -186,6 +211,24 @@ const root = base.replace(/\/?$/, '/');
   }
   .model-stage__canvas:active {
     cursor: grabbing;
+  }
+  /* The poster under the canvas; the canvas fades in over it once the vessel is in (is-ready), and the loading
+     readout stays quiet meanwhile, since the vessel is already on screen */
+  .model-stage__poster img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .model-stage__stage[data-poster] .model-stage__canvas {
+    transition: opacity var(--wp--custom--motion--duration-reveal) var(--wp--custom--motion--ease-out);
+  }
+  .model-stage__stage[data-poster]:not(.is-ready) .model-stage__canvas {
+    opacity: 0;
+  }
+  .model-stage__stage[data-poster]:not(.is-ready) .model-stage__status {
+    visibility: hidden;
   }
   .model-stage__hero {
     position: absolute;

@@ -5,10 +5,12 @@
 // investor sizing up the Reach Remote business and anyone curious what "nobody on board" means.
 //
 // The hero is the Model stage (§2.32): the 3D World's Reach Remote at sea, pinned for a six-chapter walk-around
-// scrubbed by the scroll, deck to keel to ROV, exactly as approved on /reach-remote-review/ (commit 18476e1). The
-// navy "More than a vessel" chain slides up over the stage as the launch ends, the subnav arriving with it, then:
-// the vessel in numbers (one short spec table: the key particulars; the detail rides on the fact cards) · the track
-// record figures · four levels of oversight (a short split, then the levels as one numbered row) · partners · projects · a client's words · what's next (3 & 4, the carve-out) ·
+// scrubbed by the scroll, deck to keel to ROV, exactly as approved on /reach-remote-review/ (commit 18476e1), a poster
+// still under it until the vessel is in. The navy numbers block slides up over the stage as the launch ends, the
+// subnav arriving with it (11 Oct 2026: the facts about the boat just toured come first), then: the track record
+// figures · four levels of oversight (a short split, then the levels as one numbered row) · more than a vessel (the
+// System chain, drawn as the Q2 2026 report p19: vessel, Reach Relay, ROC, on Reach Horizon) · partners · projects ·
+// a client's words · what's next (3 & 4, the carve-out) ·
 // FAQ · contact. Sources: the brochure (ref/reach remote/REA25 2595 170, p3–11), the Perth ROC brochure, the Q2 2026
 // report p17–25, the client PDF's Reach Remote screens (oversight levels and the three-part model in its wording).
 // Left out of the PDF's plan: the stats strip over the hero (nothing overlaps the hero), the "Technology onboard" cards
@@ -20,7 +22,7 @@ import Header from '../../../components/header/Header.astro';
 import Footer from '../../../components/Footer.astro';
 import ModelStage from '../../../blocks/ModelStage.astro';
 import SectionSubnav from '../../../blocks/SectionSubnav.astro';
-import SystemChain from '../../../blocks/SystemChain.astro';
+import SystemChain, { type ChainNode } from '../../../blocks/SystemChain.astro';
 import StatsBand from '../../../blocks/StatsBand.astro';
 import SplitMedia from '../../../blocks/SplitMedia.astro';
 import CardGrid from '../../../blocks/CardGrid.astro';
@@ -46,26 +48,32 @@ const subnavItems = [
 const [relay] = pickFigures(['relay-speed']);
 const rr12 = assets.find((a) => a.slug === 'reach-remote-1-2')!;
 
-// More than a vessel (client PDF p11 / screens p24, its wording, shortened to two lines a node). Pictograms (Ross,
-// 10 Oct 2026): the vessel its own glyph, the ROC the library's "profile laptop" (new here), Reach Horizon the
-// "settings-screen" it has on Technology & Innovation (same meaning). Reach Relay is the link, named on the connector.
-const chain = [
+// More than a vessel (client PDF p11 / screens p24, its wording, cut to one line a part), drawn as the Q2 2026
+// report p19 draws Reach Relay, on a horizon (Ross, 11 Oct 2026, after the critique): the vessel and the ROC stand on
+// it, Reach Relay over the satellite in the sky between them, Reach Horizon named under it as the ground it all
+// stands on. No eyebrows on the parts. Pictograms from the library: the vessel its own glyph, the ROC "profile
+// laptop", Reach Relay "satellite".
+const chainEnds: [ChainNode, ChainNode] = [
   {
     pictogram: 'reach-remote',
     title: 'The vessel',
-    text: 'Reach Remote 1 and 2, purpose-built uncrewed surface vessels carrying the same ROV and survey spreads as our crewed fleet.',
+    text: 'Uncrewed, with a full ROV and survey spread.',
   },
   {
     pictogram: 'profile-laptop',
     title: 'The ROC',
-    text: 'Our remote operations centres in Haugesund and Perth: the master, navigator, ROV pilots and surveyors, around the clock.',
-  },
-  {
-    pictogram: 'settings-screen',
-    title: 'Reach Horizon',
-    text: 'The software platform connecting it all, built to run uncrewed missions and now supporting our crewed fleet too.',
+    text: 'Haugesund and Perth, staffed around the clock.',
   },
 ];
+const chainLink: ChainNode = {
+  pictogram: 'satellite',
+  title: 'Reach Relay',
+  text: `Our own encrypted link to shore, up to ${relay.value.replace('x', '×')} faster.`,
+};
+const chainBase = {
+  title: 'Reach Horizon',
+  text: `The <a href="${base}services/technology-innovation/">software platform</a> that ties it all together.`,
+};
 
 // Four levels of oversight (brochure p10's four names; the client PDF screens p24's one line each), as one numbered row
 // under a short split (Ross, 10 Oct 2026: as a list beside the photo the column ran far past it)
@@ -104,26 +112,15 @@ const faqItems = faqsFor('reach-remote');
       breadcrumb={[{ label: 'Home', href: base }, { label: 'Assets', href: section.href }, { label: page.label }]}
       chapters={reachRemoteChapters}
       dims={reachRemoteDims}
-      skipTo="more-than-a-vessel"
+      skipTo="specifications"
+      poster={{ landscape: `${base}images/reach-remote-stage-poster.jpg`, portrait: `${base}images/reach-remote-stage-poster-phone.jpg` }}
     />
 
     <SectionSubnav source="section-pages" label="Assets" items={subnavItems} current={page.href} />
 
-    <SystemChain
-      anchor="more-than-a-vessel"
-      background="navy"
-      sectionHeader={{
-        eyebrow: 'More than a vessel',
-        title: 'The vessel, the ROC and Reach Horizon, working as one',
-        intro: 'Together they are a different way of delivering subsea services, not just a different type of vessel.',
-      }}
-      nodes={chain}
-      link={{ label: 'Reach Relay', text: `Data link, up to ${relay.value} faster` }}
-    />
-
     <SplitMedia
       anchor="specifications"
-      background="white"
+      background="navy"
       media="spec-table"
       eyebrow="Specifications"
       title="The vessel in numbers"
@@ -164,6 +161,25 @@ const faqItems = faqsFor('reach-remote');
       cards={oversight}
     />
 
+    <SplitMedia
+      anchor="more-than-a-vessel"
+      background="navy"
+      layout="beside"
+      eyebrow="More than a vessel"
+      title="Delivering subsea services differently"
+      body={`<p>Reach Remote is more than the uncrewed vessels described above. It combines the vessel, the onshore ROC team and Reach Horizon, our in-house software platform giving clients, surveyors and experts access to data, operations and expertise from shore. Not simply a different type of vessel.</p>`}
+    />
+
+    <SystemChain
+      anchor="system"
+      background="navy"
+      joined
+      ariaLabel="Reach Remote as one system: the vessel, Reach Relay, the ROC and Reach Horizon"
+      ends={chainEnds}
+      link={chainLink}
+      base={chainBase}
+    />
+
     <CardGrid
       anchor="partners"
       background="white"
@@ -200,8 +216,8 @@ const faqItems = faqsFor('reach-remote');
       media="image"
       position="end"
       eyebrow="What's next"
-      title="Reach Remote 3 and 4, and a company of its own"
-      body={`<p>Two more vessels are being built at Kongsberg Maritime, with support from the EU Innovation Fund, for delivery in the second half of 2027.</p><p>As our Q2 2026 report sets out, work continues to make Reach Remote a standalone company, combining its operations, ROV services and the Reach Horizon platform, with Reach Horizon also developed as software in its own right.</p>`}
+      title="Reach Remote 3 and 4"
+      body={`<p>Two more vessels are being built at Kongsberg Maritime with EU Innovation Fund support, due in the second half of 2027. Our Q2 2026 report also sets out plans to make Reach Remote a company of its own.</p>`}
       actions={[
         { label: 'Build and funding update', url: '/assets/reach-remote/3-4/', action: 'page' },
         { label: 'Why invest', url: '/investors/why-invest/', action: 'page' },

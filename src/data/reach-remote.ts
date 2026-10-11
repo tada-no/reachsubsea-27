@@ -55,17 +55,18 @@ export interface TourDimension {
   b: [number, number, number];
 }
 
-/** The vessel in numbers (Ross, 10 Oct 2026: one short spec table, not eight groups): the brochure's key particulars
- *  (REA25 2595 170, A5, p3, p6, p9, p11). The finer detail rides on the model's fact cards and stays in the brochure. */
+/** The vessel in numbers (Ross, 10 Oct 2026: one short spec table, not eight groups; 11 Oct 2026: "match the numbers
+ *  a bit closer to the client PDF"): the client screens' vessel facts (p23), in their order and wording. One label
+ *  differs: the screens' "Displacement 230 t" is the brochure's gross tonnage (REA25 2595 170 p11: GT 230, deadweight
+ *  105 t), and gross tonnage has no unit, so it reads "Gross tonnage 230". The finer detail rides on the model's fact
+ *  cards and stays in the brochure. */
 export const reachRemoteKeySpecs: TourSpec[] = [
-  { label: 'Length', value: '23.9 m' },
-  { label: 'Breadth', value: '8.0 m' },
-  { label: 'Max speed', value: '11 knots' },
-  { label: 'Endurance', value: 'Min. 30 days at sea' },
-  { label: 'ROV', value: 'ZEEROV, 115 kW electric' },
-  { label: 'ROV depth rating', value: '2,000 m' },
-  { label: 'Hull survey depth', value: 'To 500 m' },
-  { label: 'Autonomy', value: 'IMO degree three, no crew' },
+  { label: 'Length', value: '23.90 m' },
+  { label: 'Max speed', value: '11.0 knots' },
+  { label: 'Gross tonnage', value: '230' },
+  { label: 'Endurance', value: '30 days' },
+  { label: 'Crew on board', value: 'None, uncrewed' },
+  { label: 'Status', value: 'In operation' },
 ];
 
 /** Dimension lines drawn on the model at the deck chapter */

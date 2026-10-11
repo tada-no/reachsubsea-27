@@ -189,6 +189,9 @@ export function mountStage(stage: HTMLElement) {
   const controls = new OrbitControls(camera, canvas);
   controls.enablePan = false;
   controls.enableZoom = false;
+  // OrbitControls writes touch-action: none on the canvas, which stops a vertical swipe scrolling the page on
+  // phones (the picture fills the stage, so the tour couldn't be scrolled); sideways drags still orbit
+  canvas.style.touchAction = 'pan-y';
   controls.enableDamping = true;
   controls.dampingFactor = 0.06;
   controls.minPolarAngle = THREE.MathUtils.degToRad(5);
@@ -321,6 +324,8 @@ export function mountStage(stage: HTMLElement) {
     const ms = Math.round(performance.now() - t0);
     if (status) status.textContent = `Vessel · 950 KB · ${ms.toLocaleString('en-GB')} ms`;
     stage.classList.remove('is-loading');
+    // Over the poster once the vessel has drawn (two frames: the one that renders it, then the fade)
+    requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.add('is-ready')));
     // Then the ROV and TMS in the background, once the page is idle
     const idle = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
     if (idle) idle(() => void loadLaunch(true), { timeout: 3000 });
