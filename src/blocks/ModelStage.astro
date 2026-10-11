@@ -300,6 +300,11 @@ const root = base.replace(/\/?$/, '/');
     opacity: 0.85;
     transition: opacity 0.6s var(--wp--custom--motion--ease-in-out);
   }
+  /* The stills are at sea too: the scrim is there from the first paint (and without JS), not only once the script
+     has set the scene (Ross, 11 Oct 2026: the still showed without it, then it faded in) */
+  .model-stage__stage[data-poster]:not(.is-ready) .model-stage__scrim {
+    opacity: 0.85;
+  }
   /* On the tour the cards carry the words, so the picture keeps its daylight to the foot */
   .model-stage.is-live .model-stage__stage.is-at-sea.is-touring .model-stage__scrim {
     opacity: 0.35;
