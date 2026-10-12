@@ -135,12 +135,9 @@ export const checklistGroups: ChecklistGroup[] = [
   {
     title: 'Decisions for Reach',
     items: [
-      { n: 61, subject: 'Projects in the main menu', text: 'Should Projects appear in the main menu? That would make eight items instead of seven.', status: 'open' },
-      { n: 62, subject: 'Services and Assets menus', text: 'Approve Services and Assets as separate menu sections. This differs from the design and the original sitemap.', status: 'open' },
-      { n: 63, subject: 'Technology & Innovation in the menu', text: 'Approve where Technology & Innovation sits in the menu.', status: 'open' },
       { n: 64, subject: 'Main email address', text: 'Main email address: post@reachsubsea.com or post@reachsubsea.no? We use .com, and hseq@reachsubsea.com for HSEQ.', status: 'open' },
       { n: 65, subject: 'Career growth and Meet our people cards', text: 'Keep or drop the "Career growth" and "Meet our people" cards. They have no pages behind them yet.', pages: 'Careers', status: 'open' },
-      { n: 66, subject: 'Pages planned for later', text: 'Approve the pages planned for later: Reach Pilot, Reach Horizon, Reach Relay, Reach Remote 3 & 4 and the publication detail pages.', status: 'open' },
+      { n: 66, subject: 'Pages planned for later', text: "Some pages won't be ready at launch: a page each for Reach Pilot, Reach Horizon and Reach Relay, and a page for each research publication. Until then, the three products are described on Technology & Innovation, and the publications are listed on Research & Publications. Can these pages wait until after launch, or do you need any of them at launch?", pages: 'Technology & Innovation, Research & Publications', status: 'open' },
     ],
   },
 ];
