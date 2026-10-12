@@ -11,6 +11,12 @@ _No open questions right now._
 
 ## Answered log
 
+### Q170. Careers heroes: people instead of the sea (12 Oct 2026)
+Context: Ross: "feel like the hero images on the career pages could have some people, what do you think?" Careers overview and Life at Reach shared the calm sea also used by Investors and Company; Why work with us had the Trinidad platform sunset. Compared live at 1440 (current against a people photo from the library, all live/dev media; the photos are 1200 px wide, shown at native width with the side fades).
+- [ ] ~~Overview + Life at Reach~~ (recommended) · [ ] ~~Overview only~~ · [x] **All three** · [ ] ~~None for now~~
+
+**Answer:** all three (Ross). Careers overview: two crew in orange coveralls at the rail at dusk (`life-crew-on-deck.jpg`, focal 0.65 / 0.5). Life at Reach: the harbour-side lounge (`team-lounge-harbour.jpg`, focal 0.6 / 0.5), reversing Q129's calm sea; the open-day photo stays in the intro. Why work with us: a colleague at a desk against the harbour window (`life-office-harbour-desk.jpg`, focal 0.6 / 0.5). Checked at 1440 · 1100 · 800 · 375: text legible over the scrim at every width; from 800 the people sit right of the copy, on phones above the title. Larger originals of the crew-on-deck photo would sharpen the overview hero at 1440.
+
 ### Q167. Reach Remote page: the walk-around and the blocks below it (9 Oct 2026)
 Context: Ross: "plan the rest of the Reach Remote page, think carefully about the UX and UI of the user scrolling and experiencing all the features of the Reach Remote model." Builds on Q165 (the stage is the hero, at sea in daylight on a slight swell; scrolling pins it for a walk-around; the descent fades into the next block). Sources: the brochure (`ref/reach remote/REA25 2595 170…`: p7's six labels, p10 oversight levels, p11 spec), the Perth ROC brochure, client PDF p11 (section list), Q2 2026 report p17–25 (milestones, projects, quotes, carve-out), the render test on `/reach-remote-review/`.
 
