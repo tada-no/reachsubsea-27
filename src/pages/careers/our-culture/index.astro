@@ -52,8 +52,8 @@ const peopleCards: CardField[] = [peopleAndSafety.people, peopleAndSafety.safety
   <Header current="careers" overlay />
   <main id="main">
     <PageHero
-      style="text"
-      background="navy"
+      style="photo"
+      animate
       breadcrumb={[
         { label: 'Home', href: base },
         { label: 'Careers', href: careers.href },
@@ -61,6 +61,8 @@ const peopleCards: CardField[] = [peopleAndSafety.people, peopleAndSafety.safety
       ]}
       title={cultureIntro.title}
       lead={cultureIntro.lead}
+      image={{ src: `${base}images/life-electronics-workshop.jpg`, alt: '', focalPoint: { x: 0.6, y: 0.4 } }}
+      actions={[{ label: 'Open positions', url: hrManager.vacancies, action: 'external' }]}
     />
 
     <SectionSubnav source="section-pages" label="Careers" items={subnavItems} current={page.href} />
