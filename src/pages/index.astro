@@ -24,8 +24,12 @@ import type { CardField } from '../lib/types';
 import { faqsFor, faqHubHref } from '../data/faqs';
 import { SHOW_EVENTS } from '../data/navigation';
 import { newsPosts, postUrl } from '../data/news';
+import { quarterlyReleases } from '../data/reports';
+import { shortDate } from '../lib/dates';
 
 const [uncrewedDays] = pickFigures(['uncrewed-days']);
+// The newest quarterly results, for the Investor update card (reports.ts).
+const latestResults = quarterlyReleases[0];
 
 // Bento: 7 cards on a 12-column grid (6×2 · 3 · 3×2 / 3 · then 4 · 5 · 3).
 const bentoCards: CardField[] = [
@@ -129,9 +133,9 @@ const newsroomItems: CardField[] = [
   cardPresets.document({
     eyebrow: 'Investor update',
     badge: { label: 'PDF', tone: 'neutral' },
-    title: 'Q2 2026 report',
-    meta: [{ icon: 'calendar', text: '20 Aug 2026' }],
-    action: { label: 'Report (PDF)', url: '#', action: 'file' },
+    title: `Q${latestResults.quarter} ${latestResults.year} report`,
+    meta: [{ icon: 'calendar', text: shortDate(latestResults.published!) }],
+    action: { label: 'Report (PDF)', url: latestResults.report!, action: 'file' },
   }),
   cardPresets.news({
     media: 'none',

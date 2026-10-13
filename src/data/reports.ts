@@ -18,6 +18,8 @@ import { investorCalendar } from './investor-calendar';
 const base = import.meta.env.BASE_URL;
 const UP = 'https://reachsubsea.no/wp-content/uploads';
 const cast = (id: string) => `https://channel.royalcast.com/landingpage/hegnarmedia/${id}/`;
+/** Webcasts from Q4 2025 on are on qcnl.tv (live Reports page, 13 Oct 2026). */
+const qcnl = (id: string) => `https://qcnl.tv/p/${id}`;
 
 export interface ReportCover {
   src: string;
@@ -54,10 +56,10 @@ export interface QuarterRelease {
 
 /** Quarterly results, newest first. */
 export const quarterlyReleases: QuarterRelease[] = [
-  { year: 2026, quarter: 2, published: '2026-08-18', report: `${UP}/2026/08/Reach-Subsea-ASA-2Q-2026-Report.pdf`, presentation: `${UP}/2026/08/Reach-Subsea-ASA-2Q-2026-Presentation.pdf`, cover: landscape('quarterly-report-2026-q2.jpg') },
-  { year: 2026, quarter: 1, published: '2026-05-05', report: `${UP}/2026/05/Reach-Subsea-ASA_1Q-2026-Report.pdf`, presentation: `${UP}/2026/05/Reach-Subsea-ASA_1Q-2026-Presentation.pdf`, cover: landscape('quarterly-report-2026-q1.jpg') },
+  { year: 2026, quarter: 2, published: '2026-08-18', report: `${UP}/2026/08/Reach-Subsea-ASA-2Q-2026-Report.pdf`, presentation: `${UP}/2026/08/Reach-Subsea-ASA-2Q-2026-Presentation.pdf`, webcast: qcnl('yvYoUYM3ZyQXYC70JxeBfQ'), cover: landscape('quarterly-report-2026-q2.jpg') },
+  { year: 2026, quarter: 1, published: '2026-05-05', report: `${UP}/2026/05/Reach-Subsea-ASA_1Q-2026-Report.pdf`, presentation: `${UP}/2026/05/Reach-Subsea-ASA_1Q-2026-Presentation.pdf`, webcast: qcnl('3mtPJRvpmITwRztI2XzJQw'), cover: landscape('quarterly-report-2026-q1.jpg') },
 
-  { year: 2025, quarter: 4, published: '2026-02-12', report: `${UP}/2026/02/Reach-Subsea-ASA-4Q-2025-Report.pdf`, presentation: `${UP}/2026/02/Reach-Subsea-ASA-4Q-2025-Presentation.pdf` },
+  { year: 2025, quarter: 4, published: '2026-02-12', report: `${UP}/2026/02/Reach-Subsea-ASA-4Q-2025-Report.pdf`, presentation: `${UP}/2026/02/Reach-Subsea-ASA-4Q-2025-Presentation.pdf`, webcast: qcnl('S_zINNF65tBsygKUq1s5Lw') },
   { year: 2025, quarter: 3, published: '2025-11-18', report: `${UP}/2025/11/Reach-Subsea-ASA_3Q-2025-Report.pdf`, presentation: `${UP}/2025/11/Reach-Subsea-ASA_3Q-2025-Presentation.pdf`, webcast: cast('20251118_2') },
   { year: 2025, quarter: 2, published: '2025-08-26', report: `${UP}/2025/08/Reach-Subsea-ASA-2Q-2025-Report.pdf`, presentation: `${UP}/2025/08/Reach-Subsea-ASA-2Q-2025-Presentation.pdf`, webcast: cast('20250826_3') },
   { year: 2025, quarter: 1, published: '2025-05-08', report: `${UP}/2025/05/Reach-Subsea-ASA_1Q2025_Report.pdf`, presentation: `${UP}/2025/05/Reach-Subsea-ASA_1Q2025_Presentation.pdf`, webcast: cast('20250508_8') },

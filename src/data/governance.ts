@@ -18,7 +18,8 @@
 // - 2013: the live "Extra ordinary" pair (files 29.05.13) and "General Meeting" pair (files 29.04.13) keep their
 //   live labels; dates from the file names.
 // - Dates before 2021 come from the file names.
-// - The articles of association are in Norwegian only (vedtekter, 28 Mar 2023). Ask Reach for an English version.
+// - The articles of association are in Norwegian only: the 2025 vedtekter the live Investors page links (was the
+//   28 Mar 2023 edition). Ask Reach for an English version.
 // - The 2027 AGM has no date yet: the live financial calendar runs to Q4 2026. investor-calendar.ts holds a
 //   placeholder (27 May 2027, `confirmed: false`), so the Next row reads "Date to come" until Reach confirms it.
 import { board } from './people';
@@ -311,7 +312,7 @@ export const investorRelationsPolicy = [
  * has its own page. */
 export const governanceDocuments = [
   { label: 'Corporate governance statement 2025', url: `${annualReport2025}#page=78` },
-  { label: 'Articles of association (Norwegian)', url: up('2023/05/Reach-Subsea-ASA-Vedtekter-Vedtatt-28032311118569.2.pdf') },
+  { label: 'Articles of association (Norwegian)', url: up('2026/03/Vedtekter-Reach-Subsea-ASA_2025.pdf') },
   { label: 'Executive remuneration policy', url: up('2024/05/Reach-Subsea-ASA-executive-remuneration-policy-2024.pdf') },
   { label: 'Code of Conduct 2025', url: up('2025/12/Code-of-Conduct-2025.pdf') },
   { label: 'Anti-bribery policy', url: up('2025/09/REACH-MS-POL-007-Anti-bribery-Policy.pdf') },
