@@ -4,7 +4,8 @@
 // Text hero on navy, then one white section: a short how-to with the counts and an "Email your answers" button, then
 // the groups. Each group is an H2 (Heading/H3 look) with an optional line, and a numbered list of rows:
 // - Wide (container ≥ 760): number · text with its pages under it (at most the prose measure) · status · Answer by
-//   email, the last two in columns shared down the group (subgrid), so the badges and links line up. A 1px
+//   email, the last two in columns shared down the group (subgrid), so the badges and links line up. The pages link to
+//   the page, at the section the item is about where there is one (checklistPages). A 1px
 //   border/subtle rule between rows.
 // - Narrow: number beside the text, then status and the email link in one row under it.
 // Answer by email opens a message to Ross with "Reach checklist <n>: <subject>" (src/data/client-checklist.ts); the
@@ -22,6 +23,7 @@ import {
   checklistEmail,
   checklistUpdated,
   checklistMailto,
+  checklistPageLink,
   type ChecklistStatus,
 } from '../data/client-checklist';
 import type { BadgeTone } from '../lib/types';
@@ -89,7 +91,16 @@ const groupId = (title: string) => `checklist-${title.toLowerCase().replace(/[^a
                         <span class="visually-hidden">Item {item.n}: </span>
                         {item.text}
                       </p>
-                      {item.pages && <p class="client-checklist__pages text-caption">{item.pages}</p>}
+                      {item.pages && (
+                        <p class="client-checklist__pages text-caption">
+                          {item.pages.map(checklistPageLink).map(({ label, path }, i) => (
+                            <>
+                              {i > 0 && ', '}
+                              {path === undefined ? label : <a href={base + path}>{label}</a>}
+                            </>
+                          ))}
+                        </p>
+                      )}
                     </div>
                     <Badge label={STATUS[item.status].label} tone={STATUS[item.status].tone} icon={STATUS[item.status].icon} class="client-checklist__status" />
                     <MetaItem
@@ -202,6 +213,14 @@ const groupId = (title: string) => `checklist-${title.toLowerCase().replace(/[^a
   }
   .client-checklist__pages {
     color: var(--wp--custom--color--text--secondary);
+  }
+  .client-checklist__pages a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .client-checklist__pages a:hover {
+    color: var(--wp--custom--color--text--accent);
   }
   .client-checklist__status {
     grid-area: meta;
