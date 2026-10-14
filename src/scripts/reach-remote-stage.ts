@@ -28,9 +28,14 @@ import { createHullName, createSternName, createBowImo, createDraftMarks } from 
 import { resizeHullLogo } from './reach-remote-hulllogo.js';
 import { raiseBootTop } from './reach-remote-boottop.js';
 import { createUnderwaterGear } from './reach-remote-propulsion.js';
+import { installFastRaycast } from './reach-remote-fastraycast.js';
 import { createTmsCage } from './reach-remote-tmscage.js';
 // @ts-expect-error untyped module ported from the 3D World
 import { createOcean, createZeeRovRig } from './reach-remote-ocean.js';
+
+// 3D World v86d: the hull probes (names, logo, IMO, draft marks, sea chests, moonpool) raycast through a BVH; the v86
+// hull's ~4x triangles had made them seconds slower. ?slowray=1 keeps three's own, for comparison.
+if (!/[?&]slowray=1/.test(location.search)) installFastRaycast(THREE);
 
 type ViewName = 'cover' | 'stern' | 'top' | 'starboard' | 'quarter';
 type SceneName = 'studio' | 'sea';
