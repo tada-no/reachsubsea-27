@@ -1,5 +1,5 @@
-// Reach Remote walk-around (Q165, Q167): the Model stage block's content for Reach Remote 1 & 2, shared by the page
-// (/assets/reach-remote/) and the review page (/reach-remote-review/), so the tour is written once.
+// Reach Remote walk-around (Q165, Q167): the Model stage block's content for Reach Remote 1 & 2 on the page
+// (/assets/reach-remote/). It was shared with the /reach-remote-review/ render test until that was removed (14 Oct 2026).
 //
 // Each chapter carries its camera key (`cam`: distance, elevation, azimuth in the launch's convention where 0 =
 // starboard beam and +π/2 = ahead of the bow, the target on the hull in the holder's frame with the waterline at

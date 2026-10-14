@@ -1,7 +1,8 @@
 ---
 // Model stage · reach/model-stage (docs/05 §2.32; Q165, Q167). A page hero that is a live 3D model: the 3D World's
 // Reach Remote at sea, pinned while its chapters scroll past (deck to keel to ROV), one continuous camera pan
-// scrubbed by the scroll. Built on /reach-remote-review/ (build step 1) and lifted here unchanged for the page.
+// scrubbed by the scroll. Built on the /reach-remote-review/ render test (build step 1, removed 14 Oct 2026) and lifted
+// here unchanged for the page.
 //
 // Live (JS, no reduced motion): the stage is `position: sticky` the viewport's height (the header over its top, as on
 // the photo heroes) and a runway of chapters scrolls behind it; the scroll position drives the camera, the pinned
@@ -15,7 +16,7 @@
 // the first paint; the live canvas fades in over it once the vessel is in (Ross, 11 Oct 2026: the hero sat on empty
 // sea while the model loaded). Without JS or WebGL the poster is the stage.
 //
-// Fields: hero (eyebrow, title, lead; breadcrumb from the page), poster (landscape, portrait), model (level), scene (sea · studio), chapters[]
+// Fields: hero (eyebrow, title, lead; breadcrumb from the page), poster (landscape, portrait), scene (sea · studio), chapters[]
 // (eyebrow, title, text, specs[], points[]), dims[]. Camera keys and anchors are developer presets per model.
 // Three.js is bundled on the page that uses this block only.
 import Breadcrumb, { type BreadcrumbItem } from '../components/Breadcrumb.astro';
@@ -27,14 +28,12 @@ interface Props {
   title: string;
   lead?: string;
   breadcrumb?: BreadcrumbItem[];
-  /** h1 when the stage is the page hero; the review page, which has its own h1, passes h2 */
+  /** h1 when the stage is the page hero; h2 under a page's own h1 */
   titleLevel?: 'h1' | 'h2';
   chapters: TourChapter[];
   dims?: TourDimension[];
-  /** The scene the stage opens on (the review page's chips can switch it) */
+  /** The scene the stage opens on */
   scene?: 'sea' | 'studio';
-  /** Model detail level (public/models/reach-remote-lod0–2.glb) */
-  level?: 0 | 1 | 2;
   /** The tour's accessible name */
   label?: string;
   /** Where "Skip tour" lands: the id of the block after the tour (the one that slides over the stage) */
@@ -57,7 +56,6 @@ const {
   chapters,
   dims = [],
   scene = 'sea',
-  level = 1,
   label = `${title} walk-around`,
   skipTo = 'rr-after',
   poster,
@@ -91,7 +89,7 @@ const root = base.replace(/\/?$/, '/');
   <link rel="preload" href={`${root}draco/draco_wasm_wrapper.js`} as="fetch" crossorigin="anonymous" />
   <link rel="preload" href={`${root}draco/draco_decoder.wasm`} as="fetch" crossorigin="anonymous" />
   <div class="model-stage__pin" data-tour-pin>
-    <div class="model-stage__stage has-surface-navy" data-stage data-level={level} data-scene={scene} data-base={base} data-poster={poster ? '' : undefined}>
+    <div class="model-stage__stage has-surface-navy" data-stage data-scene={scene} data-base={base} data-poster={poster ? '' : undefined}>
       {
         poster && (
           <picture class="model-stage__poster" aria-hidden="true">
@@ -633,9 +631,6 @@ const root = base.replace(/\/?$/, '/');
     border-radius: var(--wp--custom--radius--md);
     background-color: var(--wp--custom--color--alpha--navy-88);
     color: var(--wp--custom--color--text--on-overlay);
-  }
-  .model-stage.is-solid-card .model-stage__card {
-    background-color: var(--wp--preset--color--navy-900);
   }
   .model-stage__card.is-left {
     transform: translate(-100%, -50%);

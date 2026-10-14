@@ -17,9 +17,7 @@
 // chase follows it (wheel steps and flings never jerk the picture), and the chapter text switches at a threshold
 // read from the same scroll position (not an IntersectionObserver, so a fling can't skip one: the Figures block's
 // lesson). The last chapter hands over to the launch scrubber, driven by the same scroll. Points (`[data-point]`,
-// the brochure's labels) are projected onto the stage every frame and hidden when the hull is in the way. Two
-// camera feels to compare live: the camera follows the scroll, or snaps to each chapter's key as it becomes
-// current (`data-stage-feel`).
+// the brochure's labels) are projected onto the stage every frame and hidden when the hull is in the way.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -715,7 +713,6 @@ export function mountStage(stage: HTMLElement) {
   const pinEl = tourRoot?.querySelector<HTMLElement>('[data-tour-pin]') ?? null;
   const pointsEl = tourRoot?.querySelector<HTMLElement>('[data-tour-points]') ?? null;
   const launchIndex = chapterEls.findIndex((el) => el.dataset.tourChapter === 'launch');
-  let feel: 'follow' | 'snap' = 'follow';
 
   /** Chapter keys from the runway's data; the hero (chapter 0) is the cover view, computed once the vessel is measured */
   const keysOf: (Key | null)[] = chapterEls.map((el) => {
@@ -763,7 +760,7 @@ export function mountStage(stage: HTMLElement) {
   const _ro = new THREE.Vector3();
   const _tg = new THREE.Vector3();
   function railsFrame(dt: number) {
-    const k = 1 - Math.exp(-dt * (feel === 'follow' ? 5 : 4.5));
+    const k = 1 - Math.exp(-dt * 5);
     lerpKey(cur, goal, k, cur);
     const ce = Math.cos(cur.elev);
     // Portrait stages sit further back, but less than the hero does: the chapters frame a part of the vessel, not all of it
@@ -872,7 +869,7 @@ export function mountStage(stage: HTMLElement) {
     setLaunch(next < 0.002 && launchGoal === 0 ? 0 : next);
     if (inLaunch) return;
     // The camera's goal: from the previous key to this one over the run, eased at both ends
-    if (feel === 'snap' || i === 0) {
+    if (i === 0) {
       const k0 = keyAt(current);
       lerpKey(k0, k0, 0, goal);
     } else lerpKey(keyAt(i - 1), keyAt(i), smooth(s), goal);
@@ -1162,38 +1159,11 @@ export function mountStage(stage: HTMLElement) {
   startTour();
   requestAnimationFrame(frame);
 
-  // ── Controls on the page ────────────────────────────────────────────────────────────────────
-  function group(attr: string, onPick: (value: string) => void) {
-    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>(`[${attr}]`));
-    for (const b of buttons) {
-      b.addEventListener('click', () => {
-        for (const o of buttons) o.setAttribute('aria-pressed', String(o === b));
-        onPick(b.getAttribute(attr)!);
-      });
-    }
-  }
-  group('data-stage-view', (v) => applyView(v as ViewName));
-  group('data-stage-scene', (v) => applyScene(v as SceneName));
-  group('data-stage-swell', (v) => SEA.setSwell(Number(v)));
-  group('data-stage-mirror', (v) => SEA.setMirror(v === 'on'));
-  group('data-stage-spin', (v) => {
-    spin = reducedMotion ? 'off' : (v as SpinMode);
-    if (spin !== 'sway') {
-      holder.rotation.set(0, 0, 0);
-      holder.position.set(0, 0, 0);
-    }
-  });
-  group('data-stage-feel', (v) => (feel = v as 'follow' | 'snap'));
-  group('data-stage-card', (v) => tourRoot?.classList.toggle('is-solid-card', v === 'solid'));
-  const slider = document.querySelector<HTMLInputElement>('[data-stage-launch]');
-  slider?.addEventListener('input', () => setLaunch(Number(slider.value) / 100));
-
-  // The scene the page's chips start on, else the block's own (`data-scene`; the Model stage opens at sea)
-  applyScene(
-    ((document.querySelector('[data-stage-scene][aria-pressed="true"]')?.getAttribute('data-stage-scene') ?? stage.dataset.scene) as SceneName | undefined) ?? 'studio',
-  );
+  // The block's scene (`data-scene`; the Model stage opens at sea). The review page's view, scene, swell, mirror, spin,
+  // feel, card and launch-slider controls went with it (14 Oct 2026); git history has them (commit 67e13eb and before).
+  applyScene((stage.dataset.scene as SceneName | undefined) ?? 'sea');
   void loadVessel();
-  // Review page only: a handle for checking placement from the browser console
+  // A handle for checking placement from the browser console (scripts/stage-poster.mjs waits on it too)
   (window as unknown as { __rr: unknown }).__rr = { THREE, camera, clock, holder, SEA, scene, controls, createHullName, renderer, pbrMats, cur, goal, measureTour, get current() { return current; } };
 }
 
