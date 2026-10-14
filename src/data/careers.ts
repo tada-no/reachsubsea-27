@@ -10,7 +10,7 @@ const [traineeSince] = pickFigures(['trainee-since']);
 
 /** One page for vacancies, apply, register (Q24). The candidate portal is the same HR-Manager customer. */
 export const hrManager = {
-  vacancies: 'https://hr-manager.net/reachsubsea',
+  vacancies: 'https://candidate.hr-manager.net/vacancies/list.aspx?customer=reachsubsea',
   register: 'https://candidate.hr-manager.net/Agent/Subscription.aspx?cid=1021',
   openApply:
     'https://candidate.hr-manager.net/ApplicationForm/SinglePageApplicationForm.aspx?cid=1021&departmentId=8562&ProjectId=66704&MediaId=5&wStep=1',

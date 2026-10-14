@@ -20,15 +20,15 @@ const { id, open = false } = Astro.props;
     <SearchBox id={`${id}-field`} class="search-panel__form" />
     {
       popularSearchLinks.length > 0 && (
-        <div class="search-panel__popular">
-          <ul class="search-panel__links" aria-label="Popular pages">
+        <nav class="search-panel__popular" aria-label="Popular pages">
+          <ul class="search-panel__links">
             {popularSearchLinks.map((link) => (
               <li>
                 <Link label={link.label} href={link.url} action={link.external ? 'external' : 'page'} size="small" />
               </li>
             ))}
           </ul>
-        </div>
+        </nav>
       )
     }
   </div>

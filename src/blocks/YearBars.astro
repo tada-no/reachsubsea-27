@@ -221,6 +221,13 @@ const titleId = makeId('year-bars', title);
       visibility: hidden;
     }
   }
+  /* Phones: fourteen year buttons in 327px are 23px wide, under the 24px target size (WCAG 2.5.8). The chart
+     reaches 8px into each gutter, so each is 24.5px at 375 */
+  @media (max-width: 419px) {
+    .year-bars__chart {
+      margin-inline: calc(-1 * var(--wp--preset--spacing--8));
+    }
+  }
   @media (max-width: 599px) {
     .year-bars__plot {
       padding-inline: calc(var(--wp--preset--spacing--4) / 2);

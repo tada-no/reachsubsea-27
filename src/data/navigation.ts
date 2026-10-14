@@ -6,6 +6,7 @@ import { worldPagePath, worldLabel } from './world';
 import { newsPosts, postUrl } from './news';
 import { shortDate } from '../lib/dates';
 import { projectSingles } from './projects';
+import { latestResults } from './investor-results';
 
 // The newest posts (8 Oct 2026, Newsroom, Q145): in WordPress the same query as the archive's lead
 // The menu's Latest project: the newest project with its own page (was a sample project with no page)
@@ -158,8 +159,9 @@ export const navSections: NavSection[] = [
       image: { src: `${import.meta.env.BASE_URL}images/windfarm-turbine-install.jpg`, alt: 'Vessel installing turbines at an offshore wind farm', focalPoint: { x: 0.6, y: 0.55 } },
       eyebrow: 'Sustainability',
       badge: { label: 'PDF', tone: 'neutral' },
-      title: 'Sustainability report 2025',
-      action: { label: 'Report (PDF)', url: '#', action: 'file' },
+      // The 2025 sustainability report is part of the annual report (live Reports page, 13 Oct 2026).
+      title: 'Annual and sustainability report 2025',
+      action: { label: 'Report (PDF)', url: latestResults.annualReport.url, action: 'file' },
     },
   },
   {
@@ -203,7 +205,7 @@ export const navSections: NavSection[] = [
       eyebrow: 'Join us',
       title: 'Open positions',
       description: 'Current vacancies are listed on HR-Manager.',
-      action: { label: 'View open positions', url: 'https://hr-manager.net/reachsubsea', action: 'external' },
+      action: { label: 'View open positions', url: 'https://candidate.hr-manager.net/vacancies/list.aspx?customer=reachsubsea', action: 'external' },
     },
   },
   {
@@ -272,11 +274,12 @@ export const getInTouch: MenuLinkItem[] = [
 
 /** Mobile menu utility block below the accordion (docs/04 §16 Mobile menu panel). */
 export const mobileUtility: NavLink[] = [
-  { label: 'Open positions', url: 'https://hr-manager.net/reachsubsea', action: 'external', external: true },
+  { label: 'Open positions', url: 'https://candidate.hr-manager.net/vacancies/list.aspx?customer=reachsubsea', action: 'external', external: true },
 ];
 
 export const contactDetails = {
-  phone: { label: '+47 400 07 710', href: 'tel:+4740007710' },
+  // Non-breaking spaces keep the number on one line.
+  phone: { label: '+47\u00A0400\u00A007\u00A0710', href: 'tel:+4740007710' },
   email: { label: 'post@reachsubsea.com', href: 'mailto:post@reachsubsea.com' },
 };
 
@@ -302,7 +305,7 @@ export const prototypeLinks: NavLink[] = [{ label: 'Client checklist', url: '/cl
 export const popularSearchLinks: NavLink[] = [
   { label: 'Fleet overview', url: '/assets/' },
   { label: 'Reports & presentations', url: '/investors/reports-presentations/' },
-  { label: 'Open positions', url: 'https://hr-manager.net/reachsubsea', action: 'external', external: true },
+  { label: 'Open positions', url: 'https://candidate.hr-manager.net/vacancies/list.aspx?customer=reachsubsea', action: 'external', external: true },
   { label: 'Explore 3D World', url: worldPagePath },
   { label: 'Contact', url: '/contact/' },
 ];

@@ -624,6 +624,10 @@ const root = base.replace(/\/?$/, '/');
     transform: translateY(-50%);
     display: grid;
     gap: var(--wp--preset--spacing--4);
+    /* One width on every side of the marker. Shrink-to-fit from the 26ch point body made a card on the right
+       narrower than one below, so on phones it fitted one side, moved, stopped fitting and flipped back each
+       frame (Ross, 14 Oct 2026: flicker on mobile) */
+    width: max-content;
     max-width: 26ch;
     padding: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
     border-radius: var(--wp--custom--radius--md);

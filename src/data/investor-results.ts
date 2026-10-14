@@ -5,6 +5,8 @@
 import type { ReportCardField, StatField } from '../lib/types';
 import { icsHref } from '../lib/ics';
 
+const UP = 'https://reachsubsea.no/wp-content/uploads';
+
 export interface ResultsRecord {
   period: string;
   /** All values are in this currency, stated once beside the publication date. */
@@ -21,7 +23,11 @@ export interface ResultsRecord {
    * 7 Oct 2026). The report's year-to-date paragraph; oil & gas is the rest. Written out, never "H1" (Ross, 7 Oct 2026). */
   revenueShift: { label: string; value: number }[];
   report: { label: string; url: string; context?: string };
-  /** Latest annual report. PLACEHOLDER until the client confirms the title, date and file. */
+  /** The report's slides and the webcast recording (live Reports page). */
+  presentation: string;
+  webcast: string;
+  /** Latest annual report: the live site's file (13 Oct 2026). The publication date is still for Reach to confirm
+   * (client checklist: 26 Mar or 30 Apr). */
   annualReport: { label: string; meta: string; url: string; context?: string; published: string };
   next: { label: string; date: string };
 }
@@ -55,8 +61,10 @@ export const latestResults: ResultsRecord = {
     { label: 'Renewables & other', value: shiftNow.value },
   ],
   revenueShift,
-  report: { label: 'Q2 2026 report', url: '#', context: 'PDF' },
-  annualReport: { label: 'Annual report 2025', meta: 'Annual and sustainability report', url: '#', context: 'PDF', published: '2026-03-26' },
+  report: { label: 'Q2 2026 report', url: `${UP}/2026/08/Reach-Subsea-ASA-2Q-2026-Report.pdf`, context: 'PDF' },
+  presentation: `${UP}/2026/08/Reach-Subsea-ASA-2Q-2026-Presentation.pdf`,
+  webcast: 'https://qcnl.tv/p/yvYoUYM3ZyQXYC70JxeBfQ',
+  annualReport: { label: 'Annual report 2025', meta: 'Annual and sustainability report', url: `${UP}/2026/04/Annual-and-Sustainability-Report-2025.pdf`, context: 'PDF', published: '2026-03-26' },
   next: { label: 'Q3 2026 results', date: '2026-11-17' },
 };
 
@@ -80,8 +88,8 @@ export const reportCards: ReportCardField[] = [
     meta: `Published ${shortDate(r.published)}`,
     links: [
       { label: 'Report', url: r.report.url, action: 'file', context: `${r.period} report, PDF` },
-      { label: 'Presentation', url: '#', action: 'file', context: `${r.period} presentation, PDF` },
-      { label: 'Webcast', url: '#', action: 'external', context: `${r.period} webcast` },
+      { label: 'Presentation', url: r.presentation, action: 'file', context: `${r.period} presentation, PDF` },
+      { label: 'Webcast', url: r.webcast, action: 'external', context: `${r.period} webcast` },
     ],
   },
   {

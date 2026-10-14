@@ -179,7 +179,8 @@ const shownArchives = archives.filter((a) => a.rows.length > 0);
                 >
                   {a.rows.map((row) => (
                     <li class="shelf-row">
-                      <h4 class="shelf-row__year text-h5">{row.label}</h4>
+                      {/* Under the archive title an h4; with no title (the annual drawer) an h3 under the section h2 */}
+                      {a.title ? <h4 class="shelf-row__year text-h5">{row.label}</h4> : <h3 class="shelf-row__year text-h5">{row.label}</h3>}
                       <div class="shelf-row__links">
                         {a.columns.map((label, i) => {
                           const l = row.links[i];

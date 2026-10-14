@@ -31,7 +31,7 @@ const id = (title: string) => `privacy-${title.toLowerCase().replace(/[^a-z0-9]+
       lead={p.lead}
     />
 
-    <BlockSection slug="legal" root="legal" background="white" label={p.title}>
+    <BlockSection slug="legal" root="legal" background="white" label="Policy text">
       <div class="prose article">
         {
           p.sections.map((s) => (
