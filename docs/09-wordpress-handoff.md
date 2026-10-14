@@ -22,7 +22,7 @@ Read with: [05-blocks-spec.md](05-blocks-spec.md) (block behaviour) · [04-compo
 2. ~~**Three blocks are too flexible for editors**~~ **Done (Q67, 21 Sep 2026).** Card grid's Bento is now **Card bento** (a `pattern` select; no per-card spans), Split media's Figures and Embed are **Figures** and **Split embed** (its unused Card media was dropped), and Stats band's Results style is **Results band**. Verified no visual change (§4 note).
 3. **Prototype-only code** is mixed into the blocks (image paths through `BASE_URL`, `state` and `sample` review props, GitHub Pages URL hard-coded, typed breadcrumbs). It needs stripping or replacing (§6).
 4. **The 3D World connection is a plain URL only.** The website's docs assume `?embed=1` and `?zone=1–4` exist; the world does not read them, and it has no message channel. The published scene is also two releases behind (§7).
-5. **Missing handoff pieces:** no redirect map, no page specs for the ~20 unbuilt pages beyond the docs/05 §3 block lists, and no named host for the world yet (it stays a separate app reading WordPress over an API, Q94 / §7.1). **Language is decided: English only (Q68)**, so fields stay single-language and no translation plugin is needed.
+5. **Missing handoff pieces:** ~~no redirect map~~ (done 14 Oct 2026, [docs/10](10-redirect-map.md)), no page specs for the ~20 unbuilt pages beyond the docs/05 §3 block lists, and no named host for the world yet (it stays a separate app reading WordPress over an API, Q94 / §7.1). **Language is decided: English only (Q68)**, so fields stay single-language and no translation plugin is needed.
 
 ---
 
@@ -148,7 +148,7 @@ Shared field shapes (`src/lib/types.ts`): **SectionHeader** = eyebrow, title, in
 1. **Bring the spec level with the code.** Add §2 entries to docs/05 for Lifecycle, Values and Social feed (or decide they are page-specific and say so), write up the built variants under their blocks, and update the block count in `src/blocks/README.md` (it still says 14). Then Figma: 15 blocks exist there and about a dozen "Figma to add" flags are open. The developer will trust whichever is newest, so say which one that is: **code and docs win over Figma today**.
 2. ~~Settle the three flexible blocks~~ **Done (Q67).** Still open here: Card grid Strip and Live operations are the next candidates if the developer finds them heavy.
 3. **Fix the single-source breach** (Home bento `750+`) and sweep for others: "An 18 MB scene" is typed on three pages and should be one setting.
-4. **Write the redirect map.** The brief assigned it to us (Q4). It does not exist as a file: redirects are scattered across page header comments and docs/00 (Company, Careers, Subsea). It needs the live and dev URL lists and a crawl, and it decides slugs that `services.ts` and `projects.ts` currently mark as placeholders.
+4. ~~**Write the redirect map.**~~ **Done 14 Oct 2026:** [docs/10](10-redirect-map.md) and `extract/redirect-map.csv` (434 rows, live and dev, every target checked against the build). The brief assigned it to us (Q4). It does not exist as a file: redirects are scattered across page header comments and docs/00 (Company, Careers, Subsea). It needs the live and dev URL lists and a crawl, and it decides slugs that `services.ts` and `projects.ts` currently mark as placeholders.
 5. ~~Decide language.~~ **Decided (Q68): English only.**
 6. **Set up the 3D World on Tada's servers** (host decided 9 Oct 2026, client checklist 5), get it to the embed contract (§7), and build the content API (§7.1) before the WordPress build reaches the embed block.
 7. **Strip prototype-only code** (§6) as part of the handoff, not after.
@@ -326,7 +326,7 @@ Nothing below may be presented as real until confirmed.
 | Block → WP mapping | This document, §4 (first pass, needs the §5 decisions) |
 | ACF field spec | §3 and §4 are the outline. The TypeScript interfaces in `src/lib/types.ts` and each block's `Props` are the ground truth |
 | `theme.json` tokens | Not written, by design. `src/styles/tokens.css` (183 `--wp--*` variables) is the source; naming already follows theme.json output |
-| Redirect map | **Not started.** Fragments in page header comments and docs/00 |
+| Redirect map | **Done (14 Oct 2026).** [docs/10](10-redirect-map.md), `extract/redirect-map.csv`: 434 rows (347 live, 87 dev) |
 | Page specs | docs/05 §3 lists blocks per page; 7 built pages are the visual reference |
 | Design system | Figma `HAvCQCXzWNFOKQ1AZxqNTX` (15 blocks, behind the code, see §5.1) and `docs/extract/*-ledger.json` |
 | Working prototype | `npm run dev` / `npm run build`; 55 pages build cleanly |

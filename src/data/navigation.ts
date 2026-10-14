@@ -7,6 +7,7 @@ import { newsPosts, postUrl } from './news';
 import { shortDate } from '../lib/dates';
 import { projectSingles } from './projects';
 import { latestResults } from './investor-results';
+import { quarterlyReleases } from './reports';
 
 // The newest posts (8 Oct 2026, Newsroom, Q145): in WordPress the same query as the archive's lead
 // The menu's Latest project: the newest project with its own page (was a sample project with no page)
@@ -72,6 +73,8 @@ export const primaryNav: NavItemData[] = [
   { id: 'contact', label: 'Contact', href: '/contact/' },
 ];
 
+const latestQuarter = quarterlyReleases[0];
+
 export const navSections: NavSection[] = [
   {
     id: 'services',
@@ -89,12 +92,13 @@ export const navSections: NavSection[] = [
       { label: 'Technology & Innovation', href: '/services/technology-innovation/', divider: true },
       { label: 'Research & Publications', href: '/services/technology-innovation/research-publications/' },
     ],
+    // 14 Oct 2026 (Ross): the Services card leads to the Services overview; Reach Remote moved to Assets.
     feature: {
       media: 'image-bg',
-      image: { src: `${import.meta.env.BASE_URL}images/reach-remote-bow.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel seen from the bow', focalPoint: { x: 0.6, y: 0.45 } },
-      eyebrow: 'Remote operations',
-      title: 'Reach Remote, controlled from shore',
-      action: { label: 'Meet Reach Remote', url: '/assets/reach-remote/' },
+      image: { src: `${import.meta.env.BASE_URL}images/hero-services.jpg`, alt: '', focalPoint: { x: 0.8, y: 0.55 } },
+      eyebrow: 'All services',
+      title: 'Services for the full offshore asset lifecycle',
+      action: { label: 'Services overview', url: '/services/' },
     },
   },
   {
@@ -115,13 +119,13 @@ export const navSections: NavSection[] = [
       { label: 'ROVs', href: '/assets/#rovs' },
       { label: 'Equipment', href: '/assets/#equipment' },
     ],
+    // 14 Oct 2026 (Ross): Reach Remote's card, moved here from Services (it was Reach Remote 3 & 4, still a link above).
     feature: {
       media: 'image-bg',
-      image: { src: `${import.meta.env.BASE_URL}images/vessel-olympic-zeus.jpg`, alt: 'Olympic Zeus, a Reach Subsea construction support vessel, at sea', focalPoint: { x: 0.35, y: 0.55 } },
-      eyebrow: 'Reach Remote',
-      badge: { label: 'In build', tone: 'navy' },
-      title: 'Reach Remote 3 & 4',
-      action: { label: 'Read more', url: '/assets/reach-remote/3-4/' },
+      image: { src: `${import.meta.env.BASE_URL}images/reach-remote-bow.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel seen from the bow', focalPoint: { x: 0.6, y: 0.45 } },
+      eyebrow: 'Remote operations',
+      title: 'Reach Remote, controlled from shore',
+      action: { label: 'Meet Reach Remote', url: '/assets/reach-remote/' },
     },
   },
   {
@@ -181,11 +185,12 @@ export const navSections: NavSection[] = [
     feature: {
       media: 'image-bg',
       image: { src: `${import.meta.env.BASE_URL}images/ocean-horizon-calm.jpg`, alt: 'Calm open ocean at the horizon', focalPoint: { x: 0.5, y: 0.4 } },
-      eyebrow: 'Next event',
-      badge: { label: 'Upcoming', tone: 'navy' },
-      title: 'Next results presentation',
-      description: 'Date and webcast link from the financial calendar.',
-      action: { label: 'Financial calendar', url: '/investors/financial-calendar/' },
+      // 14 Oct 2026 (Ross): the latest quarterly report (reports.ts, newest first), as the Home Investor update card
+      eyebrow: 'Latest results',
+      badge: { label: 'PDF', tone: 'neutral' },
+      title: `Q${latestQuarter.quarter} ${latestQuarter.year} report`,
+      meta: [{ icon: 'calendar', text: shortDate(latestQuarter.published!) }],
+      action: { label: 'Report (PDF)', url: latestQuarter.report!, action: 'file' },
     },
   },
   {

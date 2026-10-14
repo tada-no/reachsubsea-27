@@ -11,6 +11,15 @@ _No open questions right now._
 
 ## Answered log
 
+### Q171. Site sweep, redirect map and mega menu cards (14 Oct 2026)
+Context: Ross asked for a sweep of the whole site for missing content, W3C and WCAG problems, then for the redirect map and three mega menu changes.
+- [x] Sweep: HTML validation on 297 pages and axe (WCAG 2.2 AA) on 82 templates at 1440 and 375 came back nearly clean. Fixed: Open positions pointed at a dead HR-Manager address; the Investors, Why invest, Sustainability and Company menu report links were `#`; six small accessibility and validator fails. Still for the WordPress build: cookie consent, an accessibility statement page, SEO tags, a manual keyboard and screen-reader pass
+- [x] Reach Remote stage flicker on phones (Ross's screen recording): a card's width depended on its side of the marker, so it flipped sides every frame. One width on every side now
+- [x] Redirect map written: [docs/10](10-redirect-map.md), `extract/redirect-map.csv`, 434 rows (347 live, 87 dev), every target checked against the build
+- [x] Mega menu cards (Ross): Services now leads to the Services overview ("Services for the full offshore asset lifecycle", its hero photo); the Reach Remote card moved to Assets (replacing the Reach Remote 3 & 4 card, still a link in the list); Investors shows the latest quarterly report (`quarterlyReleases[0]`, as the Home Investor update card) instead of the placeholder "Next results presentation"
+
+**Answer:** as ticked.
+
 ### Q170. Careers heroes: people instead of the sea (12 Oct 2026)
 Context: Ross: "feel like the hero images on the career pages could have some people, what do you think?" Careers overview and Life at Reach shared the calm sea also used by Investors and Company; Why work with us had the Trinidad platform sunset. Compared live at 1440 (current against a people photo from the library, all live/dev media; the photos are 1200 px wide, shown at native width with the side fades).
 - [ ] ~~Overview + Life at Reach~~ (recommended) · [ ] ~~Overview only~~ · [x] **All three** · [ ] ~~None for now~~

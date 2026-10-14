@@ -1,0 +1,435 @@
+source,target,status,origin,note
+/,/,keep,live,
+/sample-page/,/,301,live,WordPress default page
+/services/,/services/,keep,live,
+/investors/news-web-2/,/investors/share-information/,301,live,
+/assets/,/assets/,keep,live,
+/privacy-policy/,/privacy-policy/,keep,live,
+/projects/,/projects/,keep,live,
+/about/,/company/,301,live,
+/investors/share-info/,/investors/share-information/,301,live,
+/selection-of-publications/,/services/technology-innovation/research-publications/,301,live,
+/careers-subpage-contacts-questions/,/careers/#contact,301,live,
+/sustainability/our-un-sustainability-goals/,/company/sustainability/#global-goals,301,live,
+/press-media/,/newsroom/press-media/,301,live,
+/contact/events/,/newsroom/,301,live,No Events page yet (SHOW_EVENTS off); point it at /newsroom/events/ once built
+/company/,/company/,keep,live,
+/investors/largest-shareholders-2/,/investors/share-information/,301,live,
+/contact/,/contact/,keep,live,
+/careers/,/careers/,keep,live,
+/sustainability/sponsorship-at-reach-subsea/,/company/sustainability/sponsorship/,301,live,
+/investors/general-meetings-2/,/investors/governance-meetings/#general-meetings,301,live,
+/transparency-act/,/transparency-act/,keep,live,
+/hseq-2/,/company/hseq/,301,live,
+/hseq/,/company/hseq/,301,live,
+/investors/,/investors/,keep,live,
+/about-our-company/,/company/,301,live,
+/investors/financial-calendar/,/investors/financial-calendar/,keep,live,
+/investors/financial-reports/,/investors/reports-presentations/,301,live,
+/sustainability/,/company/sustainability/,301,live,
+/environmental-monitoring/,/services/monitoring/#environmental,301,live,Short address the live site already redirects
+/survey-positioning/,/services/survey/,301,live,Short address the live site already redirects
+/reach-remote/,/assets/reach-remote/,301,live,Short address the live site already redirects
+/subsea-services/,/services/subsea/,301,live,Short address the live site already redirects
+/geophysical-monitoring/,/services/monitoring/,301,live,Short address the live site already redirects
+/sponsorship/,/company/sustainability/sponsorship/,301,live,Short address the live site already redirects
+/events/,/newsroom/,301,live,Short address the live site already redirects
+/services/subsea-services/engineering-project-management/,/services/subsea/#what-we-do,301,live,
+/services/subsea-services/asset-integrity-pipeline-inspection/,/services/subsea/#what-we-do,301,live,
+/services/subsea-services/inspection-maintenance-repair/,/services/subsea/#what-we-do,301,live,
+/services/subsea-services/construction-support/,/services/subsea/#what-we-do,301,live,
+/services/geophysical-monitoring/gravitude-depthwatch-for-seismic-nodes/,/services/monitoring/#what-we-do,301,live,
+/services/survey-positioning/seabed-surveys/general-seabed-surveys/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/seabed-surveys/site-surveys/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/seabed-surveys/pipeline-inspection/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/seabed-surveys/route-survey/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/seabed-surveys/seabed-mapping/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/seabed-surveys/uxo-surveys/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/offshore-cable/route-surveys/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/offshore-cable/cable-installation-support/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/offshore-cable/burial-support/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/offshore-cable/inspection-repair-maintenance-irm/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/marine-construction/irm/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/marine-construction/structure-installations/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/marine-construction/subsea-metrology/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/rig-mooring/fpso-mooring-operations/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/rig-mooring/jack-up-rig-moves/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/survey-positioning/rig-mooring/semi-sub-rig-moves/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/geophysical-monitoring/gwatch-4d-gravity2/,/services/monitoring/#what-we-do,301,live,
+/services/geophysical-monitoring/wellwatch-injection-integrity-monitoring/,/services/monitoring/#what-we-do,301,live,
+/services/geophysical-monitoring/drillwatch-well-drilling-under-controll/,/services/monitoring/#what-we-do,301,live,
+/services/geophysical-monitoring/real-time-seismic-monitoring/,/services/monitoring/#what-we-do,301,live,
+/services/reach-remote/imr-seabed-intervention/,/assets/reach-remote/,301,live,
+/services/survey-positioning/seabed-surveys/,/services/survey/#what-we-do,301,live,
+/services/survey-positioning/offshore-cable/,/services/survey/#what-we-do,301,live,
+/services/survey-positioning/marine-construction/,/services/survey/#what-we-do,301,live,
+/services/survey-positioning/rig-mooring/,/services/survey/#what-we-do,301,live,
+/services/geophysical-monitoring/,/services/monitoring/,301,live,
+/services/environmental-monitoring-monviro/,/services/monitoring/#environmental,301,live,
+/services/subsea-services/,/services/subsea/,301,live,
+/services/environmental-monitoring-monviro/c02-storage/,/services/monitoring/#environmental,301,live,
+/services/environmental-monitoring-monviro/earthquake-monitoring-and-prediction/,/services/monitoring/#environmental,301,live,
+/services/environmental-monitoring-monviro/geothermal-resources-assessment-and-monitoring/,/services/monitoring/#environmental,301,live,
+/services/reach-remote/survey/,/assets/reach-remote/,301,live,
+/services/survey-positioning/,/services/survey/,301,live,
+/services/reach-remote/inspection/,/assets/reach-remote/,301,live,
+/services/survey-positioning/rig-mooring/remote-control-rig-moves/,/services/survey/#what-we-do,301,live,Sub-service page dropped (Q80): its line's capability section
+/services/geophysical-monitoring/seafloor-subsidence-monitoring/,/services/monitoring/#what-we-do,301,live,
+/assets/surveyor-interceptor/,/assets/#rovs,301,live,No single pages for vessels and ROVs (Q78)
+/assets/schilling-robotics-hd-wrov/,/assets/#rovs,301,live,No single pages for vessels and ROVs (Q78)
+/assets/northern-maria/,/assets/#vessels,301,live,No single pages for vessels and ROVs (Q78)
+/assets/viking-reach-2/,/assets/#vessels,301,live,No single pages for vessels and ROVs (Q78)
+/assets/offshore-surveyor/,/assets/#vessels,301,live,No single pages for vessels and ROVs (Q78)
+/assets/olympic-taurus/,/assets/#vessels,301,live,No single pages for vessels and ROVs (Q78)
+/assets/havila-subsea/,/assets/#vessels,301,live,No single pages for vessels and ROVs (Q78)
+/assets/go-electra/,/assets/#vessels,301,live,No single pages for vessels and ROVs (Q78)
+/assets/olympic-triton/,/assets/#vessels,301,live,No single pages for vessels and ROVs (Q78)
+/assets/newbuild/,/assets/#vessels,301,live,No single pages for vessels and ROVs (Q78)
+/assets/drix-orca-1-and-orca-2/,/assets/#uncrewed,301,live,No single pages for vessels and ROVs (Q78)
+/assets/zeerov/,/assets/#rovs,301,live,No single pages for vessels and ROVs (Q78)
+/assets/supporter-wrov/,/assets/#rovs,301,live,No single pages for vessels and ROVs (Q78)
+/assets/constructor-wrov/,/assets/#rovs,301,live,No single pages for vessels and ROVs (Q78)
+/assets/reach-remote-1-2/,/assets/reach-remote/,301,live,
+/assets/reach-remote-3-4/,/assets/reach-remote/3-4/,301,live,
+/assets/deep-cygnus/,/assets/#vessels,301,live,No single pages for vessels and ROVs (Q78)
+/projects/autonomous-survey/,/projects/autonomous-survey/,keep,live,
+/projects/fleet-update-2/,/newsroom/financial-report-for-4q-2021-and-strategic-partner/,301,live,Not migrated as a project (Q150)
+/projects/reach-subsea-sets-a-new-milestone-for-accuracy-and-efficiency-of-gravimetry-surveys-with-shell-norge-at-ormen-lange-field/,/projects/reach-subsea-sets-a-new-milestone-for-accuracy-and-efficiency-of-gravimetry-surveys-with-shell-norge-at-ormen-lange-field/,keep,live,
+/projects/sabella-sas-2/,/projects/sabella-sas-2/,keep,live,
+/projects/black-sea-map-project/,/projects/black-sea-map-project/,keep,live,
+/projects/geophysical-and-uxo-power-cable-route-survey/,/projects/geophysical-and-uxo-power-cable-route-survey/,keep,live,
+/projects/500-imr-days/,/projects/,301,live,Not migrated as a project (Q150)
+/projects/boulder-removal/,/projects/boulder-removal/,keep,live,
+/projects/decomissioning-3/,/projects/decomissioning-3/,keep,live,
+/projects/diver-less-riser-flange-replacement/,/projects/diver-less-riser-flange-replacement/,keep,live,
+/projects/efficient-light-construction/,/projects/efficient-light-construction/,keep,live,
+/projects/fiber-optic-cable-installation/,/projects/fiber-optic-cable-installation/,keep,live,
+/projects/haven-jack-up-removal/,/projects/haven-jack-up-removal/,keep,live,
+/projects/pipelay-installation-support/,/projects/pipelay-installation-support/,keep,live,
+/projects/suction-anchor-installation/,/projects/suction-anchor-installation/,keep,live,
+/projects/thruster-changeout/,/projects/thruster-changeout/,keep,live,
+/projects/pipeline-inspection-campaign/,/projects/pipeline-inspection-campaign/,keep,live,
+/projects/digimon/,/projects/digimon/,keep,live,
+/projects/asumo/,/projects/asumo/,keep,live,
+/projects/structure-inspection/,/projects/structure-inspection/,keep,live,
+/projects/water-pipeline/,/projects/water-pipeline/,keep,live,
+/projects/reservoir-monitoring-surveys-using-gwatch-at-several-equinor-operated-gas-fields/,/projects/reservoir-monitoring-surveys-using-gwatch-at-several-equinor-operated-gas-fields/,keep,live,
+/projects/unlocking-enhanced-value-in-4d-seismic-with-reach-subseas-depthwatch-technology-insights-from-reach-subsea-and-shell/,/projects/unlocking-enhanced-value-in-4d-seismic-with-reach-subseas-depthwatch-technology-insights-from-reach-subsea-and-shell/,keep,live,
+/projects/site-survey-campaign/,/projects/site-survey-campaign/,keep,live,
+/exercises-extension-option-for-deep-cygnus/,/newsroom/exercises-extension-option-for-deep-cygnus/,301,live,
+/close-to-1000-days-of-offshore-operation-with-nobody-on-board/,/newsroom/close-to-1000-days-of-offshore-operation-with-nobody-on-board/,301,live,
+/reach-subsea-asa-2q-2026-strong-results-building-the-fleet-for-the-future/,/newsroom/reach-subsea-asa-2q-2026-strong-results-building-the-fleet-for-the-future/,301,live,
+/reach-subsea-asa-invitation-to-presentation-of-second-quarter-and-half-year-results-2026/,/newsroom/reach-subsea-asa-invitation-to-presentation-of-second-quarter-and-half-year-results-2026/,301,live,
+/moa-signed-for-sale-of-viking-reach-and-onboard-wrov/,/newsroom/moa-signed-for-sale-of-viking-reach-and-onboard-wrov/,301,live,
+/reach-remote-1-completes-its-first-port-call-in-the-united-kingdom/,/newsroom/reach-remote-1-completes-its-first-port-call-in-the-united-kingdom/,301,live,
+/reach-subsea-signs-moa-with-beacon-offshore-in-australia/,/newsroom/reach-subsea-signs-moa-with-beacon-offshore-in-australia/,301,live,
+/reach-subsea-signs-21-year-contract/,/newsroom/reach-subsea-signs-21-year-contract/,301,live,
+/reach-subsea-asa-1q-2026-weak-quarterly-results-reach-remote-entering-scale-up-phase/,/newsroom/reach-subsea-asa-1q-2026-weak-quarterly-results-reach-remote-entering-scale-up-phase/,301,live,
+/reach-subsea-receives-loi-for-a-21-year-contract/,/newsroom/reach-subsea-receives-loi-for-a-21-year-contract/,301,live,
+/annual-and-sustainability-report-2025/,/newsroom/annual-and-sustainability-report-2025/,301,live,
+/reach-subsea-awarded-two-contracts-using-reach-remote-1/,/newsroom/reach-subsea-awarded-two-contracts-using-reach-remote-1/,301,live,
+/strategic-inspection-contract-awarded-with-reach-remote-fully-certified/,/newsroom/strategic-inspection-contract-awarded-with-reach-remote-fully-certified/,301,live,
+/reach-subsea-asa-4q-2025-results-down-milestones-on-reach-remote-delivered/,/newsroom/reach-subsea-asa-4q-2025-results-down-milestones-on-reach-remote-delivered/,301,live,
+/code-of-conduct-2025/,/newsroom/code-of-conduct-2025/,301,live,
+/reach-subsea-asa-3q-2025-weaker-results-solid-performance-on-remote-milestones/,/newsroom/reach-subsea-asa-3q-2025-weaker-results-solid-performance-on-remote-milestones/,301,live,
+/reach-subsea-fleet-update/,/newsroom/reach-subsea-fleet-update/,301,live,
+/reach-remote-1-cleared-for-operations-without-supporting-vessel/,/newsroom/reach-remote-1-cleared-for-operations-without-supporting-vessel/,301,live,
+/reach-subsea-asa-orders-reach-remote-3-and-4-from-kongsberg-maritime/,/newsroom/reach-subsea-asa-orders-reach-remote-3-and-4-from-kongsberg-maritime/,301,live,
+/reach-subsea-acquires-subvision-ab/,/newsroom/reach-subsea-acquires-subvision-ab/,301,live,
+/change-in-management/,/newsroom/change-in-management/,301,live,
+/reach-subseas-usv-reach-remote-2-sets-sail-for-australia/,/newsroom/reach-subseas-usv-reach-remote-2-sets-sail-for-australia/,301,live,
+/reach-subsea-asa-2q-2025-impacted-by-a-cautious-market/,/newsroom/reach-subsea-asa-2q-2025-impacted-by-a-cautious-market/,301,live,
+/invitation-to-presentation-of-the-second-quarter-and-half-year-results-2025/,/newsroom/invitation-to-presentation-of-the-second-quarter-and-half-year-results-2025/,301,live,
+/multiple-new-contracts-including-usv-services/,/newsroom/multiple-new-contracts-including-usv-services/,301,live,
+/reach-subsea-asa-fixed-income-credit-investor-meetings/,/newsroom/reach-subsea-asa-fixed-income-credit-investor-meetings/,301,live,
+/reach-subsea-confirms-delivery-of-reach-remote-2/,/newsroom/reach-subsea-confirms-delivery-of-reach-remote-2/,301,live,
+/reach-subsea-asa-annual-and-sustainability-report-2024/,/newsroom/reach-subsea-asa-annual-and-sustainability-report-2024/,301,live,
+/reach-subsea-asa-1q-2025-another-record-quarter/,/newsroom/reach-subsea-asa-1q-2025-another-record-quarter/,301,live,
+/invitation-to-presentation-of-the-first-quarter-results-2025/,/newsroom/invitation-to-presentation-of-the-first-quarter-results-2025/,301,live,
+/annual-and-sustainability-report-2024/,/newsroom/annual-and-sustainability-report-2024/,301,live,
+/reach-subsea-asa-exercise-of-warrants-by-primary-insider/,/newsroom/reach-subsea-asa-exercise-of-warrants-by-primary-insider/,301,live,
+/reach-subsea-asa-increasing-vessel-capacity-through-ownership-and-charter-agreement/,/newsroom/reach-subsea-asa-increasing-vessel-capacity-through-ownership-and-charter-agreement/,301,live,
+/reach-subsea-asa-q4-2024-another-record-year/,/newsroom/reach-subsea-asa-q4-2024-another-record-year/,301,live,
+/invitation-to-presentation-of-the-fourth-quarter-and-preliminary-full-year-results-2024/,/newsroom/invitation-to-presentation-of-the-fourth-quarter-and-preliminary-full-year-results-2024/,301,live,
+/reach-subsea-confirms-delivery-of-reach-remote-1/,/newsroom/reach-subsea-confirms-delivery-of-reach-remote-1/,301,live,
+/reach-subsea-global-continuing-to-welcome-new-clients/,/newsroom/reach-subsea-global-continuing-to-welcome-new-clients/,301,live,
+/reach-subsea-asa-q3-2024-continued-steady-progress/,/newsroom/reach-subsea-asa-q3-2024-continued-steady-progress/,301,live,
+/invitation-to-presentation-of-the-third-quarter-results-2024/,/newsroom/invitation-to-presentation-of-the-third-quarter-results-2024/,301,live,
+/reach-subsea-gains-totalenergies-as-new-collaboration-partner-for-the-reach-remote-usv-qualification-program/,/newsroom/reach-subsea-gains-totalenergies-as-new-collaboration-partner-for-the-reach-remote-usv-qualification-program/,301,live,
+/reach-subsea-has-been-granted-up-to-eur-14-3-million-from-the-eu-innovation-fund/,/newsroom/reach-subsea-has-been-granted-up-to-eur-14-3-million-from-the-eu-innovation-fund/,301,live,
+/reach-remote-1-named-ship-of-the-year-2024/,/newsroom/reach-remote-1-named-ship-of-the-year-2024/,301,live,
+/reach-subsea-asa-q2-2024-confirming-steady-progress/,/newsroom/reach-subsea-asa-q2-2024-confirming-steady-progress/,301,live,
+/invitation-to-presentation-of-the-second-quarter-and-half-year-results-2024/,/newsroom/invitation-to-presentation-of-the-second-quarter-and-half-year-results-2024/,301,live,
+/reach-subsea-collaborates-with-equinor-for-reach-remote-usv-qualification-program/,/newsroom/reach-subsea-collaborates-with-equinor-for-reach-remote-usv-qualification-program/,301,live,
+/reach-subsea-strengthens-order-backlog-with-new-contracts/,/newsroom/reach-subsea-strengthens-order-backlog-with-new-contracts/,301,live,
+/reach-subsea-extended-3-year-charter-on-havila-subsea/,/newsroom/reach-subsea-extended-3-year-charter-on-havila-subsea/,301,live,
+/reach-subsea-australia-awarded-first-survey-project-under-renewed-hipp-deed/,/newsroom/reach-subsea-australia-awarded-first-survey-project-under-renewed-hipp-deed/,301,live,
+/new-agreement-ensures-international-cooperation-in-the-operation-of-autonomous-ships/,/newsroom/new-agreement-ensures-international-cooperation-in-the-operation-of-autonomous-ships/,301,live,
+/reach-subsea-asa-q1-2024-starting-the-year-with-new-records/,/newsroom/reach-subsea-asa-q1-2024-starting-the-year-with-new-records/,301,live,
+/invitation-to-presentation-of-the-first-quarter-2024/,/newsroom/invitation-to-presentation-of-the-first-quarter-2024/,301,live,
+/reach-subsea-asa-annual-and-sustainability-report-2023/,/newsroom/reach-subsea-asa-annual-and-sustainability-report-2023/,301,live,
+/reach-subsea-invests-in-local-suppliers/,/newsroom/reach-subsea-invests-in-local-suppliers/,301,live,
+/reach-subsea-expands-fleet-charter-option-lifted-and-two-new-constructor-rovs-ordered/,/newsroom/reach-subsea-expands-fleet-charter-option-lifted-and-two-new-constructor-rovs-ordered/,301,live,
+/reach-subsea-asa-q4-2023-record-high-numbers-and-strong-outlook/,/newsroom/reach-subsea-asa-q4-2023-record-high-numbers-and-strong-outlook/,301,live,
+/reach-subsea-increasing-project-capacity-through-charter-arrangements/,/newsroom/reach-subsea-increasing-project-capacity-through-charter-arrangements/,301,live,
+/invitation-to-presentation-of-the-fourth-quarter-and-preliminary-full-year-2023-results/,/newsroom/invitation-to-presentation-of-the-fourth-quarter-and-preliminary-full-year-2023-results/,301,live,
+/code-of-conduct-2024/,/newsroom/code-of-conduct-2024/,301,live,
+/reach-subsea-expanding-orderbook-with-several-contract-awards/,/newsroom/reach-subsea-expanding-orderbook-with-several-contract-awards/,301,live,
+/reach-subsea-notice-of-contract-award-with-equinor-for-services-in-brazil-and-expansion-of-order-backlog/,/newsroom/reach-subsea-notice-of-contract-award-with-equinor-for-services-in-brazil-and-expansion-of-order-backlog/,301,live,
+/equinor-extending-multi-year-frame-agreement-using-gwatch/,/newsroom/equinor-extending-multi-year-frame-agreement-using-gwatch/,301,live,
+/reach-subsea-further-increased-capacity-through-long-term-contract-for-an-innovative-imr-survey-vessel/,/newsroom/reach-subsea-further-increased-capacity-through-long-term-contract-for-an-innovative-imr-survey-vessel/,301,live,
+/reach-subsea-asa-q3-2023-strong-growth-in-revenue-and-profitability-continued-positive-outlook/,/newsroom/reach-subsea-asa-q3-2023-strong-growth-in-revenue-and-profitability-continued-positive-outlook/,301,live,
+/invitation-to-presentation-of-the-third-quarter-2023-results/,/newsroom/invitation-to-presentation-of-the-third-quarter-2023-results/,301,live,
+/reach-subsea-has-now-signed-survey-contract-with-major-scottish-energy-firm-ssen-transmission/,/newsroom/reach-subsea-has-now-signed-survey-contract-with-major-scottish-energy-firm-ssen-transmission/,301,live,
+/reach-subsea-asa-obtaining-strong-australian-market-access-and-world-leading-survey-capabilities-by-acquiring-guardian-geomatics/,/newsroom/reach-subsea-asa-obtaining-strong-australian-market-access-and-world-leading-survey-capabilities-by-acquiring-guardian-geomatics/,301,live,
+/reach-subsea-asa-exercising-option-for-the-subsea-vessel-havila-subsea/,/newsroom/reach-subsea-asa-exercising-option-for-the-subsea-vessel-havila-subsea/,301,live,
+/a-new-potential-source-of-information-to-improve-our-understanding-of-earthquakes/,/newsroom/a-new-potential-source-of-information-to-improve-our-understanding-of-earthquakes/,301,live,
+/reach-subsea-asa-q2-2023-continued-strong-growth-in-revenue-profitability-and-order-book/,/newsroom/reach-subsea-asa-q2-2023-continued-strong-growth-in-revenue-profitability-and-order-book/,301,live,
+/invitation-to-presentation-of-the-second-quarter-2023-results/,/newsroom/invitation-to-presentation-of-the-second-quarter-2023-results/,301,live,
+/reach-subsea-notice-of-contract-award/,/newsroom/reach-subsea-notice-of-contract-award/,301,live,
+/subsea-vessel-olympic-triton-chartered-for-3-years-plus-2-years-options/,/newsroom/subsea-vessel-olympic-triton-chartered-for-3-years-plus-2-years-options/,301,live,
+/reach-subsea-asa-q1-2023-continued-strong-growth-and-record-high-order-book/,/newsroom/reach-subsea-asa-q1-2023-continued-strong-growth-and-record-high-order-book/,301,live,
+/invitation-to-presentation-of-the-first-quarter-results-for-2023/,/newsroom/invitation-to-presentation-of-the-first-quarter-results-for-2023/,301,live,
+/five-months-plus-options-offshore-wind-contract-with-tier-one-renewable-energy-company/,/newsroom/five-months-plus-options-offshore-wind-contract-with-tier-one-renewable-energy-company/,301,live,
+/sustainability-report-2022/,/newsroom/sustainability-report-2022/,301,live,
+/annual-report-and-sustainability-report-2022/,/newsroom/annual-report-and-sustainability-report-2022/,301,live,
+/sustainability-report/,/newsroom/sustainability-report/,301,live,
+/code-of-conduct/,/newsroom/code-of-conduct/,301,live,
+/reach-subsea-asa-strategic-three-year-frame-agreement-and-two-months-call-off-with-equinor/,/newsroom/reach-subsea-asa-strategic-three-year-frame-agreement-and-two-months-call-off-with-equinor/,301,live,
+/reach-subsea-asa-reach-subsea-partners-with-eidesvik-offshore-for-ownershipand-operation-of-edda-sun/,/newsroom/reach-subsea-asa-reach-subsea-partners-with-eidesvik-offshore-for-ownershipand-operation-of-edda-sun/,301,live,
+/reach-subsea-awarded-contract-with-major-renewables-energy-company-and-signs-contracts-for-new-vessel-to-serve-a-continued-strong-market/,/newsroom/reach-subsea-awarded-contract-with-major-renewables-energy-company-and-signs-contracts-for-new-vessel-to-serve-a-continued-strong-market/,301,live,
+/survey-division-onshore-and-offshore-positions/,/newsroom/survey-division-onshore-and-offshore-positions/,301,live,
+/reach-subsea-secures-cost-attractive-long-term-vessel-capacity-through-acquisition-of-edda-sun-and-charter-of-go-electra/,/newsroom/reach-subsea-secures-cost-attractive-long-term-vessel-capacity-through-acquisition-of-edda-sun-and-charter-of-go-electra/,301,live,
+/1431-2/,/newsroom/1431-2/,301,live,
+/octio-awarded-a-multi-year-4d-geophysical-monitoring-frame-contract-offshore-australia/,/newsroom/octio-awarded-a-multi-year-4d-geophysical-monitoring-frame-contract-offshore-australia/,301,live,
+/reach-subsea-asa-subsea-vessel-deep-cygnus-secured-for-41-years/,/newsroom/reach-subsea-asa-subsea-vessel-deep-cygnus-secured-for-41-years/,301,live,
+/contract-signed-with-kongsberg-maritime-to-build-the-first-two-game-changing-reach-remote-unmanned-offshore-vessels/,/newsroom/contract-signed-with-kongsberg-maritime-to-build-the-first-two-game-changing-reach-remote-unmanned-offshore-vessels/,301,live,
+/annual-report-and-sustainability-report/,/newsroom/annual-report-and-sustainability-report/,301,live,
+/ma-closing/,/newsroom/ma-closing/,301,live,
+/exciting-times-ahead/,/newsroom/exciting-times-ahead/,301,live,
+/financial-report-for-4q-2021-and-strategic-partner/,/newsroom/financial-report-for-4q-2021-and-strategic-partner/,301,live,
+/reach-subsea-octio-awarded-multi-year-geophysical-monitoring-contract-with-a-s-norske-shell/,/newsroom/reach-subsea-octio-awarded-multi-year-geophysical-monitoring-contract-with-a-s-norske-shell/,301,live,
+/reach-subsea-asa-acquisition-of-geophysical-monitoring-solutions-provider-octio/,/newsroom/reach-subsea-asa-acquisition-of-geophysical-monitoring-solutions-provider-octio/,301,live,
+/reach-second-quarter-and-first-half-2021-report/,/newsroom/reach-second-quarter-and-first-half-2021-report/,301,live,
+/reach-remote-project-update/,/newsroom/reach-remote-project-update/,301,live,
+/contract-awards-3/,/newsroom/contract-awards-3/,301,live,
+/cooperation-update/,/newsroom/cooperation-update/,301,live,
+/record-result-proposed-dividend-of-nok-015-per-share/,/newsroom/record-result-proposed-dividend-of-nok-015-per-share/,301,live,
+/good-start-to-the-year/,/newsroom/good-start-to-the-year/,301,live,
+/future-proofing-subsea/,/newsroom/future-proofing-subsea/,301,live,
+/environmental-initiatives/,/newsroom/environmental-initiatives/,301,live,
+/reach-subsea-secures-modern-fit-for-purpose-vessel-capacity/,/newsroom/reach-subsea-secures-modern-fit-for-purpose-vessel-capacity/,301,live,
+/contract-award-4/,/newsroom/contract-award-4/,301,live,
+/contract-update/,/newsroom/contract-update/,301,live,
+/contract-awards-2/,/newsroom/contract-awards-2/,301,live,
+/r-e-c-r-u-i-t-m-e-n-t-were-hiring/,/newsroom/r-e-c-r-u-i-t-m-e-n-t-were-hiring/,301,live,
+/contract-award-and-operational-figures/,/newsroom/contract-award-and-operational-figures/,301,live,
+/contract-award-3/,/newsroom/contract-award-3/,301,live,
+/new-vessel-capacity/,/newsroom/new-vessel-capacity/,301,live,
+/contracts/,/newsroom/contracts/,301,live,
+/contract-awards/,/newsroom/contract-awards/,301,live,
+/imr-contract-award/,/newsroom/imr-contract-award/,301,live,
+/subsea-vessel-olympic-challenger-secured-for-21-years/,/newsroom/subsea-vessel-olympic-challenger-secured-for-21-years/,301,live,
+/bp-contract-for-normand-reach/,/newsroom/bp-contract-for-normand-reach/,301,live,
+/statoil-frame-agreement-and-contract-award/,/newsroom/statoil-frame-agreement-and-contract-award/,301,live,
+/contract-award-2/,/newsroom/contract-award-2/,301,live,
+/surveyor-ii-is-well-underway/,/newsroom/surveyor-ii-is-well-underway/,301,live,
+/unique-antique-shipwrecks-detected-in-the-black-sea/,/newsroom/unique-antique-shipwrecks-detected-in-the-black-sea/,301,live,
+/contract-and-vessel-update/,/newsroom/contract-and-vessel-update/,301,live,
+/letter-of-intent/,/newsroom/letter-of-intent/,301,live,
+/nord-stream-awards-contract-for-external-inspection-of-the-pipeline/,/newsroom/nord-stream-awards-contract-for-external-inspection-of-the-pipeline/,301,live,
+/surveyor-rov-2/,/newsroom/surveyor-rov-2/,301,live,
+/updated-prospectus-2/,/newsroom/updated-prospectus-2/,301,live,
+/edda-fonn-contract/,/newsroom/edda-fonn-contract/,301,live,
+/extraordinary-general-meeting-2/,/newsroom/extraordinary-general-meeting-2/,301,live,
+/completed-private-placement-2/,/newsroom/completed-private-placement-2/,301,live,
+/black-sea-maritime-archaeological-project/,/newsroom/black-sea-maritime-archaeological-project/,301,live,
+/updated-prospectus/,/newsroom/updated-prospectus/,301,live,
+/cooperation-agreement-with-aibel/,/newsroom/cooperation-agreement-with-aibel/,301,live,
+/research-expedition-with-ntnu/,/newsroom/research-expedition-with-ntnu/,301,live,
+/taking-actions-to-remain-competitive/,/newsroom/taking-actions-to-remain-competitive/,301,live,
+/contract-extensions-with-eidesvik-offshore/,/newsroom/contract-extensions-with-eidesvik-offshore/,301,live,
+/contract-news-for-stril-explorer-and-edda-fonn/,/newsroom/contract-news-for-stril-explorer-and-edda-fonn/,301,live,
+/contract-for-viking-neptun/,/newsroom/contract-for-viking-neptun/,301,live,
+/contracts-for-edda-fonn/,/newsroom/contracts-for-edda-fonn/,301,live,
+/annual-report-2014/,/newsroom/annual-report-2014/,301,live,
+/contract-award/,/newsroom/contract-award/,301,live,
+/gassco-press-release/,/newsroom/gassco-press-release/,301,live,
+/presentation-4q2014/,/newsroom/presentation-4q2014/,301,live,
+/4q2014-results/,/newsroom/4q2014-results/,301,live,
+/successful-tests-of-surveyor-interceptor/,/newsroom/successful-tests-of-surveyor-interceptor/,301,live,
+/surveyor-interceptor-offshore-tests-ongoing/,/newsroom/surveyor-interceptor-offshore-tests-ongoing/,301,live,
+/exercise-of-options/,/newsroom/exercise-of-options/,301,live,
+/contract-award-with-technip/,/newsroom/contract-award-with-technip/,301,live,
+/letter-of-award-for-nok-60-70-million-contract/,/newsroom/letter-of-award-for-nok-60-70-million-contract/,301,live,
+/3-year-rov-contract-with-eidesvik-offshore/,/newsroom/3-year-rov-contract-with-eidesvik-offshore/,301,live,
+/new-contract-2/,/newsroom/new-contract-2/,301,live,
+/1q2014/,/newsroom/1q2014/,301,live,
+/organizational-changes/,/newsroom/organizational-changes/,301,live,
+/notice-of-annual-general-meeting/,/newsroom/notice-of-annual-general-meeting/,301,live,
+/new-contracts-2/,/newsroom/new-contracts-2/,301,live,
+/joint-venture-agreement-with-mmt/,/newsroom/joint-venture-agreement-with-mmt/,301,live,
+/new-contract-for-dina-star/,/newsroom/new-contract-for-dina-star/,301,live,
+/new-contract/,/newsroom/new-contract/,301,live,
+/4th-quarter-report-2013/,/newsroom/4th-quarter-report-2013/,301,live,
+/contract-awards-and-increased-fleet-for-reach-subsea/,/newsroom/contract-awards-and-increased-fleet-for-reach-subsea/,301,live,
+/normand-reach-has-arrived-at-aukra/,/newsroom/normand-reach-has-arrived-at-aukra/,301,live,
+/3rd-quarter-2013-report-and-presentation/,/newsroom/3rd-quarter-2013-report-and-presentation/,301,live,
+/normand-reach-contract-with-dof-subsea/,/newsroom/normand-reach-contract-with-dof-subsea/,301,live,
+/awarded-two-contracts/,/newsroom/awarded-two-contracts/,301,live,
+/stock-option-scheme/,/newsroom/stock-option-scheme/,301,live,
+/2nd-quarter-2013-report/,/newsroom/2nd-quarter-2013-report/,301,live,
+/contract-award-calecore/,/newsroom/contract-award-calecore/,301,live,
+/new-contracts/,/newsroom/new-contracts/,301,live,
+/extraordinary-general-meeting/,/newsroom/extraordinary-general-meeting/,301,live,
+/completed-private-placement/,/newsroom/completed-private-placement/,301,live,
+/joint-venture-with-mmt/,/newsroom/joint-venture-with-mmt/,301,live,
+/loi-award-from-cosl/,/newsroom/loi-award-from-cosl/,301,live,
+/1st-quarter-2014-report/,/newsroom/1st-quarter-2014-report/,301,live,
+/general-meeting/,/newsroom/general-meeting/,301,live,
+/annual-report-2012/,/newsroom/annual-report-2012/,301,live,
+/4th-quarter-2012-report/,/newsroom/4th-quarter-2012-report/,301,live,
+/reach-subsea-asa-conclude-long-term-charter-with-solstad-offshore-asa/,/newsroom/reach-subsea-asa-conclude-long-term-charter-with-solstad-offshore-asa/,301,live,
+/private-placement-and-stock-listing-for-reach-subsea/,/newsroom/private-placement-and-stock-listing-for-reach-subsea/,301,live,
+/workclass-rov-order/,/newsroom/workclass-rov-order/,301,live,
+/ons-2012/,/newsroom/ons-2012/,301,live,
+/new-office/,/newsroom/new-office/,301,live,
+/were-hiring-3/,/newsroom/were-hiring-3/,301,live,
+/were-hiring-2/,/newsroom/were-hiring-2/,301,live,
+/were-hiring/,/newsroom/were-hiring/,301,live,
+/business-development-manager/,/newsroom/business-development-manager/,301,live,
+/surveyor-rov-sets-new-records/,/newsroom/surveyor-rov-sets-new-records/,301,live,
+/surveyor-interceptor-fat-and-wet-tests/,/newsroom/surveyor-interceptor-fat-and-wet-tests/,301,live,
+/first-photos-of-the-surveyor-interceptor/,/newsroom/first-photos-of-the-surveyor-interceptor/,301,live,
+/establishment-of-reach-subsea-as/,/newsroom/establishment-of-reach-subsea-as/,301,live,
+/teamday/,/newsroom/teamday/,301,live,
+/testing-of-supporter-20-21/,/newsroom/testing-of-supporter-20-21/,301,live,
+/nb-825-tbn-normand-reach/,/newsroom/nb-825-tbn-normand-reach/,301,live,
+/news/,/newsroom/,301,live,
+/category/news/,/newsroom/category/news/,301,live,
+/category/reports/,/newsroom/category/reports/,301,live,
+/events/offshore-technology-conference-asia/,/newsroom/,301,live,Past events; no Events page yet
+/events/emigration-expo-netherlands/,/newsroom/,301,live,Past events; no Events page yet
+/events/event-oceanology-international/,/newsroom/,301,live,Past events; no Events page yet
+/events/subsea-operations-conference/,/newsroom/,301,live,Past events; no Events page yet
+/events/reach-beyond/,/newsroom/,301,live,Past events; no Events page yet
+/events/ons-2024/,/newsroom/,301,live,Past events; no Events page yet
+/events/wind-energy-hamburg/,/newsroom/,301,live,Past events; no Events page yet
+/events/rog-e-2024-rio-de-janeiro/,/newsroom/,301,live,Past events; no Events page yet
+/events/karriereuka-2024-oslo/,/newsroom/,301,live,Past events; no Events page yet
+/events/mtec-icmass-2024/,/newsroom/,301,live,Past events; no Events page yet
+/events/mass-moorgate/,/newsroom/,301,live,Past events; no Events page yet
+/events/kvinner-i-kuling-2024/,/newsroom/,301,live,Past events; no Events page yet
+/events/career-fair-plymouth/,/newsroom/,301,live,Past events; no Events page yet
+/events/career-fair-glasgow/,/newsroom/,301,live,Past events; no Events page yet
+/events/career-fair-szczecin/,/newsroom/,301,live,Past events; no Events page yet
+/events/norway/,/newsroom/,301,live,Past events; no Events page yet
+/events/uk/,/newsroom/,301,live,Past events; no Events page yet
+/events/asia/,/newsroom/,301,live,Past events; no Events page yet
+/events/europe/,/newsroom/,301,live,Past events; no Events page yet
+/events/sa/,/newsroom/,301,live,Past events; no Events page yet
+/events/career/,/newsroom/,301,live,Past events; no Events page yet
+/publication-category/gravity-and-subsidence-monitoring/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-category/integration-of-gravity-and-electromagnetic-data/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-category/microseismic-monitoring/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-category/subsidence-monitoring/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-category/passive-seismic-monitoring/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-category/accurate-node-depths/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-reference/eage-annual/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-reference/eage-workshop/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-reference/first-break/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-reference/spe-annual/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-reference/seg-annual/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-reference/spe-workshop/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-reference/omc/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-reference/geoexpro/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-reference/ghgt/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/publication-reference/image/,/services/technology-innovation/research-publications/#library,301,live,Publication taxonomy archive
+/markers/geophysical-monitoring-area/,/services/monitoring/,301,live,Map marker taxonomy
+/careers/explore-your-path/,/careers/,301,dev,
+/careers/explore-your-path/diversity-inclusion/,/careers/our-culture/,301,dev,
+/careers/explore-your-path/graduates-students/,/careers/why-work-with-us/,301,dev,
+/careers/explore-your-path/offshore-careers/,/careers/why-work-with-us/,301,dev,
+/careers/explore-your-path/onshore-careers/,/careers/why-work-with-us/,301,dev,
+/careers/opportunities/,/careers/#open-positions,301,dev,
+/careers/opportunities/candidate-portal/,/careers/#open-positions,301,dev,
+/careers/opportunities/careers-faq/,/faq/#careers,301,dev,
+/careers/opportunities/trainees-laerlinger/,/careers/#trainees,301,dev,
+/careers/opportunities/vacancies/,/careers/#open-positions,301,dev,
+/careers/people/,/careers/,301,dev,
+/careers/people/diversity-inclusion/,/careers/our-culture/,301,dev,
+/careers/people/employee-engagement/,/careers/,301,dev,
+/careers/people/leadership-organisation/,/careers/,301,dev,
+/careers/people/learning-development/,/careers/,301,dev,
+/careers/people/our-culture/,/careers/our-culture/,301,dev,
+/careers/why-work-with-us/career-growth/,/careers/why-work-with-us/,301,dev,
+/careers/why-work-with-us/everything-within-reach/,/careers/why-work-with-us/,301,dev,
+/careers/why-work-with-us/life-at-reach/,/careers/life-at-reach/,301,dev,
+/careers/why-work-with-us/meet-our-people/,/careers/why-work-with-us/,301,dev,
+/careers/why-work-with-us/sustainability-in-work/,/careers/why-work-with-us/,301,dev,
+/company/assets/,/assets/,301,dev,
+/company/assets/remote-vessels/,/assets/reach-remote/,301,dev,
+/company/assets/rovs/,/assets/#rovs,301,dev,
+/company/assets/vessels/,/assets/#vessels,301,dev,
+/company/hseq/hseq-campaigns/,/company/hseq/campaigns/,301,dev,
+/company/hseq/hseq-introduction/,/company/hseq/,301,dev,
+/company/hseq/hseq-standards/,/company/hseq/,301,dev,
+/company/hseq/policies-code-of-conduct/,/company/hseq/,301,dev,
+/company/hseq/sustainability/,/company/sustainability/,301,dev,
+/company/hseq/sustainability/material-sustainability-matters/,/company/sustainability/#esg,301,dev,
+/company/hseq/sustainability/our-un-sustainability-goals/,/company/sustainability/#global-goals,301,dev,
+/company/hseq/sustainability/sponsorship-at-reach-subsea/,/company/sustainability/sponsorship/,301,dev,
+/company/hseq/sustainability/sustainability-introduction/,/company/sustainability/,301,dev,
+/company/hseq/transparency-act/,/transparency-act/,301,dev,
+/company/technology/,/services/technology-innovation/,301,dev,
+/company/technology/future-concepts/,/services/technology-innovation/#investing,301,dev,
+/company/technology/innovation-at-reach/,/services/technology-innovation/,301,dev,
+/company/technology/selection-of-publications/,/services/technology-innovation/research-publications/,301,dev,
+/company/technology/tools-systems/,/services/technology-innovation/,301,dev,
+/company/who-we-are/,/company/,301,dev,
+/company/who-we-are/about-us/,/company/,301,dev,
+/company/who-we-are/leadership-board/,/company/leadership-board/,301,dev,
+/company/who-we-are/press-media/,/newsroom/press-media/,301,dev,
+/company/who-we-are/vision-values-and-promise/,/company/#values,301,dev,
+/downloads-table/,/investors/reports-presentations/,301,dev,
+/frequently-asked-questions/,/faq/,301,dev,
+/faq/,/faq/,keep,dev,
+/faqs/,/faq/,301,dev,
+/investors/key-information/,/investors/,301,dev,
+/investors/key-information/board-of-directors/,/company/leadership-board/#board,301,dev,
+/investors/key-information/corporate-governance/,/investors/governance-meetings/,301,dev,
+/investors/key-information/investor-relations-contact/,/investors/share-information/,301,dev,
+/investors/key-information/investors-introduction/,/investors/,301,dev,
+/investors/key-information/share-information/,/investors/share-information/,301,dev,
+/investors/key-information/largest-shareholders/,/investors/share-information/,301,dev,
+/investors/key-information/news-web/,/investors/share-information/,301,dev,
+/investors/results-reporting/,/investors/reports-presentations/,301,dev,
+/investors/results-reporting/financial-calendar/,/investors/financial-calendar/,301,dev,
+/investors/results-reporting/financial-reports/,/investors/reports-presentations/,301,dev,
+/investors/results-reporting/general-meetings-2/,/investors/governance-meetings/#general-meetings,301,dev,
+/investors/results-reporting/largest-shareholders-2/,/investors/share-information/,301,dev,
+/investors/results-reporting/news-web-2/,/investors/share-information/,301,dev,
+/investors/results-reporting/share-info/,/investors/share-information/,301,dev,
+/services/all-services/,/services/,301,dev,
+/services/all-services/subsea-services/,/services/subsea/,301,dev,
+/services/all-services/survey-services/,/services/survey/,301,dev,
+/services/all-services/monitoring-services/,/services/monitoring/,301,dev,
+/assets/reach-remote-1/,/assets/reach-remote/,301,dev,
+/assets/reach-remote-2/,/assets/reach-remote/,301,dev,
+/assets/reach-remote-3/,/assets/reach-remote/3-4/,301,dev,
+/assets/reach-remote-4/,/assets/reach-remote/3-4/,301,dev,
+/assets/viking-vigor/,/assets/#vessels,301,dev,
+/assets/reach-remote/,/assets/reach-remote/,keep,dev,
+/faq-category/assets/,/faq/#assets,301,dev,FAQ topic archive
+/faq-category/sustainability/,/faq/#company,301,dev,FAQ topic archive
+/faq-category/investors/,/faq/#investors,301,dev,FAQ topic archive
+/faq-category/careers/,/faq/#careers,301,dev,FAQ topic archive
+/faq-category/application-process/,/faq/#careers,301,dev,FAQ topic archive
+/faq-category/roles-paths/,/faq/#careers,301,dev,FAQ topic archive
+/faq-category/life-at-reach/,/faq/#careers,301,dev,FAQ topic archive
+/faq-category/international-applicants/,/faq/#careers,301,dev,FAQ topic archive
+/faq-category/about-the-company/,/faq/#company,301,dev,FAQ topic archive
+/marker-zones/zone-1/,/3d-world/#zones,301,dev,3D World zone taxonomy
+/marker-zones/zone-2/,/3d-world/#zones,301,dev,3D World zone taxonomy
+/marker-zones/zone-3/,/3d-world/#zones,301,dev,3D World zone taxonomy
+/marker-zones/zone-4/,/3d-world/#zones,301,dev,3D World zone taxonomy
