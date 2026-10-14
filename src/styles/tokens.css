@@ -149,6 +149,7 @@
   --wp--custom--letter-spacing--h1: -0.015em;
   --wp--custom--letter-spacing--h2: -0.01em;
   --wp--custom--letter-spacing--h3: -0.005em;
+  --wp--custom--letter-spacing--h4: -0.0075em; /* Figma Heading/H4 -0.75% (Ross, 14 Oct 2026) */
   --wp--custom--letter-spacing--eyebrow: 0.06em;
   --wp--custom--letter-spacing--figure: -0.03em; /* Figure */
   --wp--custom--letter-spacing--display-xl: -0.04em; /* Display XL */

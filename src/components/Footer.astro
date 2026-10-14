@@ -164,9 +164,11 @@ const logoInner = logoSvg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*
   }
   /* Tagline as a statement (17 Sep 2026): H4, white, the last words in sage. On desktop it drops to
      the bottom of the brand column, level with the last link of the longest column. */
+  /* Two lines, "Transforming the way / we work in the ocean." (Figma 621:2545, 286 wide at 24px, 243 at 20px;
+     Ross, 14 Oct 2026; was 14ch, three lines) */
   .site-footer__tagline {
     margin-top: var(--wp--preset--spacing--16);
-    max-width: 14ch;
+    max-width: 12.5em;
     color: var(--wp--custom--color--text--primary);
     text-wrap: balance;
   }

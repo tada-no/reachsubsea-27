@@ -106,6 +106,7 @@ a {
   font-size: var(--wp--preset--font-size--h4);
   line-height: var(--wp--custom--line-height--h4);
   font-weight: var(--wp--custom--font-weight--bold);
+  letter-spacing: var(--wp--custom--letter-spacing--h4);
 }
 .text-h5 {
   font-size: var(--wp--preset--font-size--h5);
