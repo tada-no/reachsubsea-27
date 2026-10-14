@@ -53,6 +53,13 @@ export function createUnderwaterGear({THREE, hull, ...opts}){
     red: 0x7d2a24, brass: 0xc29a5c,
   }, opts);
   const mesh = hull.isMesh ? hull : (hull.getObjectByName(o.hullName) || largest(hull));
+  // v86: the model rebuilt from Ross's full FBX (pipeline/reach_remote_nemo.py) carries its own thrusters, gondola,
+  // stern fins and moonpool (rr_gear, rr_prop_*, rr_hatches). Then only the sea-chest grilles are built here; the
+  // model's propellers get the slow turn and its hatches are hidden (every ZeeROV is out, so the moonpool is open).
+  // A model without them (the old Unity export, still on the website's review page) gets the v76-v81 gear as before.
+  const root = hull.isMesh ? null : hull;
+  const modelGear = root && root.getObjectByName('rr_gear');
+  if(modelGear){ o.thrusters = []; o.finsAft = null; o.gondola = null; o.opening = null; }
   let frame = o.frame;
   if(!frame){ frame = hull; if(hull.isMesh){ while(frame.parent && !frame.parent.isScene) frame = frame.parent; } }
   frame.updateWorldMatrix(true, true); mesh.updateWorldMatrix(true, false);
@@ -290,6 +297,17 @@ export function createUnderwaterGear({THREE, hull, ...opts}){
   const g = new THREE.Group(); g.name = 'underwaterGear';
   const redMesh = new THREE.Mesh(merge(THREE, redParts), redMat); redMesh.name = 'gearRed';
   g.add(redMesh);
+  const modelProps = [];
+  if(modelGear){
+    const hatches = root.getObjectByName('rr_hatches');
+    if(hatches) hatches.visible = false;
+    for(const name of ['rr_prop_bow', 'rr_prop_aft']){
+      const p = root.getObjectByName(name), ax = p && p.userData.spinAxis;
+      if(!p || !ax) continue;
+      const axis = new THREE.Vector3(...ax).normalize(), q0 = p.quaternion.clone();
+      modelProps.push({p, axis, q0});
+    }
+  }
   let voidMat = null, voidMesh = null;
   if(mouthY != null){
     const pl = new THREE.PlaneGeometry(o.opening.len + 0.1, o.opening.wid + 0.1); pl.rotateX(Math.PI / 2);   // faces down
@@ -307,6 +325,14 @@ export function createUnderwaterGear({THREE, hull, ...opts}){
     // spin about the unit's own axis (the group carries its yaw); onBeforeRender runs every frame it is drawn
     const sp = p.children[0];
     sp.onBeforeRender = () => { sp.rotation.x = ((performance.now() - t0) / 1000) * (o.rpm / 60) * Math.PI * 2; sp.updateMatrixWorld(true); };
+  }
+  // the model's own propellers (v86): about the shaft the pipeline measured, from the pose they loaded in
+  const _q = new THREE.Quaternion();
+  for(const {p, axis, q0} of modelProps){
+    p.onBeforeRender = () => {
+      _q.setFromAxisAngle(axis, ((performance.now() - t0) / 1000) * (o.rpm / 60) * Math.PI * 2);
+      p.quaternion.copy(_q).multiply(q0); p.updateMatrixWorld(true);
+    };
   }
   g.traverse(c => { if(c.isMesh) c.userData.notHull = true; });   // hull raycasts (src/launch.js) look past it
   g.userData = {isUnderwaterGear: true, keel, options: o,

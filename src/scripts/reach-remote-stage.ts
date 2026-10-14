@@ -2,7 +2,7 @@
 // GLB (public/models/, from reach-world/glb) into a stage with two scenes to compare: the studio (solid navy, as
 // the brochure) and the vessel at sea in the 3D World itself: the world's own sky, Gerstner swell, hull shadow and
 // waterline foam, water column and lights (reach-world/reach-ocean-realism.html and src/lighting.js, ported to
-// reach-remote-ocean.js). At sea the hull rides the swell at its 2.6 m draft, carries the moonpool housing the
+// reach-remote-ocean.js). At sea the hull rides the swell at its 2.1 m draft, carries the moonpool housing the
 // world gives it (reach-world/src/launch.js) and its painted hull name (reach-world/src/hullname.js, copied to
 // reach-remote-hullname.js), and a scrubber plays the ZeeROV launch: the TMS and ROV stack lowered out of the
 // housing, down through the water, then the ROV released on its yellow tether, with the camera dipping below the
@@ -53,8 +53,12 @@ const VIEWS: Record<ViewName, { az: number; polar: number; fit: number; shift: n
 const STUDIO = { exposure: 1.05, hemi: [0xe4ecff, 0x1b1d3b, 0.7] as [number, number, number] };
 const BOB = { half: 9, beam: 4 }; // the world's BOBBERS entry for the Reach Remotes: metres from the middle to the wave samples
 
-const DRAFT = 2.6; // the world's draft: the hull's lowest point this far below the waterline
-const MOON = { x: -0.5, len: 6.2, wid: 2.9 }; // the moonpool mouth between the gondola walls (reach-world v77, src/propulsion.js opening; bow +X here)
+// the world's draft: the hull's lowest point this far below the waterline. 2.1 since the v86 model (3D World v86): the old
+// model had a part 0.5 m under its flat bottom and 2.6 was measured from that, so the hull sits where it always did
+const DRAFT = 2.1;
+// The moonpool opening of the real model (3D World v86, pipeline/reach_remote_nemo.py): x -2.4..4.0 with the bow +X, 3.0 m
+// wide, so the centre is x 0.8. The probes sit just outside it, on the flat bottom between the gondola walls.
+const MOON = { x: 0.8, len: 7.0, wid: 3.4 };
 const ROV = { halfH: 1.02, top: 0.65, tmsHalf: 0.67, tmsScale: 0.7, dockGap: 0.1, hangBelow: 10, dive: 40, tetherOut: 3.4 };
 const CHAPTERS = [
   { name: 'Ready', t0: 0, t1: 0.1 },
@@ -281,15 +285,20 @@ export function mountStage(stage: HTMLElement) {
     const gltf = await loader.loadAsync(url);
     const root = gltf.scene;
     satin(root, 0.7);
-    const box0 = new THREE.Box3().setFromObject(root);
-    orientBow(root, box0);
+    // 3D World v86: the model (rebuilt from Ross's full FBX) carries its thrusters, gondola and fins below the keel, so
+    // the draft and the bow test are measured on the hull mesh itself, not the whole model
+    const hull = root.getObjectByName('reach_remote_lod1_1') as THREE.Mesh | undefined;
+    const hullBox = () => new THREE.Box3().setFromObject(hull ?? root);
+    orientBow(root, hullBox());
     const box = new THREE.Box3().setFromObject(root);
     const centre = box.getCenter(new THREE.Vector3());
-    radius = box.getSize(new THREE.Vector3()).length() / 2;
+    // framed on the hull, as before v86 (the gear under the keel would otherwise pull the camera back)
+    radius = hullBox().getSize(new THREE.Vector3()).length() / 2;
     // Waterline at y = 0: the hull's lowest point sits at the draft, centred on the holder
-    root.position.set(-centre.x, -box.min.y - DRAFT, -centre.z);
+    root.position.set(-centre.x, -hullBox().min.y - DRAFT, -centre.z);
     holder.add(root);
     root.updateMatrixWorld(true);
+    hullMesh = hull ?? null;
     root.traverse((o) => {
       if ((o as THREE.Mesh).isMesh && !hullMesh) hullMesh = o as THREE.Mesh;
     });
@@ -314,7 +323,8 @@ export function mountStage(stage: HTMLElement) {
       holder.add(createDraftMarks({ THREE, hull: root, frame: holder, renderer, bow: 1, ...stern.userData.marks }));
       // the IMO number, dark, centred on the forward-facing panel above the bow bulwark (Reach Remote 1's real number)
       holder.add(createBowImo({ THREE, hull: root, frame: holder, renderer, bow: 1, text: 'IMO 9972191' }));
-      // the azimuth thrusters, the gondola (moonpool walls, sonar pods, U foil), the stern fins and the moonpool mouth, as the 3D World v77 (reach-world/src/propulsion.js)
+      // the sea-chest grilles and the propellers' slow turn (3D World v86, reach-world/src/propulsion.js); the model has its own
+      // thrusters, gondola, stern fins and moonpool, so the v77 hand-built gear is only drawn for the old model
       holder.add(createUnderwaterGear({ THREE, hull: root, frame: holder, bow: 1 }));
     } catch (e) {
       console.warn('hull name', e);
@@ -322,7 +332,7 @@ export function mountStage(stage: HTMLElement) {
     controls.target.set(0, TARGET_Y, 0);
     applyView(currentView, false);
     const ms = Math.round(performance.now() - t0);
-    if (status) status.textContent = `Vessel · 950 KB · ${ms.toLocaleString('en-GB')} ms`;
+    if (status) status.textContent = `Vessel · 1.4 MB · ${ms.toLocaleString('en-GB')} ms`;
     stage.classList.remove('is-loading');
     // The stills are rendered at scene time 0 (?poster, below), so the scene's one clock restarts here: the first frame
     // that fades in over the still is the still (swell, water, clouds and the vessel's ride), and the motion carries
