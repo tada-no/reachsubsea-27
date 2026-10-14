@@ -44,6 +44,10 @@ interface Props extends BlockFields {
   actions?: ActionField[];
   /** Photo style: the Video style's entrance and scroll parallax. */
   animate?: boolean;
+  /** A funder's acknowledgement logo, last in the stack (11 Oct 2026, Reach Remote 3 & 4: the EU's "Co-funded by
+   * the European Union" emblem must be visible on landing, without scrolling). Artwork: no photo tint. On a Navy
+   * hero, pass the funder's version for dark grounds. */
+  fundingLogo?: ImageField;
 }
 
 const {
@@ -60,6 +64,7 @@ const {
   meta = [],
   actions = [],
   animate = false,
+  fundingLogo,
   background,
   spacing,
   anchor,
@@ -187,6 +192,16 @@ const objectPosition = image?.focalPoint
               </div>
             )
           }
+          {fundingLogo?.src && (
+            <img
+              class="page-hero__funding"
+              src={fundingLogo.src}
+              alt={fundingLogo.alt}
+              width={fundingLogo.width}
+              height={fundingLogo.height}
+              decoding="async"
+            />
+          )}
         </div>
         {isVideo && (
           <MediaToggle class="page-hero__toggle" />
@@ -263,6 +278,19 @@ const objectPosition = image?.focalPoint
     gap: var(--wp--preset--spacing--16) var(--wp--preset--spacing--24);
     /* Actions sit a step further from the lead than the rest of the stack (17 Sep 2026). */
     padding-top: var(--wp--preset--spacing--16);
+  }
+  /* Funding logo: a step further from the lead, as the actions; 48 tall (the EU's minimum is 1 cm), 40 on phones */
+  .page-hero__funding {
+    display: block;
+    align-self: flex-start;
+    width: auto;
+    height: var(--wp--preset--spacing--48);
+    margin-top: var(--wp--preset--spacing--16);
+  }
+  @media (max-width: 599px) {
+    .page-hero__funding {
+      height: var(--wp--preset--spacing--40);
+    }
   }
 
   /* ── Photo style ───────────────────────────────────────────── */

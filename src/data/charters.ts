@@ -38,6 +38,9 @@ export interface CharterFields {
   /** What the vessel did in the reporting quarter. */
   quarterStatus: string[];
   note?: string;
+  /** The row's link when the vessel has a page of its own (11 Oct 2026: Reach Remote 3 and 4 → their build and
+   * funding page). Default: its card on Fleet overview. */
+  link?: { label: string; url: string };
   source: string;
 }
 
@@ -169,6 +172,7 @@ export const charterFields: CharterFields[] = [
     start: '2027',
     quarterStatus: ['Under construction.'],
     note: 'Reach Remote 3 and 4 are under construction, part-funded by the EU Innovation Fund. No delivery date is confirmed yet, so their bars mark the build, not a firm date.',
+    link: { label: 'Build and funding update', url: '/assets/reach-remote/3-4/' },
     source: 'Q2 2026 report p16 ("2027 -->", under construction) and p54 (EU Innovation Fund).',
   },
   {
@@ -178,6 +182,7 @@ export const charterFields: CharterFields[] = [
     start: '2027',
     quarterStatus: ['Under construction.'],
     note: 'Reach Remote 3 and 4 are under construction, part-funded by the EU Innovation Fund. No delivery date is confirmed yet, so their bars mark the build, not a firm date.',
+    link: { label: 'Build and funding update', url: '/assets/reach-remote/3-4/' },
     source: 'Q2 2026 report p16 ("2027 -->", under construction) and p54 (EU Innovation Fund).',
   },
 ];

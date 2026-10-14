@@ -216,7 +216,8 @@ const assetAnchor = { vessel: 'vessels', usv: 'uncrewed', rov: 'rovs', equipment
 const assetEntries: SearchEntry[] = assets.map((a) => ({
   type: 'asset',
   title: a.name,
-  url: a.type === 'usv' ? '/assets/reach-remote/' : `/assets/#${assetAnchor[a.type]}`,
+  // Reach Remote 3 & 4 has its own build and funding page (11 Oct 2026); other uncrewed assets land on Reach Remote
+  url: a.url === '/assets/reach-remote/3-4/' ? a.url : a.type === 'usv' ? '/assets/reach-remote/' : `/assets/#${assetAnchor[a.type]}`,
   context: a.kindShort ?? a.kind,
   excerpt: a.summary,
   aliases: [a.kind, a.owner, ...(a.unitNames ?? []), ...(a.rovs ?? [])].filter(Boolean).join(' '),

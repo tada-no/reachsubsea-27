@@ -1,0 +1,98 @@
+---
+// Assets › Reach Remote › Reach Remote 3 & 4 (11 Oct 2026, Q165, Q167 build step 6, Q169; client screens PDF p26–27,
+// design reference p12). A short status page on the build of the next two vessels and their EU funding, updated
+// at each reporting date. Rigid by design (Q165): the facts the grant's communication duties ask for, in order.
+// Hero Text (navy, the "Co-funded by the European Union" emblem in the stack, so it is visible on landing without
+// scrolling: Q169) · project facts (Split media Spec table) · spend to date (Share bars, one bar: the PDF's "Overall
+// completion" panel, as money invested, since no build percentage exists) · build timeline · EU funding and the
+// EU's disclaimer · CTA. As the PDF: no subnav, no FAQ.
+// Left out of the PDF's plan: the template banner and dashed placeholders, the disclaimer card over the hero's edge
+// (nothing overlaps the hero), the stage statuses (hull, systems, sea trials, delivery: no dated stages yet, client
+// checklist), and the "Why this project matters" and "Reporting & transparency" cards, folded into the facts and the
+// funding text so each thing is said once. Figures: src/data/reach-remote-3-4.ts.
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Header from '../../../../components/header/Header.astro';
+import Footer from '../../../../components/Footer.astro';
+import PageHero from '../../../../blocks/PageHero.astro';
+import SplitMedia from '../../../../blocks/SplitMedia.astro';
+import ShareBars from '../../../../blocks/ShareBars.astro';
+import Timeline from '../../../../blocks/Timeline.astro';
+import CtaBand from '../../../../blocks/CtaBand.astro';
+import { navSections } from '../../../../data/navigation';
+import { reportingDate, projectFacts, spend, spendShare, milestones } from '../../../../data/reach-remote-3-4';
+
+const base = import.meta.env.BASE_URL;
+const section = navSections.find((s) => s.id === 'assets')!;
+const parent = section.links.find((l) => l.href === '/assets/reach-remote/')!;
+const page = parent.children!.find((l) => l.href === '/assets/reach-remote/3-4/')!;
+const nok = (m: number) => `NOK ${m.toLocaleString('en-GB', { minimumFractionDigits: 1 })} million`;
+---
+
+<BaseLayout title={`${page.label} · Reach Subsea`} motion>
+  <Header current="assets" overlay />
+  <main id="main">
+    <PageHero
+      style="text"
+      background="navy"
+      breadcrumb={[
+        { label: 'Home', href: base },
+        { label: section.label, href: section.href },
+        { label: parent.label, href: parent.href },
+        { label: page.label },
+      ]}
+      badge={{ label: 'In build', tone: 'accent' }}
+      title="Building Reach Remote 3 & 4"
+      lead="Two more uncrewed vessels, built by Kongsberg Maritime with EU Innovation Fund support. Expected in operation in 2027."
+      fundingLogo={{ src: `${base}images/eu-co-funded-white.svg`, alt: 'Co-funded by the European Union', width: 322, height: 64 }}
+    />
+
+    <SplitMedia
+      anchor="project"
+      background="white"
+      media="spec-table"
+      eyebrow="The project"
+      title="Two more of a proven design"
+      body={`<p>Reach Remote 3 and 4 follow Reach Remote 1 and 2, with targeted changes from their qualification programme and time at sea. With nobody on board, they keep people out of harm's way offshore and use far less fuel than a crewed vessel.</p>`}
+      actions={[{ label: 'About Reach Remote', url: parent.href, action: 'page' }]}
+      specs={projectFacts}
+    />
+
+    <ShareBars
+      anchor="progress"
+      background="tint"
+      sectionHeader={{
+        eyebrow: 'Build progress',
+        title: `${nok(spend.invested)} invested by ${reportingDate}`,
+        intro: `Of about ${nok(spend.invested + spend.toComplete)} for the two vessels, with ${nok(spend.toComplete)} to go.`,
+      }}
+      parts={['Invested', 'To complete']}
+      bars={[{ label: reportingDate, value: spendShare }]}
+    />
+
+    <Timeline
+      anchor="milestones"
+      background="tint"
+      sectionHeader={{ eyebrow: 'Milestones', title: 'The build so far' }}
+      milestones={milestones}
+    />
+
+    <SplitMedia
+      anchor="eu-funding"
+      layout="beside"
+      background="white"
+      eyebrow="EU funding"
+      title="Co-funded by the European Union"
+      body={`<p>Reach Remote 3 and 4 are part-funded by the EU Innovation Fund, which backs clean technologies on their way to market. As the grant asks, we report the project's progress here at each reporting date, and in our <a href="/investors/reports-presentations/">quarterly reports</a>.</p><p class="text-small">Views and opinions expressed are those of Reach Subsea only and do not necessarily reflect those of the European Union or the European Climate, Infrastructure and Environment Executive Agency (CINEA). Neither the European Union nor the granting authority can be held responsible for them.</p>`}
+    />
+
+    <CtaBand
+      anchor="contact"
+      style="panel"
+      background="white"
+      title="Questions about this project?"
+      text="Get in touch with our team."
+      actions={[{ label: 'Contact us', url: '/contact/', action: 'page' }]}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

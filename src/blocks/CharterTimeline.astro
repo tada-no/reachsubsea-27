@@ -223,7 +223,7 @@ const fleetAnchor = (r: CharterRow) => (r.asset.type === 'usv' ? '/assets/#uncre
                             <div class="charter-timeline__status">
                               <p class="charter-timeline__status-title text-caption">{charterSource.period}</p>
                               {r.quarterStatus.map((s) => <p class="text-small">{s}</p>)}
-                              <Link label="Fleet overview" href={fleetAnchor(r)} size="small" context={`: ${r.name}`} />
+                              <Link label={r.link?.label ?? 'Fleet overview'} href={r.link?.url ?? fleetAnchor(r)} size="small" context={`: ${r.name}`} />
                             </div>
                           </div>
                         </div>
