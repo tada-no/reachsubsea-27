@@ -50,6 +50,9 @@ export function createUnderwaterGear({THREE, hull, ...opts}){
     opening: {x: 0.5, len: 6.2, wid: 2.9},     // the dark moonpool mouth in the hull bottom, between the gondola walls
     grilles: [{x: 6.65, w: 0.56, y0: 0.5, y1: 1.85, rows: 12}, {x: 7.28, w: 0.53, y0: 1.0, y1: 1.75, rows: 7}],   // sea chests (lift photo), y above the keel
     keel: null,                                // keel height; default: measured (the flat bottom amidships)
+    // v86c: the moonpool trunk of the v86 model, shaded as an enclosed shaft: a box in the holder's frame (x aft of
+    // the hull centre, y up from the waterline) and how much light it keeps. See shadeTrunk below.
+    trunk: {x0: -4.2, x1: 2.6, y0: -1.95, y1: 4.3, halfW: 1.95, keep: 0.12},
     red: 0x7d2a24, brass: 0xc29a5c,
   }, opts);
   const mesh = hull.isMesh ? hull : (hull.getObjectByName(o.hullName) || largest(hull));
@@ -301,6 +304,7 @@ export function createUnderwaterGear({THREE, hull, ...opts}){
   if(modelGear){
     const hatches = root.getObjectByName('rr_hatches');
     if(hatches) hatches.visible = false;
+    shadeTrunk(THREE, mesh, frame, o.trunk, aftSign);
     for(const name of ['rr_prop_bow', 'rr_prop_aft']){
       const p = root.getObjectByName(name), ax = p && p.userData.spinAxis;
       if(!p || !ax) continue;
@@ -339,6 +343,36 @@ export function createUnderwaterGear({THREE, hull, ...opts}){
     moonpool: mouthY == null ? null : {x: X(o.opening.x), mouth: mouthY, len: o.opening.len, wid: o.opening.wid},
     dispose(){ if(voidMesh){ voidMesh.geometry.dispose(); voidMat.dispose(); } redMesh.geometry.dispose(); props.forEach(p => p.children[0].geometry.dispose()); redMat.dispose(); brassMat.dispose(); }};
   return g;
+}
+
+// v86c (Ross: looking up the moonpool should show what is above, not sky). With the hatches open and no sea drawn in the
+// opening (the page's uMoon), the trunk's inner walls are seen from below at a grazing angle, where even their dark
+// paint (pipeline/reach_remote_nemo.py) mirrors the bright sky. Inside the trunk's box the hull's lit colour is scaled
+// down to `keep`, as in a shaft with a roof on it, so the launch frame and the light through the deck grating read
+// instead. Done in the hull material's shader (no texture, no draw call). The material and the mesh's place in its
+// holder are the same on every copy, so the first call covers them all. Either bow direction (aftSign).
+function shadeTrunk(THREE, mesh, frame, T, aftSign){
+  const mat = mesh && mesh.material;
+  if(!T || !mat || mat.userData.trunkShade) return;
+  frame.updateWorldMatrix(true, true); mesh.updateWorldMatrix(true, false);
+  const toFrame = new THREE.Matrix4().copy(frame.matrixWorld).invert().multiply(mesh.matrixWorld);
+  const xa = aftSign * T.x0, xb = aftSign * T.x1;
+  const U = {uTkToFrame: {value: toFrame}, uTkMin: {value: new THREE.Vector3(Math.min(xa, xb), T.y0, -T.halfW)},
+    uTkMax: {value: new THREE.Vector3(Math.max(xa, xb), T.y1, T.halfW)}, uTkKeep: {value: T.keep}};
+  const prev = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey ? mat.customProgramCacheKey() : '';
+  mat.onBeforeCompile = function(sh, renderer){
+    if(typeof prev === 'function') prev.call(this, sh, renderer);
+    if(sh.vertexShader.indexOf('#include <begin_vertex>') < 0 || sh.fragmentShader.indexOf('#include <opaque_fragment>') < 0) return;
+    Object.assign(sh.uniforms, U);
+    sh.vertexShader = 'uniform mat4 uTkToFrame;\nvarying vec3 vTkP;\n' + sh.vertexShader.replace('#include <begin_vertex>',
+      '#include <begin_vertex>\n  vTkP = (uTkToFrame * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = 'uniform vec3 uTkMin, uTkMax;\nuniform float uTkKeep;\nvarying vec3 vTkP;\n' + sh.fragmentShader.replace('#include <opaque_fragment>',
+      `#include <opaque_fragment>
+  if(all(greaterThan(vTkP, uTkMin)) && all(lessThan(vTkP, uTkMax))) gl_FragColor.rgb *= uTkKeep;`);
+  };
+  mat.customProgramCacheKey = () => prevKey + '|trunk86c';
+  mat.userData.trunkShade = true;
+  mat.needsUpdate = true;
 }
 
 function largest(root){
