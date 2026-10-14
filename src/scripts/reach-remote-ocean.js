@@ -9,6 +9,7 @@
      const SEA = createOcean({THREE, scene, renderer, camera, oceanSeg: 200});
      SEA.setVisible(true | false)           show the sea, sky dome and its lights (the studio hides them)
      SEA.setHull(holder, ellipse)           the hull's waterline ellipse {cx, cz, hl, hw}, for shadow + foam
+     SEA.setMoon(holder, {x, z, hl, hw})    the moonpool: no sea drawn inside it (3D World v86c)
      SEA.update(t, camera, pbrMats)         once per frame: fog, lights, backdrop, dome, uniforms. Returns {under, f}
      SEA.waveAt(x, z, t)                    the swell's displacement [dx, dy, dz] at a point (buoyancy)
      SEA.setSwell(k)                        sea state: every wave's steepness × k (1 = the world's; Ross asked for calmer)
@@ -198,6 +199,8 @@ vec3 gerstner(vec2 p, out vec3 nrm){
     uCloudCoverage: { value: 1 },
     uHull: { value: [new THREE.Vector4(1e5, 1e5, 1, 1)] },
     uHullDir: { value: [new THREE.Vector2(1, 0)] },
+    uMoon: { value: new THREE.Vector4(1e5, 1e5, 0, 0) },
+    uMoonDir: { value: new THREE.Vector2(1, 0) },
   };
   const oceanGeo = new THREE.PlaneGeometry(1400, 1400, oceanSeg, oceanSeg);
   oceanGeo.rotateX(-Math.PI / 2);
@@ -231,6 +234,7 @@ vec3 gerstner(vec2 p, out vec3 nrm){
       `
     uniform vec3 uCam; uniform vec3 uFogCol; uniform float uFogDen; uniform float uUnder; uniform float uSkyR;
     uniform vec4 uHull[1]; uniform vec2 uHullDir[1];
+    uniform vec4 uMoon; uniform vec2 uMoonDir;
     uniform sampler2D tMirror; uniform float uMirror; uniform float uExposure;
     varying vec3 vW; varying vec3 vN; varying float vH; varying vec4 vMirror;
     // The mirror texture holds linear, untone-mapped colour (render targets skip the renderer's ACES and sRGB), so it is
@@ -252,6 +256,8 @@ vec3 gerstner(vec2 p, out vec3 nrm){
       return band*mix(0.10,1.0,clump)*mix(0.25,1.0,lace)*mix(0.45,1.0,side);
     }
     void main(){
+      { vec2 dm=vW.xz-uMoon.xy; vec2 lm=vec2(dm.x*uMoonDir.x-dm.y*uMoonDir.y, dm.x*uMoonDir.y+dm.y*uMoonDir.x);
+        if(abs(lm.x)<uMoon.z && abs(lm.y)<uMoon.w) discard; }   // no sea inside the moonpool (see setMoon)
       vec3 V=normalize(uCam-vW); float dist=length(uCam-vW);
       vec3 Nw=normalize(mix(normalize(vN),vec3(0.0,1.0,0.0),0.6*smoothstep(180.0,800.0,dist)*float(gl_FrontFacing)));
       vec3 N=Nw;
@@ -647,6 +653,15 @@ vec3 gerstner(vec2 p, out vec3 nrm){
     oceanUni.uHull.value[0].set(_a.x, _a.z, wl.hl, wl.hw);
     oceanUni.uHullDir.value[0].set(Math.cos(holder.rotation.y), Math.sin(holder.rotation.y));
   }
+  /** 3D World v86c: no sea surface drawn inside the moonpool, out to the trunk walls, so from below you see up the
+   *  shaft to the launch frame and the deck grating instead of the water's underside. m = {x, z, hl, hw} in the
+   *  holder's frame (centre and half-sizes). Same turn as setHull. */
+  function setMoon(holder, m) {
+    if (!m) return;
+    _a.set(m.x, 0, m.z).applyAxisAngle(_Y, holder.rotation.y).add(holder.position);
+    oceanUni.uMoon.value.set(_a.x, _a.z, m.hl, m.hw);
+    oceanUni.uMoonDir.value.set(Math.cos(holder.rotation.y), Math.sin(holder.rotation.y));
+  }
   /** The ride at time t as [y, rot.x, rot.z]: heave from the wave under the hull, pitch from bow and stern, roll from
    *  the two sides, measured along the hull's own axes. Rotation order YXZ on the holder. */
   function bobPose(holder, t, half, beam, out) {
@@ -665,7 +680,7 @@ vec3 gerstner(vec2 p, out vec3 nrm){
     return out;
   }
 
-  return { SUN, SUNR, sky, ocean, oceanRing, oceanUni, environment, sun, amb, skyFill, waterDome, fog, setVisible, setSwell, setMirror, renderMirror, update, waveAt, waterlineEllipse, setHull, bobPose };
+  return { SUN, SUNR, sky, ocean, oceanRing, oceanUni, environment, sun, amb, skyFill, waterDome, fog, setVisible, setSwell, setMirror, renderMirror, update, waveAt, waterlineEllipse, setHull, setMoon, bobPose };
 }
 
 /* ---- the ZeeROV's lamp rig, as the world dresses it (reach-world/src/lighting.js makeZeeRov) ------------------

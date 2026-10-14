@@ -693,6 +693,7 @@ export function mountStage(stage: HTMLElement) {
     }
     if (sceneName === 'sea') {
       if (wl) SEA.setHull(holder, wl);
+      SEA.setMoon(holder, { x: MOON.x, z: 0, hl: 3.45, hw: 1.9 }); // out to the trunk walls (3D World v86c)
       const { under, f } = SEA.update(t, camera, pbrMats);
       rig.update(t, under, f);
       snow.visible = under > 0;
