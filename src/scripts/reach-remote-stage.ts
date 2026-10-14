@@ -401,6 +401,40 @@ export function mountStage(stage: HTMLElement) {
     root.position.sub(c);
     into.add(root);
   }
+  /** Ross, 14 Oct 2026: parked up in the moonpool the ZeeROV and TMS were lit as in open water. Anything of the stack
+   *  inside the shaft is shaded down (to IN_HULL_KEEP), fading to full light from 0.2 m above the mouth to 0.4 m
+   *  below it (the parked ROV's skid sits only 0.15 m above the mouth), so the stack comes out of the hull's shadow
+   *  as it is lowered. In the materials' shaders (no texture, no draw call);
+   *  the holder's inverse matrix is updated every frame (the vessel rides the swell). Box as the 3D World's trunk. */
+  const IN_HULL_KEEP = 0.16;
+  const inHullU = { uToHolder: { value: new THREE.Matrix4() }, uMouthY: { value: -2.13 }, uKeep: { value: IN_HULL_KEEP },
+    uTrunk: { value: new THREE.Vector3(MOON.x, 3.4, 1.95) } };
+  function shadeInHull(root: THREE.Object3D) {
+    root.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        if (!m || m.userData.inHull) continue;
+        m.userData.inHull = true;
+        const prev = m.onBeforeCompile;
+        const prevKey = m.customProgramCacheKey ? m.customProgramCacheKey() : '';
+        m.onBeforeCompile = function (sh, renderer) {
+          if (typeof prev === 'function') prev.call(this, sh, renderer);
+          if (!sh.vertexShader.includes('#include <worldpos_vertex>') || !sh.fragmentShader.includes('#include <opaque_fragment>')) return;
+          Object.assign(sh.uniforms, inHullU);
+          sh.vertexShader = 'uniform mat4 uToHolder;\nvarying vec3 vHolderP;\n' + sh.vertexShader.replace('#include <worldpos_vertex>',
+            '#include <worldpos_vertex>\n  vHolderP = (uToHolder * modelMatrix * vec4(transformed, 1.0)).xyz;');
+          sh.fragmentShader = 'uniform float uMouthY, uKeep;\nuniform vec3 uTrunk;\nvarying vec3 vHolderP;\n' + sh.fragmentShader.replace('#include <opaque_fragment>',
+            `#include <opaque_fragment>
+  float inShaft = smoothstep(uMouthY - 0.4, uMouthY + 0.2, vHolderP.y) * step(abs(vHolderP.x - uTrunk.x), uTrunk.y) * step(abs(vHolderP.z), uTrunk.z);
+  gl_FragColor.rgb *= mix(1.0, uKeep, inShaft);`);
+        };
+        m.customProgramCacheKey = () => prevKey + '|inHull';
+        m.needsUpdate = true;
+      }
+    });
+  }
+
   /** `quiet`: fetched in the background once the vessel is in, so the launch is ready by the time the tour gets there;
    *  the loading readout shows only if the visitor reaches the launch while it is still on its way */
   let launchShown = false;
@@ -424,6 +458,7 @@ export function mountStage(stage: HTMLElement) {
       cage.scale.setScalar(0.78); // etms.glb's half-height (0.78 m at this scale) / the cage's CAGE_HALF (1.0), as the world; ROV.tmsHalf is its real half-height
       cage.rotation.y = -2.258;
       tmsHolder.add(cage);
+      shadeInHull(stack);
       launchLoaded = true;
       if (T === 0) poseStack(); // parked in the moonpool until the launch
       stack.visible = true;
@@ -709,6 +744,8 @@ export function mountStage(stage: HTMLElement) {
     }
     if (sceneName === 'sea') {
       if (wl) SEA.setHull(holder, wl);
+      inHullU.uToHolder.value.copy(holder.matrixWorld).invert();
+      inHullU.uMouthY.value = moon.mouth;
       SEA.setMoon(holder, { x: MOON.x, z: 0, hl: 3.45, hw: 1.9 }); // out to the trunk walls (3D World v86c)
       const { under, f } = SEA.update(t, camera, pbrMats);
       rig.update(t, under, f);
