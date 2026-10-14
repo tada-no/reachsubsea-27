@@ -425,6 +425,8 @@ export function mountStage(stage: HTMLElement) {
       cage.rotation.y = -2.258;
       tmsHolder.add(cage);
       launchLoaded = true;
+      if (T === 0) poseStack(); // parked in the moonpool until the launch
+      stack.visible = true;
       if (status && launchShown) status.textContent = 'ZeeROV 1,159 KB · TMS 588 KB';
       stage.classList.remove('is-loading');
     })();
@@ -442,7 +444,10 @@ export function mountStage(stage: HTMLElement) {
   const stackC = new THREE.Vector3(); // stack centre, holder frame
   const rovP = new THREE.Vector3();
   const tmsP = new THREE.Vector3();
-  function poseLaunch() {
+  /** The stack, umbilical and tether at T. At T = 0 that is the stack parked up inside the moonpool, where the
+   *  ZeeROV lives between dives, shown from the moment it has loaded (Ross, 14 Oct 2026: it used to appear only as
+   *  the launch began, so the empty moonpool of one chapter suddenly held it in the next). */
+  function poseStack() {
     const dockH = ROV.halfH + ROV.dockGap + ROV.tmsHalf - ROV.top; // TMS centre above the ROV attach when latched
     const inside = new THREE.Vector3(MOON.x, moon.mouth + 0.15 + ROV.halfH, 0);
     const hang = new THREE.Vector3(MOON.x, moon.mouth - ROV.hangBelow, 0);
@@ -491,6 +496,11 @@ export function mountStage(stage: HTMLElement) {
       m2.y -= 0.6 * release;
       cable(tether, [b, m1, m2, r], 0.03);
     }
+    return release;
+  }
+  function poseLaunch() {
+    poseStack();
+    const [ready] = CHAPTERS;
     // Lamps come on as the stack clears the mouth
     rig.setLamps(smooth((T - 0.16) / 0.1));
     // Chapter label
@@ -578,9 +588,10 @@ export function mountStage(stage: HTMLElement) {
   function setLaunch(t: number) {
     T = clamp01(t);
     if (T > 0 && !launchLoaded) void loadLaunch();
-    stack.visible = T > 0;
+    stack.visible = launchLoaded;
     controls.enabled = T === 0 && !touring;
     if (T === 0) {
+      if (launchLoaded) poseStack();
       keys = null;
       rig.setLamps(0);
       if (hero && !tourLive) hero.style.opacity = '1';
