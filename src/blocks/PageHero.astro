@@ -26,8 +26,10 @@ import type { ActionField, BadgeField, BlockFields, ImageField, MetaField } from
 interface Props extends BlockFields {
   style?: 'text' | 'photo' | 'video';
   /** Video style: muted background loop. `poster` shows first and for reduced motion. */
-  /** loopStart/loopEnd (s) trim a fade-in/out at either end of the file out of the loop. */
-  video?: { src: string; poster?: string; loopStart?: number; loopEnd?: number };
+  /** loopStart/loopEnd (s) trim a fade-in/out at either end of the file out of the loop. `srcWide`: an optional sharper
+   *  file (1080p) for screens 1024 px and wider; phones and small tablets keep `src` (14 Oct 2026, Ross: the 720p film
+   *  looked soft across a full-width hero). Both files must have the same timing. */
+  video?: { src: string; srcWide?: string; poster?: string; loopStart?: number; loopEnd?: number };
   /** Visual style of the (always <h1>) title: Display on Home/section landing pages, H1 elsewhere. */
   titleStyle?: 'h1' | 'display';
   /** Ends with the current page (no href). Shown from depth ≥ 3. */
@@ -109,6 +111,7 @@ const objectPosition = image?.focalPoint
                 preload="metadata"
                 poster={video.poster}
                 data-src={video.src}
+                data-src-wide={video.srcWide}
                 data-loop-start={video.loopStart}
                 data-loop-end={video.loopEnd}
               />
@@ -726,7 +729,7 @@ const objectPosition = image?.focalPoint
         if (toggleLabel) toggleLabel.textContent = `${paused ? 'Play' : 'Pause'} ${toggle?.dataset.subject}`;
       };
 
-      video.src = video.dataset.src;
+      video.src = video.dataset.srcWide && window.matchMedia('(min-width: 1024px)').matches ? video.dataset.srcWide : video.dataset.src;
       toggle?.removeAttribute('hidden');
       setPaused(userPaused);
       // Reveal on the first painted frame (not on 'playing', which can fire before one exists), instantly,
