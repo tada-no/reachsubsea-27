@@ -9,7 +9,10 @@
 //   border/subtle rule between rows.
 // - Narrow: number beside the text, then status and the email link in one row under it.
 // Answer by email opens a message to Ross with "Reach checklist <n>: <subject>" (src/data/client-checklist.ts); the
-// morning sync task moves the statuses. A done item keeps its link's space, so the columns don't shift.
+// weekday sync task (reach-checklist-sync) moves an answered item to In progress, and Done is set once it is acted on.
+// Clicking Answer by email on an Open item shows it In progress straight away in that visitor's browser (localStorage,
+// until the data catches up). Each row renders both the Open and In progress badges stacked in one cell, one hidden,
+// so the status column keeps its width when one flips. A done item keeps its link's space, so the columns don't shift.
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/header/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -34,7 +37,7 @@ const count = (s: ChecklistStatus) => items.filter((i) => i.status === s).length
 const updated = new Date(checklistUpdated).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 const STATUS: Record<ChecklistStatus, { label: string; tone: BadgeTone; icon?: string }> = {
   open: { label: 'Open', tone: 'neutral' },
-  received: { label: 'Received', tone: 'accent' },
+  progress: { label: 'In progress', tone: 'accent' },
   done: { label: 'Done', tone: 'success', icon: 'check' },
 };
 const groupId = (title: string) => `checklist-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
@@ -57,11 +60,11 @@ const groupId = (title: string) => `checklist-${title.toLowerCase().replace(/[^a
         <div class="client-checklist__intro">
           <p class="text-lead">
             Answer by email, one item at a time or several in one message. Each item's link starts an email with its number
-            in the subject. We mark an item Received when your answer arrives, and Done once it is on the site.
+            in the subject. The item shows In progress once you've emailed about it, and Done once it is on the site.
           </p>
           <ul class="client-checklist__counts text-small">
             <li><strong>{items.length}</strong> items</li>
-            <li><strong>{count('received')}</strong> received</li>
+            <li><strong class="client-checklist__count" data-checklist-progress>{count('progress')}</strong> in progress</li>
             <li><strong>{count('done')}</strong> done</li>
             <li>Checked {updated}</li>
           </ul>
@@ -82,7 +85,7 @@ const groupId = (title: string) => `checklist-${title.toLowerCase().replace(/[^a
               </div>
               <ol class="client-checklist__rows text-body">
                 {group.items.map((item) => (
-                  <li class:list={['client-checklist__row', `is-${item.status}`]}>
+                  <li class:list={['client-checklist__row', `is-${item.status}`]} data-checklist-n={item.n}>
                     <span class="client-checklist__n text-label" aria-hidden="true">
                       {item.n}
                     </span>
@@ -102,7 +105,16 @@ const groupId = (title: string) => `checklist-${title.toLowerCase().replace(/[^a
                         </p>
                       )}
                     </div>
-                    <Badge label={STATUS[item.status].label} tone={STATUS[item.status].tone} icon={STATUS[item.status].icon} class="client-checklist__status" />
+                    <span class="client-checklist__status">
+                      {item.status === 'open' ? (
+                        <>
+                          <Badge label={STATUS.open.label} tone={STATUS.open.tone} class="client-checklist__badge is-open" />
+                          <Badge label={STATUS.progress.label} tone={STATUS.progress.tone} class="client-checklist__badge is-progress" />
+                        </>
+                      ) : (
+                        <Badge label={STATUS[item.status].label} tone={STATUS[item.status].tone} icon={STATUS[item.status].icon} class="client-checklist__badge" />
+                      )}
+                    </span>
                     <MetaItem
                       icon="mail"
                       text="Answer by email"
@@ -121,6 +133,42 @@ const groupId = (title: string) => `checklist-${title.toLowerCase().replace(/[^a
   </main>
   <Footer />
 </BaseLayout>
+
+<script>
+  // Answer by email on an Open item: show it In progress in this browser until the data catches up
+  const KEY = 'reach-checklist-sent';
+  const read = (): number[] => {
+    try {
+      return JSON.parse(localStorage.getItem(KEY) || '[]');
+    } catch {
+      return [];
+    }
+  };
+  const count = document.querySelector('[data-checklist-progress]');
+  const base = Number(count?.textContent) || 0;
+  const apply = () => {
+    const sent = new Set(read());
+    let extra = 0;
+    document.querySelectorAll<HTMLElement>('.client-checklist__row.is-open').forEach((row) => {
+      const on = sent.has(Number(row.dataset.checklistN));
+      row.classList.toggle('is-sent', on);
+      if (on) extra++;
+    });
+    if (count) count.textContent = String(base + extra);
+  };
+  document.querySelectorAll<HTMLElement>('.client-checklist__row.is-open .client-checklist__email').forEach((link) => {
+    link.addEventListener('click', () => {
+      const n = Number(link.closest<HTMLElement>('.client-checklist__row')?.dataset.checklistN);
+      const sent = read();
+      if (!sent.includes(n)) sent.push(n);
+      try {
+        localStorage.setItem(KEY, JSON.stringify(sent));
+      } catch {}
+      apply();
+    });
+  });
+  apply();
+</script>
 
 <style is:global>
   .client-checklist__body {
@@ -148,6 +196,12 @@ const groupId = (title: string) => `checklist-${title.toLowerCase().replace(/[^a
   }
   .client-checklist__counts strong {
     color: var(--wp--custom--color--text--primary);
+  }
+  /* Two digits reserved, so the count growing doesn't push the line along */
+  .client-checklist__count {
+    display: inline-block;
+    min-width: 2ch;
+    text-align: end;
   }
   .client-checklist__actions {
     display: flex;
@@ -224,6 +278,20 @@ const groupId = (title: string) => `checklist-${title.toLowerCase().replace(/[^a
   }
   .client-checklist__status {
     grid-area: meta;
+    display: grid;
+    justify-items: start;
+    justify-self: start;
+  }
+  /* Open and In progress stacked: the cell is as wide as the wider, so flipping moves nothing */
+  .client-checklist__badge {
+    grid-area: 1 / 1;
+  }
+  .client-checklist__badge.is-progress,
+  .client-checklist__row.is-sent .client-checklist__badge.is-open {
+    visibility: hidden;
+  }
+  .client-checklist__row.is-sent .client-checklist__badge.is-progress {
+    visibility: visible;
   }
   /* Narrow: badge and link share the meta row */
   .client-checklist__email {

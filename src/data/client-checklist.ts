@@ -1,12 +1,14 @@
 // Client checklist (prototype only, not for WordPress; Ross, 9 Oct 2026). What Reach still has to send, confirm or
 // decide before launch, as a page on the prototype (/client-checklist/) so the client needs no Claude sign-in. They
 // answer by email: each item's link opens a message to Ross with "Reach checklist <n>: <subject>" as the subject, so
-// the morning sync task (reach-client-sync) can match the reply to the item and move its status.
+// the weekday sync task (reach-checklist-sync) can match the reply to the item and move it from open to progress.
+// Statuses: open → progress (In progress: an answer has arrived, or, on the client's own browser only, they clicked
+// Answer by email) → done (acted on; set by hand or by the fix's commit).
 // Items are numbered 1, 2, 3… in page order, with no gaps (Ross, 13 Oct 2026): a dropped or added item renumbers the
 // rest. The email subject also carries the item's subject, so the sync task can match a reply sent before a renumber.
 // Statuses only, never the client's answers: the repo and the prototype are public.
 
-export type ChecklistStatus = 'open' | 'received' | 'done';
+export type ChecklistStatus = 'open' | 'progress' | 'done';
 
 export interface ChecklistItem {
   /** Stable number, used in the email subject. */
