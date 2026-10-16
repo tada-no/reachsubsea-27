@@ -14,8 +14,8 @@
 // Both take the site's photo tint.
 //
 // To confirm with Reach (docs/03 F, flagged in the handover): every phone number and email (published on the
-// dev site, not yet confirmed for the new one), Hilde Drønen's year on the board (in neither source), and
-// "MKOLD AS" (live site) against the PDF's "MMOLD AS".
+// dev site, not yet confirmed for the new one) and "MKOLD AS" (live site) against the PDF's "MMOLD AS". Hilde
+// Drønen's year on the board confirmed by Reach (client checklist 21, 16 Oct 2026).
 
 const base = import.meta.env.BASE_URL;
 const portrait = (slug: string) => `${base}images/people/${slug}.jpg`;
@@ -136,7 +136,7 @@ export const people: Person[] = [
     role: 'Board member',
     portrait: { src: portrait('hilde-dronen'), focalPoint: face },
     born: 1961,
-    // since: to confirm with Reach (not in the PDF or on the live site)
+    since: 2026,
     bio: 'Holds an MBA from the Norwegian School of Economics (NHH), a bachelor’s degree from BI Norwegian Business School and a law degree from the University of Bergen. CFO of DOF Group ASA for 20 years until retiring in January 2025; previously CFO of Bergen Yards AS (today Endur ASA) and Group Controller at Møgster Group. More than 35 years of experience, mainly in the oil service industry. Current board positions include BW Energy Ltd., Eviny AS and Outlet Group AS.',
   },
 ];
