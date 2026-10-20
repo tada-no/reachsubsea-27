@@ -88,7 +88,7 @@ export const checklistGroups: ChecklistGroup[] = [
       { n: 2, subject: 'Privacy & Cookie Policy', text: "Can you send new wording for your Privacy & Cookie Policy? We moved the current one (March 2023) across as it is, but it describes contact forms and Facebook Pixels the new site doesn't have. It also leaves out the videos, maps, share data and LinkedIn feed, and names no legal basis under GDPR. We'll use your new wording as written.", pages: ['Privacy & Cookie Policy'], status: 'open' },
       { n: 3, subject: 'Cookie consent tool', text: "Which cookie consent tool should the site use, and do you approve the wording it shows visitors? Videos, the share graph and maps load only after consent.", status: 'open' },
       { n: 4, subject: 'Benefits package', text: "Can you send the benefits package?", pages: ['Why work with us#reasons'], status: 'open' },
-      { n: 5, subject: 'Transparency Act wording', text: "Can your legal adviser check the Transparency Act wording? It currently describes a Californian law rather than Norway's Åpenhetsloven.", pages: ['Transparency Act'], status: 'open' },
+      { n: 5, subject: 'Transparency Act wording', text: "Can your legal adviser check the Transparency Act wording? The opening paragraph calls the Act the \"Transparency in Supply Chains Act\" (a California law) and frames it around trafficking and modern slavery. Norway's Åpenhetsloven is about human rights and decent working conditions.", pages: ['Transparency Act'], status: 'open' },
     ],
   },
   {
