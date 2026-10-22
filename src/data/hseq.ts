@@ -292,8 +292,8 @@ export interface Campaign {
   poster: string;
   width: number;
   height: number;
-  /** The poster as a PDF (Ross, 7 Oct 2026: a poster opens its PDF, with a Download link). Originals for Q2 2026
-   * and Q1–Q3 2021; the rest are `placeholderPdf` until Reach sends them. */
+  /** The poster as a PDF (Ross, 7 Oct 2026: a poster opens its PDF, with a Download link). Originals from Q1 2023
+   * on and for Q1–Q3 2021; Q4 2021 and 2022 are `placeholderPdf` until Reach sends them (checklist 30). */
   file?: string;
 }
 
@@ -301,24 +301,26 @@ const poster = (year: number, q: number, ext: 'png' | 'jpg') => `/images/hseq/ca
 /** PLACEHOLDER (7 Oct 2026): a one-page PDF made from the poster image, so every archive poster opens a PDF
  * (Ross). Replace each with Reach's original poster PDF. */
 const placeholderPdf = (year: number, q: number) => `/files/hseq/placeholder/hseq-campaign-${year}-q${q}.pdf`;
+/** Reach's original poster PDFs (ref/Reach HSEQ Campaigns, 22 Oct 2026), named like the Q2 2026 one. */
+const original = (year: number, q: number, slug: string) => `/files/hseq/hseq-campaign-q${q}-${year}-${slug}.pdf`;
 
 /** Newest first. Titles and topics transcribed from the posters. Q2 2026: the poster PDF Ross supplied
  * (ref/REA26 2842.110 Q2 HSEQ Manual handling V3.pdf), its image rendered from it. */
 export const campaigns: Campaign[] = [
   { year: 2026, quarter: 2, topic: 'Safety first', title: 'Stop & think before lifting', poster: poster(2026, 2, 'png'), width: 1000, height: 1415, file: '/files/hseq/hseq-campaign-q2-2026-stop-think-before-lifting.pdf' },
-  { year: 2026, quarter: 1, topic: 'Tired minds make risky decisions', title: 'Fatigue reduces performance long before you notice it', poster: poster(2026, 1, 'png'), width: 671, height: 955, file: placeholderPdf(2026, 1) },
-  { year: 2025, quarter: 4, topic: 'Well-being & mental health', title: 'Take care of your emotional health and well-being', poster: poster(2025, 4, 'jpg'), width: 724, height: 1024, file: placeholderPdf(2025, 4) },
-  { year: 2025, quarter: 3, topic: 'Aligning voices & values', title: 'Culture shapes how we connect', poster: poster(2025, 3, 'png'), width: 1000, height: 1424, file: placeholderPdf(2025, 3) },
-  { year: 2025, quarter: 2, topic: 'It’s the little things', title: 'Covered. Protected. Ready.', poster: poster(2025, 2, 'png'), width: 867, height: 1180, file: placeholderPdf(2025, 2) },
-  { year: 2025, quarter: 1, topic: 'Inclusive & healthy workplaces', title: 'Integrity and respect help people thrive', poster: poster(2025, 1, 'png'), width: 553, height: 787, file: placeholderPdf(2025, 1) },
-  { year: 2024, quarter: 4, topic: 'Stay sober, stay safe', title: 'Clear minds ensure a safer workplace', poster: poster(2024, 4, 'png'), width: 552, height: 785, file: placeholderPdf(2024, 4) },
-  { year: 2024, quarter: 3, topic: 'Empowering safety mindsets', title: 'Safety first: Stop the Job policy', poster: poster(2024, 3, 'png'), width: 553, height: 783, file: placeholderPdf(2024, 3) },
-  { year: 2024, quarter: 2, topic: 'Well-being & mental health', title: 'Take care of your emotional health and well-being', poster: poster(2024, 2, 'png'), width: 589, height: 835, file: placeholderPdf(2024, 2) },
-  { year: 2024, quarter: 1, topic: 'Navigate safely', title: 'Smooth onboarding process', poster: poster(2024, 1, 'png'), width: 601, height: 850, file: placeholderPdf(2024, 1) },
-  { year: 2023, quarter: 4, topic: 'IT security awareness', title: 'Protecting our digital world', poster: poster(2023, 4, 'png'), width: 662, height: 937, file: placeholderPdf(2023, 4) },
-  { year: 2023, quarter: 3, topic: 'Dropped object prevention', title: 'Safe position & gear, to keep you clear', poster: poster(2023, 3, 'jpg'), width: 784, height: 1114, file: placeholderPdf(2023, 3) },
-  { year: 2023, quarter: 2, topic: 'IOGP', title: 'Life-Saving Rules', poster: poster(2023, 2, 'jpg'), width: 789, height: 1105, file: placeholderPdf(2023, 2) },
-  { year: 2023, quarter: 1, topic: 'Well-being & mental health', title: 'Take care of your emotional, psychological & social well-being', poster: poster(2023, 1, 'jpg'), width: 789, height: 1119, file: placeholderPdf(2023, 1) },
+  { year: 2026, quarter: 1, topic: 'Tired minds make risky decisions', title: 'Fatigue reduces performance long before you notice it', poster: poster(2026, 1, 'png'), width: 671, height: 955, file: original(2026, 1, 'fatigue') },
+  { year: 2025, quarter: 4, topic: 'Well-being & mental health', title: 'Take care of your emotional health and well-being', poster: poster(2025, 4, 'jpg'), width: 724, height: 1024, file: original(2025, 4, 'mental-health') },
+  { year: 2025, quarter: 3, topic: 'Aligning voices & values', title: 'Culture shapes how we connect', poster: poster(2025, 3, 'png'), width: 1000, height: 1424, file: original(2025, 3, 'hseq-culture') },
+  { year: 2025, quarter: 2, topic: 'It’s the little things', title: 'Covered. Protected. Ready.', poster: poster(2025, 2, 'png'), width: 867, height: 1180, file: original(2025, 2, 'ppe') },
+  { year: 2025, quarter: 1, topic: 'Inclusive & healthy workplaces', title: 'Integrity and respect help people thrive', poster: poster(2025, 1, 'png'), width: 553, height: 787, file: original(2025, 1, 'inclusive-workplace') },
+  { year: 2024, quarter: 4, topic: 'Stay sober, stay safe', title: 'Clear minds ensure a safer workplace', poster: poster(2024, 4, 'png'), width: 552, height: 785, file: original(2024, 4, 'alcohol-drugs') },
+  { year: 2024, quarter: 3, topic: 'Empowering safety mindsets', title: 'Safety first: Stop the Job policy', poster: poster(2024, 3, 'png'), width: 553, height: 783, file: original(2024, 3, 'stop-the-job') },
+  { year: 2024, quarter: 2, topic: 'Well-being & mental health', title: 'Take care of your emotional health and well-being', poster: poster(2024, 2, 'png'), width: 589, height: 835, file: original(2024, 2, 'mental-health') },
+  { year: 2024, quarter: 1, topic: 'Navigate safely', title: 'Smooth onboarding process', poster: poster(2024, 1, 'png'), width: 601, height: 850, file: original(2024, 1, 'onboarding') },
+  { year: 2023, quarter: 4, topic: 'IT security awareness', title: 'Protecting our digital world', poster: poster(2023, 4, 'png'), width: 662, height: 937, file: original(2023, 4, 'it-security') },
+  { year: 2023, quarter: 3, topic: 'Dropped object prevention', title: 'Safe position & gear, to keep you clear', poster: poster(2023, 3, 'jpg'), width: 784, height: 1114, file: original(2023, 3, 'dropped-objects') },
+  { year: 2023, quarter: 2, topic: 'IOGP', title: 'Life-Saving Rules', poster: poster(2023, 2, 'jpg'), width: 789, height: 1105, file: original(2023, 2, 'life-saving-rules') },
+  { year: 2023, quarter: 1, topic: 'Well-being & mental health', title: 'Take care of your emotional, psychological & social well-being', poster: poster(2023, 1, 'jpg'), width: 789, height: 1119, file: original(2023, 1, 'mental-health') },
   { year: 2022, quarter: 4, topic: 'Prevention of eye injuries', title: 'Look after your eyes, prevent a life in the dark', poster: poster(2022, 4, 'jpg'), width: 647, height: 914, file: placeholderPdf(2022, 4) },
   { year: 2022, quarter: 3, topic: 'Inclusive & healthy workplaces', title: 'Integrity and respect, enabling people to thrive', poster: poster(2022, 3, 'jpg'), width: 575, height: 789, file: placeholderPdf(2022, 3) },
   { year: 2022, quarter: 2, topic: 'Quality control focus', title: 'Meet the expectations, deliver quality in every step', poster: poster(2022, 2, 'jpg'), width: 612, height: 843, file: placeholderPdf(2022, 2) },
