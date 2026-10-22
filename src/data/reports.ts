@@ -9,7 +9,6 @@
 //
 // Gaps on the live site, to raise with Reach (not invented here):
 // - No webcast link for Q4 2025, Q1 2026 or Q2 2026.
-// - Q1 2021's "Report" link opens the Q1 2021 presentation; the Q1 2021 report itself isn't on the site.
 // - Annual report 2025 was uploaded 30 Apr 2026; investor-results.ts still has the placeholder 26 Mar 2026.
 // - Q1 2026 was uploaded 5 May 2026; investor-calendar.ts has the placeholder 24 Apr 2026.
 import { latestResults } from './investor-results';
@@ -82,8 +81,8 @@ export const quarterlyReleases: QuarterRelease[] = [
   { year: 2021, quarter: 4, published: '2022-02-08', report: `${UP}/2023/03/REACH-SUBSEA-ASA-4Q2021-Consolidated-report.pdf`, presentation: `${UP}/2023/03/Reach-Subsea-ASA-Q4-2021-presentation.pdf`, webcast: cast('20220208_2') },
   { year: 2021, quarter: 3, published: '2021-11-04', report: `${UP}/2023/03/REACH-SUBSEA-ASA-3Q2021-Consolidated-Report.pdf`, presentation: `${UP}/2023/03/Reach-Subsea-ASA-Q3-2021-presentation.pdf`, webcast: cast('20211104_10') },
   { year: 2021, quarter: 2, published: '2021-08-17', report: `${UP}/2023/03/REACH-SUBSEA-ASA-2Q2021-consolidated-report.pdf`, presentation: `${UP}/2023/03/Reach-Subsea-ASA-Q2-2021-presentation.pdf`, webcast: cast('20210817_6') },
-  // The live site labels this file "Report"; it is the Q1 2021 presentation
-  { year: 2021, quarter: 1, presentation: `${UP}/2023/03/Reach-Subsea-ASA-Q1-2021-presentation.pdf` },
+  // The report isn't on the live site (its "Report" link opens the presentation); Reach sent it, 22 Oct 2026
+  { year: 2021, quarter: 1, report: `${base}files/reports/reach-subsea-asa-q1-2021-report.pdf`, presentation: `${UP}/2023/03/Reach-Subsea-ASA-Q1-2021-presentation.pdf` },
 
   // 2012–2020: the quarterly report only
   { year: 2020, quarter: 4, report: `${UP}/2023/03/Reach-Subsea-ASA-Consolidated-report-for-4Q2020.pdf` },

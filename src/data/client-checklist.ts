@@ -127,7 +127,7 @@ export const checklistGroups: ChecklistGroup[] = [
   {
     title: 'Files and links to send',
     items: [
-      { n: 28, subject: 'Q1 2021 report', text: "Can you send the Q1 2021 report? Your current site's Report link for that quarter opens the presentation.", pages: ['Reports & presentations'], status: 'open' },
+      { n: 28, subject: 'Q1 2021 report', text: "Can you send the Q1 2021 report? Your current site's Report link for that quarter opens the presentation.", pages: ['Reports & presentations'], status: 'done' },
       { n: 29, subject: 'AGM 2017 minutes and articles', text: "Can you send the minutes of the 29 May 2017 AGM, and an English version of the articles of association? Your current site's 2017 minutes link opens the notice of the February 2017 extraordinary meeting, and the articles are only in Norwegian.", pages: ['Governance & general meetings#general-meetings'], status: 'open' },
       { n: 30, subject: 'HSEQ campaign posters', text: "Can you send the original PDFs of the 18 HSEQ campaign posters? Stand-ins are in place for now.", pages: ['HSEQ campaigns'], status: 'open' },
       { n: 31, subject: 'Spec sheets', text: "Do you have spec sheets (PDF) for the other vessels and the Supporter WROV? We link the six on your current site: Havila Subsea, Surveyor Interceptor, HD WROV, Constructor WROV, ZEEROV and the Reach Remote brochure.", pages: ['Assets#vessels', 'Survey#fleet', 'Monitoring'], status: 'open' },
