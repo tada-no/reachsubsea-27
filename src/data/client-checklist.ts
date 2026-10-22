@@ -135,7 +135,7 @@ export const checklistGroups: ChecklistGroup[] = [
       { n: 33, subject: 'Trainee programme link', text: 'Where should the "Learn about the trainee programme" button go: a new page or an existing one?', pages: ['Careers#trainees'], status: 'open' },
       { n: 34, subject: 'Sponsorship portal', text: "What is the address of the sponsorship application portal?", pages: ['Sponsorship'], status: 'open' },
       { n: 35, subject: 'Current website addresses', text: "Which address should the new site use, reachsubsea.com or reachsubsea.no? Today reachsubsea.com forwards to reachsubsea.no. And do you use any other addresses, such as campaign domains? Every page on your current site is already mapped to its new page.", status: 'open' },
-      { n: 36, subject: 'Logo packs', text: "Are the EPS, PNG and SVG logo packs from March 2023 still current? We link to them as they are. If not, can you send updated packs?", pages: ['Press & media#brand-assets'], status: 'progress' },
+      { n: 36, subject: 'Logo packs', text: "Are the EPS, PNG and SVG logo packs from March 2023 still current? We link to them as they are. If not, can you send updated packs?", pages: ['Press & media#brand-assets'], status: 'done' },
     ],
   },
   {

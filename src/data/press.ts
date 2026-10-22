@@ -9,7 +9,8 @@
 //
 // In WordPress:
 // - Logo packs: a Press options page (or the Brand assets block's own fields): label, file (Media Library), note.
-//   The zips are the live uploads; sizes are read from the attachment, not typed.
+//   The zips are Reach's current packs (ref/Logo, 22 Oct 2026; checklist 36), zipped as EPS, PNG and SVG; sizes
+//   are read from the attachment, not typed.
 // - Colours: the Brand assets block's colour repeater, two groups. Each colour picks its swatch from the theme
 //   palette (`token`, so the fill is the same token the site uses) and carries the print values as text.
 // - Press photos: a Card grid; each card's action is the pack's file once uploaded, until then the request email
@@ -41,7 +42,7 @@ export interface LogoPack {
   url: string;
   /** What the format is for, shown beside the size. */
   note: string;
-  /** From the attachment (HEAD content-length, 9 Oct 2026). */
+  /** From the attachment (file size, 22 Oct 2026). */
   size: string;
 }
 
@@ -74,9 +75,9 @@ export const brandAssets = {
     { title: 'Keep it as drawn', text: 'Use the supplied files: no new colours, effects or redrawn wordmark.' },
   ],
   logoPacks: [
-    { label: 'EPS', url: 'https://reachsubsea.no/wp-content/uploads/2023/03/EPS.zip', note: 'For print', size: '1.5 MB' },
-    { label: 'PNG', url: 'https://reachsubsea.no/wp-content/uploads/2023/03/PNG.zip', note: 'For digital', size: '100 KB' },
-    { label: 'SVG', url: 'https://reachsubsea.no/wp-content/uploads/2023/03/SVG.zip', note: 'For digital', size: '11 KB' },
+    { label: 'EPS', url: `${base}files/brand/reach-subsea-logos-eps.zip`, note: 'For print', size: '3 MB' },
+    { label: 'PNG', url: `${base}files/brand/reach-subsea-logos-png.zip`, note: 'For digital', size: '102 KB' },
+    { label: 'SVG', url: `${base}files/brand/reach-subsea-logos-svg.zip`, note: 'For digital', size: '7 KB' },
   ] satisfies LogoPack[],
 };
 
