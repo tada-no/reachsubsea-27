@@ -66,7 +66,8 @@ export interface Asset {
   rovs?: string[];
   /** Omit `src` for the media-library placeholder (no approved photo yet). */
   image: ImageField;
-  /** Spec sheet or brochure, only where the file exists on the live site. */
+  /** Spec sheet or brochure, only where a file exists: the live site's, or Reach's data sheets (ref/Data sheets,
+   * 22 Oct 2026; checklist 31), hosted in /files/spec-sheets/. Per-unit sheets are merged into one PDF per model. */
   specSheet?: LinkField;
   /** The dev single's URL, for the redirect map only: vessels and ROVs have no page of their own on the new
    * site (Ross, 4 Oct 2026). The card is the record, as in the Q2 report's "Status of vessels and assets". */
@@ -78,6 +79,7 @@ export interface Asset {
 
 const base = import.meta.env.BASE_URL;
 const files = 'https://reachsubsea.no/wp-content/uploads';
+const sheets = `${base}files/spec-sheets`;
 
 export const assets: Asset[] = [
   // ── Vessels, in service (dev hub order) ─────────────────────────────────────
@@ -174,6 +176,7 @@ export const assets: Asset[] = [
     specs: { crane: '150 t', pax: '100', deck: '940 m²' },
     rovs: ['2 Constructor WROV'],
     image: { src: `${base}images/vessel-olympic-triton.jpg`, alt: 'Olympic Triton, a dark-hulled construction vessel with a helideck, at sea', focalPoint: { x: 0.5, y: 0.5 } },
+    specSheet: { label: 'Spec sheet (PDF)', url: `${sheets}/olympic-triton-data-sheet.pdf`, action: 'file', context: 'Olympic Triton' },
     url: '/assets/olympic-triton/',
     source: 'DEV spec table and intro (150t AHC crane, 940m2 deck, 100 PAX); the "ROVs onboard" card lists Constructor x2.',
   },
@@ -322,7 +325,7 @@ export const assets: Asset[] = [
     summary: 'Heavy-duty ROV for carrying and operating large tools and modules, with more power and payload than the Supporter.',
     specs: { power: '160 kW / 220 hp', depth: '2,000–6,000 m', payload: '400 kg', weight: '4,600 kg', dimensions: '3.2 × 1.7 × 1.9 m' },
     image: { src: `${base}images/asset-constructor-wrov.jpg`, alt: 'A Constructor work-class ROV on deck', focalPoint: { x: 0.6, y: 0.45 } },
-    specSheet: { label: 'Spec sheet (PDF)', url: `${files}/2023/03/Constructor-data-sheet.pdf`, action: 'file', context: 'Constructor WROV' },
+    specSheet: { label: 'Spec sheet (PDF)', url: `${sheets}/constructor-07-data-sheet.pdf`, action: 'file', context: 'Constructor WROV' },
     url: '/assets/constructor-wrov/',
     source: 'DEV spec table (Power 160 Kw / 220 Hp, Depth rating 2-6000 msg, Dimensions 3.2 L / 1.7W / 1.9H m, Weight 4600 Kg, Payload 400 Kg) and intro.',
   },
@@ -335,8 +338,9 @@ export const assets: Asset[] = [
     summary: 'Compact and powerful work-class ROV, refined from years of hands-on operational experience.',
     specs: { power: '93 kW / 125 hp', depth: '2,000–3,000 m', payload: '220 kg', weight: '2,450 kg', dimensions: '2.5 × 1.7 × 1.65 m' },
     image: { src: `${base}images/rov-supporter-launch.jpg`, alt: 'A yellow Supporter work-class ROV lowered through the splash zone', focalPoint: { x: 0.5, y: 0.5 } },
+    specSheet: { label: 'Spec sheets (PDF)', url: `${sheets}/supporter-wrov-data-sheets.pdf`, action: 'file', context: 'Supporter WROV' },
     url: '/assets/supporter-wrov/',
-    source: 'DEV spec table (Power 93 Kw / 125 Hp, Depth rating 2-3000 msg, Dimensions 2.5 L / 1.7 W / 1.65 H m, Weight 2450 Kg, Payload 220 Kg) and intro. No data sheet on either site.',
+    source: 'DEV spec table (Power 93 Kw / 125 Hp, Depth rating 2-3000 msg, Dimensions 2.5 L / 1.7 W / 1.65 H m, Weight 2450 Kg, Payload 220 Kg) and intro. Data sheets: Reach’s Supporter 07, 10, 21 and 27, merged.',
   },
   {
     slug: 'schilling-robotics-hd-wrov',
@@ -347,7 +351,7 @@ export const assets: Asset[] = [
     summary: 'Compact 150 hp ROV for IMR and drill support, built for rigs and vessels where deck space is limited.',
     specs: { power: '112 kW / 150 hp', depth: '3,000 m', payload: '250 kg', weight: '3,600 kg', dimensions: '2.9 × 1.7 × 1.9 m' },
     image: { src: `${base}images/rov-hd-wrov.jpg`, alt: 'A yellow HD work-class ROV on deck beside a vessel', focalPoint: { x: 0.5, y: 0.5 } },
-    specSheet: { label: 'Spec sheet (PDF)', url: `${files}/2023/03/HDROV-data-sheet.pdf`, action: 'file', context: 'HD WROV' },
+    specSheet: { label: 'Spec sheets (PDF)', url: `${sheets}/hd-wrov-data-sheets.pdf`, action: 'file', context: 'HD WROV' },
     url: '/assets/schilling-robotics-hd-wrov/',
     source: 'DEV spec table (Power 112 Kw / 150 Hp, Depth rating 3000 msg, Dimensions 2.9 L / 1.7 W / 1.9 H m, Weight 3600 Kg, Payload 250 Kg) and intro. Vessel pages call it "Schilling HD WROV".',
   },
@@ -373,7 +377,7 @@ export const assets: Asset[] = [
     summary: 'Fully electric work-class ROV carried by Reach Remote, with AutoPOS and AutoTRACK for control from shore.',
     specs: { power: '115 kW / 150 hp', depth: '2,000 m', payload: '600 kg', weight: '3,800 kg', dimensions: '2.75 × 1.7 × 1.69 m' },
     image: { src: `${base}images/rov-zeerov-seabed.jpg`, alt: 'A ZEEROV electric work-class ROV working on the seabed', focalPoint: { x: 0.5, y: 0.5 } },
-    specSheet: { label: 'Spec sheet (PDF)', url: `${files}/2024/11/KD-ZEEROV.pdf`, action: 'file', context: 'ZEEROV' },
+    specSheet: { label: 'Spec sheet (PDF)', url: `${sheets}/zeerov-data-sheet.pdf`, action: 'file', context: 'ZEEROV' },
     url: '/assets/zeerov/',
     source: 'DEV spec table (Power 115 Kw / 150 Hp, Depth rating 2000 msg, Dimensions 2.75 L / 1.7 W / 1.69 H m, Weight 3800 Kg, Payload 600 Kg, Umbilical length 1065 m) and intro.',
   },
