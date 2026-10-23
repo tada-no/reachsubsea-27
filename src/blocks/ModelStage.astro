@@ -12,11 +12,11 @@
 // than a cut to a blank viewport. "Skip tour" scrolls to `skipTo`, the id of the block that slides over.
 // Not live: the chapters are the content and read as rows under a still stage, text beside spec rows.
 //
-// Poster: a still of the hero frame, rendered once from the stage (landscape, and portrait for phones), shows from
-// the first paint; the live canvas fades in over it once the vessel is in (Ross, 11 Oct 2026: the hero sat on empty
-// sea while the model loaded). Without JS or WebGL the poster is the stage.
+// Poster: a still of the hero frame, rendered from the stage itself, shows from the first paint; the live canvas fades
+// in over it once the vessel is in (Ross, 11 Oct 2026: the hero sat on empty sea while the model loaded), the scene
+// held at the still's moment until it has (23 Oct 2026). Without JS or WebGL the poster is the stage.
 //
-// Fields: hero (eyebrow, title, lead; breadcrumb from the page), poster (landscape, portrait), scene (sea · studio), chapters[]
+// Fields: hero (eyebrow, title, lead; breadcrumb from the page), poster (stills by screen shape), scene (sea · studio), chapters[]
 // (eyebrow, title, text, specs[], points[]), dims[]. Camera keys and anchors are developer presets per model.
 // Three.js is bundled on the page that uses this block only.
 import Breadcrumb, { type BreadcrumbItem } from '../components/Breadcrumb.astro';
@@ -38,13 +38,16 @@ interface Props {
   label?: string;
   /** Where "Skip tour" lands: the id of the block after the tour (the one that slides over the stage) */
   skipTo?: string;
-  /** Stills of the hero frame, rendered from the stage itself, shown until the live model is in. The stage frames
-   *  the vessel by its own rules (landscape: sized to the stage's height, a fixed share across; portrait: sized to its
-   *  width, lifted), so the stills are positioned by the same rules, not cropped (Ross, 11 Oct 2026: the still and the
-   *  first frame didn't line up). `landscape` is the widest still (the fallback); `steps` are narrower ones, each used
-   *  up to its `maxAspect` (viewport width / height), so the sky behind the vessel hardly shifts at the hand-off;
-   *  `portrait` for portrait screens. Each still must be at least as wide (as a ratio) as the screens it serves. */
-  poster?: { landscape: string; steps?: { maxAspect: string; src: string }[]; portrait?: string };
+  /** Stills of the hero frame, rendered from the stage itself (scripts/stage-poster.mjs), shown until the live model
+   *  is in. The stage frames its hero as one picture per band of screen shapes that it crops at the sides (src/scripts/
+   *  reach-remote-stage.ts, HERO), so every still of a band is a centre crop of that band's render, placed at the
+   *  stage's height and centred, and the still and the first live frame match at any screen size (Ross, 11 and 23 Oct
+   *  2026). Narrowest first, each used up to its `maxAspect` (viewport width / height), and the `maxAspect`s include
+   *  the bands' edges (3/5, 4/5, 1/1, 4/3); the last, with no `maxAspect`, is the widest and the fallback. Only the
+   *  one that shows is fetched. A still must be at least as wide (as a ratio) as the stages it serves: a narrower one
+   *  covers the stage instead, and no longer matches. Under 900 the dots strip makes the stage up to 16/15 of the
+   *  viewport's shape, so a still served there is that much wider than its `maxAspect`. */
+  poster?: { stills: { src: string; maxAspect?: string }[] };
 }
 
 const {
@@ -62,29 +65,36 @@ const {
 } = Astro.props;
 const base = import.meta.env.BASE_URL;
 // The stills, narrowest first: `media` picks the <source> (first match wins), `range` is the same band made exclusive
-// for its preload, so only the still that shows is fetched. The last is the widest (the <img> itself).
+// for its preload, so only the still that shows is fetched (`aspect-ratio >`: min-aspect-ratio is inclusive, so a
+// 16:10 or 9:5 screen, on a band's edge, fetched two). The last is the widest (the <img> itself).
 const posterSources = (() => {
   if (!poster) return [];
-  const list = [
-    ...(poster.portrait ? [{ maxAspect: '1/1', src: poster.portrait }] : []),
-    ...(poster.steps ?? []),
-  ];
-  const out: { src: string; media?: string; range?: string }[] = [];
+  const out: { src: string; media?: string; range: string }[] = [];
   let prev: string | undefined;
-  for (const p of list) {
-    const media = `(max-aspect-ratio: ${p.maxAspect})`;
-    out.push({ src: p.src, media, range: prev ? `(min-aspect-ratio: ${prev}) and ${media}` : media });
+  for (const p of poster.stills) {
+    const media = p.maxAspect ? `(max-aspect-ratio: ${p.maxAspect})` : undefined;
+    const after = prev ? `(aspect-ratio > ${prev})` : undefined;
+    out.push({ src: p.src, media, range: ['(prefers-reduced-motion: no-preference)', after, media].filter(Boolean).join(' and ') });
     prev = p.maxAspect;
   }
-  out.push({ src: poster.landscape, range: prev ? `(min-aspect-ratio: ${prev})` : undefined });
   return out;
 })();
+// With reduced motion the stage stays unpinned at 16:9 from 900 and 4:5 below, whatever the screen's shape, so its
+// still is the first that covers that shape (each still is at least as wide as its band's maxAspect)
+const ratioOf = (r: string) => r.split('/').map(Number).reduce((a, b) => a / b);
+const stillFor = (aspect: number) => poster!.stills.find((s) => !s.maxAspect || ratioOf(s.maxAspect) >= aspect)!.src;
+const stillSources = poster
+  ? [
+      { media: '(prefers-reduced-motion: reduce) and (min-width: 900px)', src: stillFor(16 / 9) },
+      { media: '(prefers-reduced-motion: reduce) and (max-width: 899px)', src: stillFor(4 / 5) },
+    ]
+  : [];
 // The vessel and the Draco decoder start downloading with the page, not after three.js has loaded and run
 const root = base.replace(/\/?$/, '/');
 ---
 
 <section class="wp-block-reach-model-stage model-stage" data-tour aria-label={label}>
-  {posterSources.map((p) => <link rel="preload" href={p.src} as="image" fetchpriority="high" media={p.range} />)}
+  {[...stillSources.map((p) => ({ src: p.src, range: p.media })), ...posterSources].map((p) => <link rel="preload" href={p.src} as="image" fetchpriority="high" media={p.range} />)}
   <link rel="preload" href={`${root}models/reach-remote-lod1.glb`} as="fetch" crossorigin="anonymous" />
   <link rel="preload" href={`${root}draco/draco_wasm_wrapper.js`} as="fetch" crossorigin="anonymous" />
   <link rel="preload" href={`${root}draco/draco_decoder.wasm`} as="fetch" crossorigin="anonymous" />
@@ -93,8 +103,8 @@ const root = base.replace(/\/?$/, '/');
       {
         poster && (
           <picture class="model-stage__poster" aria-hidden="true">
-            {posterSources.slice(0, -1).map((p) => <source media={p.media} srcset={p.src} />)}
-            <img src={poster.landscape} alt="" fetchpriority="high" decoding="async" />
+            {[...stillSources, ...posterSources.slice(0, -1)].map((p) => <source media={p.media} srcset={p.src} />)}
+            <img src={posterSources[posterSources.length - 1].src} alt="" fetchpriority="high" decoding="async" />
           </picture>
         )
       }
@@ -234,38 +244,24 @@ const root = base.replace(/\/?$/, '/');
   }
   /* The poster under the canvas; the canvas fades in over it once the vessel is in (is-ready), and the loading
      readout stays quiet meanwhile, since the vessel is already on screen */
-  /* Placed by the stage's own framing (src/scripts/reach-remote-stage.ts, frameView), so the still and the first live
-     frame line up at any stage size: landscape, the still takes the stage's height and its vessel anchor (66% across:
-     the centre plus the cover view's 0.16 shift) sits 66% across the stage; portrait, it takes the stage's width and
-     its anchor (38% down: the centre less the 0.12 lift) sits 38% down. left 66% + translate −66% puts the still's own
-     66% on the stage's, whatever the still's width. If a stage is ever wider than its still, cover takes over. */
+  /* Placed as the stage frames its hero (src/scripts/reach-remote-stage.ts, HERO): one picture per band of screen
+     shapes, the stage's height, cropped equally at the sides, so the still and the first live frame line up at any
+     stage size. If a stage is ever wider than its still, cover takes over. */
   .model-stage__poster {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    container-type: size;
   }
   .model-stage__poster img {
     position: absolute;
     top: 0;
-    left: 66%;
+    left: 50%;
     height: 100%;
     width: auto;
     min-width: 100%;
     max-width: none;
     object-fit: cover;
-    translate: -66% 0;
-  }
-  @container (aspect-ratio < 1) {
-    .model-stage__poster img {
-      top: 38%;
-      left: 0;
-      width: 100%;
-      height: auto;
-      min-width: 0;
-      min-height: 100%;
-      translate: 0 -38%;
-    }
+    translate: -50% 0;
   }
   .model-stage__stage[data-poster] .model-stage__canvas {
     transition: opacity var(--wp--custom--motion--duration-reveal) var(--wp--custom--motion--ease-out);
@@ -285,7 +281,9 @@ const root = base.replace(/\/?$/, '/');
     gap: var(--wp--preset--spacing--16);
     pointer-events: none;
   }
-  /* At sea the text sits on daylight: a navy scrim rises from the stage's foot, like the photo heroes' tint */
+  /* At sea the text sits on daylight: a navy scrim rises from the stage's foot, like the photo heroes' tint. It stays
+     for the whole tour, under the dots and Skip tour (Ross, 23 Oct 2026: it used to fade to 0.35 on a timer as the
+     tour began, a change of light the scroll didn't drive) */
   .model-stage__scrim {
     position: absolute;
     inset: auto 0 0 0;
@@ -302,10 +300,6 @@ const root = base.replace(/\/?$/, '/');
      has set the scene (Ross, 11 Oct 2026: the still showed without it, then it faded in) */
   .model-stage__stage[data-poster]:not(.is-ready) .model-stage__scrim {
     opacity: 0.85;
-  }
-  /* On the tour the cards carry the words, so the picture keeps its daylight to the foot */
-  .model-stage.is-live .model-stage__stage.is-at-sea.is-touring .model-stage__scrim {
-    opacity: 0.35;
   }
   .model-stage__title {
     max-width: 18ch;

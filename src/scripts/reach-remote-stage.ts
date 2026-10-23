@@ -43,8 +43,8 @@ type SpinMode = 'sway' | 'orbit' | 'off';
 
 /** Camera positions as spherical angles around the vessel. Azimuth 0 = ahead of the bow, +90 = starboard beam,
  *  180 = astern, -90 = port beam. Polar 0 = straight above, 90 = at the waterline. `fit` scales the fitted distance.
- *  `shift` moves the vessel right by that fraction of the stage width on landscape stages, leaving the left column
- *  to the hero text (subject right, as the photo heroes). */
+ *  `shift` moves the vessel right by that fraction of a 16:10 stage's width on landscape stages (the hero is framed
+ *  for 16:10, HERO below), leaving the left column to the hero text (subject right, as the photo heroes). */
 const VIEWS: Record<ViewName, { az: number; polar: number; fit: number; shift: number }> = {
   cover: { az: -38, polar: 85, fit: 0.78, shift: 0.16 }, // brochure cover: port bow, at the waterline
   stern: { az: 180, polar: 86, fit: 0.9, shift: 0 }, // brochure p7: dead astern, thrusters and gondola
@@ -52,6 +52,28 @@ const VIEWS: Record<ViewName, { az: number; polar: number; fit: number; shift: n
   starboard: { az: 90, polar: 78, fit: 0.95, shift: 0 },
   quarter: { az: -140, polar: 76, fit: 0.85, shift: 0.1 }, // port quarter: moonpool deck and mast
 };
+
+/** The hero is one picture per band of screen shapes, which the stage crops at its sides as a photo hero crops its
+ *  photo: within a band the camera stands where it stands for a stage of the band's `as` shape, whatever the stage's
+ *  own, so every still of a band is a centre crop of one render and the still and the first live frame match at any
+ *  screen size (Ross, 23 Oct 2026; the camera used to move with the stage's shape, so they matched only at the stills'
+ *  own shapes, and on phones not at all). A band runs up to its `upTo` (viewport width / height, as the poster's
+ *  <source>s pick their stills, whose `maxAspect`s include these edges: ModelStage.astro). Portrait: as far back as
+ *  fits the hull across a stage of `as` (53% of its width there). Landscape: the vessel 0.16 of a 16:10 stage's width
+ *  right of centre (66% across there), and no further than `maxAcross` of a stage of `as`, so near-square windows
+ *  keep the whole hull (70% across a square one). */
+const HERO = {
+  bands: [
+    { upTo: '3/5', as: 0.6 }, // phones
+    { upTo: '4/5', as: 0.75 }, // portrait tablets
+    { upTo: '1/1', as: 0.9 }, // square-ish portrait windows
+    { upTo: '4/3', as: 1 }, // square-ish landscape windows
+    { upTo: '', as: 1.6 }, // landscape
+  ],
+  maxAcross: 0.7,
+};
+type HeroBand = (typeof HERO.bands)[number];
+const ratioOf = (r: string) => r.split('/').map(Number).reduce((a, b) => a / b);
 
 const STUDIO = { exposure: 1.05, hemi: [0xe4ecff, 0x1b1d3b, 0.7] as [number, number, number] };
 const BOB = { half: 9, beam: 4 }; // the world's BOBBERS entry for the Reach Remotes: metres from the middle to the wave samples
@@ -113,8 +135,24 @@ export function mountStage(stage: HTMLElement) {
   rim.position.set(-20, 24, -50);
   scene.add(hemi, key, fill, rim);
 
+  // The tour (below): live when the stage sits in a `[data-tour]` section; `touring` while a chapter past the hero is current
+  const tourRoot = stage.closest<HTMLElement>('[data-tour]');
+  // `?static=1` previews the fallback (the chapters as a plain list) without switching the OS to reduced motion
+  const tourLive = !!tourRoot && !reducedMotion && !new URLSearchParams(location.search).has('static');
+
+  // The hero's band (HERO): on the tour by the viewport's shape, the same test the poster's <source>s make (under 900
+  // the dots strip makes the stage a little wider than the viewport, so the stage's own shape picked the wrong band at
+  // the edges); unpinned (reduced motion) by the stage's own 16:9 or 4:5, as its stills are picked
+  const bandQueries = HERO.bands.map((b) => (b.upTo ? matchMedia(`(max-aspect-ratio: ${b.upTo})`) : null));
+  const bandOf = (aspect: number): HeroBand =>
+    HERO.bands.find((b, i) => !b.upTo || (tourLive ? bandQueries[i]!.matches : aspect <= ratioOf(b.upTo)))!;
+  let band = bandOf(stage.clientWidth / (stage.clientHeight || 1));
+
   // ── Sea: the 3D World's sky, swell, water column and lights (reach-remote-ocean.js) ──────────
-  const phone = Math.min(innerWidth, innerHeight) < 900;
+  // Portrait bands (phones, mostly) get the lighter sea and sky, told as the stage mounts, so each band's stills,
+  // rendered with its own, match the live frame. It used to be the window's short side under 900, which gave most
+  // laptop windows the phone sea under stills rendered with the full one (the hand-off showed it).
+  const phone = band.as < 1;
   const SEA = createOcean({ THREE, scene, renderer, camera, oceanSeg: phone ? 128 : 200, cloudOct: phone ? 3 : 4, swell: 0.6 });
   // Marine snow: motes drifting down through the water around the camera (wrapped in a box that follows it), so the
   // underwater picture has depth and movement; only drawn while the camera is under the surface
@@ -204,11 +242,9 @@ export function mountStage(stage: HTMLElement) {
   controls.minPolarAngle = THREE.MathUtils.degToRad(5);
   controls.maxPolarAngle = THREE.MathUtils.degToRad(92);
   controls.autoRotateSpeed = 0.35;
-  let spin: SpinMode = reducedMotion ? 'off' : 'sway';
-  // The tour (below): live when the stage sits in a `[data-tour]` section; `touring` while a chapter past the hero is current
-  const tourRoot = stage.closest<HTMLElement>('[data-tour]');
-  // `?static=1` previews the fallback (the chapters as a plain list) without switching the OS to reduced motion
-  const tourLive = !!tourRoot && !reducedMotion && !new URLSearchParams(location.search).has('static');
+  // With reduced motion the scene's clock stays at 0 (frame, below): the stills' moment, the vessel riding the swell as
+  // in them, nothing moving unless the visitor drags. It used to stop the ride and keep the waves going.
+  let spin: SpinMode = 'sway';
   let touring = false;
 
   const draco = new DRACOLoader();
@@ -217,6 +253,22 @@ export function mountStage(stage: HTMLElement) {
   draco.preload();
   const loader = new GLTFLoader();
   loader.setDRACOLoader(draco);
+
+  /** Compile a model's shaders before it shows: off the main thread where the browser can (KHR_parallel_shader_compile),
+   *  for the screen and for the sea's mirror pass (a render target: linear, no tone mapping). Rendered straight away,
+   *  the vessel's first frame stalled the page for 380 ms on an M2 (the scroll-driven words froze, then jumped). */
+  const warmTarget = new THREE.WebGLRenderTarget(1, 1);
+  async function warm(root: THREE.Object3D) {
+    const was = renderer.getRenderTarget();
+    let mirror: Promise<unknown>;
+    renderer.setRenderTarget(warmTarget);
+    try {
+      mirror = renderer.compileAsync(root, camera, scene);
+    } finally {
+      renderer.setRenderTarget(was);
+    }
+    await Promise.all([mirror, renderer.compileAsync(root, camera, scene)]);
+  }
 
   // ── The vessel ──────────────────────────────────────────────────────────────────────────────
   let hullMesh: THREE.Mesh | null = null;
@@ -334,15 +386,16 @@ export function mountStage(stage: HTMLElement) {
     }
     controls.target.set(0, TARGET_Y, 0);
     applyView(currentView, false);
+    // Out of the picture while its shaders compile, the underwater ones too (the snow, the water column), so neither
+    // the vessel's first frame nor the first dive stalls
+    holder.visible = false;
+    await warm(scene).catch((e) => console.warn('warm', e));
+    holder.visible = true;
     const ms = Math.round(performance.now() - t0);
     if (status) status.textContent = `Vessel · 1.4 MB · ${ms.toLocaleString('en-GB')} ms`;
     stage.classList.remove('is-loading');
-    // The stills are rendered at scene time 0 (?poster, below), so the scene's one clock restarts here: the first frame
-    // that fades in over the still is the still (swell, water, clouds and the vessel's ride), and the motion carries
-    // on from it (Ross, 11 Oct 2026: the still and the first frame didn't line up)
-    clock.start();
     // Over the poster once the vessel has drawn (two frames: the one that renders it, then the fade)
-    requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.add('is-ready')));
+    requestAnimationFrame(() => requestAnimationFrame(reveal));
     // Then the ROV and TMS in the background, once the page is idle
     const idle = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
     if (idle) idle(() => void loadLaunch(true), { timeout: 3000 });
@@ -459,6 +512,7 @@ export function mountStage(stage: HTMLElement) {
       cage.rotation.y = -2.258;
       tmsHolder.add(cage);
       shadeInHull(stack);
+      await warm(stack).catch((e) => console.warn('warm', e));
       launchLoaded = true;
       if (T === 0) poseStack(); // parked in the moonpool until the launch
       stack.visible = true;
@@ -621,6 +675,7 @@ export function mountStage(stage: HTMLElement) {
   let launchShift = 0; // the tour's `shift` carried into the launch, so the picture stays right of the text panel
 
   function setLaunch(t: number) {
+    const ended = T > 0;
     T = clamp01(t);
     if (T > 0 && !launchLoaded) void loadLaunch();
     stack.visible = launchLoaded;
@@ -631,20 +686,29 @@ export function mountStage(stage: HTMLElement) {
       rig.setLamps(0);
       if (hero && !tourLive) hero.style.opacity = '1';
       if (chapterEl) chapterEl.textContent = CHAPTERS[0].name;
-      if (!touring) applyView(currentView, false);
+      // Back to the hero as the launch ends; only then: the tour calls this every frame, and putting the camera back
+      // each time cut the glide back from the tour short (a snap) and undid the visitor's drag on the hero. A glide:
+      // the launch only ends off the tour when the scroll is back on the hero before it has unwound (Home, the first
+      // dot, a fling), and the camera used to cut there from the launch's pose, a 66° turn in one frame
+      if (!touring && ended) applyView(currentView, true);
     }
   }
 
   // ── Views ───────────────────────────────────────────────────────────────────────────────────
   let currentView: ViewName = 'cover';
-  const tween = { from: new THREE.Vector3(), to: new THREE.Vector3(), t: 1 };
+  // the camera's glide back to the hero; its aim (the orbit target) glides with it
+  const tween = { from: new THREE.Vector3(), to: new THREE.Vector3(), aimFrom: new THREE.Vector3(), aimTo: new THREE.Vector3(), t: 1 };
 
   /** Portrait stages look down on the vessel a little more: the hero lift below would otherwise put a waterline camera
    *  into the swell (at 375 the crests hid the hull) */
-  const portraitPolar = (polar: number) => (camera.aspect < 1 ? polar - 12 : polar);
+  const portraitPolar = (polar: number) => (band.as < 1 ? polar - 12 : polar);
+  /** The hero's distance and shift by its band (HERO) */
+  const heroFit = () => (band.as < 1 ? 1.35 / band.as : 1);
+  /** A landscape hero's shift as a share of the stage's own width (the rails' `shift`) */
+  const heroShift = (shift: number) => Math.min(shift * 1.6, (HERO.maxAcross - 0.5) * band.as) / camera.aspect;
   function viewPosition(name: ViewName, from: THREE.Vector3 = controls.target): THREE.Vector3 {
     const v = VIEWS[name];
-    const dist = (radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2))) * v.fit * fitScale;
+    const dist = (radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2))) * v.fit * heroFit();
     const az = THREE.MathUtils.degToRad(v.az);
     const polar = THREE.MathUtils.degToRad(portraitPolar(v.polar));
     // Azimuth is measured from +X (ahead of the bow) towards +Z (starboard)
@@ -660,8 +724,8 @@ export function mountStage(stage: HTMLElement) {
     const h = stage.clientHeight;
     if (!w || !h || T > 0 || touring) return;
     const v = VIEWS[currentView];
-    const landscape = w / h >= 1;
-    const dist = (radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2))) * v.fit * fitScale;
+    const landscape = band.as >= 1;
+    const dist = (radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2))) * v.fit * heroFit();
     const az = THREE.MathUtils.degToRad(v.az);
     const polar = THREE.MathUtils.degToRad(portraitPolar(v.polar));
     const dir = new THREE.Vector3(Math.cos(az) * Math.sin(polar), Math.cos(polar), Math.sin(az) * Math.sin(polar)); // target → camera
@@ -670,18 +734,22 @@ export function mountStage(stage: HTMLElement) {
     const viewH = 2 * dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     const viewW = viewH * camera.aspect;
     controls.target.copy(BASE_TARGET);
-    if (landscape) controls.target.addScaledVector(right, -v.shift * viewW);
+    if (landscape) controls.target.addScaledVector(right, -heroShift(v.shift) * viewW);
     else controls.target.addScaledVector(up, -0.12 * viewH);
   }
 
   function applyView(name: ViewName, animate = true) {
     currentView = name;
+    tween.aimFrom.copy(controls.target);
     frameView();
     const to = viewPosition(name);
     if (!animate || reducedMotion) {
       camera.position.copy(to);
       tween.t = 1;
     } else {
+      // The aim glides with the camera: it used to snap, so scrolling back up into the hero turned the view 15° in a frame
+      tween.aimTo.copy(controls.target);
+      controls.target.copy(tween.aimFrom);
       tween.from.copy(camera.position);
       tween.to.copy(to);
       tween.t = 0;
@@ -694,23 +762,53 @@ export function mountStage(stage: HTMLElement) {
     if (!w || !h) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    // Portrait stages (phones) need the camera further back to fit the hull's length
+    band = bandOf(camera.aspect);
+    // Portrait stages (phones) need the camera further back to fit the hull's length; the tour's chapters take part of
+    // it (railsScale), the hero its own (heroFit)
     fitScale = camera.aspect < 1 ? 1.35 / camera.aspect : 1;
     camera.updateProjectionMatrix();
     keys = null;
     if (T === 0 && !touring) applyView(currentView, false);
   }
   new ResizeObserver(resize).observe(stage);
+  // a window can change band without the stage changing size (held at its 640 minimum)
+  for (const q of bandQueries) q?.addEventListener('change', resize);
   resize();
 
   // ── Frame loop ──────────────────────────────────────────────────────────────────────────────
   const clock = new THREE.Clock();
   // ?poster holds the scene at time 0, for rendering the hero stills (ModelStage `poster`)
   const posterMode = new URLSearchParams(location.search).has('poster');
+  // The hand-off (Ross, 23 Oct 2026: the still and the 3D render didn't sync). The stills are the scene at time 0, so
+  // the scene's own clock stays at 0, and the tour's camera on the hero frame, until the canvas has faded in over the
+  // still: the fade crosses two identical pictures. Then the motion eases in over WAKE s. The clock used to run from
+  // the vessel's arrival, so the swell had moved on by the time the fade began, and a stalled frame mid-fade moved it
+  // further.
+  const WAKE = 1.5;
+  let sceneT = 0;
+  let wake = -1; // seconds since the canvas covered the still; -1 until then
+  function reveal() {
+    stage.classList.add('is-ready');
+    const live = () => {
+      if (wake < 0) wake = 0;
+    };
+    if (!stage.hasAttribute('data-poster')) return live();
+    canvas.addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'opacity') live();
+    });
+    window.setTimeout(live, parseFloat(getComputedStyle(canvas).transitionDuration) * 1000 + 100);
+  }
+  /** Fact cards and dimension lines fade in as the live picture takes over, if the visitor scrolled into the tour
+   *  while the vessel was on its way */
+  const liveIn = () => smooth(wake / 0.6);
   const _bob = [0, 0, 0];
   function frame() {
     const dt = Math.min(clock.getDelta(), 0.05);
-    const t = posterMode ? 0 : clock.elapsedTime;
+    if (wake >= 0) {
+      wake += dt;
+      if (!posterMode && !reducedMotion) sceneT += dt * smooth(wake / WAKE);
+    }
+    const t = sceneT;
     if (spin === 'sway') {
       holder.rotation.y = Math.sin(t * 0.21) * 0.07; // yaw ±4°
       if (sceneName === 'sea') {
@@ -735,12 +833,17 @@ export function mountStage(stage: HTMLElement) {
       railsFrame(dt);
     } else {
       if (tween.t < 1) {
+        // The glide drives the camera itself: the orbit's limits (polar 5–92°) would snap a camera coming back from
+        // under the water in its first frame
         tween.t = Math.min(1, tween.t + dt / 0.9);
         const e = 1 - Math.pow(1 - tween.t, 3);
         camera.position.lerpVectors(tween.from, tween.to, e);
+        controls.target.lerpVectors(tween.aimFrom, tween.aimTo, e);
+        camera.lookAt(controls.target);
+      } else {
+        controls.autoRotate = spin === 'orbit';
+        controls.update();
       }
-      controls.autoRotate = spin === 'orbit';
-      controls.update();
     }
     if (sceneName === 'sea') {
       if (wl) SEA.setHull(holder, wl);
@@ -755,7 +858,7 @@ export function mountStage(stage: HTMLElement) {
       SEA.renderMirror(renderer, scene, camera);
     } else rig.update(t, 0, 0);
     renderer.render(scene, camera);
-    if (tourLive) placePoints();
+    if (tourLive && wake >= 0) placePoints();
     requestAnimationFrame(frame);
   }
 
@@ -768,16 +871,22 @@ export function mountStage(stage: HTMLElement) {
   const pointsEl = tourRoot?.querySelector<HTMLElement>('[data-tour-points]') ?? null;
   const launchIndex = chapterEls.findIndex((el) => el.dataset.tourChapter === 'launch');
 
-  /** Chapter keys from the runway's data; the hero (chapter 0) is the cover view, computed once the vessel is measured */
+  /** Chapter keys from the runway's data; the hero (chapter 0) is the cover view as the hero frames it (HERO),
+   *  computed once the vessel is measured */
   const keysOf: (Key | null)[] = chapterEls.map((el) => {
     const n = (el.dataset.cam ?? '').split(',').map(Number);
     if (n.length < 7 || n.some((v) => Number.isNaN(v))) return null;
     return { dist: n[0], elev: n[1], az: n[2], target: new THREE.Vector3(n[3], n[4], n[5]), shift: n[6], lift: 0 };
   });
+  /** Portrait stages sit further back on the tour, but less than the hero does: the chapters frame a part of the
+   *  vessel, not all of it. A key's `dist` is the landscape one and the rails scale it, so the hero's distance (and
+   *  the camera handed to the rails, and back to the launch) goes in divided by it: on phones it had been scaled twice,
+   *  a 62% zoom out in one frame as the tour began and back in as the launch began */
+  const railsScale = () => 1 + (fitScale - 1) * 0.35;
   function heroKey(): Key {
     const p = viewPosition('cover', BASE_TARGET).sub(BASE_TARGET);
     const d = p.clone().normalize();
-    return { dist: p.length(), elev: Math.asin(d.y), az: Math.atan2(d.x, d.z), target: BASE_TARGET.clone(), shift: VIEWS.cover.shift, lift: 0.12 };
+    return { dist: p.length() / railsScale(), elev: Math.asin(d.y), az: Math.atan2(d.x, d.z), target: BASE_TARGET.clone(), shift: heroShift(VIEWS.cover.shift), lift: 0.12 };
   }
   const keyAt = (i: number): Key => (i === 0 || !keysOf[i] ? heroKey() : keysOf[i]!);
 
@@ -793,7 +902,7 @@ export function mountStage(stage: HTMLElement) {
     _right.crossVectors(new THREE.Vector3(0, 1, 0), dir).normalize();
     const viewH = 2 * dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     out.set(0, 0, 0);
-    if (camera.aspect >= 1) out.addScaledVector(_right, -shift * viewH * camera.aspect);
+    if (band.as >= 1) out.addScaledVector(_right, -shift * viewH * camera.aspect);
     else out.addScaledVector(_up.crossVectors(dir, _right).normalize(), -lift * viewH);
     return out;
   }
@@ -817,8 +926,7 @@ export function mountStage(stage: HTMLElement) {
     const k = 1 - Math.exp(-dt * 5);
     lerpKey(cur, goal, k, cur);
     const ce = Math.cos(cur.elev);
-    // Portrait stages sit further back, but less than the hero does: the chapters frame a part of the vessel, not all of it
-    _ro.set(ce * Math.sin(cur.az), Math.sin(cur.elev), ce * Math.cos(cur.az)).multiplyScalar(cur.dist * (1 + (fitScale - 1) * 0.35));
+    _ro.set(ce * Math.sin(cur.az), Math.sin(cur.elev), ce * Math.cos(cur.az)).multiplyScalar(cur.dist * railsScale());
     holder.localToWorld(_tg.copy(cur.target));
     composeOffset(_ro, cur.shift, cur.lift, _s);
     _tg.add(_s);
@@ -839,9 +947,9 @@ export function mountStage(stage: HTMLElement) {
   /** How far a chapter's cards are revealed, 0 → 1: they rise in over the run's 55–80% (each card a step after the one
    *  before) and go out over the next run's 20–45%; the launch's with the ROV's descent */
   function revealOf(chapter: number, order: number): number {
-    if (launchIndex > 0 && chapter === launchIndex) return tourI >= launchIndex ? smooth(clamp01((T - 0.12 - order * 0.05) / 0.18)) : 0;
-    if (chapter === tourI) return smooth(clamp01((tourS - 0.55 - order * 0.06) / 0.25));
-    if (chapter === tourI - 1) return tourI === launchIndex ? 1 - smooth(clamp01(T / 0.12)) : 1 - smooth(clamp01((tourS - 0.2) / 0.25));
+    if (launchIndex > 0 && chapter === launchIndex) return tourI >= launchIndex ? smooth(clamp01((T - 0.12 - order * 0.05) / 0.18)) * liveIn() : 0;
+    if (chapter === tourI) return smooth(clamp01((tourS - 0.55 - order * 0.06) / 0.25)) * liveIn();
+    if (chapter === tourI - 1) return (tourI === launchIndex ? 1 - smooth(clamp01(T / 0.12)) : 1 - smooth(clamp01((tourS - 0.2) / 0.25))) * liveIn();
     return 0;
   }
   function measureTour() {
@@ -873,14 +981,17 @@ export function mountStage(stage: HTMLElement) {
     stage.classList.toggle('is-touring', on);
     controls.enabled = !on && T === 0;
     if (on) {
-      // Leave the hero from wherever the visitor's orbit left the camera, so the rails never jump
+      // Leave the hero from wherever the visitor's orbit left the camera, aim and all, so the rails never jump. The
+      // rails' aim rides with the vessel and the hero's stands still while it heaves, so it is taken over as it is now.
+      const hk = heroKey();
       _ro.copy(camera.position).sub(controls.target);
-      cur.dist = _ro.length();
-      cur.elev = Math.asin(THREE.MathUtils.clamp(_ro.y / (cur.dist || 1), -1, 1));
+      cur.dist = _ro.length() / railsScale();
+      cur.elev = Math.asin(THREE.MathUtils.clamp(_ro.y / (_ro.length() || 1), -1, 1));
       cur.az = Math.atan2(_ro.x, _ro.z);
-      cur.target.copy(BASE_TARGET);
-      cur.shift = VIEWS.cover.shift;
-      cur.lift = 0.12;
+      cur.shift = hk.shift;
+      cur.lift = hk.lift;
+      composeOffset(_ro, cur.shift, cur.lift, _s);
+      holder.worldToLocal(cur.target.copy(controls.target).sub(_s));
     } else applyView(currentView, true);
   }
   // The scroll line the camera reads is smoothed (a wheel notch is a 100 px step; the goal must not step with it);
@@ -892,15 +1003,20 @@ export function mountStage(stage: HTMLElement) {
   function tourFrame(dt: number) {
     if (!tops.length || !tourLive) return;
     const lineNow = window.scrollY + pinTop;
-    if (Number.isNaN(lineS)) lineS = lineNow;
+    // From the top on the first frame: a visitor who scrolled before this script ran sees the words rise to where the
+    // scroll is, rather than jump there
+    if (Number.isNaN(lineS)) lineS = Math.min(lineNow, tops[0]);
     lineS += (lineNow - lineS) * (1 - Math.exp(-dt * 10));
     const line = Math.abs(lineNow - lineS) < 0.5 ? lineNow : lineS;
     let i = 0;
     for (let n = 0; n < tops.length; n++) if (line >= tops[n]) i = n;
     const s = heights[i] ? clamp01((line - tops[i]) / heights[i]) : 0;
     // The camera runs the whole chapter, easing into its key at the run's end (a continuous scrub, no holds); the
-    // title changes halfway, when the picture is nearer the new feature than the old one
-    setTouring(i > 0);
+    // title changes halfway, when the picture is nearer the new feature than the old one. Until the live picture
+    // covers the still (wake), the camera holds the hero frame and the launch waits; then the rails glide from it to
+    // wherever the scroll is (a visitor who scrolled while the vessel loaded used to get the still, then a cut).
+    const live = wake >= 0;
+    setTouring(live && i > 0);
     setCurrent(i > 0 && s < (i === launchIndex ? 0.12 : 0.5) ? i - 1 : i);
     tourI = i;
     tourS = s;
@@ -909,13 +1025,13 @@ export function mountStage(stage: HTMLElement) {
       riseSet = rise;
       stage.style.setProperty('--rr-rise', rise.toFixed(3));
     }
-    const inLaunch = launchIndex > 0 && i >= launchIndex;
+    const inLaunch = live && launchIndex > 0 && i >= launchIndex;
     // The launch: its own scrub, damped like the rails, starting from where the rails are
     launchGoal = inLaunch ? (i > launchIndex ? 1 : s) : 0;
     const k = 1 - Math.exp(-dt * 6);
     const next = T + (launchGoal - T) * k;
     if (inLaunch && T === 0 && next > 0) {
-      launchStart = [cur.dist, cur.elev, cur.az];
+      launchStart = [cur.dist * railsScale(), cur.elev, cur.az];
       launchFocus0.copy(cur.target);
       launchShift = cur.shift;
       keys = null;
@@ -1061,8 +1177,8 @@ export function mountStage(stage: HTMLElement) {
   }
   /** A drawn line's presence: whole through its chapter, out with the cards over the next run's 20–45% */
   function fadeOf(chapter: number): number {
-    if (chapter === tourI) return 1;
-    if (chapter === tourI - 1) return 1 - smooth(clamp01((tourS - 0.2) / 0.25));
+    if (chapter === tourI) return liveIn();
+    if (chapter === tourI - 1) return (1 - smooth(clamp01((tourS - 0.2) / 0.25))) * liveIn();
     return 0;
   }
   function placeDims(w: number, h: number) {
@@ -1218,7 +1334,7 @@ export function mountStage(stage: HTMLElement) {
   applyScene((stage.dataset.scene as SceneName | undefined) ?? 'sea');
   void loadVessel();
   // A handle for checking placement from the browser console (scripts/stage-poster.mjs waits on it too)
-  (window as unknown as { __rr: unknown }).__rr = { THREE, camera, clock, holder, SEA, scene, controls, createHullName, renderer, pbrMats, cur, goal, measureTour, get current() { return current; } };
+  (window as unknown as { __rr: unknown }).__rr = { THREE, camera, clock, holder, SEA, scene, controls, createHullName, renderer, pbrMats, cur, goal, measureTour, get current() { return current; }, get sceneT() { return sceneT; }, get wake() { return wake; }, get band() { return band; } };
 }
 
 for (const stage of document.querySelectorAll<HTMLElement>('[data-stage]')) mountStage(stage);

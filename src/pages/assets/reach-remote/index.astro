@@ -136,14 +136,18 @@ const faqItems = faqsFor('reach-remote');
       dims={reachRemoteDims}
       skipTo="specifications"
       poster={{
-        portrait: `${base}images/reach-remote-stage-poster-phone.jpg`,
-        steps: [
+        // One render per framing band (scripts/stage-poster.mjs): phones, portrait tablets, square-ish portrait and
+        // landscape windows, then four crops of the landscape render
+        stills: [
+          { maxAspect: '3/5', src: `${base}images/reach-remote-stage-poster-3x5.jpg` },
+          { maxAspect: '4/5', src: `${base}images/reach-remote-stage-poster-4x5.jpg` },
+          { maxAspect: '1/1', src: `${base}images/reach-remote-stage-poster-1x1.jpg` },
           { maxAspect: '4/3', src: `${base}images/reach-remote-stage-poster-4x3.jpg` },
           { maxAspect: '8/5', src: `${base}images/reach-remote-stage-poster-16x10.jpg` },
           { maxAspect: '9/5', src: `${base}images/reach-remote-stage-poster-9x5.jpg` },
           { maxAspect: '2/1', src: `${base}images/reach-remote-stage-poster-2x1.jpg` },
+          { src: `${base}images/reach-remote-stage-poster-12x5.jpg` },
         ],
-        landscape: `${base}images/reach-remote-stage-poster-12x5.jpg`,
       }}
     />
 
