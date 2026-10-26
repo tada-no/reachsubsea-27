@@ -8,13 +8,27 @@ interface Props {
 }
 
 const { text, tone = 'accent', as: Tag = 'p', class: className } = Astro.props;
+// A list eyebrow ("Subsea · Survey · …") wraps between items, never inside one, and each dot stays at the
+// end of its line (26 Oct 2026: on phones a line began "· Remote Operations")
+const items = text.split(' · ');
 ---
 
-<Tag class:list={['eyebrow', 'text-eyebrow', tone === 'muted' && 'eyebrow--muted', className]}>{text}</Tag>
+<Tag class:list={['eyebrow', 'text-eyebrow', tone === 'muted' && 'eyebrow--muted', className]}>
+  {items.length > 1
+    ? items.map((item, i) => (
+        <Fragment>
+          <span class="eyebrow__item">{i < items.length - 1 ? `${item} ·` : item}</span>{' '}
+        </Fragment>
+      ))
+    : text}
+</Tag>
 
 <style is:global>
   .eyebrow {
     color: var(--wp--custom--color--text--accent);
+  }
+  .eyebrow__item {
+    white-space: nowrap;
   }
   .eyebrow--muted {
     color: var(--wp--custom--color--text--secondary);

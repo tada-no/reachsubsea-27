@@ -478,18 +478,20 @@ const objectPosition = image?.focalPoint
   }
 
   /* Below 900 (22 Sep 2026, ref/mobile hero.jpg): the photo no longer fills the frame behind the copy.
-     It is a band across the top, sized to the screen (near square on phones, so far more of the wide
-     image shows than a tall cover crop did), fading into a solid navy panel that carries the text.
-     The title starts 70 % of the way down the band, over the solid end of the fade; the breadcrumb
-     stays pinned under the header. */
+     It is a band across the top, fading into a solid navy panel that carries the text; the breadcrumb
+     stays pinned under the header.
+     26 Oct 2026 (Ross, on iPhone): the band is 4:3, a landscape shape closer to the source media than
+     the near-square it was, and the copy starts low on it (88 %), over the solid end of the fade, so the
+     eyebrow sits on navy. The Video hero takes the same band (below), so every hero opens the same. */
   @media (max-width: 899px) {
-    .page-hero--photo:not(.page-hero--video) {
-      --hero-media-h: min(90vw, 560px);
+    /* Capped by the screen height: a phone held sideways (844 × 390) gets a wider band, title on screen */
+    .page-hero--photo {
+      --hero-media-h: min(75vw, 75svh);
     }
     .page-hero--photo:not(.page-hero--video) .page-hero__frame,
     .site-header--overlay ~ main > .page-hero--photo:not(.page-hero--video):first-child .page-hero__frame {
       min-height: 0;
-      padding-top: calc(var(--hero-media-h) * 0.7);
+      padding-top: calc(var(--hero-media-h) * 0.88);
     }
     .page-hero--photo:not(.page-hero--video) .page-hero__media,
     .page-hero--motion:not(.page-hero--video) .page-hero__media {
@@ -601,18 +603,39 @@ const objectPosition = image?.focalPoint
       linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, color-mix(in srgb, var(--wp--preset--color--navy-900) 70%, transparent) 22%, transparent 56%),
       linear-gradient(to bottom, color-mix(in srgb, var(--wp--preset--color--navy-900) 78%, transparent) 0%, transparent 26%);
   }
-  /* Below 900 the copy spans the full width, so the side fades give way to an even wash plus a
-     deeper bottom ramp; the footage reads through the top half.
-     A genuine solid panel now (17 Sep 2026 fix), not a gradient from the very bottom: the copy is
-     pinned to the bottom of the frame, so a flat navy block through ~36% guarantees full contrast
-     for it regardless of how many lines the title wraps to, and reads as a deliberate panel rather
-     than a wash. Above that it fades out monotonically (never lighter-then-darker) so the footage
-     clears fully by mid-frame and plays as a horizontal band across the top, not a tinted backdrop. */
+  /* Below 900 (26 Oct 2026, Ross, on iPhone): no longer near full screen. With the copy pinned to the
+     bottom of a 100svh frame, the actions and the pause control sat under Safari's floating toolbar.
+     The footage is the Photo hero's 4:3 band instead, with the same scrim and copy start, and the hero
+     is as tall as its content: the actions are a short scroll away. The pause control moves into the
+     band's bottom-right corner, on the footage it controls, clear of the copy. */
   @media (max-width: 899px) {
+    .page-hero--video .page-hero__frame,
+    .site-header--overlay ~ main > .page-hero--video:first-child .page-hero__frame {
+      min-height: 0;
+      padding-top: calc(var(--hero-media-h) * 0.88);
+    }
+    .page-hero--video .page-hero__media {
+      inset: 0 0 auto;
+      height: var(--hero-media-h);
+    }
     .page-hero--video .page-hero__scrim {
       background:
-        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, var(--wp--preset--color--navy-900) 40%, color-mix(in srgb, var(--wp--preset--color--navy-900) 55%, transparent) 72%, color-mix(in srgb, var(--wp--preset--color--navy-900) 30%, transparent) 100%),
-        linear-gradient(to right, color-mix(in srgb, var(--wp--preset--color--navy-900) 50%, transparent) 0%, transparent 12%, transparent 88%, color-mix(in srgb, var(--wp--preset--color--navy-900) 50%, transparent) 100%);
+        linear-gradient(to top, var(--wp--preset--color--navy-900) 0%, var(--wp--preset--color--navy-900) 12%, color-mix(in srgb, var(--wp--preset--color--navy-900) 82%, transparent) 32%, transparent 70%),
+        linear-gradient(to bottom, color-mix(in srgb, var(--wp--preset--color--navy-900) 60%, transparent) 0%, transparent 30%),
+        color-mix(in srgb, var(--wp--preset--color--navy-900) 30%, transparent);
+    }
+    /* The frame becomes the toggle's positioning box; the copy keeps its own layer over the media */
+    .page-hero--video .page-hero__container,
+    .page-hero--video .page-hero__bottom {
+      position: static;
+    }
+    .page-hero--video .page-hero__content {
+      position: relative;
+      z-index: 1;
+    }
+    .page-hero--video .page-hero__toggle {
+      top: calc(var(--hero-media-h) * 0.88 - var(--wp--preset--spacing--48) - var(--wp--preset--spacing--16));
+      bottom: auto;
     }
   }
   .page-hero--video .page-hero__content {
@@ -773,11 +796,20 @@ const objectPosition = image?.focalPoint
     // Parallax: the media drifts at ~25% of scroll speed and the copy lifts away slightly faster
     // while fading, so the hero feels deep rather than flat. Runs only while the hero is on screen,
     // one rAF per scroll frame, transforms set directly on the two elements.
+    // Below 900 the media is a band above the copy and the actions are a scroll away (26 Oct 2026):
+    // the copy must not fade while people scroll to it, and a drifting band would slide under the title.
     if (media && content && !reduceMotion) {
+      const band = window.matchMedia('(max-width: 899px)');
       let active = true;
       let ticking = false;
       const update = () => {
         ticking = false;
+        if (band.matches) {
+          media.style.transform = '';
+          content.style.transform = '';
+          content.style.opacity = '';
+          return;
+        }
         const height = root.offsetHeight || 1;
         const progress = Math.min(Math.max(window.scrollY / height, 0), 1);
         media.style.transform = `translate3d(0, ${(progress * height * 0.25).toFixed(1)}px, 0)`;
@@ -799,6 +831,7 @@ const objectPosition = image?.focalPoint
         },
         { passive: true },
       );
+      band.addEventListener('change', update);
       update();
     }
   }

@@ -11,6 +11,14 @@ _No open questions right now._
 
 ## Answered log
 
+### Q173. Phone heroes: media band instead of full screen (26 Oct 2026)
+Context: Ross's iPhone screenshot of Home. The video hero filled the screen with its copy pinned to the bottom, so the actions and the pause control clustered under Safari's floating toolbar. Ross suggested a landscape media shape near 16:9, the eyebrow lower on a darker ground, and the actions a short scroll away.
+- [x] A 4:3 band, not 16:9: at 375 wide, 16:9 is only ~210 tall, and the header takes ~96 of that. 4:3 is 281. The same band on every Photo and Video hero below 900
+- [x] Eyebrow on the solid navy where the band's scrim ends, with no chip behind it. Pause control in the band's corner. No scroll parallax below 900
+- [x] Reach Remote's model stage stays as it is (Ross: it works well)
+
+**Answer:** as ticked.
+
 ### Q171. Site sweep, redirect map and mega menu cards (14 Oct 2026)
 Context: Ross asked for a sweep of the whole site for missing content, W3C and WCAG problems, then for the redirect map and three mega menu changes.
 - [x] Sweep: HTML validation on 297 pages and axe (WCAG 2.2 AA) on 82 templates at 1440 and 375 came back nearly clean. Fixed: Open positions pointed at a dead HR-Manager address; the Investors, Why invest, Sustainability and Company menu report links were `#`; six small accessibility and validator fails. Still for the WordPress build: cookie consent, an accessibility statement page, SEO tags, a manual keyboard and screen-reader pass
