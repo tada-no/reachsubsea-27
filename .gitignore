@@ -15,3 +15,11 @@ skills-lock.json
 /*.pdf
 /ref/*.pdf
 /.impeccable/
+# Review screenshots under public/ (untracked 10 Oct 2026) and the client's source folders in ref/
+# (logos, data sheets, campaign posters): the site uses its own copies in public/files and public/images.
+/public/review/
+/ref/Co-funded by the European Union/
+/ref/Data sheets/
+/ref/Logo/
+/ref/Reach HSEQ Campaigns/
+/ref/reach remote/
