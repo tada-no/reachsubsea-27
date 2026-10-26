@@ -19,6 +19,13 @@ Context: Ross's iPhone screenshot of Home. The video hero filled the screen with
 
 **Answer:** as ticked.
 
+### Q172. About › Our story: split instead of Wide (15 Oct 2026)
+Context: Ross asked whether Our story (heading, one long paragraph in a narrow column, a 21:9 photo below) had a better layout: media and text, or heading left with the body right.
+- [x] Media and text (Split, Image at End). The text keeps flowing as one piece; heading left and body right would have split them, the pattern the taste review flags. The hero above already gives the wide photo
+- [x] Between 900 and 1199 the split squeezed the 85-word paragraph (heading 4–6 lines beside a small photo), so it stacks there: new Split media option `stack="desktop"` (photo above at 16:9, text at the prose measure, split from 1200)
+
+**Answer:** as ticked.
+
 ### Q171. Site sweep, redirect map and mega menu cards (14 Oct 2026)
 Context: Ross asked for a sweep of the whole site for missing content, W3C and WCAG problems, then for the redirect map and three mega menu changes.
 - [x] Sweep: HTML validation on 297 pages and axe (WCAG 2.2 AA) on 82 templates at 1440 and 375 came back nearly clean. Fixed: Open positions pointed at a dead HR-Manager address; the Investors, Why invest, Sustainability and Company menu report links were `#`; six small accessibility and validator fails. Still for the WordPress build: cookie consent, an accessibility statement page, SEO tags, a manual keyboard and screen-reader pass

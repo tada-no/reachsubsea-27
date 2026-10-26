@@ -14,6 +14,9 @@
 // two columns (one paragraph each), then the image as a full-width 21:9 banner (16:9 tablet, 4:3 phone).
 // Below 900 the columns stack. The image is optional: Careers › Who thrives (20 Sep 2026) is the same
 // heading over two columns with no banner.
+// Stack Desktop (15 Oct 2026, About › Our story, Ross): for an Image/Video split whose copy runs long (80+ words).
+// The split holds from 1200; below it the media stacks above the text as on tablet (16:9 from 600, 4:3 on phones),
+// the text at the prose measure. Between 900 and 1199 the default split gave the heading 4–6 lines beside a small photo.
 // Layout Beside (8 Oct 2026, Careers › Who thrives, Ross; Figma 435:17585): short copy that answers the heading.
 // Eyebrow on top, then the heading in cols 1–6 and one paragraph in cols 7–12, top-aligned with the heading's first
 // line. No media. Below 900 the body follows the heading.
@@ -77,6 +80,9 @@ interface Props extends BlockFields {
    * half, one paragraph beside it in the end half, no image. */
   layout?: 'split' | 'stacked' | 'wide' | 'beside';
   position?: 'end' | 'start';
+  /** Split layout, Image/Video media: where the columns stack. `tablet` (default) below 900; `desktop` below 1200,
+   * for long copy that squeezes in a 5-column text side. */
+  stack?: 'tablet' | 'desktop';
   eyebrow?: string;
   title: string;
   headingLevel?: 'h2' | 'h3';
@@ -129,6 +135,7 @@ const {
   media = 'image',
   layout = 'split',
   position = 'end',
+  stack = 'tablet',
   eyebrow,
   title,
   headingLevel: Heading = 'h2',
@@ -169,7 +176,8 @@ const docsStacked = layout === 'stacked' && media === 'documents';
 const wide = layout === 'wide' && media === 'image';
 const beside = layout === 'beside';
 const titleClass = Heading === 'h3' ? 'text-h3' : 'text-h2';
-const rootClass = [joined && 'split-media--joined', wide && 'split-media--wide', beside && 'split-media--beside', (stacked || specStacked || docsStacked) && 'split-media--stacked', `split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
+const stackDesktop = stack === 'desktop' && layout === 'split' && (media === 'image' || media === 'video');
+const rootClass = [joined && 'split-media--joined', stackDesktop && 'split-media--stack-desktop', wide && 'split-media--wide', beside && 'split-media--beside', (stacked || specStacked || docsStacked) && 'split-media--stacked', `split-media--${media}`, `split-media--${position}`, className].filter(Boolean).join(' ');
 ---
 
 <BlockSection
@@ -780,6 +788,26 @@ const rootClass = [joined && 'split-media--joined', wide && 'split-media--wide',
     .split-media--image .split-media__media,
     .split-media--video .split-media__media {
       order: -1;
+    }
+  }
+
+  @media (max-width: 1199px) {
+    .split-media--stack-desktop .split-media__columns {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--wp--custom--stack--xl);
+    }
+    .split-media--stack-desktop .split-media__media {
+      order: -1;
+    }
+    .split-media--stack-desktop .split-media__text {
+      max-inline-size: var(--wp--custom--measure--prose);
+    }
+  }
+  @media (min-width: 600px) and (max-width: 1199px) {
+    .split-media--stack-desktop .media-frame__frame {
+      aspect-ratio: 16 / 9;
     }
   }
 
