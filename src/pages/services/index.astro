@@ -48,8 +48,8 @@ const serviceCards = serviceLines.filter((line) => line.id !== 'technology').map
   }),
 );
 
-// Industries we serve (2 Nov 2026): the three service pages' strips gathered into one (industriesServed), under the
-// service lines, before the lifecycle
+// Industries we serve (2 Nov 2026, Q176): Reach's four general industries, as on Subsea (industriesServed), under
+// the service lines, before the lifecycle
 const industryCards: CardField[] = industriesServed.map((ind) => ({ media: 'icon', title: ind.label, pictogram: ind.pictogram }));
 
 // Two ways to reach the seabed (2 Nov 2026, Q174): the client asked for a visual of crewed and uncrewed (PDF screens

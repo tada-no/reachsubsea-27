@@ -2616,7 +2616,8 @@
       "Services overview · Mobile 370:13225": "Card grid Strip 742:27732 (8 tiles in one column) under the service lines; Split media 742:27752 (technology). The mobile bento has no figure card, so nothing to change there."
     },
     "pictograms": "Used in the strip: oil-gas, offshore-wind, subsea-infrastructure, carbon-storage 394:7870, geothermal 394:7959, marine, subsea-telemetry 394:7809 (the older ledger ID 35:105 is stale), technology.",
-    "notes": "Checked: every other Strip instance (Subsea, Survey, Monitoring, About and Sustainability certificates, Reach Remote partners) is unchanged."
+    "notes": "Checked: every other Strip instance (Subsea, Survey, Monitoring, About and Sustainability certificates, Reach Remote partners) is unchanged.",
+    "update": "Later on 2 Nov 2026 (Ross): the overview shows the four general industries, as Subsea. Desktop 742:27676: Show second row off, row 1 relabelled (Renewables, Subsea infrastructure, Emerging offshore sectors with Pictogram/technology), 300 tall. Mobile 742:27732: Show second row off, Show 4th row on (tile 450:17418), 448 tall. Note: the mobile 'Tile · more' tiles all follow Show second row, so setting one tile's visibility toggles the property for all."
   },
   "phase4AboutValuesQ177_2Nov": {
     "pages": {
