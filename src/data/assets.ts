@@ -291,7 +291,7 @@ export const assets: Asset[] = [
     units: 2,
     unitNames: ['Reach Remote 3', 'Reach Remote 4'],
     kind: 'Uncrewed surface vessels',
-    summary: 'The next two uncrewed vessels, under construction at Kongsberg Maritime and co-funded by the EU Innovation Fund.',
+    summary: 'The next two uncrewed vessels, under construction at Kongsberg Maritime and funded by the EU Innovation Fund.',
     owner: 'Reach Subsea ASA',
     joining: '2027',
     specs: {},

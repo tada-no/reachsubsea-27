@@ -4,7 +4,11 @@ Questions are asked in Claude with clickable options, then recorded here. You ca
 
 ---
 
-_No open questions right now._
+### Q175. Reach Remote 3 & 4: "Funded by", not "Co-funded by" (2 Nov 2026)
+Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the European Union", not "Co-funded by". Reach's set has both (`ref/Co-funded by the European Union/EN_Funded-by-theIF`).
+- [x] **Funded by** everywhere for this project: the hero lockup (`public/images/eu-funded-innovation-fund-white.png`, RGB NEG for navy, trimmed, 858×144, shown 286×48), the EU funding section title, its text ("are funded by the EU Innovation Fund"), the Assets card and the charter timeline note. The co-funded file is removed.
+
+**Answer:** as ticked.
 
 
 ---

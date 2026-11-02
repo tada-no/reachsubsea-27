@@ -128,7 +128,7 @@ const uncrewedCards: CardField[] = [
   usvCard(rr12, { size: 'featured', action: { label: 'Meet Reach Remote', url: rr12.url, action: 'page' } }),
   { media: 'stat', surface: 'navy', statValue: uncrewedDays.value, title: uncrewedDays.label },
   // Short on purpose: the tall cell is 3 columns wide, so the copy must hold to three lines (docs/08 card sweep)
-  usvCard(rr34, { description: 'In build at Kongsberg Maritime, co-funded by the EU Innovation Fund.', action: { label: 'Read more', url: rr34.url, action: 'page', context: rr34.name } }),
+  usvCard(rr34, { description: 'In build at Kongsberg Maritime, funded by the EU Innovation Fund.', action: { label: 'Read more', url: rr34.url, action: 'page', context: rr34.name } }),
   { media: 'stat', surface: 'white', statValue: (rr12.specs.endurance ?? '').replace(/\D.*$/, ''), title: 'Days at sea per mission, uncrewed' },
   ...drix.map((a) =>
     usvCard(a, {

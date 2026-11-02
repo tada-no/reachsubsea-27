@@ -2,7 +2,7 @@
 // Assets › Reach Remote › Reach Remote 3 & 4 (11 Oct 2026, Q165, Q167 build step 6, Q169; client screens PDF p26–27,
 // design reference p12). A short status page on the build of the next two vessels and their EU funding, updated
 // at each reporting date. Rigid by design (Q165): the facts the grant's communication duties ask for, in order.
-// Hero Text (navy, the "Co-funded by the European Union" emblem in the stack, so it is visible on landing without
+// Hero Text (navy, the "Funded by the European Union" emblem in the stack, so it is visible on landing without
 // scrolling: Q169) · project facts (Split media Spec table) · spend to date (Share bars, one bar: the PDF's "Overall
 // completion" panel, as money invested, since no build percentage exists) · build timeline · EU funding and the
 // EU's disclaimer · CTA. As the PDF: no subnav, no FAQ.
@@ -43,7 +43,7 @@ const nok = (m: number) => `NOK ${m.toLocaleString('en-GB', { minimumFractionDig
       badge={{ label: 'In build', tone: 'accent' }}
       title="Building Reach Remote 3 & 4"
       lead="Two more uncrewed vessels, built by Kongsberg Maritime with EU Innovation Fund support. Expected in operation in 2027."
-      fundingLogo={{ src: `${base}images/eu-co-funded-innovation-fund-white.png`, alt: 'Co-funded by the European Union: Emissions Trading System, Innovation Fund', width: 306, height: 48 }}
+      fundingLogo={{ src: `${base}images/eu-funded-innovation-fund-white.png`, alt: 'Funded by the European Union: Emissions Trading System, Innovation Fund', width: 286, height: 48 }}
     />
 
     <SplitMedia
@@ -81,8 +81,8 @@ const nok = (m: number) => `NOK ${m.toLocaleString('en-GB', { minimumFractionDig
       layout="beside"
       background="white"
       eyebrow="EU funding"
-      title="Co-funded by the European Union"
-      body={`<p>Reach Remote 3 and 4 are part-funded by the EU Innovation Fund, which backs clean technologies on their way to market. As the grant asks, we report the project's progress here at each reporting date, and in our <a href="/investors/reports-presentations/">quarterly reports</a>.</p><p class="text-small">Views and opinions expressed are those of Reach Subsea only and do not necessarily reflect those of the European Union or the European Climate, Infrastructure and Environment Executive Agency (CINEA). Neither the European Union nor the granting authority can be held responsible for them.</p>`}
+      title="Funded by the European Union"
+      body={`<p>Reach Remote 3 and 4 are funded by the EU Innovation Fund, which backs clean technologies on their way to market. As the grant asks, we report the project's progress here at each reporting date, and in our <a href="/investors/reports-presentations/">quarterly reports</a>.</p><p class="text-small">Views and opinions expressed are those of Reach Subsea only and do not necessarily reflect those of the European Union or the European Climate, Infrastructure and Environment Executive Agency (CINEA). Neither the European Union nor the granting authority can be held responsible for them.</p>`}
     />
 
     <CtaBand
