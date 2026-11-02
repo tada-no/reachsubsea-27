@@ -265,6 +265,22 @@ export const serviceLines: ServiceLine[] = [
   },
 ];
 
+// ── Industries we serve, all lines (2 Nov 2026, Services overview) ────────────
+// The three lines' industries gathered into one list, each named once: the lines label some of them
+// differently ("Renewables" on Subsea, "Offshore wind & renewables" on Survey), so this is a curated
+// merge, not a computed union. Keep it in step when a line's `industries` change.
+// WP: an options-page repeater (label, pictogram).
+export const industriesServed: { label: string; pictogram: string }[] = [
+  { label: 'Oil & gas', pictogram: 'oil-gas' },
+  { label: 'Offshore wind & renewables', pictogram: 'offshore-wind' },
+  { label: 'Subsea cables & infrastructure', pictogram: 'subsea-infrastructure' },
+  { label: 'CO2 & carbon storage', pictogram: 'carbon-storage' },
+  { label: 'Geothermal energy', pictogram: 'geothermal' },
+  { label: 'Ports & marine construction', pictogram: 'marine' },
+  { label: 'Seismic risk monitoring', pictogram: 'subsea-telemetry' },
+  { label: 'Emerging offshore sectors', pictogram: 'technology' },
+];
+
 // ── Asset lifecycle (19 Sep 2026) ─────────────────────────────────────────────
 // Which service line works at which stage of an offshore asset's life. PLACEHOLDER MAPPING, drafted
 // from the dev site's sub-service pages: Reach to confirm the stages and every label before launch.

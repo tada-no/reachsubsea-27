@@ -26,7 +26,7 @@ import { worldPath, worldPagePath, worldSceneUrl } from '../../data/world';
 import type { CardField } from '../../lib/types';
 import { navSections } from '../../data/navigation';
 import { cardPresets } from '../../data/card-presets';
-import { serviceLines, lifecyclePhases, lifecycleRows, lifecycleFoundation } from '../../data/services';
+import { serviceLines, lifecyclePhases, lifecycleRows, lifecycleFoundation, industriesServed } from '../../data/services';
 import { faqsFor, faqHubHref } from '../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
@@ -47,6 +47,10 @@ const serviceCards = serviceLines.filter((line) => line.id !== 'technology').map
     action: { label: `Explore ${line.short.toLowerCase()}`, url: line.href, action: 'page' },
   }),
 );
+
+// Industries we serve (2 Nov 2026): the three service pages' strips gathered into one (industriesServed), under the
+// service lines, before the lifecycle
+const industryCards: CardField[] = industriesServed.map((ind) => ({ media: 'icon', title: ind.label, pictogram: ind.pictogram }));
 
 // Two ways to reach the seabed (2 Nov 2026, Q174): the client asked for a visual of crewed and uncrewed (PDF screens
 // p5's "How we deliver"). Two Navy cards, each with the same drawing: the crew, or Reach Relay to the ROC on shore,
@@ -186,6 +190,8 @@ const faqItems = faqsFor('services');
       surface="tint"
       cards={serviceCards}
     />
+
+    <CardGrid anchor="industries" layout="strip" eyebrow="Industries we serve" background="white" spacing="sm" cards={industryCards} />
 
     {/* Custom visual (Q63): which line works at which stage. Placeholder mapping until Reach confirms */}
     <Lifecycle
