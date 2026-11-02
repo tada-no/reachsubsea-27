@@ -2617,5 +2617,12 @@
     },
     "pictograms": "Used in the strip: oil-gas, offshore-wind, subsea-infrastructure, carbon-storage 394:7870, geothermal 394:7959, marine, subsea-telemetry 394:7809 (the older ledger ID 35:105 is stale), technology.",
     "notes": "Checked: every other Strip instance (Subsea, Survey, Monitoring, About and Sustainability certificates, Reach Remote partners) is unchanged."
+  },
+  "phase4AboutValuesQ177_2Nov": {
+    "pages": {
+      "About · Desktop 351:3194": "Values instance 352:11695 replaced by Card grid 3 columns 744:40186 (a copy of the key-contacts grid 454:17413: Media=Icon, Surface=White, on bg/tint; second row off). Section header: eyebrow 'Our values', title 'Learn. Teach. Reach.\\nWithin Reach.' (two lines), no intro. Cards Learn / Teach / Reach with Pictogram/value-learn 301:2372, value-teach 301:2391, value-reach 301:2410 and the client copy; lead, note and meta off. Content hugs; Teach and Reach take 24 more bottom padding so all three are 430 tall (the instance cannot override min height)."
+    },
+    "removed": "Block/Values 331:6958 (variants 329:6828, 329:6854, 329:6879, 329:6936) and its doc frame 'Blocks / Values' 329:6823 on Blocks. No other instances.",
+    "notes": "The About frame has no mobile version. Its Our story Split media still shows the earlier Wide layout (code moved to stack=desktop on 15 Oct 2026, Q172); not changed here."
   }
 }

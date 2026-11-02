@@ -18,7 +18,7 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 Context: client: "The values on the company page are taking up too much space and the animations is delaying the scrolling." The Values block was a sticky navy band scrubbed by scroll (Learn. → Teach. → Reach. with large pictograms), over a screen and a half for three paragraphs.
 - [x] Three cards as the client PDF screens p30 (Ross, 2 Nov 2026): Card grid 3 columns, icon media (the value pictograms, playing once in view, not scroll-bound), White cards on Tint, Section header "Our values" / H2 "Learn. Teach. Reach." with "Within Reach." (`promise.short`) on its own line in the heading, as the PDF (Ross), the client's card copy unchanged. About is ~780 tall here at 1440 instead of the sticky band
 - [x] The Values block is retired (About was its only use): `src/blocks/Values.astro` removed; 21 blocks in code
-- [ ] Figma: About page frame to use a Card grid 3 columns instance; `Block/Values` 331:6958 to remove
+- [x] Figma (2 Nov 2026): About frame 351:3194 uses Card grid 3 columns 744:40186 (White icon cards on Tint, the heading on two lines); `Block/Values` 331:6958 and its doc frame removed. Ledger `phase4AboutValuesQ177_2Nov`
 
 **Answer:** as ticked.
 
