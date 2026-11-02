@@ -1,6 +1,6 @@
 # Blocks (Phase 3b)
 
-Static Astro versions of the WordPress section blocks (22 in code, 21 Sep 2026; the original 14 plus Live operations, Lifecycle, Values, Social feed and the four blocks split out for editors: Card bento, Figures, Split embed, Results band) in [docs/05-blocks-spec.md](../../docs/05-blocks-spec.md). Figma file `HAvCQCXzWNFOKQ1AZxqNTX`, page **Blocks** (`12:25`), is the source of truth; node ids are in [docs/extract/figma-blocks-ledger.json](../../docs/extract/figma-blocks-ledger.json).
+Static Astro versions of the WordPress section blocks (21 in code; 22 on 21 Sep 2026, then Values retired 2 Nov 2026, Q177; the original 14 plus Live operations, Lifecycle, Social feed and the four blocks split out for editors: Card bento, Figures, Split embed, Results band) in [docs/05-blocks-spec.md](../../docs/05-blocks-spec.md). Figma file `HAvCQCXzWNFOKQ1AZxqNTX`, page **Blocks** (`12:25`), is the source of truth; node ids are in [docs/extract/figma-blocks-ledger.json](../../docs/extract/figma-blocks-ledger.json).
 
 ```bash
 npm run dev    # http://localhost:4321/blocks/
@@ -35,7 +35,7 @@ npm run dev    # http://localhost:4321/blocks/
 
 A block does one job. If a field only applies to one of its media types or styles, split it. Card grid → **Card bento** (`pattern` from `src/data/bento-patterns.ts`, cards fill the cells in order, no per-card span); Split media → **Figures** and **Split embed** (Card media dropped); Stats band → **Results band**. Each is a normal block file with its own root class (`.card-bento`, `.figures`, `.split-embed`, `.results-band`), a demo in `src/demos/` and an entry in `src/review/registry.ts`.
 
-**Figma (added 21 Sep 2026, page Blocks `12:25`):** `Block/Card bento` `312:10744` (doc frame `310:4981`), `Block/Figures` `316:6183` (`314:6177`), `Block/Split embed` `320:6274` (`319:6246`), `Block/Results band` `322:6434` (`321:6312`). The two custom visuals with no §2 entry were built in the same pass: `Block/Lifecycle` `328:6684` (`324:6654`) and `Block/Values` `331:6958` (`329:6823`). Full variant ids, properties and gotchas: [figma-blocks-ledger.json](../../docs/extract/figma-blocks-ledger.json) → `phase4Tidy21Sep`.
+**Figma (added 21 Sep 2026, page Blocks `12:25`):** `Block/Card bento` `312:10744` (doc frame `310:4981`), `Block/Figures` `316:6183` (`314:6177`), `Block/Split embed` `320:6274` (`319:6246`), `Block/Results band` `322:6434` (`321:6312`). The two custom visuals with no §2 entry were built in the same pass: `Block/Lifecycle` `328:6684` (`324:6654`) and `Block/Values` `331:6958` (`329:6823`; retired in code 2 Nov 2026, Q177, to remove). Full variant ids, properties and gotchas: [figma-blocks-ledger.json](../../docs/extract/figma-blocks-ledger.json) → `phase4Tidy21Sep`.
 
 ## Shared components
 

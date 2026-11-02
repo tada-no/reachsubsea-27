@@ -3,7 +3,7 @@
 // p30–31 ("12 — Company — About Us") in its own wording, the promise from the live /about/ page, and the ISO
 // certificates and management team from the dev /company/who-we-are/about-us/ page. Built for a prospective
 // client, investor or hire deciding whether Reach is credible and a good fit: who we are (vision, story, key
-// figures) · what we are certified to · how we work (Learn · Teach · Reach, ending in the promise) · who
+// figures) · what we are certified to · how we work (Learn · Teach · Reach, three cards under the promise) · who
 // leads us · quick facts (FAQ) · a way in. Copy and lists: src/data/company.ts; figures: key-figures.ts.
 // Redirects to this page: /about/ (live), /company/who-we-are/ and /company/who-we-are/about-us/ (dev), and
 // /company/who-we-are/vision-values-and-promise/ → /company/#values (dev).
@@ -15,7 +15,6 @@ import SectionSubnav from '../../blocks/SectionSubnav.astro';
 import SplitMedia from '../../blocks/SplitMedia.astro';
 import CardGrid from '../../blocks/CardGrid.astro';
 import StatsBand from '../../blocks/StatsBand.astro';
-import Values from '../../blocks/Values.astro';
 import Accordion from '../../blocks/Accordion.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
 import { navSections } from '../../data/navigation';
@@ -36,6 +35,8 @@ const certificateTiles: CardField[] = certificates.map((c) => ({
   pictogram: 'shield-tick',
   title: `${c.standard} · ${c.scope}`,
 }));
+
+const valueCards: CardField[] = values.map((v) => ({ media: 'icon', pictogram: v.pictogram, title: v.word, description: v.text }));
 ---
 
 <BaseLayout title="About Reach Subsea" motion>
@@ -74,7 +75,16 @@ const certificateTiles: CardField[] = certificates.map((c) => ({
 
     <CardGrid anchor="certificates" layout="strip" eyebrow="Certified management systems" background="white" spacing="sm" cards={certificateTiles} />
 
-    <Values anchor="values" eyebrow="Our values" title="Learn. Teach. Reach." values={values} promise={promise} />
+    {/* Learn · Teach · Reach as three cards (client PDF screens p30; 2 Nov 2026, Q177: was the scroll-driven Values block) */}
+    <CardGrid
+      anchor="values"
+      layout="3-columns"
+      media="icon"
+      surface="white"
+      background="tint"
+      sectionHeader={{ eyebrow: 'Our values', title: 'Learn. Teach. Reach.', intro: promise.short }}
+      cards={valueCards}
+    />
 
     <SplitMedia
       anchor="leadership"

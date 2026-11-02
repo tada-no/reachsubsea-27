@@ -14,6 +14,14 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q177. About: values as three cards (2 Nov 2026)
+Context: client: "The values on the company page are taking up too much space and the animations is delaying the scrolling." The Values block was a sticky navy band scrubbed by scroll (Learn. → Teach. → Reach. with large pictograms), over a screen and a half for three paragraphs.
+- [x] Three cards as the client PDF screens p30 (Ross, 2 Nov 2026): Card grid 3 columns, icon media (the value pictograms, playing once in view, not scroll-bound), White cards on Tint, Section header "Our values" / "Learn. Teach. Reach." / "Within Reach." (the PDF's line, `promise.short`), the client's card copy unchanged. About is ~780 tall here at 1440 instead of the sticky band
+- [x] The Values block is retired (About was its only use): `src/blocks/Values.astro` removed; 21 blocks in code
+- [ ] Figma: About page frame to use a Card grid 3 columns instance; `Block/Values` 331:6958 to remove
+
+**Answer:** as ticked.
+
 ### Q176. Services overview: industries gathered into one strip (2 Nov 2026)
 Context: Ross: gather the service pages' "Industries we serve" strips on the Services overview, above "From first survey to decommissioning". The three lines list four each and overlap, with different labels for the same industry, so the overview takes a curated merge (`industriesServed` in `src/data/services.ts`), placed as a Strip under the service lines on the same White ground.
 - [x] All eight, two rows of four (Ross, 2 Nov 2026): Oil & gas · Offshore wind & renewables · Subsea cables & infrastructure · CO2 & carbon storage · Geothermal energy · Ports & marine construction · Seismic risk monitoring · Emerging offshore sectors
