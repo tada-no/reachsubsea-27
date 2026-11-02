@@ -142,7 +142,7 @@ Icon 20 (`icon/accent`) + `Body/Small` `text/secondary`, gap `space/8`, centred.
 - Hover spec (one example): `Shadow/md` + −3px lift; image cards zoom the image to 1.04 (dev). A Tint card turns White as it lifts (Q166, 9 Oct 2026): on the pale tint the shadow's edge melted into a muddy halo; the white face gives it a crisp edge.
 - Clickable area: for Page and External actions the whole card is the link (stretched link, one tab stop). File, Video and Expand keep the action as the only target.
 - Conditional (PDF p31): the action only renders when its file, video or URL exists.
-- Drawing slot (2 Nov 2026, Q174): a block may pass its own drawing as the card's media (`slot="media"`, wrapped in `card__drawing`, above the body). Used by Delivery routes (docs/05 §2.34); not an editor field.
+- Drawing slot (2 Nov 2026, Q174): a block may pass its own drawing as the card's media (`slot="media"`, wrapped in `card__drawing`, above the body). Used by Delivery routes (docs/05 §2.34); not an editor field. Figma: Card variant `Media=Drawing, Surface=Navy, Size=Default` 738:3183 with an instance-swap property `Drawing`.
 
 ### Card presets (8)
 Wrapper components `Card preset/<Name>`, each holding one configured Card instance. Pre-filled from CPT fields.

@@ -2590,5 +2590,20 @@
       "No mobile page frame yet (every block has its Mobile variant)",
       "Fact card label positions on phones can sit over the 8.0 m figure, as in code (open in Q167)"
     ]
+  },
+  "phase4DeliveryRoutesQ174_2Nov": {
+    "block": {
+      "Block/Delivery routes 739:16672": "Doc frame 'Blocks / Delivery routes' 739:16673 on Blocks (x -10768, y 47468, under System chain). Breakpoint=Desktop 739:16169 (1440: Section header Align=Start, title only; Cards row gap grid/gutter, two Card instances Media=Drawing FILL) | Mobile 739:16436 (375: cards stacked, space/16, the System chain mobile's spacing modes). On bg/tint."
+    },
+    "components": {
+      "Components / Delivery routes drawing 738:3037": "Doc frame on Components (x 0, y 70942)",
+      "Delivery routes/Drawing 738:3036": "Route × Breakpoint: Crewed Desktop 738:2886, Uncrewed Desktop 738:2901, Crewed Mobile 738:2961, Uncrewed Mobile 738:2976. 640×392 / 327×296, hug height. Three auto-layout columns (Sea · Vessel · Shore, FILL) with discs (bg/default, 1 px border/default ring, radius/full; pictogram 56 / 36 in 80 / 48); absolute behind them: Surface (2 px border/default, STRETCH), Drop and Arc vectors (2 px text/primary, dash 0.1/5.9 with round vertex caps so they render as dots; the Arc scales), Data dot (8, icon/accent). Navy variable mode 7:2. Pictograms team 49:109, marine 39:89, survey-rov 38:104, satilite 658:30201, profile-laptop 45:126, reach-remote 52:95.",
+      "Card Media=Drawing, Surface=Navy, Size=Default 738:3183": "New Card variant (set 103:1110): the Navy default with a Drawing instance (738:3197) on top, full width, hug height; new INSTANCE_SWAP property Drawing#738:42 (preferred: Delivery routes/Drawing). Code: Card's media slot."
+    },
+    "pages": {
+      "Services overview 355:3374": "Delivery routes Desktop instance 739:39868 above the bento; bento renamed and retitled 'The fleet and platforms behind it'",
+      "Services overview · Mobile 370:13225": "Delivery routes Mobile instance 739:39998 above the bento, retitled likewise"
+    },
+    "notes": "Not changed here: the Services frames still lack the Technology split (5 Oct 2026, Q79) and the bento's figure card reads '750+ per quarter'."
   }
 }
