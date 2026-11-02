@@ -89,6 +89,12 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
     {media === 'stat' && statValue && (
       <p class="card__stat text-display" data-count-up>{statValue}</p>
     )}
+    {/* A block's own drawing as the card's media (Delivery routes, 2 Nov 2026) */}
+    {Astro.slots.has('media') && (
+      <div class="card__drawing">
+        <slot name="media" />
+      </div>
+    )}
     <div class="card__body">
     <div class="card__text">
       {

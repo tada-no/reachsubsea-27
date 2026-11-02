@@ -10,6 +10,15 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 **Answer:** as ticked.
 
+---
+
+### Q174. Services overview: a visual for "two ways to reach the seabed" (2 Nov 2026)
+Context: the client said they miss a visualisation of crewed and uncrewed delivery (client PDF screens p5, "How we deliver", drawn there as two plain icon cards). Four drafts the same day. 1: a navy cross-section with every stop titled and described (Ross: too spelled out). 2: white cards with a small line drawing each (Ross: much worse, not in keeping with the site). 3: one navy scene in the approved System chain's hand (Ross: better, but each way in its own card; no On board / On shore labels; no seabed line). 4, built on `/services/#two-ways`: two Navy cards on Tint, each with the same drawing: a horizon across the card and a dotted drop from the sky through the vessel to its ROV. Crewed has the crew in the sky. Uncrewed has Reach Relay, with an arc down to the ROC on the shore. Each card then has a title and the PDF's line, both trimmed to 15 words (the uncrewed line without "750+ operational days delivered per quarter", which contradicts the key figure of ~750 to date). The relay pings as on Reach Remote. The bento below stays, under "The fleet and platforms behind it".
+- [x] Keep the bento (Ross, 2 Nov 2026)
+- [x] Approve draft 4 (Ross, 2 Nov 2026: "Yes, commit")
+- [ ] Figma: Block/Delivery routes, the Card media slot, the Services page frame
+
+**Answer:** draft 4, as built. Open until the Figma update is done.
 
 ---
 

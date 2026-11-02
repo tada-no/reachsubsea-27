@@ -14,6 +14,7 @@ import SectionSubnav from '../../blocks/SectionSubnav.astro';
 import CardGrid from '../../blocks/CardGrid.astro';
 import SplitMedia from '../../blocks/SplitMedia.astro';
 import CardBento from '../../blocks/CardBento.astro';
+import DeliveryRoutes, { type DeliveryRoute } from '../../blocks/DeliveryRoutes.astro';
 import Lifecycle from '../../blocks/Lifecycle.astro';
 import FeedGrid from '../../blocks/FeedGrid.astro';
 import Embed from '../../blocks/Embed.astro';
@@ -46,6 +47,29 @@ const serviceCards = serviceLines.filter((line) => line.id !== 'technology').map
     action: { label: `Explore ${line.short.toLowerCase()}`, url: line.href, action: 'page' },
   }),
 );
+
+// Two ways to reach the seabed (2 Nov 2026, Q174): the client asked for a visual of crewed and uncrewed (PDF screens
+// p5's "How we deliver"). Two Navy cards, each with the same drawing: the crew, or Reach Relay to the ROC on shore,
+// over the vessel and its ROV.
+const routes: [DeliveryRoute, DeliveryRoute] = [
+  {
+    title: 'Crewed vessels',
+    text: 'Experienced offshore personnel, engineers and project managers operating work-class and inspection ROVs and survey spreads.',
+    sky: 'team',
+    vessel: 'marine',
+    rov: 'survey-rov',
+  },
+  {
+    title: 'Uncrewed vessels',
+    // The PDF's lines, trimmed to the same length (15 words each): crewed without "for complex subsea operations",
+    // uncrewed without "750+ operational days delivered per quarter" (key figures: ~750 to date, in the bento below)
+    text: 'Uncrewed surface vessels operated remotely from shore, carrying the same work-class ROV and survey spreads.',
+    sky: 'satellite',
+    shore: 'profile-laptop',
+    vessel: 'reach-remote',
+    rov: 'survey-rov',
+  },
+];
 
 // How we deliver: the PDF's "How we deliver", "Our platforms" and "Explore the full fleet" in one bento.
 // 12 columns: crewed (6×2) · fleet figure · Reach Remote (3×2) · uncrewed-days figure, then
@@ -195,11 +219,18 @@ const faqItems = faqsFor('services');
       ]}
     />
 
+    <DeliveryRoutes
+      anchor="two-ways"
+      background="tint"
+      sectionHeader={{ title: 'One partner, two ways to reach the seabed' }}
+      routes={routes}
+    />
+
     <CardBento
       anchor="how-we-deliver"
       pattern="lead-tall-trio-b"
       background="white"
-      sectionHeader={{ title: 'One partner, two ways to reach the seabed' }}
+      sectionHeader={{ title: 'The fleet and platforms behind it' }}
       cards={deliveryCards}
     />
 

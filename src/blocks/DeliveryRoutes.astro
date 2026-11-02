@@ -1,0 +1,354 @@
+---
+// Delivery routes · reach/delivery-routes (2 Nov 2026, Services overview, Q174; for the client's "I am missing a
+// visualisation on two ways to reach the seabed, crewed and uncrewed", client PDF screens p5; outside the 14-block
+// budget). Fourth drawing the same day (Ross: in the System chain's hand, but each way in its own card, no labels, no
+// seabed line): two Navy Cards side by side, each with a drawing as its media, then its title and one line.
+//
+// The two drawings are the same scene, so the eye reads the difference. The sea surface is a horizon across the card
+// (out to its edges); a dotted line drops down the middle from a disc in the sky, through the vessel standing on the
+// surface, to its ROV under the water. Crewed: the crew in the sky. Uncrewed: Reach Relay in the sky, and a dotted
+// arc from it down into the ROC on the shore at the right, with two data dots travelling ROC → relay → vessel, one each
+// way, and a ring out from each disc as a dot reaches it (the System chain's pings).
+// Library pictograms in ringed discs; round 2 px dots every 6, as the System chain's.
+//
+// Drawing: 3 columns (· the vessel's column · the shore), rows sky · air · surface · water · ROV. Discs centre on
+// their row; the horizon runs through the surface discs' centres. The arc and the dot come from the discs' measured
+// centres (script below). Motion: a quarter in view the horizon runs out from the centre, the drop draws down, the
+// discs land in turn (scale, no fade), then the arc; the dots and pings run while on screen. Still under reduced motion; no
+// arc without JS. Discs 80 (glyph 56), 64 under 1200, 48 under 600.
+// Fields: `sectionHeader`, `routes` (two: title, text, `sky` pictogram, `shore?` pictogram, `vessel` and `rov`
+// pictograms), `background`.
+import BlockSection from '../components/BlockSection.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Card from '../components/Card.astro';
+import Pictogram from '../components/Pictogram.astro';
+import { makeId } from '../lib/ids';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
+
+export interface DeliveryRoute {
+  title: string;
+  /** One line */
+  text: string;
+  /** Over the vessel: the crew on board, or the relay to shore */
+  sky: string;
+  /** On the shore, when the crew works from land */
+  shore?: string;
+  vessel: string;
+  rov: string;
+}
+
+interface Props extends BlockFields {
+  sectionHeader: SectionHeaderField;
+  routes: [DeliveryRoute, DeliveryRoute];
+}
+
+const { sectionHeader, routes, background = 'tint', spacing, anchor } = Astro.props;
+const titleId = makeId('delivery-routes', sectionHeader.title);
+---
+
+<BlockSection slug="delivery-routes" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId}>
+  <div class="block__body">
+    <SectionHeader {...sectionHeader} id={titleId} />
+    <ul class="delivery-routes__list" role="list">
+      {
+        routes.map((route) => (
+          <li class="delivery-routes__item">
+            <Card media="none" surface="navy" title={route.title} description={route.text}>
+              <div slot="media" class="delivery-routes__scene" data-delivery-route aria-hidden="true">
+                <svg class="delivery-routes__arc">
+                  <path data-arc />
+                </svg>
+                {route.shore && <span class="delivery-routes__packet" data-packet />}
+                {route.shore && <span class="delivery-routes__packet delivery-routes__packet--back" data-packet />}
+                <span class="delivery-routes__surface" />
+                <span class="delivery-routes__drop" />
+                <span class="delivery-routes__mark delivery-routes__mark--sky" data-mark="sky" style="--i: 0">
+                  <Pictogram name={route.sky} size={56} />
+                </span>
+                <span class="delivery-routes__mark delivery-routes__mark--vessel" data-mark="vessel" style="--i: 1">
+                  <Pictogram name={route.vessel} size={56} />
+                </span>
+                <span class="delivery-routes__mark delivery-routes__mark--rov" style="--i: 2">
+                  <Pictogram name={route.rov} size={56} />
+                </span>
+                {route.shore && (
+                  <span class="delivery-routes__mark delivery-routes__mark--shore" data-mark="shore" style="--i: 2">
+                    <Pictogram name={route.shore} size={56} />
+                  </span>
+                )}
+              </div>
+            </Card>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BlockSection>
+
+<style is:global>
+  /* Two cards side by side from 900; one under the other below */
+  .delivery-routes__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--wp--custom--grid--gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .delivery-routes__item {
+    display: flex;
+  }
+  .delivery-routes__item > .card {
+    flex: 1;
+  }
+  @media (max-width: 899px) {
+    .delivery-routes__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* The drawing: 3 columns (· the vessel's · the shore), rows sky · air · surface · water · ROV; out to the card's
+     edges over its padding */
+  .delivery-routes__scene {
+    --dr-mark: 80px;
+    --dr-glyph: 56px;
+    --dr-step: 0.35s;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows:
+      [sky] var(--dr-mark) [air] var(--wp--preset--spacing--40) [surface] var(--dr-mark)
+      [water] var(--wp--preset--spacing--40) [rov] var(--dr-mark) [end];
+    margin: var(--wp--preset--spacing--16) calc(-1 * var(--wp--preset--spacing--32)) var(--wp--preset--spacing--32);
+  }
+  @media (max-width: 1199px) {
+    .delivery-routes__scene {
+      --dr-mark: 64px;
+      --dr-glyph: 48px;
+    }
+  }
+  @media (max-width: 599px) {
+    .delivery-routes__scene {
+      --dr-mark: 48px;
+      --dr-glyph: 36px;
+    }
+  }
+  .delivery-routes__mark {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    justify-self: center;
+    width: var(--dr-mark);
+    height: var(--dr-mark);
+    border: 1px solid var(--wp--custom--color--border--default);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--bg--default);
+  }
+  .delivery-routes__mark .pictogram {
+    width: var(--dr-glyph);
+    height: var(--dr-glyph);
+  }
+  .delivery-routes__mark--sky {
+    grid-area: sky / 2;
+  }
+  .delivery-routes__mark--vessel {
+    grid-area: surface / 2;
+  }
+  .delivery-routes__mark--rov {
+    grid-area: rov / 2;
+  }
+  .delivery-routes__mark--shore {
+    grid-area: surface / 3;
+  }
+
+  /* The surface: a solid line across the card through the surface discs' centres */
+  .delivery-routes__surface {
+    grid-area: surface / 1 / auto / -1;
+    z-index: 1;
+    align-self: center;
+    height: 2px;
+    background-color: var(--wp--custom--color--border--default);
+  }
+  /* The drop: dotted, from the sky disc's centre down to the ROV's */
+  .delivery-routes__drop {
+    grid-area: sky / 2 / end;
+    z-index: 1;
+    justify-self: center;
+    width: 2px;
+    margin-block: calc(var(--dr-mark) / 2);
+    background-image: radial-gradient(circle, var(--wp--custom--color--text--primary) 1px, transparent 1.25px);
+    background-size: 2px 6px;
+    background-repeat: repeat-y;
+    transform-origin: top;
+  }
+  /* The arc: from the relay, level then down into the ROC on the shore */
+  .delivery-routes__arc {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .delivery-routes__arc path {
+    fill: none;
+    stroke: var(--wp--custom--color--text--primary);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 0 6;
+  }
+  .delivery-routes__packet {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: none;
+    width: var(--wp--preset--spacing--8);
+    height: var(--wp--preset--spacing--8);
+    border-radius: var(--wp--custom--radius--full);
+    background-color: var(--wp--custom--color--icon--accent);
+    offset-rotate: 0deg;
+    offset-anchor: center;
+    pointer-events: none;
+  }
+
+  /* Draw-in */
+  html.js .delivery-routes__surface {
+    transition: scale calc(var(--dr-step) * 2) var(--wp--custom--motion--ease-out);
+  }
+  html.js .delivery-routes__drop {
+    transition: scale calc(var(--dr-step) * 3) var(--wp--custom--motion--ease-out) calc(var(--dr-step) * 0.5);
+  }
+  html.js .delivery-routes__arc {
+    transition: clip-path calc(var(--dr-step) * 2) linear calc(var(--dr-step) * 2);
+  }
+  html.js .delivery-routes__mark {
+    transition: scale 0.4s var(--wp--custom--motion--ease-out) calc(var(--dr-step) * (var(--i) + 1));
+  }
+  html.js .delivery-routes__scene:not(.is-drawn) .delivery-routes__surface {
+    scale: 0 1;
+  }
+  html.js .delivery-routes__scene:not(.is-drawn) .delivery-routes__drop {
+    scale: 1 0;
+  }
+  html.js .delivery-routes__scene:not(.is-drawn) .delivery-routes__arc {
+    clip-path: inset(0 100% 0 0);
+  }
+  html.js .delivery-routes__scene:not(.is-drawn) .delivery-routes__mark {
+    scale: 0;
+  }
+  /* Data on the link, as on Reach Remote's System chain: two dots travel ROC → relay → vessel at an even pace, one
+     each way, half a cycle apart; each disc sends a ring out (its line colour, spreading to 1.5× as it fades, about
+     1.2 s) as a dot reaches it: the vessel and the ROC on arrival, the relay as each dot passes it. --dr-f is the
+     relay's place along the line (measured, script below), so its rings land on the dots. */
+  @media (prefers-reduced-motion: no-preference) {
+    .delivery-routes__scene.has-arc {
+      --dr-cycle: 4.8s;
+      --dr-start: calc(var(--dr-step) * 5);
+    }
+    .delivery-routes__scene.has-arc .delivery-routes__packet {
+      display: block;
+      animation: delivery-routes-travel var(--dr-cycle) linear var(--dr-start) infinite both paused;
+    }
+    .delivery-routes__scene.has-arc .delivery-routes__packet--back {
+      animation-direction: reverse;
+      animation-delay: calc(var(--dr-start) + var(--dr-cycle) / 2);
+    }
+    .delivery-routes__scene.has-arc :is(.delivery-routes__mark--vessel, .delivery-routes__mark--shore)::after,
+    .delivery-routes__scene.has-arc .delivery-routes__mark--sky::before,
+    .delivery-routes__scene.has-arc .delivery-routes__mark--sky::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border: 2px solid var(--wp--custom--color--border--default);
+      border-radius: var(--wp--custom--radius--full);
+      opacity: 0;
+      pointer-events: none;
+    }
+    /* the outbound dot reaches the vessel one cycle in; the return dot the ROC half a cycle later */
+    .delivery-routes__scene.has-arc .delivery-routes__mark--vessel::after {
+      animation: delivery-routes-arrive var(--dr-cycle) var(--wp--custom--motion--ease-out) calc(var(--dr-start) + var(--dr-cycle)) infinite paused;
+    }
+    .delivery-routes__scene.has-arc .delivery-routes__mark--shore::after {
+      animation: delivery-routes-arrive var(--dr-cycle) var(--wp--custom--motion--ease-out) calc(var(--dr-start) + var(--dr-cycle) * 1.5) infinite paused;
+    }
+    /* the relay: the outbound dot passes at --dr-f of its run, the return dot at (1 − --dr-f) of its run */
+    .delivery-routes__scene.has-arc .delivery-routes__mark--sky::before {
+      animation: delivery-routes-arrive var(--dr-cycle) var(--wp--custom--motion--ease-out) calc(var(--dr-start) + var(--dr-cycle) * var(--dr-f, 0.5)) infinite paused;
+    }
+    .delivery-routes__scene.has-arc .delivery-routes__mark--sky::after {
+      animation: delivery-routes-arrive var(--dr-cycle) var(--wp--custom--motion--ease-out) calc(var(--dr-start) + var(--dr-cycle) * (1.5 - var(--dr-f, 0.5))) infinite paused;
+    }
+    /* (Separate selectors: a pseudo-element can't sit inside :is()) */
+    .delivery-routes__scene.is-drawn.is-running .delivery-routes__packet,
+    .delivery-routes__scene.is-drawn.is-running .delivery-routes__mark::before,
+    .delivery-routes__scene.is-drawn.is-running .delivery-routes__mark::after {
+      animation-play-state: running;
+    }
+  }
+  @keyframes delivery-routes-travel {
+    from {
+      offset-distance: 0%;
+    }
+    to {
+      offset-distance: 100%;
+    }
+  }
+  /* The ring leaves the disc's edge at full strength and spreads to 1.5× as it fades: about 1.2 s */
+  @keyframes delivery-routes-arrive {
+    0% {
+      scale: 1;
+      opacity: 1;
+    }
+    25%,
+    100% {
+      scale: 1.5;
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  // The arc from the discs' measured centres: from the relay, level, then down into the ROC (a quarter ellipse). The
+  // data dots ride ROC → relay → vessel. Each drawing draws on first view; the dot runs only while it is on screen.
+  const K = 0.5523; // cubic Bézier approximation of a quarter ellipse
+  for (const scene of document.querySelectorAll<HTMLElement>('[data-delivery-route]')) {
+    const svg = scene.querySelector<SVGSVGElement>('.delivery-routes__arc')!;
+    const path = svg.querySelector<SVGPathElement>('[data-arc]')!;
+    const packets = [...scene.querySelectorAll<HTMLElement>('[data-packet]')];
+    // centres from the layout boxes, so the discs' landing scale doesn't move them
+    const centre = (k: string) => {
+      const el = scene.querySelector<HTMLElement>(`[data-mark="${k}"]`);
+      return el ? [el.offsetLeft + el.offsetWidth / 2, el.offsetTop + el.offsetHeight / 2] : null;
+    };
+    const layout = () => {
+      const sky = centre('sky');
+      const shore = centre('shore');
+      const vessel = centre('vessel');
+      svg.setAttribute('viewBox', `0 0 ${scene.offsetWidth} ${scene.offsetHeight}`);
+      if (!sky || !shore || !vessel) return;
+      const [sx, sy] = sky;
+      const [bx, by] = shore;
+      path.setAttribute('d', `M ${sx} ${sy} C ${sx + K * (bx - sx)} ${sy} ${bx} ${by - K * (by - sy)} ${bx} ${by}`);
+      const run = `M ${bx} ${by} C ${bx} ${by - K * (by - sy)} ${sx + K * (bx - sx)} ${sy} ${sx} ${sy} L ${vessel[0]} ${vessel[1]}`;
+      for (const p of packets) p.style.offsetPath = `path("${run}")`;
+      // the relay's place along the run, so its rings land as the dots pass
+      const arcLength = path.getTotalLength();
+      scene.style.setProperty('--dr-f', (arcLength / (arcLength + Math.abs(vessel[1] - sy))).toFixed(3));
+      scene.classList.add('has-arc');
+    };
+    new ResizeObserver(layout).observe(scene);
+    layout();
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(
+        ([entry]) => {
+          scene.classList.toggle('is-running', entry.isIntersecting);
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.25) scene.classList.add('is-drawn');
+        },
+        { threshold: [0, 0.25] },
+      ).observe(scene);
+    } else scene.classList.add('is-drawn', 'is-running');
+  }
+</script>
