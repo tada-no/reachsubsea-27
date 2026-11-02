@@ -17,7 +17,7 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 ### Q176. Services overview: industries gathered into one strip (2 Nov 2026)
 Context: Ross: gather the service pages' "Industries we serve" strips on the Services overview, above "From first survey to decommissioning". The three lines list four each and overlap, with different labels for the same industry, so the overview takes a curated merge (`industriesServed` in `src/data/services.ts`), placed as a Strip under the service lines on the same White ground.
 - [x] All eight, two rows of four (Ross, 2 Nov 2026): Oil & gas · Offshore wind & renewables · Subsea cables & infrastructure · CO2 & carbon storage · Geothermal energy · Ports & marine construction · Seismic risk monitoring · Emerging offshore sectors
-- [ ] Figma: add the strip to the Services page frames
+- [x] Figma: add the strip to the Services page frames (2 Nov 2026: desktop 742:27676, two rows of four via the Strip's new "Show second row"; mobile 742:27732. The frames also gained the Technology split and the bento's "~750 to date" figure; IDs in the ledger, `phase4ServicesIndustriesQ176_2Nov`)
 
 **Answer:** as ticked.
 

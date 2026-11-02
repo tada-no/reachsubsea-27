@@ -2605,5 +2605,17 @@
       "Services overview · Mobile 370:13225": "Delivery routes Mobile instance 739:39998 above the bento, retitled likewise"
     },
     "notes": "Not changed here: the Services frames still lack the Technology split (5 Oct 2026, Q79) and the bento's figure card reads '750+ per quarter'."
+  },
+  "phase4ServicesIndustriesQ176_2Nov": {
+    "block": {
+      "Card grid Layout=Strip, Breakpoint=Desktop 450:17384": "Tiles now sit in a Rows wrapper 742:40406 (vertical, gap space/16): Row (the first four) and Row 2 742:40407, shown by the existing boolean 'Show second row#454:33' (off by default, so the other strips are unchanged at 300 tall).",
+      "Card grid Layout=Strip, Breakpoint=Mobile": "5 more 'Tile · more' tiles 742:37854 to 742:37870 after the first three, hidden by default; turn them on per instance for longer lists."
+    },
+    "pages": {
+      "Services overview · Desktop 355:3374": "Card grid Strip 'Industries we serve' 742:27676 (8 tiles, two rows of four, 428 tall) under the service lines; Split media Image End 742:27696 (technology, one action 'Technology & Innovation', since the variant has one action slot) after the lifecycle; bento figure card reads '~750' / 'Uncrewed operational days to date'.",
+      "Services overview · Mobile 370:13225": "Card grid Strip 742:27732 (8 tiles in one column) under the service lines; Split media 742:27752 (technology). The mobile bento has no figure card, so nothing to change there."
+    },
+    "pictograms": "Used in the strip: oil-gas, offshore-wind, subsea-infrastructure, carbon-storage 394:7870, geothermal 394:7959, marine, subsea-telemetry 394:7809 (the older ledger ID 35:105 is stale), technology.",
+    "notes": "Checked: every other Strip instance (Subsea, Survey, Monitoring, About and Sustainability certificates, Reach Remote partners) is unchanged."
   }
 }
