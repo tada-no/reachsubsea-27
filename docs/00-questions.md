@@ -10,6 +10,14 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 **Answer:** as ticked.
 
+### Q178. Services overview: "two ways to reach the seabed" doesn't land (3 Nov 2026)
+Context: client on the live pair (Q174 draft 4): "the small visualisation inside the boxes does not come out as a hit, and it should 🙂 Because this is a key differentiator and we are the company that have the most real-world experience with uncrewed operations with WROV." Not photos. The two drawings are near-identical stacks of small discs, so the difference (the people on shore, not on board) is one icon at the card's edge, and the pair reads as two equal options.
+- [ ] **Lead variant** on review at `/delivery-routes-review/` (3 Nov 2026): uncrewed leads in one wide Navy card (8 of 12 columns from 1200) whose drawing is a cross-section: the control room on the shore (land and seabed navy/700, water navy/900), the arc up through Reach Relay and down to the uncrewed vessel, a solid tether to its work-class ROV, larger discs (96) and a short label on each. Its title and line, then "~750 Uncrewed operational days to date" beside them. Crewed beside it as a White card with the same rows (crew on board, the vessel, its ROV), its surface level with the lead's; drawing beside its text at 600–1199
+- [ ] If approved: the bento's "~750" figure card swaps for another key figure, so the figure isn't said twice on the page
+- [ ] Keep the live pair
+
+**Answer:**
+
 ---
 
 ## Answered log

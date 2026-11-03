@@ -17,7 +17,13 @@
 // discs land in turn (scale, no fade), then the arc; the dots and pings run while on screen. Still under reduced motion; no
 // arc without JS. Discs 80 (glyph 56), 64 under 1200, 48 under 600.
 // Fields: `sectionHeader`, `routes` (two: title, text, `sky` pictogram, `shore?` pictogram, `vessel` and `rov`
-// pictograms), `background`.
+// pictograms, `labels?`), `variant`, `figure?`, `background`.
+//
+// Variant `lead` (3 Nov 2026, on review; the client: the pair "does not come out as a hit", and uncrewed is the key
+// differentiator). The route with a shore leads: one wide Navy card whose drawing is a cross-section, from the control
+// room on the shore, up through Reach Relay and down to the vessel at sea, its ROV on a tether near the seabed, each
+// disc with a short label. Land and seabed navy/700, water navy/900 below the surface. Then its title and line, and
+// `figure` beside them (a key figure). The other route is a White icon card beside it (8 + 4 columns from 1200).
 import BlockSection from '../components/BlockSection.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import Card from '../components/Card.astro';
@@ -35,20 +41,83 @@ export interface DeliveryRoute {
   shore?: string;
   vessel: string;
   rov: string;
+  /** Lead variant: a short label beside each disc */
+  labels?: { sky?: string; shore?: string; vessel?: string; rov?: string };
 }
 
 interface Props extends BlockFields {
   sectionHeader: SectionHeaderField;
   routes: [DeliveryRoute, DeliveryRoute];
+  /** `pair`: two equal cards with the same drawing; `lead`: the route with a shore leads, the other beside it */
+  variant?: 'pair' | 'lead';
+  /** Lead variant: a key figure beside the lead's text */
+  figure?: { value: string; label: string };
 }
 
-const { sectionHeader, routes, background = 'tint', spacing, anchor } = Astro.props;
+const { sectionHeader, routes, variant = 'pair', figure, background = 'tint', spacing, anchor } = Astro.props;
 const titleId = makeId('delivery-routes', sectionHeader.title);
+const lead = routes.find((r) => r.shore) ?? routes[1];
+const side = routes.find((r) => r !== lead)!;
+const marks = [
+  { key: 'shore', at: 'shore', place: 'below' },
+  { key: 'sky', at: 'sky', place: 'below' },
+  { key: 'vessel', at: 'vessel', place: 'start' },
+  { key: 'rov', at: 'rov', place: 'start' },
+] as const;
 ---
 
 <BlockSection slug="delivery-routes" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId}>
   <div class="block__body">
     <SectionHeader {...sectionHeader} id={titleId} />
+    {variant === 'lead' && (
+      <ul class="delivery-routes__list delivery-routes__list--lead" role="list">
+        {[lead, side].map((route) => (
+          <li class:list={['delivery-routes__item', route === lead ? 'delivery-routes__item--lead' : 'delivery-routes__item--side']}>
+            <Card media="none" surface={route === lead ? 'navy' : 'white'} size="featured" title={route.title} description={route.text}>
+              <div
+                slot="media"
+                class:list={['delivery-routes__scene', 'delivery-routes__scene--section', route === lead && 'delivery-routes__scene--lead']}
+                data-delivery-route
+                aria-hidden="true"
+              >
+                <span class="delivery-routes__water" />
+                {route.shore && <span class="delivery-routes__land" />}
+                <span class="delivery-routes__seabed" />
+                <span class="delivery-routes__surface" />
+                {!route.shore && <span class="delivery-routes__drop" />}
+                <span class="delivery-routes__tether" />
+                {route.shore && (
+                  <svg class="delivery-routes__arc">
+                    <path data-arc />
+                  </svg>
+                )}
+                {route.shore && <span class="delivery-routes__packet" data-packet />}
+                {route.shore && <span class="delivery-routes__packet delivery-routes__packet--back" data-packet />}
+                {marks
+                  .filter((m) => route[m.key])
+                  .map((m, i) => (
+                    <span class={`delivery-routes__mark delivery-routes__mark--${m.key}`} data-mark={m.key} style={`--i: ${i}`}>
+                      <Pictogram name={route[m.key]!} size={64} />
+                      {route.labels?.[m.key] && (
+                        <span class={`delivery-routes__label delivery-routes__label--${route.shore ? m.place : 'start'} text-caption`}>
+                          {route.labels[m.key]}
+                        </span>
+                      )}
+                    </span>
+                  ))}
+              </div>
+              {route === lead && figure && (
+                <div slot="figure" class="delivery-routes__figure">
+                  <p class="delivery-routes__figure-value text-display">{figure.value}</p>
+                  <p class="delivery-routes__figure-label text-small">{figure.label}</p>
+                </div>
+              )}
+            </Card>
+          </li>
+        ))}
+      </ul>
+    )}
+    {variant === 'pair' && (
     <ul class="delivery-routes__list" role="list">
       {
         routes.map((route) => (
@@ -82,6 +151,7 @@ const titleId = makeId('delivery-routes', sectionHeader.title);
         ))
       }
     </ul>
+    )}
   </div>
 </BlockSection>
 
@@ -214,6 +284,199 @@ const titleId = makeId('delivery-routes', sectionHeader.title);
     pointer-events: none;
   }
 
+
+  /* ── Lead variant (3 Nov 2026): the lead card 8 columns, the other route 4, from 1200; stacked below ── */
+  .delivery-routes__list--lead {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .delivery-routes__item--lead {
+    grid-column: span 8;
+  }
+  .delivery-routes__item--side {
+    grid-column: span 4;
+  }
+  /* The side card: its pictogram at the top, the text at the foot, level with the lead's */
+  .delivery-routes__item--side .card__content {
+    justify-content: space-between;
+  }
+  @media (max-width: 1199px) {
+    .delivery-routes__list--lead > .delivery-routes__item {
+      grid-column: 1 / -1;
+    }
+  }
+  /* 600–1199, full width: the side card's drawing on its left, down to the card's foot, the text beside it */
+  @media (min-width: 600px) and (max-width: 1199px) {
+    .delivery-routes__item--side .card__content {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--wp--preset--spacing--48);
+      align-items: center;
+    }
+    .delivery-routes__item--side .card__drawing {
+      grid-row: 1;
+      align-self: end;
+    }
+    .delivery-routes__item--side .card__text {
+      grid-row: 1;
+    }
+    .delivery-routes__item--side .delivery-routes__scene {
+      margin-right: 0;
+      margin-bottom: calc(-1 * var(--wp--preset--spacing--48));
+    }
+  }
+  /* The lead card: the drawing across the top, then the text and the figure side by side */
+  .delivery-routes__item--lead .card__content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: var(--wp--preset--spacing--48);
+    align-items: end;
+  }
+  /* The drawing holds the top, so its surface stays level with the side card's */
+  .delivery-routes__item--lead .card__drawing {
+    align-self: start;
+  }
+  .delivery-routes__item--lead .card__drawing {
+    grid-column: 1 / -1;
+  }
+  @media (max-width: 599px) {
+    .delivery-routes__item--lead .card__content {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .delivery-routes__figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--preset--spacing--4);
+    max-width: 14rem;
+  }
+  .delivery-routes__figure p {
+    margin: 0;
+  }
+  .delivery-routes__figure-value {
+    color: var(--wp--custom--color--text--accent-display);
+  }
+  .delivery-routes__figure-label {
+    color: var(--wp--custom--color--text--secondary);
+  }
+
+  /* The cross-section, out to the card's edges and flush with its top: rows sky · air · surface · water · ROV ·
+     seabed; columns shore · relay · sea */
+  .delivery-routes__scene--section {
+    --dr-mark: 96px;
+    --dr-glyph: 64px;
+    grid-template-rows:
+      [sky] var(--dr-mark) [air] var(--wp--preset--spacing--48) [surface] var(--dr-mark)
+      [water] var(--wp--preset--spacing--40) [rov] var(--dr-mark) [seabed] var(--wp--preset--spacing--24) [end];
+    margin: calc(-1 * var(--wp--preset--spacing--48)) calc(-1 * var(--wp--preset--spacing--48)) var(--wp--preset--spacing--16);
+    padding-top: var(--wp--preset--spacing--48);
+  }
+  @media (max-width: 1199px) {
+    .delivery-routes__scene--section {
+      --dr-mark: 80px;
+      --dr-glyph: 56px;
+    }
+  }
+  @media (max-width: 599px) {
+    .delivery-routes__scene--section {
+      --dr-mark: 56px;
+      --dr-glyph: 40px;
+    }
+  }
+  .delivery-routes__scene--section .delivery-routes__mark--sky {
+    grid-area: sky / -2;
+  }
+  .delivery-routes__scene--section .delivery-routes__mark--vessel {
+    grid-area: surface / -2;
+  }
+  .delivery-routes__scene--section .delivery-routes__mark--rov {
+    grid-area: rov / -2;
+  }
+  .delivery-routes__scene--lead .delivery-routes__mark--sky {
+    grid-area: sky / 2;
+  }
+  .delivery-routes__scene--lead .delivery-routes__mark--shore {
+    grid-area: surface / 1;
+  }
+  .delivery-routes__scene--lead .delivery-routes__mark--vessel {
+    grid-area: surface / 3;
+  }
+  .delivery-routes__scene--lead .delivery-routes__mark--rov {
+    grid-area: rov / 3;
+  }
+  /* Water from the surface down; the land over it, its shore sloping to the seabed under the relay; the seabed */
+  .delivery-routes__water {
+    grid-area: surface / 1 / end / -1;
+    margin-top: calc(var(--dr-mark) / 2);
+    background-color: var(--wp--custom--color--bg--tint);
+  }
+  .delivery-routes__land {
+    grid-area: surface / 1 / end / 3;
+    margin-top: calc(var(--dr-mark) / 2);
+    background-color: var(--wp--custom--color--bg--accent-subtle);
+    clip-path: polygon(0 0, 50% 0, 64% 100%, 0 100%);
+  }
+  .delivery-routes__seabed {
+    grid-area: seabed / 1 / end / -1;
+    background-color: var(--wp--custom--color--bg--accent-subtle);
+  }
+  .delivery-routes__scene--lead .delivery-routes__surface {
+    grid-column: 2 / -1;
+  }
+  /* The side route's drawing: one column, the crew over its vessel (rows as the lead's, so the surfaces line up) */
+  .delivery-routes__scene--section:not(.delivery-routes__scene--lead) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .delivery-routes__scene--section:not(.delivery-routes__scene--lead) > * {
+    grid-column: 1;
+  }
+  .delivery-routes__scene--section:not(.delivery-routes__scene--lead) .delivery-routes__drop {
+    grid-area: sky / 1 / water / 1;
+  }
+  /* The tether: solid, the vessel to its ROV (the link above is dotted: radio, not cable) */
+  .delivery-routes__tether {
+    grid-area: surface / -2 / seabed;
+    z-index: 1;
+    justify-self: center;
+    width: 2px;
+    margin-block: calc(var(--dr-mark) / 2);
+    background-color: var(--wp--custom--color--border--strong);
+    transform-origin: top;
+  }
+  .delivery-routes__label {
+    position: absolute;
+    color: var(--wp--custom--color--text--secondary);
+    white-space: nowrap;
+  }
+  .delivery-routes__label--below {
+    top: calc(100% + var(--wp--preset--spacing--8));
+    left: 50%;
+    translate: -50% 0;
+  }
+  .delivery-routes__label--start {
+    right: calc(100% + var(--wp--preset--spacing--12));
+    top: 50%;
+    translate: 0 -50%;
+  }
+  /* Phones: the shore's label runs from its disc's left edge, so it stays inside the card */
+  @media (max-width: 599px) {
+    .delivery-routes__mark--shore .delivery-routes__label--below {
+      left: 0;
+      translate: none;
+    }
+  }
+  .delivery-routes__mark--vessel .delivery-routes__label--start {
+    top: auto;
+    bottom: calc(50% + var(--wp--preset--spacing--8));
+    translate: none;
+  }
+  html.js .delivery-routes__tether {
+    transition: scale calc(var(--dr-step) * 2) var(--wp--custom--motion--ease-out) calc(var(--dr-step) * 3);
+  }
+  html.js .delivery-routes__scene:not(.is-drawn) .delivery-routes__tether {
+    scale: 1 0;
+  }
+
   /* Draw-in */
   html.js .delivery-routes__surface {
     transition: scale calc(var(--dr-step) * 2) var(--wp--custom--motion--ease-out);
@@ -315,8 +578,8 @@ const titleId = makeId('delivery-routes', sectionHeader.title);
   // data dots ride ROC → relay → vessel. Each drawing draws on first view; the dot runs only while it is on screen.
   const K = 0.5523; // cubic Bézier approximation of a quarter ellipse
   for (const scene of document.querySelectorAll<HTMLElement>('[data-delivery-route]')) {
-    const svg = scene.querySelector<SVGSVGElement>('.delivery-routes__arc')!;
-    const path = svg.querySelector<SVGPathElement>('[data-arc]')!;
+    const svg = scene.querySelector<SVGSVGElement>('.delivery-routes__arc');
+    const path = svg?.querySelector<SVGPathElement>('[data-arc]');
     const packets = [...scene.querySelectorAll<HTMLElement>('[data-packet]')];
     // centres from the layout boxes, so the discs' landing scale doesn't move them
     const centre = (k: string) => {
@@ -327,10 +590,20 @@ const titleId = makeId('delivery-routes', sectionHeader.title);
       const sky = centre('sky');
       const shore = centre('shore');
       const vessel = centre('vessel');
+      if (!svg || !path || !sky || !shore || !vessel) return;
       svg.setAttribute('viewBox', `0 0 ${scene.offsetWidth} ${scene.offsetHeight}`);
-      if (!sky || !shore || !vessel) return;
       const [sx, sy] = sky;
       const [bx, by] = shore;
+      if (scene.classList.contains('delivery-routes__scene--lead')) {
+        // Lead: an arch from the ROC up to the relay and down to the vessel; the dots ride it end to end
+        const [vx, vy] = vessel;
+        const d = `M ${bx} ${by} C ${bx} ${by - K * (by - sy)} ${sx - K * (sx - bx)} ${sy} ${sx} ${sy} C ${sx + K * (vx - sx)} ${sy} ${vx} ${vy - K * (vy - sy)} ${vx} ${vy}`;
+        path.setAttribute('d', d);
+        for (const p of packets) p.style.offsetPath = `path("${d}")`;
+        scene.style.setProperty('--dr-f', '0.5');
+        scene.classList.add('has-arc');
+        return;
+      }
       path.setAttribute('d', `M ${sx} ${sy} C ${sx + K * (bx - sx)} ${sy} ${bx} ${by - K * (by - sy)} ${bx} ${by}`);
       const run = `M ${bx} ${by} C ${bx} ${by - K * (by - sy)} ${sx + K * (bx - sx)} ${sy} ${sx} ${sy} L ${vessel[0]} ${vessel[1]}`;
       for (const p of packets) p.style.offsetPath = `path("${run}")`;

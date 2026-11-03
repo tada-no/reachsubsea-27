@@ -1,3 +1,4 @@
+import type { DeliveryRoute } from '../blocks/DeliveryRoutes.astro';
 // Service lines (19 Sep 2026, Services overview). One source for the three service lines and the technology
 // under them (Technology & Innovation, kept as the fourth entry; 5 Oct 2026, Q79: the client counts three): the overview
 // cards, the lifecycle visual and (later) the service single pages read from here.
@@ -353,3 +354,29 @@ export const lifecycleFoundation: LifecycleFoundation = {
   ],
   caption: 'in-house technology under every line, in every phase.',
 };
+
+// Two ways to reach the seabed (2 Nov 2026, Q174): the client asked for a visual of crewed and uncrewed (PDF screens
+// p5's "How we deliver"). Two Navy cards, each with the same drawing: the crew, or Reach Relay to the ROC on shore,
+// over the vessel and its ROV.
+export const deliveryRoutes: [DeliveryRoute, DeliveryRoute] = [
+  {
+    title: 'Crewed vessels',
+    text: 'Experienced offshore personnel, engineers and project managers operating work-class and inspection ROVs and survey spreads.',
+    sky: 'team',
+    vessel: 'marine',
+    rov: 'survey-rov',
+    labels: { sky: 'Crew on board', vessel: 'Crewed vessel', rov: 'Work-class ROV' },
+  },
+  {
+    title: 'Uncrewed vessels',
+    // The PDF's lines, trimmed to the same length (15 words each): crewed without "for complex subsea operations",
+    // uncrewed without "750+ operational days delivered per quarter" (key figures: ~750 to date, in the bento below)
+    text: 'Uncrewed surface vessels operated remotely from shore, carrying the same work-class ROV and survey spreads.',
+    sky: 'satellite',
+    shore: 'profile-laptop',
+    vessel: 'reach-remote',
+    rov: 'survey-rov',
+    // Lead variant's labels (3 Nov 2026, on review)
+    labels: { shore: 'Control room on shore', sky: 'Reach Relay', vessel: 'Uncrewed vessel', rov: 'Work-class ROV' },
+  },
+];

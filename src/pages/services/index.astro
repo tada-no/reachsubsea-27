@@ -14,7 +14,7 @@ import SectionSubnav from '../../blocks/SectionSubnav.astro';
 import CardGrid from '../../blocks/CardGrid.astro';
 import SplitMedia from '../../blocks/SplitMedia.astro';
 import CardBento from '../../blocks/CardBento.astro';
-import DeliveryRoutes, { type DeliveryRoute } from '../../blocks/DeliveryRoutes.astro';
+import DeliveryRoutes from '../../blocks/DeliveryRoutes.astro';
 import Lifecycle from '../../blocks/Lifecycle.astro';
 import FeedGrid from '../../blocks/FeedGrid.astro';
 import Embed from '../../blocks/Embed.astro';
@@ -26,7 +26,7 @@ import { worldPath, worldPagePath, worldSceneUrl } from '../../data/world';
 import type { CardField } from '../../lib/types';
 import { navSections } from '../../data/navigation';
 import { cardPresets } from '../../data/card-presets';
-import { serviceLines, lifecyclePhases, lifecycleRows, lifecycleFoundation, industriesServed } from '../../data/services';
+import { serviceLines, lifecyclePhases, lifecycleRows, lifecycleFoundation, industriesServed, deliveryRoutes } from '../../data/services';
 import { faqsFor, faqHubHref } from '../../data/faqs';
 
 const base = import.meta.env.BASE_URL;
@@ -51,29 +51,6 @@ const serviceCards = serviceLines.filter((line) => line.id !== 'technology').map
 // Industries we serve (2 Nov 2026, Q176): Reach's four general industries, as on Subsea (industriesServed), under
 // the service lines, before the lifecycle
 const industryCards: CardField[] = industriesServed.map((ind) => ({ media: 'icon', title: ind.label, pictogram: ind.pictogram }));
-
-// Two ways to reach the seabed (2 Nov 2026, Q174): the client asked for a visual of crewed and uncrewed (PDF screens
-// p5's "How we deliver"). Two Navy cards, each with the same drawing: the crew, or Reach Relay to the ROC on shore,
-// over the vessel and its ROV.
-const routes: [DeliveryRoute, DeliveryRoute] = [
-  {
-    title: 'Crewed vessels',
-    text: 'Experienced offshore personnel, engineers and project managers operating work-class and inspection ROVs and survey spreads.',
-    sky: 'team',
-    vessel: 'marine',
-    rov: 'survey-rov',
-  },
-  {
-    title: 'Uncrewed vessels',
-    // The PDF's lines, trimmed to the same length (15 words each): crewed without "for complex subsea operations",
-    // uncrewed without "750+ operational days delivered per quarter" (key figures: ~750 to date, in the bento below)
-    text: 'Uncrewed surface vessels operated remotely from shore, carrying the same work-class ROV and survey spreads.',
-    sky: 'satellite',
-    shore: 'profile-laptop',
-    vessel: 'reach-remote',
-    rov: 'survey-rov',
-  },
-];
 
 // How we deliver: the PDF's "How we deliver", "Our platforms" and "Explore the full fleet" in one bento.
 // 12 columns: crewed (6×2) · fleet figure · Reach Remote (3×2) · uncrewed-days figure, then
@@ -229,7 +206,7 @@ const faqItems = faqsFor('services');
       anchor="two-ways"
       background="tint"
       sectionHeader={{ title: 'One partner, two ways to reach the seabed' }}
-      routes={routes}
+      routes={deliveryRoutes}
     />
 
     <CardBento
