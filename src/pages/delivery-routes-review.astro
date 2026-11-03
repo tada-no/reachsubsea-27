@@ -1,15 +1,13 @@
 ---
 // Review page for Delivery routes (3 Nov 2026): the client found the two equal drawings on the Services overview
 // didn't land ("does not come out as a hit, and it should": uncrewed with WROV is the key differentiator). The live
-// pair, then the Lead variant: uncrewed as one wide cross-section from the shore to the seabed, crewed beside it.
+// pair, then the Renders variant: each card's vessel and ROV from the Reach 3D World, cut at the waterline. (The Lead
+// variant, uncrewed as one wide cross-section, was dropped the same day: Ross, "too unbalanced and messy".)
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/header/Header.astro';
 import Footer from '../components/Footer.astro';
 import DeliveryRoutes from '../blocks/DeliveryRoutes.astro';
 import { deliveryRoutes } from '../data/services';
-import { pickFigures } from '../data/key-figures';
-
-const [uncrewedDays] = pickFigures(['uncrewed-days']);
 const sectionHeader = { title: 'One partner, two ways to reach the seabed' };
 ---
 
@@ -18,15 +16,15 @@ const sectionHeader = { title: 'One partner, two ways to reach the seabed' };
   <main id="main" class="routes-review">
     <div class="routes-review__intro container">
       <h1 class="text-h3">Two ways to reach the seabed: variants</h1>
-      <p class="text-body">The live pair from the Services overview, then the Lead variant for the client's comment.</p>
+      <p class="text-body">The Renders variant for the client's comment, then the live pair from the Services overview.</p>
       <ul class="routes-review__jump text-small">
-        <li><a href="#routes-lead">Lead (new)</a></li>
+        <li><a href="#routes-renders">Renders (new)</a></li>
         <li><a href="#routes-pair">Pair (live)</a></li>
       </ul>
     </div>
 
-    <p class="routes-review__label container text-eyebrow">Lead · uncrewed as a cross-section, crewed beside it</p>
-    <DeliveryRoutes anchor="routes-lead" variant="lead" figure={uncrewedDays} sectionHeader={sectionHeader} routes={deliveryRoutes} />
+    <p class="routes-review__label container text-eyebrow">Renders · each vessel and its ROV from the 3D World</p>
+    <DeliveryRoutes anchor="routes-renders" variant="renders" sectionHeader={sectionHeader} routes={deliveryRoutes} />
 
     <p class="routes-review__label container text-eyebrow">Pair · live on the Services overview</p>
     <DeliveryRoutes anchor="routes-pair" sectionHeader={sectionHeader} routes={deliveryRoutes} />

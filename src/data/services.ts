@@ -365,18 +365,20 @@ export const deliveryRoutes: [DeliveryRoute, DeliveryRoute] = [
     sky: 'team',
     vessel: 'marine',
     rov: 'survey-rov',
-    labels: { sky: 'Crew on board', vessel: 'Crewed vessel', rov: 'Work-class ROV' },
+    // Renders variant (3 Nov 2026, on review): Reach 3D World v139 stills
+    surface: { src: `${import.meta.env.BASE_URL}images/routes-crewed-surface.jpg`, alt: 'The Viking Vigor construction vessel at sea, in the Reach 3D World' },
+    subsea: { src: `${import.meta.env.BASE_URL}images/routes-crewed-subsea.jpg`, alt: 'A Surveyor ROV on its tether over a pipeline on the seabed' },
   },
   {
     title: 'Uncrewed vessels',
     // The PDF's lines, trimmed to the same length (15 words each): crewed without "for complex subsea operations",
-    // uncrewed without "750+ operational days delivered per quarter" (key figures: ~750 to date, in the bento below)
+    // uncrewed without "750+ operational days delivered per quarter" (key figures: ~1,000 to date, in the bento below)
     text: 'Uncrewed surface vessels operated remotely from shore, carrying the same work-class ROV and survey spreads.',
     sky: 'satellite',
     shore: 'profile-laptop',
     vessel: 'reach-remote',
     rov: 'survey-rov',
-    // Lead variant's labels (3 Nov 2026, on review)
-    labels: { shore: 'Control room on shore', sky: 'Reach Relay', vessel: 'Uncrewed vessel', rov: 'Work-class ROV' },
+    surface: { src: `${import.meta.env.BASE_URL}images/routes-uncrewed-surface.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel at sea, in the Reach 3D World' },
+    subsea: { src: `${import.meta.env.BASE_URL}images/routes-uncrewed-subsea.jpg`, alt: 'A work-class ROV and its cage beside a jacket on the seabed' },
   },
 ];

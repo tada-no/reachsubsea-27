@@ -117,8 +117,6 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
         )}
       </div>
     </div>
-    {/* A block's own figure beside or under the text (Delivery routes lead, 3 Nov 2026) */}
-    {Astro.slots.has('figure') && <slot name="figure" />}
     {
       meta.length > 0 && (
         <ul class="card__meta">

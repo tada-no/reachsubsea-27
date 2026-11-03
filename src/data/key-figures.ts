@@ -11,8 +11,8 @@ export const keyFigures: StatField[] = [
   { key: 'countries', value: '9', label: 'Countries reached' },
   // PLACEHOLDER wording (7 Oct 2026, Ross): the Q2 2026 report (p18) gives "~750 uncrewed operations days" with no
   // period, a running total (two Reach Remote vessels cannot log more than ~182 days a quarter). The Design Reference
-  // PDF's "750+ … per quarter" is dropped until Reach confirms the period.
-  { key: 'uncrewed-days', value: '~750', label: 'Uncrewed operational days to date' },
+  // PDF's "750+ … per quarter" is dropped until Reach confirms the period. Now ~1,000 (Ross, 3 Nov 2026).
+  { key: 'uncrewed-days', value: '~1,000', label: 'Uncrewed operational days to date' },
   // Design Reference PDF p10: 13 WROV + 2 Surveyor Interceptor, cited to the 2Q 2026 Report (added 17 Sep 2026)
   { key: 'rov-systems', value: '15', label: 'ROV systems' },
   // Design Reference PDF p10 and p18, 2Q 2026: kept distinct from Countries reached (offices = physical locations)
