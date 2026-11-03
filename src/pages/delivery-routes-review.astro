@@ -1,8 +1,9 @@
 ---
 // Review page for Delivery routes (3 Nov 2026): the client found the two equal drawings on the Services overview
 // didn't land ("does not come out as a hit, and it should": uncrewed with WROV is the key differentiator). The live
-// pair, then the Renders variant: each card's vessel and ROV from the Reach 3D World, cut at the waterline. (The Lead
-// variant, uncrewed as one wide cross-section, was dropped the same day: Ross, "too unbalanced and messy".)
+// Films variant first (each vessel's ROV deployment, two synced loops from the Reach 3D World), then the live pair.
+// Dropped the same day: the Lead variant (one wide cross-section; "too unbalanced and messy") and the Renders
+// variant (surface + seabed stills stitched at the waterline; "messy").
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/header/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -16,15 +17,15 @@ const sectionHeader = { title: 'One partner, two ways to reach the seabed' };
   <main id="main" class="routes-review">
     <div class="routes-review__intro container">
       <h1 class="text-h3">Two ways to reach the seabed: variants</h1>
-      <p class="text-body">The Renders variant for the client's comment, then the live pair from the Services overview.</p>
+      <p class="text-body">The Films variant for the client's comment, then the live pair from the Services overview.</p>
       <ul class="routes-review__jump text-small">
-        <li><a href="#routes-renders">Renders (new)</a></li>
+        <li><a href="#routes-films">Films (new)</a></li>
         <li><a href="#routes-pair">Pair (live)</a></li>
       </ul>
     </div>
 
-    <p class="routes-review__label container text-eyebrow">Renders · each vessel and its ROV from the 3D World</p>
-    <DeliveryRoutes anchor="routes-renders" variant="renders" sectionHeader={sectionHeader} routes={deliveryRoutes} />
+    <p class="routes-review__label container text-eyebrow">Films · each vessel's ROV deployment, in step</p>
+    <DeliveryRoutes anchor="routes-films" variant="films" sectionHeader={sectionHeader} routes={deliveryRoutes} />
 
     <p class="routes-review__label container text-eyebrow">Pair · live on the Services overview</p>
     <DeliveryRoutes anchor="routes-pair" sectionHeader={sectionHeader} routes={deliveryRoutes} />

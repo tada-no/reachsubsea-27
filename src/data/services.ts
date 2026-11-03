@@ -365,9 +365,8 @@ export const deliveryRoutes: [DeliveryRoute, DeliveryRoute] = [
     sky: 'team',
     vessel: 'marine',
     rov: 'survey-rov',
-    // Renders variant (3 Nov 2026, on review): Reach 3D World v139 stills
-    surface: { src: `${import.meta.env.BASE_URL}images/routes-crewed-surface.jpg`, alt: 'The Viking Vigor construction vessel at sea, in the Reach 3D World' },
-    subsea: { src: `${import.meta.env.BASE_URL}images/routes-crewed-subsea.jpg`, alt: 'A Surveyor ROV on its tether over a pipeline on the seabed' },
+    // Films variant (3 Nov 2026, on review): Reach 3D World v141 `vigor-deploy`, 12 s, its first frame as the poster
+    film: { src: `${import.meta.env.BASE_URL}video/routes-crewed.mp4`, poster: `${import.meta.env.BASE_URL}images/routes-crewed-poster.jpg` },
   },
   {
     title: 'Uncrewed vessels',
@@ -378,7 +377,7 @@ export const deliveryRoutes: [DeliveryRoute, DeliveryRoute] = [
     shore: 'profile-laptop',
     vessel: 'reach-remote',
     rov: 'survey-rov',
-    surface: { src: `${import.meta.env.BASE_URL}images/routes-uncrewed-surface.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel at sea, in the Reach 3D World' },
-    subsea: { src: `${import.meta.env.BASE_URL}images/routes-uncrewed-subsea.jpg`, alt: 'A work-class ROV and its cage beside a jacket on the seabed' },
+    // v141 `rr-deploy`, in step with the crewed loop
+    film: { src: `${import.meta.env.BASE_URL}video/routes-uncrewed.mp4`, poster: `${import.meta.env.BASE_URL}images/routes-uncrewed-poster.jpg` },
   },
 ];

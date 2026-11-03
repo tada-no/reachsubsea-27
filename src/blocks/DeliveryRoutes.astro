@@ -17,19 +17,24 @@
 // discs land in turn (scale, no fade), then the arc; the dots and pings run while on screen. Still under reduced motion; no
 // arc without JS. Discs 80 (glyph 56), 64 under 1200, 48 under 600.
 // Fields: `sectionHeader`, `routes` (two: title, text, `sky` pictogram, `shore?` pictogram, `vessel` and `rov`
-// pictograms, `surface?` and `subsea?` images), `variant`, `background`.
+// pictograms, `film?`), `variant`, `background`.
 //
-// Variant `renders` (3 Nov 2026, Q178, on review; the client: the drawings "do not come out as a hit" and are "too
-// flat"). The same two Navy cards, each with a picture from the Reach 3D World (v139) as its media, cut at the
-// waterline: the vessel on the surface above, its ROV at work on the seabed below, out to the card's edges. Crewed:
-// the Viking Vigor over the Surveyor on a pipeline. Uncrewed: Reach Remote 1 over the work-class ROV and its cage at
-// a jacket. Then the title and line as the pair. Fields: `surface` and `subsea` images on each route.
+// Variant `films` (3 Nov 2026, Q178, on review; the client found the drawings "too flat" and wanted something "more
+// capturing"; Ross found stitched surface + seabed stills messy and chose the ROV deployment from both vessels). The
+// same two Navy cards, each with a 12 s loop from the Reach 3D World (v141) as its media, out to the card's top and
+// sides at 16:10: the Supporter lowered off the Viking Vigor's LARS, and ZeeROV 1 out of Reach Remote 1's moonpool,
+// both on the same beats (vessel, into the water, down, at the seabed), so the two ROVs reach the seabed together.
+// The two play as one: they load near the viewport, start together a quarter in view, restart together when the
+// first ends, pause off screen, and share one pause control (WCAG 2.2.2). The first frame is the poster (same pixels
+// as the video), so the hand-over doesn't show. Reduced motion or Save-Data: the posters only, the control offers Play.
+// Fields: `film` on each route (`src`, `poster`).
 import BlockSection from '../components/BlockSection.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import Card from '../components/Card.astro';
 import Pictogram from '../components/Pictogram.astro';
+import MediaToggle from '../components/MediaToggle.astro';
 import { makeId } from '../lib/ids';
-import type { BlockFields, ImageField, SectionHeaderField } from '../lib/types';
+import type { BlockFields, SectionHeaderField } from '../lib/types';
 
 export interface DeliveryRoute {
   title: string;
@@ -41,16 +46,15 @@ export interface DeliveryRoute {
   shore?: string;
   vessel: string;
   rov: string;
-  /** Renders variant: the vessel on the surface, and its ROV on the seabed */
-  surface?: ImageField;
-  subsea?: ImageField;
+  /** Films variant: the deployment loop and its first frame */
+  film?: { src: string; poster: string };
 }
 
 interface Props extends BlockFields {
   sectionHeader: SectionHeaderField;
   routes: [DeliveryRoute, DeliveryRoute];
-  /** `pair`: the same drawing in each card; `renders`: each card's vessel and ROV from the 3D World */
-  variant?: 'pair' | 'renders';
+  /** `pair`: the same drawing in each card; `films`: each vessel's ROV deployment as a loop */
+  variant?: 'pair' | 'films';
 }
 
 const { sectionHeader, routes, variant = 'pair', background = 'tint', spacing, anchor } = Astro.props;
@@ -60,23 +64,25 @@ const titleId = makeId('delivery-routes', sectionHeader.title);
 <BlockSection slug="delivery-routes" background={background} spacing={spacing} anchor={anchor} labelledBy={titleId}>
   <div class="block__body">
     <SectionHeader {...sectionHeader} id={titleId} />
-    {variant === 'renders' && (
-      <ul class="delivery-routes__list delivery-routes__list--renders" role="list">
-        {routes.map((route) => (
-          <li class="delivery-routes__item">
-            <Card media="none" surface="navy" title={route.title} description={route.text}>
-              <div slot="media" class="delivery-routes__view">
-                {route.surface?.src && (
-                  <img class="delivery-routes__surface-image" src={route.surface.src} alt={route.surface.alt} loading="lazy" decoding="async" />
+    {variant === 'films' && (
+      <div class="delivery-routes__films" data-delivery-films>
+        <ul class="delivery-routes__list delivery-routes__list--films" role="list">
+          {routes.map((route, i) => (
+            <li class="delivery-routes__item">
+              <Card media="none" surface="navy" title={route.title} description={route.text}>
+                {route.film && (
+                  <div slot="media" class="delivery-routes__film">
+                    <img class="delivery-routes__poster" src={route.film.poster} alt="" loading="lazy" decoding="async" />
+                    <video class="delivery-routes__video" muted playsinline preload="none" aria-hidden="true" data-src={route.film.src} />
+                    {/* one control for both loops, at the foot of the second */}
+                    {i === routes.length - 1 && <MediaToggle subject="the launches" class="delivery-routes__toggle" />}
+                  </div>
                 )}
-                {route.subsea?.src && (
-                  <img class="delivery-routes__subsea-image" src={route.subsea.src} alt={route.subsea.alt} loading="lazy" decoding="async" />
-                )}
-              </div>
-            </Card>
-          </li>
-        ))}
-      </ul>
+              </Card>
+            </li>
+          ))}
+        </ul>
+      </div>
     )}
     {variant === 'pair' && (
     <ul class="delivery-routes__list" role="list">
@@ -248,28 +254,41 @@ const titleId = makeId('delivery-routes', sectionHeader.title);
 
   /* ── Renders variant (3 Nov 2026): the picture out to the card's top and sides, the surface 16:10 over the
      seabed 16:7, meeting at the waterline ── */
-  /* The pair holds side by side down to 600 (each card is mostly picture); one under the other on phones */
+  /* ── Films variant (3 Nov 2026): the pair holds side by side down to 600 (each card is mostly picture) ── */
   @media (min-width: 600px) and (max-width: 899px) {
-    .delivery-routes__list--renders {
+    .delivery-routes__list--films {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
-  .delivery-routes__view {
-    display: flex;
-    flex-direction: column;
+  /* The loop out to the card's top and sides, 16:10; the poster under it until its first frame is painted */
+  .delivery-routes__film {
+    position: relative;
+    aspect-ratio: 16 / 10;
     margin: calc(-1 * var(--wp--preset--spacing--32)) calc(-1 * var(--wp--preset--spacing--32)) var(--wp--preset--spacing--8);
+    overflow: hidden;
+    background-color: var(--wp--custom--color--bg--tint);
   }
-  .delivery-routes__view img {
+  .delivery-routes__poster,
+  .delivery-routes__video {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
     object-fit: cover;
   }
-  .delivery-routes__surface-image {
-    aspect-ratio: 16 / 10;
+  .delivery-routes__video {
+    opacity: 0;
   }
-  .delivery-routes__subsea-image {
-    aspect-ratio: 16 / 7;
+  .delivery-routes__video.is-playing {
+    opacity: 1;
+  }
+  /* One pause / play for both, over the second card's loop, bottom right */
+  .delivery-routes__toggle {
+    position: absolute;
+    z-index: 1;
+    right: var(--wp--preset--spacing--16);
+    bottom: var(--wp--preset--spacing--16);
   }
 
   /* Draw-in */
@@ -408,5 +427,61 @@ const titleId = makeId('delivery-routes', sectionHeader.title);
         { threshold: [0, 0.25] },
       ).observe(scene);
     } else scene.classList.add('is-drawn', 'is-running');
+  }
+
+  // Films: the two loops play as one (see the header). They are not `loop`: when the first ends, both go back to the
+  // start together, so they never drift apart.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-delivery-films]')) {
+    const videos = [...root.querySelectorAll<HTMLVideoElement>('.delivery-routes__video')];
+    const toggle = root.querySelector<HTMLButtonElement>('[data-media-toggle]');
+    const label = root.querySelector<HTMLElement>('[data-media-toggle-label]');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+    if (!videos.length || !toggle || saveData) continue;
+    let userPaused = reduceMotion;
+    let inView = false;
+    let loaded = false;
+    const setPaused = (paused: boolean) => {
+      toggle.setAttribute('aria-pressed', String(paused));
+      if (label) label.textContent = `${paused ? 'Play' : 'Pause'} ${toggle.dataset.subject}`;
+    };
+    const load = () => {
+      if (loaded) return;
+      loaded = true;
+      for (const v of videos) {
+        v.src = v.dataset.src!;
+        // show the video on its first painted frame, in one step (the poster is that frame)
+        v.addEventListener('playing', () => ('requestVideoFrameCallback' in v ? v.requestVideoFrameCallback(() => v.classList.add('is-playing')) : v.classList.add('is-playing')), { once: true });
+      }
+    };
+    const play = () => Promise.all(videos.map((v) => v.play())).catch(() => undefined);
+    const pause = () => videos.forEach((v) => v.pause());
+    videos[0].addEventListener('ended', () => {
+      for (const v of videos) v.currentTime = 0;
+      if (inView && !userPaused) play();
+    });
+    toggle.removeAttribute('hidden');
+    setPaused(userPaused);
+    toggle.addEventListener('click', () => {
+      userPaused = !userPaused;
+      setPaused(userPaused);
+      if (userPaused) pause();
+      else {
+        load();
+        play();
+      }
+    });
+    // fetch as it nears the viewport, unless it starts paused (reduced motion): then only on Play
+    new IntersectionObserver(([e]) => { if (e.isIntersecting && !userPaused) load(); }, { rootMargin: '400px 0px' }).observe(root);
+    new IntersectionObserver(
+      ([e]) => {
+        inView = e.isIntersecting && e.intersectionRatio >= 0.25;
+        if (inView && !userPaused) {
+          load();
+          play();
+        } else if (!e.isIntersecting) pause();
+      },
+      { threshold: [0, 0.25] },
+    ).observe(root);
   }
 </script>
