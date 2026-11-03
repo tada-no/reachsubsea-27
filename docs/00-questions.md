@@ -12,21 +12,20 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ---
 
+## Answered log
+
 ### Q178. Services overview: "two ways to reach the seabed" doesn't land (3 Nov 2026)
 Context: client on the live pair (Q174 draft 4): "the small visualisation inside the boxes does not come out as a hit, and it should 🙂 Because this is a key differentiator and we are the company that have the most real-world experience with uncrewed operations with WROV." Not photos. The two drawings are near-identical stacks of small discs, so the difference (the people on shore, not on board) is one icon at the card's edge, and the pair reads as two equal options.
 - [ ] ~~**Lead variant**: uncrewed as one wide cross-section, crewed beside it~~ (Ross, 3 Nov 2026: "too unbalanced and messy"; removed)
 - Client, second comment: "I would want a more capturing visualisation of this. I think this is too flat." Read as: the line-pictogram drawing itself is the problem (thin icons in identical discs, a diagram with nothing to look at), not the information. Real photos aren't required, and the two vessels are completely different (Ross)
 - [ ] ~~**Renders variant**: surface and seabed stills stitched at the waterline~~ (Ross, 3 Nov 2026: "still feels a bit messy with the split images"; removed)
-- [ ] Keep the live pair
+- [ ] ~~Keep the live pair~~ (replaced by the Films variant; the Pair stays on the review page)
 - [x] **Next direction (Ross, 3 Nov 2026): an animation of the ROV deployment from both vessels.** The Vigor's launch was built in `reach-world` v141 (the Supporter off the starboard LARS, "Watch the launch" in its drawer) with two 12 s film shots on the same beats, `vigor-deploy` and `rr-deploy`
-- [ ] **Films variant** on review at `/delivery-routes-review/` (3 Nov 2026): the two Navy cards each play their vessel's deployment, in step (the ROVs reach the seabed together), one pause control for both, posters under reduced motion. Docs/05 §2.34
+- [x] **Films variant, live on the Services overview** (Ross, 3 Nov 2026: "Yes, make it live"; first on review at `/delivery-routes-review/`): the two Navy cards each play their vessel's deployment, in step (the ROVs reach the seabed together), one pause control for both, posters under reduced motion. Docs/05 §2.34
 - [x] Uncrewed operational days now **~1,000** to date (Ross, 3 Nov 2026), in `key-figures.ts`, so every page that quotes it updates (Home, Services, Assets, Reach Remote, Sustainability, Why invest, Technology & Innovation, Why work with us; checked 375–1440)
+- [ ] Figma: the Films variant in `Block/Delivery routes` (a Card `Media=Film` variant with the poster stills) and on the Services page frames 355:3374 and 370:13225
 
-**Answer:**
-
----
-
-## Answered log
+**Answer:** the Films variant, live 3 Nov 2026. Figma still to do.
 
 ### Q177. About: values as three cards (2 Nov 2026)
 Context: client: "The values on the company page are taking up too much space and the animations is delaying the scrolling." The Values block was a sticky navy band scrubbed by scroll (Learn. → Teach. → Reach. with large pictograms), over a screen and a half for three paragraphs.

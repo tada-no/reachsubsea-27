@@ -356,8 +356,8 @@ export const lifecycleFoundation: LifecycleFoundation = {
 };
 
 // Two ways to reach the seabed (2 Nov 2026, Q174): the client asked for a visual of crewed and uncrewed (PDF screens
-// p5's "How we deliver"). Two Navy cards, each with the same drawing: the crew, or Reach Relay to the ROC on shore,
-// over the vessel and its ROV.
+// p5's "How we deliver"). Two Navy cards. Live since 3 Nov 2026 (Q178): each card plays its vessel's ROV deployment
+// (`film`, the Films variant); the pictograms are kept for the Pair variant (the earlier drawing, on the review page).
 export const deliveryRoutes: [DeliveryRoute, DeliveryRoute] = [
   {
     title: 'Crewed vessels',
@@ -365,7 +365,7 @@ export const deliveryRoutes: [DeliveryRoute, DeliveryRoute] = [
     sky: 'team',
     vessel: 'marine',
     rov: 'survey-rov',
-    // Films variant (3 Nov 2026, on review): Reach 3D World v141 `vigor-deploy`, 12 s, its first frame as the poster
+    // Reach 3D World v141 `vigor-deploy`, 12 s, its first frame as the poster
     film: { src: `${import.meta.env.BASE_URL}video/routes-crewed.mp4`, poster: `${import.meta.env.BASE_URL}images/routes-crewed-poster.jpg` },
   },
   {
