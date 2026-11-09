@@ -45,7 +45,7 @@ export const worldZones: WorldZone[] = [
     label: 'Subsea Infrastructure',
     blurb: 'A subsea template and its pipelines. A work-class ROV works at the template while a sensor-carrier ROV surveys the pipeline.',
     assets: ['Vessel 1', 'Surveyor ROV', 'Supporter ROV'],
-    image: { src: 'images/world-zone-1.jpg', alt: 'Vessel 1 on station, with platforms and a wind turbine on the horizon' },
+    image: { src: 'images/world-zone-1.jpg', alt: 'Vessel 1 on station, with a platform and floating wind turbines on the horizon' },
   },
   {
     slug: 'oilfield',

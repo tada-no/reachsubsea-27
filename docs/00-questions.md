@@ -14,6 +14,17 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q179. 3D World media brought up to v141 (9 Nov 2026)
+Context: the world moved on from v85–v86 (Viking Vigor rebuilt from the CAD in v124–v140, Pilot and welcome panel redesigned in v87–v122, route trace off in v91, Surveyor nose silver in v113, heavier jacket growth in v105). Ross: "Yes, all stale ones."
+- [x] Home hero film (`promo.mp4`, `promo-1080.mp4`, `promo-poster.jpg`): the six shots re-rendered at v141 and re-cut with `pipeline/film_promo.py` (same cut, 56.7 s, loop 1–54.5 s); opens on the CAD Vigor. Also the "Watch the film" link on Services and Technology & Innovation
+- [x] Explore 3D World zone cards: `world-zone-1.jpg` (Vigor shot at 27.4 s) and `world-zone-2.jpg` (launch shot at 31.1 s), the same moments as before
+- [x] Explore 3D World How it works: `world-step-zones`, `-panel`, `-pilot` captured fresh with `pipeline/pageshot.mjs` at 1440 × 873 (welcome panel with the camera closer so the pins sit mid-frame; Reach Remote 1's drawer; Pilot beside the template), 1200 × 800. The cards pin them to the top edge (focal point 0.5, 0), so the zone switcher and the HUD stay in the 2.1:1 crop at 1100 and up
+- [x] Services 3D World poster (`3d-world-poster.jpg`): a 2560 px Surveyor frame, cropped so the ROV sits above the zone list as before; the ROV is larger than at v85 (the shot's camera is closer now)
+- [x] Still current, unchanged: `world-hero`, `world-zone-3`, `world-zone-4`, `3d-world-careers-poster`, the routes films, the Reach Remote page's live models
+- [ ] Unused, to remove before handover: `video/hero.mp4`, `images/hero-poster.jpg`
+
+**Answer:** done 9 Nov 2026; checked 375 · 800 · 1100 · 1440 and the production build.
+
 ### Q178. Services overview: "two ways to reach the seabed" doesn't land (3 Nov 2026)
 Context: client on the live pair (Q174 draft 4): "the small visualisation inside the boxes does not come out as a hit, and it should 🙂 Because this is a key differentiator and we are the company that have the most real-world experience with uncrewed operations with WROV." Not photos. The two drawings are near-identical stacks of small discs, so the difference (the people on shore, not on board) is one icon at the card's edge, and the pair reads as two equal options.
 - [ ] ~~**Lead variant**: uncrewed as one wide cross-section, crewed beside it~~ (Ross, 3 Nov 2026: "too unbalanced and messy"; removed)
