@@ -6,20 +6,46 @@
 // module, Q60). Mobile (≤899): text, then the frame.
 // TODO for WordPress: route the iframe through the Embed block's consent placeholder (docs/05 §2.13) before
 // launch; the prototype loads it straight away (docs/09 §9).
+// Video (10 Nov 2026, Q181: the results webcast on the Investors overview): `embed.video` makes the frame 16:9 and
+// puts the player behind the Consent placeholder; "Load webcast" promotes `data-src` to `src`. Consent and player
+// share one grid cell and the placeholder turns `visibility: hidden`, so the frame keeps its height (a 16:9 box, or the
+// placeholder's height where that is taller on a phone) and nothing below moves. Editors fill fields, never paste
+// the provider's HTML: the block builds the iframe and the VideoObject / BroadcastEvent JSON-LD from them (WordPress
+// strips <script> for non-admins). `meta` lines (Meta item: icon + text) sit between the heading and the body.
 import BlockSection from '../components/BlockSection.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import Link from '../components/Link.astro';
+import MetaItem from '../components/MetaItem.astro';
+import ConsentPlaceholder from '../components/ConsentPlaceholder.astro';
 import { makeId } from '../lib/ids';
 import type { BlockFields, LinkField } from '../lib/types';
+
+interface VideoField {
+  /** Provider and its domain, for the consent text ("The player is provided by Quickchannel …"). */
+  provider: string;
+  domain: string;
+  /** The player asks for a name and email before it plays (Quickchannel's webcast registration). */
+  registration?: boolean;
+  /** The provider's own page for the video, the consent's "Open …" link. */
+  page: string;
+  /** VideoObject structured data. A live event adds `start`/`end` (ISO with offset) as a BroadcastEvent. */
+  name: string;
+  description?: string;
+  start?: string;
+  end?: string;
+  thumbnails?: string[];
+}
 
 interface EmbedField {
   src: string;
   title: string;
-  /** Full iframe height (px); the frame shows only the top `crop` px. */
-  height: number;
+  /** Full iframe height (px); the frame shows only the top `crop` px. Not used with `video` (16:9). */
+  height?: number;
   crop?: number;
   source?: string;
   link?: LinkField;
+  /** A video player: 16:9, behind the consent placeholder, with structured data. */
+  video?: VideoField;
 }
 
 interface Props extends BlockFields {
@@ -29,15 +55,51 @@ interface Props extends BlockFields {
   headingLevel?: 'h2' | 'h3';
   /** Rich text HTML string, rendered in .prose via set:html. A default slot also renders in .prose. */
   body?: string;
+  /** A live countdown to `start` (days · hours · minutes), then "Live now" until `end`, then `endedText`. */
+  countdown?: { start: string; end?: string; endedText?: string };
+  /** Short lines under the heading (date, time): Meta item, icon + text. */
+  meta?: { icon: string; text: string }[];
   /** 0–2 action Links under the body copy. */
-  actions?: LinkField[];
+  actions?: (LinkField & { download?: string })[];
   embed: EmbedField;
 }
 
-const { position = 'end', eyebrow, title, headingLevel: Heading = 'h2', body, actions = [], embed, background, spacing, anchor } = Astro.props;
+const { position = 'end', eyebrow, title, headingLevel: Heading = 'h2', body, countdown, meta = [], actions = [], embed, background, spacing, anchor } = Astro.props;
+
+// Countdown (Q181): built with the build day's values, corrected by the script on load and every 30 s (the site's
+// "in 7 days" pattern). Days · hours · minutes, no seconds, so nothing ticks every second. Sits under the meta line
+// (date · time), with no "Starts in" label (Ross, 10 Nov 2026); screen readers get "Starts in …" from the timer label.
+const pad = (n: number) => String(n).padStart(2, '0');
+const parts = (ms: number) => {
+  const m = Math.max(0, Math.floor(ms / 60_000));
+  return { days: Math.floor(m / 1440), hours: Math.floor((m % 1440) / 60), minutes: m % 60 };
+};
+const now = Date.now();
+const startMs = countdown ? Date.parse(countdown.start) : 0;
+const endMs = countdown?.end ? Date.parse(countdown.end) : startMs;
+const cdState = !countdown ? '' : now < startMs ? 'before' : now < endMs ? 'live' : 'ended';
+const cd = parts(startMs - now);
+const units = [
+  { key: 'days', value: cd.days, one: 'day', many: 'days' },
+  { key: 'hours', value: cd.hours, one: 'hour', many: 'hours' },
+  { key: 'minutes', value: cd.minutes, one: 'minute', many: 'minutes' },
+];
 
 const titleId = makeId('split-embed', title);
 const shownActions = actions.slice(0, 2);
+const video = embed?.video;
+const jsonLd = video && {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: video.name,
+  description: video.description ?? video.name,
+  ...(video.thumbnails?.length ? { thumbnailUrl: video.thumbnails } : {}),
+  ...(video.start ? { uploadDate: video.start } : {}),
+  embedUrl: embed.src,
+  ...(video.start
+    ? { publication: { '@type': 'BroadcastEvent', isLiveBroadcast: true, startDate: video.start, ...(video.end ? { endDate: video.end } : {}) } }
+    : {}),
+};
 ---
 
 {
@@ -45,11 +107,11 @@ const shownActions = actions.slice(0, 2);
     <BlockSection
       slug="split-embed"
       root="split-embed"
-      class={`split-embed--${position}`}
       background={background}
       spacing={spacing}
       anchor={anchor}
       labelledBy={titleId}
+      class={[`split-embed--${position}`, video ? 'split-embed--video' : ''].filter(Boolean).join(' ')}
     >
       <div class="split-embed__columns">
         <div class="split-embed__text">
@@ -57,6 +119,35 @@ const shownActions = actions.slice(0, 2);
           <Heading id={titleId} class:list={['split-embed__title', Heading === 'h3' ? 'text-h3' : 'text-h2']}>
             {title}
           </Heading>
+          {meta.length > 0 && (
+            <ul class="split-embed__meta">
+              {meta.map((m) => <MetaItem as="li" icon={m.icon} text={m.text} />)}
+            </ul>
+          )}
+          {countdown && (
+            <div
+              class="split-embed__countdown"
+              data-split-embed-countdown
+              data-start={countdown.start}
+              data-end={countdown.end ?? countdown.start}
+              data-state={cdState}
+            >
+              <div class="split-embed__countdown-units" role="timer" aria-label={`Starts in ${cd.days} days, ${cd.hours} hours and ${cd.minutes} minutes`}>
+                <ol class="split-embed__countdown-list" aria-hidden="true">
+                  {units.map((u) => (
+                    <li class="split-embed__countdown-unit">
+                      <span class="split-embed__countdown-value text-display" data-unit={u.key}>{pad(u.value)}</span>
+                      <span class="split-embed__countdown-name text-caption" data-one={u.one} data-many={u.many}>{u.value === 1 ? u.one : u.many}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <p class="split-embed__countdown-status split-embed__countdown-status--live text-h4">
+                <span class="split-embed__live-dot" aria-hidden="true" />Live now
+              </p>
+              <p class="split-embed__countdown-status split-embed__countdown-status--ended text-body">{countdown.endedText ?? 'This webcast has ended.'}</p>
+            </div>
+          )}
           <div class="prose split-embed__body">
             {body && <Fragment set:html={body} />}
             <slot />
@@ -65,7 +156,7 @@ const shownActions = actions.slice(0, 2);
             shownActions.length > 0 && (
               <div class="split-embed__actions">
                 {shownActions.map((action) => (
-                  <Link label={action.label} href={action.url} action={action.action ?? 'page'} context={action.context} />
+                  <Link label={action.label} href={action.url} action={action.action ?? 'page'} context={action.context} download={action.download} />
                 ))}
               </div>
             )
@@ -74,6 +165,30 @@ const shownActions = actions.slice(0, 2);
 
         <div class="split-embed__media">
           <figure class="split-embed__frame">
+            {video ? (
+              <div class="split-embed__player" data-split-embed-player>
+                <ConsentPlaceholder
+                  class="split-embed__consent"
+                  pictogram="shield-tick"
+                  title={`Load the webcast from ${video.domain}?`}
+                  text={`The player is provided by ${video.provider}, which ${video.registration ? 'asks you to register with your name and email, and ' : ''}may set cookies. You can also watch it on ${video.domain}.`}
+                  loadLabel="Load webcast"
+                  openLabel={`Open ${video.domain}`}
+                  openHref={video.page}
+                  loadAttrs={{ 'data-split-embed-load': '' }}
+                />
+                <div class="split-embed__video">
+                  <iframe
+                    data-src={embed.src}
+                    title={embed.title}
+                    allow="autoplay; fullscreen"
+                    allowfullscreen
+                    referrerpolicy="no-referrer-when-downgrade"
+                    tabindex="-1"
+                  />
+                </div>
+              </div>
+            ) : (
             <div class="split-embed__crop" style={`height: ${embed.crop ?? embed.height}px`}>
               <iframe
                 src={embed.src}
@@ -86,6 +201,7 @@ const shownActions = actions.slice(0, 2);
                 referrerpolicy="strict-origin-when-cross-origin"
               />
             </div>
+            )}
             {(embed.source || embed.link) && (
               <figcaption class="split-embed__caption text-caption">
                 {embed.source && <span>{embed.source}</span>}
@@ -95,6 +211,7 @@ const shownActions = actions.slice(0, 2);
           </figure>
         </div>
       </div>
+      {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     </BlockSection>
   )
 }
@@ -166,6 +283,111 @@ const shownActions = actions.slice(0, 2);
     color: var(--wp--preset--color--navy-600);
   }
 
+  /* Video: text 5 columns, player 7 (Ross, 10 Nov 2026: at 4 + 8 the text column felt bitty, the heading wrapping and
+     every line short; a 6-column player had been too small for Quickchannel's registration form at 1100) */
+  .split-embed--video .split-embed__text {
+    grid-column: 1 / span 5;
+  }
+  .split-embed--video .split-embed__media {
+    grid-column: 6 / span 7;
+  }
+  .split-embed--video.split-embed--start .split-embed__text {
+    grid-column: 8 / span 5;
+  }
+  .split-embed--video.split-embed--start .split-embed__media {
+    grid-column: 1 / span 7;
+  }
+
+  /* Countdown: the three states share one cell, so switching never moves anything (visibility, not display) */
+  .split-embed__countdown {
+    display: grid;
+    align-items: center;
+  }
+  .split-embed__countdown > * {
+    grid-area: 1 / 1;
+    visibility: hidden;
+  }
+  .split-embed__countdown[data-state='before'] .split-embed__countdown-units,
+  .split-embed__countdown[data-state='live'] .split-embed__countdown-status--live,
+  .split-embed__countdown[data-state='ended'] .split-embed__countdown-status--ended {
+    visibility: visible;
+  }
+  .split-embed__countdown-list {
+    display: flex;
+    gap: var(--wp--preset--spacing--40);
+  }
+  .split-embed__countdown-unit {
+    display: flex;
+    flex-direction: column;
+  }
+  .split-embed__countdown-value {
+    color: var(--wp--custom--color--text--accent-display);
+    font-variant-numeric: tabular-nums;
+  }
+  .split-embed__countdown-name {
+    color: var(--wp--custom--color--text--secondary);
+  }
+  .split-embed__countdown-status {
+    display: flex;
+    align-items: center;
+    gap: var(--wp--preset--spacing--12);
+  }
+  .split-embed__live-dot {
+    width: var(--wp--preset--spacing--12);
+    height: var(--wp--preset--spacing--12);
+    border-radius: 50%;
+    background-color: var(--wp--custom--color--text--accent-display);
+  }
+
+  .split-embed__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--preset--spacing--8) var(--wp--preset--spacing--24);
+  }
+
+  /* Video: consent and player in one cell; the cell is at least 16:9 and never changes height on load */
+  .split-embed__player {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .split-embed__player > * {
+    grid-area: 1 / 1;
+  }
+  .split-embed__player::before {
+    content: '';
+    grid-area: 1 / 1;
+    aspect-ratio: 16 / 9;
+  }
+  .split-embed__consent {
+    justify-content: center;
+    border-radius: 0;
+  }
+  .split-embed__video {
+    visibility: hidden;
+  }
+  .split-embed__video iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .split-embed__player[data-state='loaded'] .split-embed__consent {
+    visibility: hidden;
+  }
+  .split-embed__player[data-state='loaded'] .split-embed__video {
+    visibility: visible;
+  }
+
+  /* Video stacks below 1100: side by side at 900–1099 the text was ~255px and the player
+     too short for the registration form */
+  @media (max-width: 1099px) {
+    .split-embed--video .split-embed__columns {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--wp--custom--stack--xl);
+    }
+  }
+
   @media (max-width: 899px) {
     .split-embed__columns {
       display: flex;
@@ -175,3 +397,45 @@ const shownActions = actions.slice(0, 2);
     }
   }
 </style>
+
+<script>
+  // Split embed countdown (Q181): days · hours · minutes to the start, then Live now, then ended. Every 30 s.
+  document.querySelectorAll<HTMLElement>('[data-split-embed-countdown]').forEach((el) => {
+    const start = Date.parse(el.dataset.start ?? '');
+    const end = Date.parse(el.dataset.end ?? '');
+    const timer = el.querySelector<HTMLElement>('[role="timer"]');
+    const tick = () => {
+      const now = Date.now();
+      const state = now < start ? 'before' : now < end ? 'live' : 'ended';
+      el.dataset.state = state;
+      if (state !== 'before') return false;
+      const m = Math.floor((start - now) / 60_000);
+      const v = { days: Math.floor(m / 1440), hours: Math.floor((m % 1440) / 60), minutes: m % 60 };
+      (Object.keys(v) as (keyof typeof v)[]).forEach((k) => {
+        const value = el.querySelector<HTMLElement>(`[data-unit="${k}"]`);
+        const name = value?.nextElementSibling as HTMLElement | null;
+        if (value) value.textContent = String(v[k]).padStart(2, '0');
+        if (name) name.textContent = v[k] === 1 ? name.dataset.one ?? '' : name.dataset.many ?? '';
+      });
+      timer?.setAttribute('aria-label', `Starts in ${v.days} days, ${v.hours} hours and ${v.minutes} minutes`);
+      return true;
+    };
+    tick();
+    const id = window.setInterval(() => {
+      if (!tick() && el.dataset.state === 'ended') window.clearInterval(id);
+    }, 30_000);
+  });
+
+  // Split embed Video (Q181): "Load webcast" sets the player's src. Without JS the consent's "Open …" link still works.
+  document.querySelectorAll<HTMLElement>('[data-split-embed-player]').forEach((player) => {
+    const load = player.querySelector<HTMLButtonElement>('[data-split-embed-load]');
+    const iframe = player.querySelector<HTMLIFrameElement>('iframe[data-src]');
+    load?.addEventListener('click', () => {
+      if (!iframe) return;
+      if (!iframe.src) iframe.src = iframe.dataset.src ?? '';
+      iframe.removeAttribute('tabindex');
+      player.dataset.state = 'loaded';
+      iframe.focus();
+    });
+  });
+</script>

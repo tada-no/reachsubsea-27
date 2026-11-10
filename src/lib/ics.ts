@@ -22,3 +22,16 @@ export function icsHref(summary: string, isoDate: string): string {
 export function icsAllHref(events: { summary: string; isoDate: string }[]): string {
   return calendar(events.flatMap((e) => vevent(e.summary, e.isoDate)));
 }
+
+/** One timed event (the results webcast, Q181). Start and end as ISO with an offset; written in UTC. */
+export function icsTimedHref(summary: string, startIso: string, endIso: string, url?: string): string {
+  const utc = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const start = utc(startIso);
+  return calendar([
+    'BEGIN:VEVENT',
+    `UID:${start}-webcast@reachsubsea.com`, `DTSTAMP:${start}`,
+    `DTSTART:${start}`, `DTEND:${utc(endIso)}`, `SUMMARY:${summary}`,
+    ...(url ? [`URL:${url}`] : []),
+    'END:VEVENT',
+  ]);
+}

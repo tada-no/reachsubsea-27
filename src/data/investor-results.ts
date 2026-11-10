@@ -3,7 +3,7 @@
 // the investor FAQ answers quote the same figures. Values: Q2 2026 as reported, published 18 Aug 2026
 // (client PDF p40, "Why invest in Reach Subsea"). Next report date from the Financial calendar.
 import type { ReportCardField, StatField } from '../lib/types';
-import { icsHref } from '../lib/ics';
+import { icsHref, icsTimedHref } from '../lib/ics';
 
 const UP = 'https://reachsubsea.no/wp-content/uploads';
 
@@ -29,7 +29,21 @@ export interface ResultsRecord {
   /** Latest annual report: the live site's file (13 Oct 2026). The publication date is still for Reach to confirm
    * (client checklist: 26 Mar or 30 Apr). */
   annualReport: { label: string; meta: string; url: string; context?: string; published: string };
-  next: { label: string; date: string };
+  next: { label: string; date: string; webcast?: Webcast };
+}
+
+/** The next results webcast (10 Nov 2026, Q181): qcnl.tv, from the provider's embed code. The page link is the
+ * Next card's Webcast action; the embed, times and thumbnails feed the Webcast banner (Split embed, Video) and
+ * its VideoObject structured data. Times as on qcnl.tv ("2026-11-17 09:30:00 CET"), with the offset written out. */
+export interface Webcast {
+  title: string;
+  /** qcnl.tv/p/… : the webcast's own page, opened in a new tab. */
+  page: string;
+  /** qcnl.tv/e/… : the player, for the iframe. */
+  embed: string;
+  start: string;
+  end: string;
+  thumbnails: string[];
 }
 
 // 2Q 2026 report p29: "Oil & Gas revenues constituted 49 % (61 %), while Renewable/Other revenues constituted 51 % (39 %)"
@@ -65,7 +79,20 @@ export const latestResults: ResultsRecord = {
   presentation: `${UP}/2026/08/Reach-Subsea-ASA-2Q-2026-Presentation.pdf`,
   webcast: 'https://qcnl.tv/p/yvYoUYM3ZyQXYC70JxeBfQ',
   annualReport: { label: 'Annual report 2025', meta: 'Annual and sustainability report', url: `${UP}/2026/04/Annual-and-Sustainability-Report-2025.pdf`, context: 'PDF', published: '2026-03-26' },
-  next: { label: 'Q3 2026 results', date: '2026-11-17' },
+  next: {
+    label: 'Q3 2026 results',
+    date: '2026-11-17',
+    webcast: {
+      title: 'Reach Subsea Webcast Q3 2026',
+      page: 'https://qcnl.tv/p/tOy4P8E7syiCSgPXEucWDA',
+      embed: 'https://qcnl.tv/e/tOy4P8E7syiCSgPXEucWDA',
+      start: '2026-11-17T09:30:00+01:00',
+      end: '2026-11-17T11:30:00+01:00',
+      thumbnails: ['thumb', '144p', '360p', '720p', 'image'].map(
+        (size) => `https://cfcdn.screen9.com/img/m/B/mBOuh4DV7D4HPRDQVtZ44A_image/${size}.jpg?v=2`,
+      ),
+    },
+  },
 };
 
 // Short dates keep every card's meta to one line ("Published 18 Aug 2026", "17 Nov 2026 · in 59 days")
@@ -106,7 +133,19 @@ export const reportCards: ReportCardField[] = [
         context: r.next.label,
         download: `reach-subsea-${r.next.date}.ics`,
       },
+      ...(r.next.webcast
+        ? [{ label: 'Webcast', url: r.next.webcast.page, action: 'external' as const, context: `${r.next.label} webcast` }]
+        : []),
     ],
     tone: 'navy',
   },
 ];
+
+/** The webcast banner's text and calendar entry (Investors overview, Q181), from the same record. */
+const cetTime = (iso: string) => iso.slice(11, 16);
+export const nextWebcast = r.next.webcast && {
+  ...r.next.webcast,
+  when: `${new Date(`${r.next.date}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}`,
+  time: `${cetTime(r.next.webcast.start)}–${cetTime(r.next.webcast.end)} CET`,
+  ics: icsTimedHref(`Reach Subsea ${r.next.label} webcast`, r.next.webcast.start, r.next.webcast.end, r.next.webcast.page),
+};

@@ -26,7 +26,7 @@ import Accordion from '../../blocks/Accordion.astro';
 import CtaBand from '../../blocks/CtaBand.astro';
 import { navSections } from '../../data/navigation';
 import { cardPresets } from '../../data/card-presets';
-import { latestResults as r, reportCards } from '../../data/investor-results';
+import { latestResults as r, reportCards, nextWebcast } from '../../data/investor-results';
 import { investorCalendar } from '../../data/investor-calendar';
 import type { CardField } from '../../lib/types';
 import { faqsFor, faqHubHref } from '../../data/faqs';
@@ -153,6 +153,42 @@ const faqItems = faqsFor('investors');
       milestones={investorCalendar}
       panels={reportCards}
     />
+
+    {/* Webcast banner (10 Nov 2026, Q181): the next results webcast, live from qcnl.tv behind consent. An editor adds
+        it when the webcast is announced and removes it afterwards (Ross: manual, no auto-hide). */}
+    {nextWebcast && (
+      <SplitEmbed
+        background="navy"
+        eyebrow="Live webcast"
+        title={`${r.next.label.replace(' results', '')} presentation`}
+        countdown={{
+          start: nextWebcast.start,
+          end: nextWebcast.end,
+          endedText: 'This webcast has ended. The recording will be on Reports & presentations.',
+        }}
+        meta={[
+          { icon: 'calendar', text: nextWebcast.when },
+          { icon: 'clock', text: nextWebcast.time },
+        ]}
+        actions={[
+          { label: 'Add to calendar', url: nextWebcast.ics, action: 'file', context: `${r.next.label} webcast`, download: `reach-subsea-webcast-${r.next.date}.ics` },
+        ]}
+        embed={{
+          src: nextWebcast.embed,
+          title: nextWebcast.title,
+          video: {
+            provider: 'Quickchannel',
+            domain: 'qcnl.tv',
+            registration: true,
+            page: nextWebcast.page,
+            name: nextWebcast.title,
+            start: nextWebcast.start,
+            end: nextWebcast.end,
+            thumbnails: nextWebcast.thumbnails,
+          },
+        }}
+      />
+    )}
 
     <CardBento
       pattern="lead-quad"

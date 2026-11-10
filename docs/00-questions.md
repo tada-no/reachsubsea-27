@@ -14,6 +14,20 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q181. Webcast banner on the Investors overview (10 Nov 2026)
+
+Ross wanted a banner "to advertise the next webcast" between the report cards and Q2 at a glance, from qcnl.tv's embed code, editable in WordPress, and a Webcast button on the Q3 2026 results card opening https://qcnl.tv/p/tOy4P8E7syiCSgPXEucWDA.
+
+- [x] Layout: **Split: text + player** (recommended). Eyebrow "Live webcast", "Q3 2026 presentation", date and time (Meta items), one line, Add to calendar (a timed .ics, 09:30–11:30 CET); the player behind the consent placeholder. Not a full-width player.
+- [ ] Auto: show until 3 days after (recommended)
+- [x] **Manual only** (Ross): an editor adds the block when the webcast is announced and removes it after.
+
+Built as Split embed's Video type (docs/05 §2.4c): fields, not pasted HTML, so the block writes the iframe and the VideoObject / BroadcastEvent structured data. The webcast record (page, embed, start, end, thumbnails) sits on `next` in `src/data/investor-results.ts`, so the Next card's Webcast link and the banner read one source, on Why invest too.
+
+Found while building: the snippet's start time had no time zone (`2026-11-17T08:30:00`, upload date 08:30 UTC); qcnl.tv says 09:30 CET, so the site writes `09:30+01:00`. The player is Quickchannel's registration form (name, email, terms) with a countdown; the consent text says so. The thumbnail is a white slate with the logo, so it isn't shown.
+
+**Answer:** Ross, 10 Nov 2026: Split layout, shown and removed by hand. Then tried on a Navy band (Ross: "could we try it in a dark banner?"): it separates the temporary notice from the page and drops the doubled white gap; comparison `review/webcast-banner-white-vs-navy.jpg`. Navy kept (Ross pushed it, 10 Nov 2026). Countdown added (Ross: "is it possible to add a countdown timer in our banner?"): days · hours · minutes to 09:30 CET, then Live now, then an ended line. Then text 5 / player 7 columns (Ross: "a bit bitty, maybe make the iframe a bit narrower") and the body line dropped (Ross: "Yes, drop it"). "Starts in" removed and the date and time line moved above the countdown (Ross). Countdown figures at Display, the size of the page's stat figures, 40 apart (Ross: "maybe the countdown should be bigger"). Figma: block variant still to add.
+
 ### Q180. 3D World FAQs promised clicks the world doesn't have (10 Nov 2026)
 
 Ross spotted that "What can I click on inside the 3D world?" listed platforms and subsea structures. The v141 world has 12 pins: 6 vessels (Vessel 1 and 2, Reach Remote 1 to 3, DriX) and 6 ROVs; platforms, turbines and structures have none. It also downloads ~21 MB, not 18.
