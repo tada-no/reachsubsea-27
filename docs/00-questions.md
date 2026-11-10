@@ -74,8 +74,9 @@ Context: client on the live pair (Q174 draft 4): "the small visualisation inside
 - [x] **Films variant, live on the Services overview** (Ross, 3 Nov 2026: "Yes, make it live"; first on review at `/delivery-routes-review/`): the two Navy cards each play their vessel's deployment, in step (the ROVs reach the seabed together), one pause control for both, posters under reduced motion. Docs/05 §2.34
 - [x] Uncrewed operational days now **~1,000** to date (Ross, 3 Nov 2026), in `key-figures.ts`, so every page that quotes it updates (Home, Services, Assets, Reach Remote, Sustainability, Why invest, Technology & Innovation, Why work with us; checked 375–1440)
 - [ ] Figma: the Films variant in `Block/Delivery routes` (a Card `Media=Film` variant with the poster stills) and on the Services page frames 355:3374 and 370:13225
+- [x] **Films re-rendered for reach-world v146** (Ross, 10 Nov 2026: "Swap and push"), after the client's comments on the 3D World: each vessel now stands to the side of its work, the TMS stops a third of the way down, and the ROV unlatches there and flies down to the work on a straight tether. Same files, size and 12 s beats (the TMS stops at 7 s, the ROV reaches the work by 11 s); posters are the new first frames at 1280x800
 
-**Answer:** the Films variant, live 3 Nov 2026. Figma still to do.
+**Answer:** the Films variant, live 3 Nov 2026, re-rendered 10 Nov 2026 (reach-world v146). Figma still to do.
 
 ### Q177. About: values as three cards (2 Nov 2026)
 Context: client: "The values on the company page are taking up too much space and the animations is delaying the scrolling." The Values block was a sticky navy band scrubbed by scroll (Learn. → Teach. → Reach. with large pictograms), over a screen and a half for three paragraphs.
