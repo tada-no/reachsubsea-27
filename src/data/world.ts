@@ -1,7 +1,7 @@
 // 3D World: the scene is a separate static app on its own host, with its content served from WordPress over an
-// API (Q94, docs/09 §7.1). The scene URL is the published reach-world build (Ross, 21 Sep 2026), in development
+// API (Q94, docs/09 §7.1). The scene URL is the published reach-world build (Ross, 21 Sep 2026; on Vercel since 10 Nov 2026), in development
 // too, so nothing depends on a local server.
-export const worldSceneUrl = 'https://tada-no.github.io/reach-world/';
+export const worldSceneUrl = 'https://reach-world-tada.vercel.app/';
 // The scene opens in the site, under the header (Q96, 6 Oct 2026, like the dev site's Unity world today): every
 // link into the world goes to /3d-world/explore/ (src/pages/3d-world/explore.astro), which frames the scene full
 // height and passes `?zone=N` and `?careers=1` through. Only the in-place poster embeds load `worldSceneUrl` directly.
