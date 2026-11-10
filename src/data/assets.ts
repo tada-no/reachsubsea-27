@@ -8,7 +8,7 @@
 //
 // WP proposal (Asset post type, dev `assets`, hierarchical off): `type` taxonomy (vessel · usv · rov ·
 // equipment), `status` select (in-service · newbuild · sale-agreed · sold), `kind` (the dev subtitle),
-// `summary` (excerpt), `units` (number, for Reach Remote and DriX pairs), `owner`, `charter` (period text,
+// `summary` (excerpt), `units` (number, for the Reach Remote 3 & 4 and DriX pairs; Reach Remote 1 and 2 are a post each, Q182), `owner`, `charter` (period text,
 // shown on the Investors charter page, not on asset cards), `joining` (quarter or year, newbuilds), spec
 // group (crane, pax, deck, length, draft, beam, speed, endurance, power, depth, payload, weight, dimensions),
 // `rovs` (relationship to ROV assets, with a count, replacing the dev "ROVs onboard" card), `specSheet`
@@ -46,7 +46,7 @@ export interface Asset {
   name: string;
   type: AssetType;
   status: AssetStatus;
-  /** Number of physical units this entry stands for (Reach Remote 1 & 2 = 2). Default 1. */
+  /** Number of physical units this entry stands for (Reach Remote 3 & 4, DriX Orca 1 & 2 = 2). Default 1. */
   units?: number;
   /** One name per unit when `units` > 1 (the Fleet at a glance markers). */
   unitNames?: string[];
@@ -61,6 +61,10 @@ export interface Asset {
   charter?: string;
   /** Newbuilds: when the unit joins the fleet, verbatim from the source. */
   joining?: string;
+  /** Owned uncrewed vessels (Reach Remote): where it works, the control room that runs it, and its delivery month. */
+  operatesIn?: string;
+  runFrom?: string;
+  delivered?: string;
   specs: AssetSpecs;
   /** ROVs carried, from the Q2 2026 report's "Assets" row (the dev spec table matches). */
   rovs?: string[];
@@ -266,22 +270,47 @@ export const assets: Asset[] = [
     source: 'Q2 2026 report p16 and DEV spec table (crane 150 ton, 2027 →, owner split); NEWS 20 Feb 2025 (99,9 x 21m, DNV, 150t AHC knuckle boom crane, ~900m2 deck, 100 persons, DP2, 2 x WROV hangars, spring 2027 delivery).',
   },
   // ── Uncrewed surface vessels ───────────────────────────────────────────────
+  // Reach Remote 1 and 2 are two assets (Ross, 10 Nov 2026, Q182): projects name one or the other (the Perth-side work
+  // is Reach Remote 2) and the Q2 report and charter chart list them as separate lines. The two vessels are identical,
+  // so the specs are the same; what differs is where each works, which control room runs it and when it was delivered.
+  // Their record is a card on the Reach Remote page (`url` is its anchor), not a page of their own.
   {
-    slug: 'reach-remote-1-2',
-    name: 'Reach Remote 1 & 2',
+    slug: 'reach-remote-1',
+    name: 'Reach Remote 1',
     type: 'usv',
     status: 'in-service',
-    units: 2,
-    unitNames: ['Reach Remote 1', 'Reach Remote 2'],
-    kind: 'Uncrewed surface vessels',
-    summary: 'Uncrewed 24 m surface vessels with hull-mounted survey sensors and a work-class electric ROV, operated from shore.',
+    kind: 'Uncrewed surface vessel',
+    summary: 'The first Reach Remote, working in Norwegian and UK waters, run from our control room in Haugesund.',
     owner: 'Reach Subsea ASA',
+    operatesIn: 'Norway and the UK',
+    runFrom: 'Haugesund ROC',
+    delivered: 'January 2025',
     specs: { length: '23.90 m', speed: '11.0 knots', tonnage: '230 t', endurance: '30 days' },
     rovs: ['ZEEROV'],
     image: { src: `${base}images/reach-remote-bow.jpg`, alt: 'Reach Remote 1 uncrewed surface vessel seen from the bow', focalPoint: { x: 0.6, y: 0.45 } },
     specSheet: { label: 'Brochure (PDF)', url: `${files}/2024/11/REA25-2595-170-Reach-Remote-Brochure-A5.pdf`, action: 'file', context: 'Reach Remote' },
-    url: '/assets/reach-remote/',
-    source: 'DEV spec table (Length 23.90 m, Max speed 11.0 knots, Gross tonnage 230 t, Min. Endurance 30 days) and intro; NEWS 16 Jan and 12 Jun 2025 (deliveries), 24 Sep 2026 ("already in service").',
+    url: '/assets/reach-remote/#reach-remote-1',
+    source: 'DEV spec table (Length 23.90 m, Max speed 11.0 knots, Gross tonnage 230 t, Min. Endurance 30 days) and intro; NEWS 16 Jan 2025 (delivery), 13 Oct 2025 (trading permit, Norwegian Maritime Authority), 19 Jun 2026 (first UK port call, Aberdeen); 2Q 2026 report p23 (pipeline inspection in Norwegian and UK waters); FAQ reach-remote (ROCs in Haugesund and Perth).',
+  },
+  {
+    slug: 'reach-remote-2',
+    name: 'Reach Remote 2',
+    type: 'usv',
+    status: 'in-service',
+    kind: 'Uncrewed surface vessel',
+    summary: 'Working for Woodside and other clients off Western Australia, run from our control room in Perth.',
+    owner: 'Reach Subsea ASA',
+    operatesIn: 'Western Australia',
+    runFrom: 'Perth ROC',
+    delivered: 'June 2025',
+    specs: { length: '23.90 m', speed: '11.0 knots', tonnage: '230 t', endurance: '30 days' },
+    rovs: ['ZEEROV'],
+    // Focal point on the bow and the name, so the tall bento cell's narrow crop still shows the vessel
+    image: { src: `${base}images/project-scarborough-rr2.jpg`, alt: 'Reach Remote 2 under way off Fremantle, with the coast and a sailing boat behind', focalPoint: { x: 0.4, y: 0.6 } },
+    specSheet: { label: 'Brochure (PDF)', url: `${files}/2024/11/REA25-2595-170-Reach-Remote-Brochure-A5.pdf`, action: 'file', context: 'Reach Remote' },
+    url: '/assets/reach-remote/#reach-remote-2',
+    source: 'As Reach Remote 1 for specs; NEWS 12 Jun 2025 (delivery), 26 Aug 2025 (sails for Australia, Woodside, Scarborough); Q2 2026 report p15 (IMR scopes for Woodside and other Australian clients). Photo: 4Q 2025 report p21 (1102 px).',
+    note: 'The only Reach Remote 2 photo is 1102 × 521 px. A larger one would sharpen the tall bento cell.',
   },
   {
     slug: 'reach-remote-3-4',

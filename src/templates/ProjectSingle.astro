@@ -29,6 +29,7 @@ import FeedGrid from '../blocks/FeedGrid.astro';
 import CtaBand from '../blocks/CtaBand.astro';
 import { projectCard, relatedProjects, spotlights, type ProjectRef } from '../data/projects';
 import { serviceLines } from '../data/services';
+import { assets } from '../data/assets';
 
 interface Props {
   project: ProjectRef;
@@ -44,7 +45,8 @@ const tall = (image.height ?? 0) / (image.width ?? 1) > 2 / 3;
 const objectPosition = image.focalPoint ? `object-position: ${image.focalPoint.x * 100}% ${image.focalPoint.y * 100}%` : undefined;
 
 // A vessel links to its asset: the Reach Remote page for the uncrewed fleet, the fleet section of Assets otherwise
-const vesselHref = (name: string) => (name.startsWith('Reach Remote') ? '/assets/reach-remote/' : '/assets/#vessels');
+// Reach Remote 1 and 2 link to their own card on the Reach Remote page (Q182); crewed vessels to the chartered fleet
+const vesselHref = (name: string) => assets.find((a) => a.name === name && a.type === 'usv')?.url ?? '/assets/#vessels';
 const facts = [
   { label: 'Client', value: project.client },
   { label: 'Location', value: project.field },

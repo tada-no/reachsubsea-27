@@ -14,6 +14,20 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q182. Reach Remote 1 and 2 as separate assets (10 Nov 2026)
+
+Ross: projects need to reference Reach Remote 1 or 2 (the Perth-side work is Reach Remote 2), and the charter chart already lists them as separate lines. So two boxes in the uncrewed bento, and two asset cards on the Reach Remote page, below Built with partners.
+
+- [x] Bento: **RR1 lead, RR2 tall** (recommended): the existing Home pattern `lead-tall-trio-a`, 7 cells: Reach Remote 1 · uncrewed days · Reach Remote 2 (tall) · days at sea · then Reach Remote 3 & 4 · DriX · Reach Horizon. No new pattern.
+- [ ] RR1 and RR2 equal halves (a new pattern)
+- [ ] Drop a stat for RR2
+- [x] Reach Remote 3 and 4: **stay paired while in build** (recommended); split them on delivery.
+- [ ] Split them too
+- [x] Vessel card: **photo, base and work** (recommended): In service · name · Operates in · Run from · ROV · Delivered · its projects, newest first, as links.
+- [ ] Photo, name and one line
+
+**Answer:** Ross, 10 Nov 2026: the three recommended options. Built: `reach-remote-1-2` in `src/data/assets.ts` is now `reach-remote-1` and `reach-remote-2` (new fields `operatesIn`, `runFrom`, `delivered`), each `url` the anchor of its card on `/assets/reach-remote/` (Card gained an optional `anchor`). Project vessel rows, search results and the charter chart's Reach Remote 1 and 2 rows now land on that vessel's card. Reach Remote page: Card grid 2 columns, image-top, Tint cards, "Two vessels in service" (white), between Built with partners and the projects. Reach Remote 1's card uses a new crop from the June 2026 Aberdeen shoot (`reach-remote-1-aberdeen.jpg`; the bow photo belongs to the Ormen Lange project in the grid below). Redirects: dev `/assets/reach-remote-1/` and `/assets/reach-remote-2/` go to the card anchors. Open: the only Reach Remote 2 photo is 1102 × 521 (soft in the tall bento cell, hull under the copy); a larger one is wanted. Ross then dropped the cards' project links, which repeated the projects grid just below (10 Nov 2026). Figma: still to do (bento page frame, Reach Remote page frame).
+
 ### Q181. Webcast banner on the Investors overview (10 Nov 2026)
 
 Ross wanted a banner "to advertise the next webcast" between the report cards and Q2 at a glance, from qcnl.tv's embed code, editable in WordPress, and a Webcast button on the Q3 2026 results card opening https://qcnl.tv/p/tOy4P8E7syiCSgPXEucWDA.

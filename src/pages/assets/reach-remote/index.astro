@@ -15,8 +15,9 @@
 // report p17–25, the client PDF's Reach Remote screens (oversight levels and the three-part model in its wording).
 // Left out of the PDF's plan: the stats strip over the hero (nothing overlaps the hero), the "Technology onboard" cards
 // (the tour is that section), the "Explore 3D World" card (the stage is the 3D World's model), the chip row.
-// Redirects to this page: live /assets/reach-remote/ and /assets/reach-remote-1-2/, dev /assets/reach-remote-1|2/,
-// /company/assets/remote-vessels/ and /services/reach-remote/* (docs/05 §3 Assets overview).
+// Redirects to this page: live /assets/reach-remote/ and /assets/reach-remote-1-2/, /company/assets/remote-vessels/ and
+// /services/reach-remote/* (docs/05 §3 Assets overview); dev /assets/reach-remote-1/ and /assets/reach-remote-2/ to
+// that vessel's card (#reach-remote-1, #reach-remote-2; Q182).
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/header/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -46,7 +47,8 @@ const subnavItems = [
   ...section.links.map((l) => ({ label: l.label, href: l.href })),
 ];
 const [relay] = pickFigures(['relay-speed']);
-const rr12 = assets.find((a) => a.slug === 'reach-remote-1-2')!;
+const vessels = assets.filter((a) => a.slug === 'reach-remote-1' || a.slug === 'reach-remote-2');
+const rr1 = vessels[0];
 
 // More than a vessel (client PDF p11 / screens p24, its wording, cut to one line a part), drawn as the Q2 2026
 // report p19 draws Reach Relay, on a horizon (Ross, 11 Oct 2026, after the critique): the vessel and the ROC stand on
@@ -114,6 +116,28 @@ const partners: CardField[] = [
   },
 ];
 
+// The two vessels (Ross, 10 Nov 2026, Q182): Reach Remote 1 and 2 are an Asset post each, because projects name one or
+// the other. Identical vessels (the specs are the table above), so each card says only what differs: where it works,
+// the control room that runs it, its ROV and its delivery. No project links on the cards (Ross, 10 Nov 2026): the
+// projects grid just below already shows them. Each card carries the asset's slug as its id, so a project's vessel
+// row and the Fleet overview bento land on it.
+// RR1's photo is the Aberdeen arrival (June 2026 shoot): its bow photo is the Ormen Lange project's, in the grid below.
+const vesselPhoto: Record<string, CardField['image']> = {
+  'reach-remote-1': { src: `${base}images/reach-remote-1-aberdeen.jpg`, alt: 'Reach Remote 1 entering Aberdeen harbour past the breakwater', focalPoint: { x: 0.45, y: 0.5 } },
+};
+const vesselCards: CardField[] = vessels.map((a) => ({
+  anchor: a.slug,
+  image: vesselPhoto[a.slug] ?? a.image,
+  badge: { label: 'In service', tone: 'success' as const },
+  title: a.name,
+  specs: [
+    { label: 'Operates in', value: a.operatesIn ?? '' },
+    { label: 'Run from', value: a.runFrom ?? '' },
+    { label: 'ROV', value: a.rovs?.join(', ') ?? '' },
+    { label: 'Delivered', value: a.delivered ?? '' },
+  ],
+}));
+
 // Where it has worked: Feed grid Projects, vessels = Reach Remote 1 or 2, newest first (5 projects; the newest 3)
 const projectItems = projects
   .filter((p) => p.vessels?.some((v) => v.startsWith('Reach Remote')))
@@ -161,7 +185,7 @@ const faqItems = faqsFor('reach-remote');
       title="The vessel in numbers"
       body={`<p>A 24-metre hull built around a work-class ROV and its survey sensors, with nobody on board.</p>`}
       specs={reachRemoteKeySpecs}
-      actions={rr12.specSheet ? [rr12.specSheet] : []}
+      actions={rr1.specSheet ? [rr1.specSheet] : []}
     />
 
     <StatsBand
@@ -224,6 +248,19 @@ const faqItems = faqsFor('reach-remote');
         intro: 'Industry leaders in remote and autonomous systems. We plan and run the subsea work.',
       }}
       cards={partners}
+    />
+
+    <CardGrid
+      anchor="vessels"
+      background="white"
+      sectionHeader={{
+        title: 'Two vessels in service',
+        intro: 'Identical vessels, each based in its own region and run from the nearest control room.',
+      }}
+      layout="2-columns"
+      media="image-top"
+      surface="tint"
+      cards={vesselCards}
     />
 
     <FeedGrid

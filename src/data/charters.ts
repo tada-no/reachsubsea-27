@@ -15,9 +15,9 @@
 // The period the statuses describe ("Q2 2026") and the source are set once, on the Investors options page
 // (`charterSource` below), so a quarterly update is: each vessel's status, then the period label.
 // Name, owner and status (in service · newbuild · sale agreed) come from the Asset post itself (assets.ts).
-// One row per vessel (Ross, 7 Oct 2026): Reach Remote 1, 2, 3 and 4 are four rows, as in the Q2 report. The prototype's
-// assets.ts keeps them as two pair entries (the Assets page cards), so a row here names its `unit`; in WordPress the
-// cleaner model is one Asset post per vessel, which the 3D World markers and this chart both want.
+// One row per vessel (Ross, 7 Oct 2026): Reach Remote 1, 2, 3 and 4 are four rows, as in the Q2 report. Reach Remote 1
+// and 2 are an Asset post each (Q182, 10 Nov 2026); Reach Remote 3 and 4 stay one pair entry while in build, so their
+// rows name their `unit`. In WordPress the cleaner model is one Asset post per vessel once they are delivered.
 import { assets, type Asset } from './assets';
 
 export type CharterType = 'long-term' | 'project' | 'owned';
@@ -25,7 +25,7 @@ export type CharterType = 'long-term' | 'project' | 'owned';
 export interface CharterFields {
   /** Asset post slug (assets.ts). */
   slug: string;
-  /** For an asset that stands for a pair (Reach Remote 1 & 2): which vessel this row is, 1-based, named from the
+  /** For an asset that stands for a pair (Reach Remote 3 & 4): which vessel this row is, 1-based, named from the
    * asset's `unitNames`. Each vessel is its own row (Ross, 7 Oct 2026), as the Q2 report lists them. */
   unit?: number;
   charterType: CharterType;
@@ -152,16 +152,16 @@ export const charterFields: CharterFields[] = [
     source: 'Q2 2026 report p16 ("2027 -->"). The firm period and options are not published.',
   },
   {
-    slug: 'reach-remote-1-2',
-    unit: 1,
+    slug: 'reach-remote-1',
     charterType: 'owned',
+    link: { label: 'Reach Remote 1', url: '/assets/reach-remote/#reach-remote-1' },
     quarterStatus: ['A pipeline inspection and survey campaign for Equinor, and IMR scopes for other clients.'],
     source: 'Q2 2026 report p15 ("Charter period: Owned vessel").',
   },
   {
-    slug: 'reach-remote-1-2',
-    unit: 2,
+    slug: 'reach-remote-2',
     charterType: 'owned',
+    link: { label: 'Reach Remote 2', url: '/assets/reach-remote/#reach-remote-2' },
     quarterStatus: ['IMR scopes for Woodside and other Australian clients at several fields; idle for the last month.'],
     source: 'Q2 2026 report p15 ("Charter period: Owned vessel").',
   },

@@ -37,7 +37,7 @@ export const bentoPatterns: Record<BentoPatternId, BentoPattern> = {
   // Lead (6×2), small, tall (3×2), small, then a row of 4 · 5 · 3.
   'lead-tall-trio-a': {
     label: 'Lead, tall tile and a row of three (4 · 5 · 3)',
-    usedOn: 'Home',
+    usedOn: 'Home, Assets overview',
     cells: [c(6, 2), c(3), c(3, 2), c(3), c(4), c(5), c(3)],
   },
   // The same top as above, then a row of 5 · 3 · 4.

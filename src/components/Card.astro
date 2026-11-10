@@ -36,6 +36,7 @@ const {
   specs = [],
   specColumns = 1,
   action,
+  anchor,
   headingLevel: Heading = 'h3',
   class: className,
 } = Astro.props;
@@ -51,6 +52,7 @@ const objectPosition = fp ? `object-position: ${fp.x * 100}% ${fp.y * 100}%` : u
 ---
 
 <article
+  id={anchor}
   class:list={[
     'card',
     `card--${navy ? 'navy' : surface}`,

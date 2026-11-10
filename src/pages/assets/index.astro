@@ -13,8 +13,8 @@
 // and the Q2 report. Vessels, ROVs and Equipment in the nav are anchors into this page; Reach Remote is the
 // one child page. Redirects to this page: dev /company/assets/ (the hub) and every live and dev /assets/<slug>/
 // vessel and ROV single (→ #vessels or #rovs); dev /company/assets/vessels|rovs/ → #vessels / #rovs; live
-// /assets/reach-remote-1-2/, /assets/reach-remote/, dev /assets/reach-remote-1|2/, /company/assets/remote-vessels/
-// and /services/reach-remote/* → /assets/reach-remote/; live /assets/reach-remote-3-4/ and dev
+// /assets/reach-remote-1-2/, /assets/reach-remote/, /company/assets/remote-vessels/ and /services/reach-remote/* →
+// /assets/reach-remote/; dev /assets/reach-remote-1|2/ → that vessel's card, /assets/reach-remote/#reach-remote-1|2 (Q182); live /assets/reach-remote-3-4/ and dev
 // /assets/reach-remote-3|4/ → /assets/reach-remote/3-4/.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/header/Header.astro';
@@ -51,10 +51,11 @@ const usvs = assetsOf('usv');
 const rovs = assetsOf('rov');
 const reachRemote = usvs.filter((a) => a.slug.startsWith('reach-remote'));
 const drix = usvs.filter((a) => a.slug.startsWith('drix'));
-const rr12 = assets.find((a) => a.slug === 'reach-remote-1-2')!;
+const rr1 = assets.find((a) => a.slug === 'reach-remote-1')!;
+const rr2 = assets.find((a) => a.slug === 'reach-remote-2')!;
 const rr34 = assets.find((a) => a.slug === 'reach-remote-3-4')!;
 
-// The Key figures "fleet" (11) is the chartered vessels plus Reach Remote 1 & 2; "newbuilds" (4) is the two
+// The Key figures "fleet" (11) is the chartered vessels plus Reach Remote 1 and 2; "newbuilds" (4) is the two
 // chartered newbuilds plus Reach Remote 3 & 4 (PDF p19 status note). Check the data file still adds up.
 const derivedFleet = fleetCounts.vessels.inService + unitsOf(reachRemote.filter((a) => a.status !== 'newbuild'));
 const derivedNewbuilds = fleetCounts.vessels.joining + unitsOf(reachRemote.filter((a) => a.status === 'newbuild'));
@@ -112,8 +113,10 @@ const vesselItems = vessels.map((a) =>
   }),
 );
 
-// The uncrewed fleet (lead-tall-wide, 6 cells): Reach Remote 1 & 2 lead · uncrewed days · Reach Remote 3 & 4
-// (tall) · endurance · DriX · Reach Horizon (how the USVs are run from shore, dev Reach Remote page).
+// The uncrewed fleet (lead-tall-trio-a, 7 cells; Ross, 10 Nov 2026, Q182: Reach Remote 1 and 2 as two assets): Reach
+// Remote 1 lead · uncrewed days · Reach Remote 2 (tall) · endurance · then a row of Reach Remote 3 & 4 · DriX · Reach
+// Horizon (how the USVs are run from shore, dev Reach Remote page). Each Reach Remote card opens its own card on the
+// Reach Remote page.
 const usvCard = (a: Asset, overrides: Partial<CardField> = {}): CardField => ({
   media: 'image-bg',
   image: a.image,
@@ -124,12 +127,14 @@ const usvCard = (a: Asset, overrides: Partial<CardField> = {}): CardField => ({
   action: { label: `View ${a.name.split(' ')[0] === 'DriX' ? 'DriX' : 'Reach Remote'}`, url: a.url, action: 'page', context: a.name },
   ...overrides,
 });
+const meet = (a: Asset) => ({ label: `Meet ${a.name}`, url: a.url, action: 'page' as const });
 const uncrewedCards: CardField[] = [
-  usvCard(rr12, { size: 'featured', action: { label: 'Meet Reach Remote', url: rr12.url, action: 'page' } }),
+  usvCard(rr1, { size: 'featured', action: meet(rr1) }),
   { media: 'stat', surface: 'navy', statValue: uncrewedDays.value, title: uncrewedDays.label },
   // Short on purpose: the tall cell is 3 columns wide, so the copy must hold to three lines (docs/08 card sweep)
+  usvCard(rr2, { description: 'Working off Western Australia, run from Perth.', action: meet(rr2) }),
+  { media: 'stat', surface: 'white', statValue: (rr1.specs.endurance ?? '').replace(/\D.*$/, ''), title: 'Days at sea per mission, uncrewed' },
   usvCard(rr34, { description: 'In build at Kongsberg Maritime, funded by the EU Innovation Fund.', action: { label: 'Read more', url: rr34.url, action: 'page', context: rr34.name } }),
-  { media: 'stat', surface: 'white', statValue: (rr12.specs.endurance ?? '').replace(/\D.*$/, ''), title: 'Days at sea per mission, uncrewed' },
   ...drix.map((a) =>
     usvCard(a, {
       action: undefined,
@@ -147,8 +152,8 @@ const uncrewedCards: CardField[] = [
     surface: 'tint',
     eyebrow: 'Reach Horizon',
     title: 'Controlled from shore',
-    description: 'Both Reach Remote vessels are run from our onshore remote operations centre, with four levels of oversight from monitoring to direct control.',
-    action: { label: 'How remote operations work', url: rr12.url, action: 'page' },
+    description: 'Reach Remote is run from our control rooms in Haugesund and Perth, with four levels of oversight.',
+    action: { label: 'How remote operations work', url: '/assets/reach-remote/#oversight', action: 'page' },
   },
 ];
 
@@ -277,11 +282,11 @@ const faqItems = faqsFor('assets');
 
     <CardBento
       anchor="uncrewed"
-      pattern="lead-tall-wide"
+      pattern="lead-tall-trio-a"
       background="white"
       sectionHeader={{
         title: 'The uncrewed fleet',
-        action: { label: 'Reach Remote', url: rr12.url },
+        action: { label: 'Reach Remote', url: '/assets/reach-remote/' },
       }}
       cards={uncrewedCards}
     />

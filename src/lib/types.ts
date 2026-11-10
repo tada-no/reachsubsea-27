@@ -114,6 +114,9 @@ export interface CardField {
    * wide ROV card left its rows in a narrow column with empty space beside them). Default 1. */
   specColumns?: 1 | 2;
   action?: LinkField;
+  /** Optional id so a link can land on this one card (10 Nov 2026, Reach Remote: /assets/reach-remote/#reach-remote-2
+   * from a project's vessel row). */
+  anchor?: string;
 }
 
 /** Key figures options page row (brief §5.3). */
