@@ -193,20 +193,21 @@ export const faqs: Faq[] = [
     slug: 'what-is-explore-3d-world',
     question: 'What is Explore 3D World?',
     answer:
-      'An interactive 3D environment where you can fly between four working zones and click on vessels, ROVs, platforms and structures to learn more about each one.',
+      'An interactive 3D environment where you can fly between four working zones and click on the vessels and ROVs to learn what each one does.',
     topics: ['3d-world'],
   },
   {
     slug: 'install-explore-3d-world',
     question: 'Do I need to install anything to use Explore 3D World?',
     answer:
-      'No. It runs in your web browser. It loads an 18 MB scene, so it works best on a computer or tablet with a current version of Chrome, Edge, Firefox or Safari. On a phone it may run slowly.',
+      'No. It runs in your web browser. It loads a scene of about 20 MB, so it works best on a computer or tablet with a current version of Chrome, Edge, Firefox or Safari. On a phone it may run slowly.',
     topics: ['3d-world'],
   },
   {
     slug: 'what-can-i-click-3d-world',
     question: 'What can I click on inside the 3D world?',
-    answer: 'The assets in each zone: vessels, ROVs, platforms and subsea structures, each with its own information panel.',
+    answer:
+      'The pins on the vessels and ROVs in each zone. Each opens a panel on what it is and the job it’s doing; the platforms, wind turbines and subsea structures set the scene.',
     topics: ['3d-world'],
   },
 

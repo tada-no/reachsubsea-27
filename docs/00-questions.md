@@ -14,6 +14,17 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q180. 3D World FAQs promised clicks the world doesn't have (10 Nov 2026)
+
+Ross spotted that "What can I click on inside the 3D world?" listed platforms and subsea structures. The v141 world has 12 pins: 6 vessels (Vessel 1 and 2, Reach Remote 1 to 3, DriX) and 6 ROVs; platforms, turbines and structures have none. It also downloads ~21 MB, not 18.
+
+- [x] What can I click: "The pins on the vessels and ROVs in each zone. Each opens a panel on what it is and the job it's doing; the platforms, wind turbines and subsea structures set the scene."
+- [x] What is Explore 3D World: "…click on the vessels and ROVs to learn what each one does."
+- [x] Explore 3D World page, How it works: "Pins mark the vessels and ROVs at work."
+- [x] Install FAQ: "a scene of about 20 MB" (rounded so it stays true as the world changes).
+
+**Answer:** Ross chose all four recommended wordings (10 Nov 2026). If the world later gets pins on structures, widen these again.
+
 ### Q179. 3D World media brought up to v141 (9 Nov 2026)
 Context: the world moved on from v85–v86 (Viking Vigor rebuilt from the CAD in v124–v140, Pilot and welcome panel redesigned in v87–v122, route trace off in v91, Surveyor nose silver in v113, heavier jacket growth in v105). Ross: "Yes, all stale ones."
 - [x] Home hero film (`promo.mp4`, `promo-1080.mp4`, `promo-poster.jpg`): the six shots re-rendered at v141 and re-cut with `pipeline/film_promo.py` (same cut, 56.7 s, loop 1–54.5 s); opens on the CAD Vigor. Also the "Watch the film" link on Services and Technology & Innovation
