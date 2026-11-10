@@ -346,6 +346,10 @@ const jsonLd = video && {
   }
 
   /* Video: consent and player in one cell; the cell is at least 16:9 and never changes height on load */
+  /* The frame's white (for the cropped OMS page) showed as white corners round the consent panel on Navy */
+  .split-embed--video .split-embed__frame {
+    background-color: var(--wp--custom--color--bg--tint);
+  }
   .split-embed__player {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
