@@ -152,17 +152,18 @@ const siblingCards: CardField[] = [
     />
 
     {/* The 3D World's careers route (reach-world v45+): the same poster embed as Home, opened on its careers view.
-        Wording is the world's own start view ("From ship to seabed", the five stops, the hands-on survey line). */}
+        Wording is the world's own start view ("From ship to seabed", the five stops). 11 Nov 2026: the survey-line game
+        ("pilot the mini-ROV") is parked in the world (v144), so the text drops it and the poster is the tour's Surveyors stop. */}
     <Embed
       anchor="try-it-in-3d"
       type="3d-world"
       state="poster"
       eyebrow="Try it in 3D"
       title="From ship to seabed"
-      text="Five stops, about two minutes: each one a Reach asset at work, with the role behind it. Or pilot the mini-ROV along a pipeline. An 18 MB scene, best on a tablet or computer."
+      text="Five stops, about two minutes: each one a Reach asset at work, with the role behind it. An 18 MB scene, best on a tablet or computer."
       worldUrl={worldCareersUrl}
       fullScreenUrl={worldCareersPath}
-      poster={{ src: `${base}images/3d-world-careers-poster.jpg`, alt: 'A mini-ROV about to fly through the first of nine hoops along a seabed pipeline in the Reach Subsea 3D World' }}
+      poster={{ src: `${base}images/3d-world-careers-poster.jpg`, alt: 'The Surveyor ROV flying along a seabed pipeline on its tether in the Reach Subsea 3D World' }}
     />
 
     {/* SAMPLE: a 20 Sep 2026 snapshot of the HR-Manager list (src/data/careers.ts); the developer's feed replaces it */}

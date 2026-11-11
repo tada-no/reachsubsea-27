@@ -14,6 +14,15 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q185. Careers 3D World banner without the survey-line game (11 Nov 2026)
+
+Ross: "this section needs to be updated, image and text as we've removed the pilot feature" (Careers overview, "From ship to seabed"). The world parked "Fly a survey line" (the mini-ROV hoop run) in v144; the five-stop careers tour stays.
+
+- [x] **Text:** "Or pilot the mini-ROV along a pipeline." dropped: "Five stops, about two minutes: each one a Reach asset at work, with the role behind it. An 18 MB scene, best on a tablet or computer."
+- [x] **Poster:** the tour's Surveyors stop (stop 2) rendered from the world at v161 with `pipeline/pageshot.mjs` (careers=1, interface hidden), 3200 × 1080 cropped to 1920 × 1080 so the Surveyor sits at ~68% across, clear of the copy at 1100 and 1440. Alt text updated.
+
+**Answer:** Ross, 11 Nov 2026. Checked at 1440, 1100, 800 and 375. Open: the world's own careers start view still says "Or go straight to the hands-on part and pilot the mini-ROV along a pipeline" while the game is parked (`src/careers.js` in reach-world).
+
 ### Q184. Reach Remote 3 & 4: background, project summary and coordinator (11 Nov 2026)
 
 Ross pasted three texts for the page, to go after "The build so far": the grant, investment and order (four paragraphs), the Innovation Fund's project summary (four long paragraphs) and the coordinator's contact details, and asked whether to show the first paragraph with a Read more.
