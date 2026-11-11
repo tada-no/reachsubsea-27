@@ -14,6 +14,14 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q183. Reach Remote hero launch: the TMS stops, the ROV flies down on a straight tether (11 Nov 2026)
+
+Ross: "Have you updated the tms and tethers on the Reach Remote page hero section?" (after the client's comments on the 3D World, its v146-v150), then "Yes, update it".
+
+- [x] **Match the 3D World** (as asked): the E-TMS at its real Ø2200 x 1640 mm (the Reach Remote brochure; it was drawn at 70%); the TMS and ZEEROV lower out through the moonpool together and the TMS stops about 12 m under the hull (Descent, T 0.3-0.5); at Release (T 0.5-1) the ROV unlatches, drops clear and flies on down and a little along the hull, the TMS staying where it stopped, on a straight yellow tether with no slack (was a lazy S); the umbilical hangs near straight. The camera pulls back over the release to hold both, the TMS above and the ROV below.
+
+**Answer:** Ross, 11 Nov 2026. Built in `src/scripts/reach-remote-stage.ts` (`TMS_REAL`, `ROV`, `CHAPTERS`, `poseStack`, `camKeys`). Chapter copy unchanged (still true). Posters unchanged: they are the scene at time 0, the vessel only. Checked at 1440, 1100, 800 and 375 through the launch, and with reduced motion (the plain chapter list, unchanged). Not checked in Safari.
+
 ### Q182. Reach Remote 1 and 2 as separate assets (10 Nov 2026)
 
 Ross: projects need to reference Reach Remote 1 or 2 (the Perth-side work is Reach Remote 2), and the charter chart already lists them as separate lines. So two boxes in the uncrewed bento, and two asset cards on the Reach Remote page, below Built with partners.

@@ -84,12 +84,17 @@ const DRAFT = 2.1;
 // The moonpool opening of the real model (3D World v86, pipeline/reach_remote_nemo.py): x -2.4..4.0 with the bow +X, 3.0 m
 // wide, so the centre is x 0.8. The probes sit just outside it, on the flat bottom between the gondola walls.
 const MOON = { x: 0.8, len: 7.0, wid: 3.4 };
-const ROV = { halfH: 1.02, top: 0.65, tmsHalf: 0.67, tmsScale: 0.7, dockGap: 0.1, hangBelow: 10, dive: 40, tetherOut: 3.4 };
+// 11 Nov 2026 (the client's comments on the 3D World, as its v146-v150): the TMS is the Kystdesign E-TMS at its real
+// Ø2200 x 1640 mm (Reach Remote brochure; it was drawn at 70%), it stops partway down instead of riding down with the
+// ROV, and the ROV unlatches there and flies on down on a straight tether, no slack. `park`: the ROV's centre this far
+// under the moonpool mouth when the TMS stops; `dive`: where the ROV ends, `out` metres along the hull from the TMS.
+const TMS_REAL = { d: 2.2, h: 1.64 };
+const ROV = { halfH: 1.02, top: 0.65, tmsHalf: TMS_REAL.h / 2, tmsScale: 1, dockGap: 0.1, hangBelow: 4, park: 12, drop: 2, dive: 18, out: 3 };
 const CHAPTERS = [
   { name: 'Ready', t0: 0, t1: 0.1 },
   { name: 'Launch', t0: 0.1, t1: 0.3 },
-  { name: 'Descent', t0: 0.3, t1: 0.74 },
-  { name: 'Release', t0: 0.74, t1: 1 },
+  { name: 'Descent', t0: 0.3, t1: 0.5 },
+  { name: 'Release', t0: 0.5, t1: 1 },
 ];
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -508,7 +513,9 @@ export function mountStage(stage: HTMLElement) {
       // (reach-world/src/tethers.js, copied to reach-remote-tmscage.js), fitted to the model's half-height.
       tms.scene.visible = false;
       const cage = createTmsCage({ THREE, pbrMats });
-      cage.scale.setScalar(0.78); // etms.glb's half-height (0.78 m at this scale) / the cage's CAGE_HALF (1.0), as the world; ROV.tmsHalf is its real half-height
+      // the E-TMS's real size, as the world's tethers.js TUNE.cageReal (3D World v150): the bumper's outside (1.37 cage
+      // units) is the diameter, the cage's half-extent (0.86) half the height; ROV.tmsHalf is that real half-height
+      cage.scale.set(TMS_REAL.d / (2 * 1.37), TMS_REAL.h / (2 * 0.86), TMS_REAL.d / (2 * 1.37));
       cage.rotation.y = -2.258;
       tmsHolder.add(cage);
       shadeInHull(stack);
@@ -540,50 +547,54 @@ export function mountStage(stage: HTMLElement) {
     const dockH = ROV.halfH + ROV.dockGap + ROV.tmsHalf - ROV.top; // TMS centre above the ROV attach when latched
     const inside = new THREE.Vector3(MOON.x, moon.mouth + 0.15 + ROV.halfH, 0);
     const hang = new THREE.Vector3(MOON.x, moon.mouth - ROV.hangBelow, 0);
-    const deep = new THREE.Vector3(MOON.x + 6, moon.mouth - ROV.dive, 2);
-    let tmsH = dockH;
+    // where the TMS stops (the ROV latched under it), straight under the moonpool so the umbilical hangs straight
+    const park = new THREE.Vector3(MOON.x, moon.mouth - ROV.park, 0);
+    const drop = new THREE.Vector3(MOON.x, moon.mouth - ROV.park - ROV.drop, 0);
+    const deep = new THREE.Vector3(MOON.x + ROV.out, moon.mouth - ROV.dive, 1);
     let release = 0;
-    const [ready, launch, descent, rel] = CHAPTERS;
+    let latched = true;
+    const [, launch, descent, rel] = CHAPTERS;
     if (T < launch.t0) {
       rovP.copy(inside);
     } else if (T < descent.t0) {
       rovP.lerpVectors(inside, hang, smoother((T - launch.t0) / (launch.t1 - launch.t0)));
     } else if (T < rel.t0) {
-      const u = smoother((T - descent.t0) / (descent.t1 - descent.t0));
-      rovP.lerpVectors(hang, deep, u);
-      rovP.x += Math.sin(u * Math.PI) * 1.5;
+      rovP.lerpVectors(hang, park, smoother((T - descent.t0) / (descent.t1 - descent.t0)));
     } else {
-      release = smoother((T - rel.t0) / (rel.t1 - rel.t0));
-      tmsH = dockH + (4.5 - dockH) * release;
-      rovP.copy(deep);
-      rovP.x += release * ROV.tetherOut;
-      rovP.y -= (tmsH - dockH) * 0.4;
+      // Release: the ROV unlatches and drops clear under the TMS, then flies on down and a little along the hull,
+      // while the TMS stays where it stopped
+      latched = false;
+      release = clamp01((T - rel.t0) / (rel.t1 - rel.t0));
+      const k0 = smoother(release / 0.12);
+      const u = smoother((release - 0.08) / 0.84);
+      if (u <= 0) rovP.lerpVectors(park, drop, k0);
+      else {
+        const c1 = drop.clone().add(new THREE.Vector3(0, -(drop.y - deep.y) * 0.4, 0)); // leaves heading down
+        const c2 = deep.clone().add(new THREE.Vector3(-ROV.out * 0.6, (drop.y - deep.y) * 0.15, -0.5)); // arrives level-ish
+        const v = 1 - u;
+        rovP.set(0, 0, 0).addScaledVector(drop, v * v * v).addScaledVector(c1, 3 * v * v * u).addScaledVector(c2, 3 * v * u * u).addScaledVector(deep, u * u * u);
+      }
     }
-    tmsP.set(rovP.x - release * ROV.tetherOut, rovP.y + ROV.top + tmsH + release * (tmsH - dockH) * 0.4, rovP.z);
+    if (latched) tmsP.set(rovP.x, rovP.y + ROV.top + dockH, rovP.z);
+    else tmsP.set(park.x, park.y + ROV.top + dockH, park.z);
     rovHolder.position.copy(rovP);
-    rovHolder.rotation.y = -1.75 + release * 0.35; // flies off along the hull with its lamps about 40° off the camera, so they show
+    rovHolder.rotation.y = -1.75 + smoother((release - 0.08) / 0.84) * 0.35; // turns a little as it flies off, its lamps about 40° off the camera, so they show
     tmsHolder.position.copy(tmsP);
     stackC.lerpVectors(rovP, tmsP, 0.5);
-    // Umbilical: from the housing down to the TMS top, with a catenary belly
+    // Umbilical: from the housing straight down to the TMS top (the TMS hangs on it), a whisper of belly
     const top = new THREE.Vector3(tmsP.x, tmsP.y + ROV.tmsHalf, tmsP.z);
     const a = moon.attach.clone();
     const span = a.distanceTo(top);
     const mid = a.clone().lerp(top, 0.5);
-    mid.x += Math.min(4, span * 0.08);
-    mid.y -= Math.min(3, span * 0.06);
+    mid.x += Math.min(0.6, span * 0.03);
     umbilical.visible = T > launch.t0;
     if (umbilical.visible) cable(umbilical, [a, mid, top], 0.06);
-    // Tether: out of the TMS bellmouth to the ROV, a lazy S once released
-    tether.visible = release > 0.02;
+    // Tether: out of the TMS bellmouth straight to the ROV, no slack (Ross, 10 Nov 2026)
+    tether.visible = !latched && release > 0.01;
     if (tether.visible) {
       const b = new THREE.Vector3(tmsP.x, tmsP.y - ROV.tmsHalf, tmsP.z);
       const r = new THREE.Vector3(rovP.x, rovP.y + ROV.top, rovP.z);
-      const m1 = b.clone().lerp(r, 0.35);
-      m1.y -= 1.2 * release;
-      m1.z += 0.6 * release;
-      const m2 = b.clone().lerp(r, 0.75);
-      m2.y -= 0.6 * release;
-      cable(tether, [b, m1, m2, r], 0.03);
+      cable(tether, [b, b.clone().lerp(r, 0.5), r], 0.03);
     }
     return release;
   }
@@ -615,13 +626,15 @@ export function mountStage(stage: HTMLElement) {
       az0 = Math.atan2(d.x, d.z);
       el0 = Math.asin(d.y);
     }
+    // 11 Nov 2026: the focus is the stack's middle, which becomes the point half way between the TMS and the ROV as
+    // they part, so the camera pulls back over the release to hold both, the TMS above and the ROV below on its tether
     return [
       [0, D0, el0, az0],
       [0.3, D0 * 0.4 + 26 * 0.6, el0 * 0.4 - 0.45 * 0.6, az0 + 0.5],
-      [0.5, 28, -0.3, az0 + 0.75],
-      [0.74, 22, -0.1, az0 + 1.0],
-      [0.88, 24, 0.08, az0 + 1.1],
-      [1, 24, 0.12, az0 + 1.15],
+      [0.5, 22, -0.12, az0 + 0.8],
+      [0.62, 24, -0.04, az0 + 0.95],
+      [0.85, 36, 0.02, az0 + 1.05],
+      [1, 38, 0.04, az0 + 1.1],
     ];
   }
   function camKey(t: number, K: number[][]) {
