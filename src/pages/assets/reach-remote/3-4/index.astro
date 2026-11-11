@@ -4,7 +4,8 @@
 // at each reporting date. Rigid by design (Q165): the facts the grant's communication duties ask for, in order.
 // Hero Text (navy, the "Funded by the European Union" emblem in the stack, so it is visible on landing without
 // scrolling: Q169) · project facts (Split media Spec table) · spend to date (Share bars, one bar: the PDF's "Overall
-// completion" panel, as money invested, since no build percentage exists) · build timeline · EU funding and the
+// completion" panel, as money invested, since no build percentage exists) · build timeline · background (grant, investment,
+// order) · the Innovation Fund's project summary (Read more) · coordinator (Q184, 11 Nov 2026) · EU funding and the
 // EU's disclaimer · CTA. As the PDF: no subnav, no FAQ.
 // Left out of the PDF's plan: the template banner and dashed placeholders, the disclaimer card over the hero's edge
 // (nothing overlaps the hero), the stage statuses (hull, systems, sea trials, delivery: no dated stages yet, client
@@ -19,7 +20,7 @@ import ShareBars from '../../../../blocks/ShareBars.astro';
 import Timeline from '../../../../blocks/Timeline.astro';
 import CtaBand from '../../../../blocks/CtaBand.astro';
 import { navSections } from '../../../../data/navigation';
-import { reportingDate, projectFacts, spend, spendShare, milestones } from '../../../../data/reach-remote-3-4';
+import { reportingDate, projectFacts, spend, spendShare, milestones, background, projectSummary, coordinator } from '../../../../data/reach-remote-3-4';
 
 const base = import.meta.env.BASE_URL;
 const section = navSections.find((s) => s.id === 'assets')!;
@@ -74,6 +75,39 @@ const nok = (m: number) => `NOK ${m.toLocaleString('en-GB', { minimumFractionDig
       background="tint"
       sectionHeader={{ eyebrow: 'Milestones', title: 'The build so far' }}
       milestones={milestones}
+    />
+
+    {/* Background, Project summary and the coordinator (11 Nov 2026, Q184): three Beside sections, the same shape
+        each, so the EU texts read as one run. The summary is the Innovation Fund's own wording, so it is kept whole,
+        its first paragraph shown and the rest behind Read more. The coordinator joins the summary on the same tint. */}
+    <SplitMedia
+      anchor="background"
+      layout="beside"
+      background="white"
+      eyebrow="Background"
+      title="From EU grant to vessel order"
+      body={background}
+    />
+
+    <SplitMedia
+      anchor="project-summary"
+      layout="beside"
+      background="tint"
+      eyebrow="EU Innovation Fund"
+      title="Project summary"
+      body={projectSummary.lead}
+      more={projectSummary.more}
+      moreLabel="Read the full summary"
+    />
+
+    <SplitMedia
+      anchor="coordinator"
+      layout="beside"
+      background="tint"
+      joined
+      headingLevel="h3"
+      title="Coordinator’s contact details"
+      body={`<p><strong>${coordinator.name}</strong>, ${coordinator.country}<br /><a href="mailto:${coordinator.email}">${coordinator.email}</a></p>`}
     />
 
     <SplitMedia

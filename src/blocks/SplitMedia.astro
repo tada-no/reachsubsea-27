@@ -20,6 +20,10 @@
 // Layout Beside (8 Oct 2026, Careers › Who thrives, Ross; Figma 435:17585): short copy that answers the heading.
 // Eyebrow on top, then the heading in cols 1–6 and one paragraph in cols 7–12, top-aligned with the heading's first
 // line. No media. Below 900 the body follows the heading.
+// Read more (11 Nov 2026, Reach Remote 3 & 4 Project summary, Q184): Beside can hold a long text as `body` (the first
+// paragraph, shown) and `more` (the rest, hidden until "Read more" is pressed). The hidden part is `hidden=until-found`,
+// so it stays in the page for search engines and find-in-page opens it; the toggle is an Expand link (plus/minus),
+// its label unchanged, so nothing but the revealed text moves.
 // Poster (6 Oct 2026, HSEQ campaigns, Q115): a campaign poster or similar artwork shown whole, at its own
 // proportions (no crop, no photo tint: it is artwork) in 5 columns, the text in 6, a 1px subtle edge; it opens the
 // Lightbox (the page renders <Dialog type="lightbox" />). Below 900 it follows the text (a tall poster first
@@ -117,6 +121,9 @@ interface Props extends BlockFields {
    * (7 Oct 2026, HSEQ campaign: The golden rules beside Offshore risks, both as Spec rows). */
   pairSpecs?: SpecItem[];
   pairHeading?: string;
+  /** Beside only: the rest of a long text, revealed by the `moreLabel` Expand link under `body` (rich text HTML). */
+  more?: string;
+  moreLabel?: string;
   /** Keep `title` as the section's accessible name only (a visually hidden heading), where the block continues
    * the one above (`joined`) and its own H3s head the content. */
   titleHidden?: boolean;
@@ -157,6 +164,8 @@ const {
   pictogram,
   pairSpecs = [],
   pairHeading,
+  more,
+  moreLabel = 'Read more',
   titleHidden = false,
   artwork = false,
   joined = false,
@@ -167,6 +176,7 @@ const {
 } = Astro.props;
 
 const titleId = makeId('split-media', title);
+const moreId = `${titleId}-more`;
 const shownActions = actions.slice(0, 2);
 const hasSpecFile = Boolean(specFile?.url);
 const listInText = media !== 'numbered-list' && items.length > 0;
@@ -196,6 +206,12 @@ const rootClass = [joined && 'split-media--joined', stackDesktop && 'split-media
       <div class="prose split-media__body">
         {body && <Fragment set:html={body} />}
         <slot />
+        {more && (
+          <Fragment>
+            <div id={moreId} class="split-media__more" hidden="until-found" set:html={more} />
+            <Link label={moreLabel} action="expand" class="split-media__more-toggle" aria-controls={moreId} data-split-more />
+          </Fragment>
+        )}
       </div>
     </div>
   ) : wide ? (
@@ -508,6 +524,18 @@ const rootClass = [joined && 'split-media--joined', stackDesktop && 'split-media
   .split-media__beside > .split-media__body {
     grid-column: 7 / span 6;
   }
+  /* Read more: the revealed paragraphs keep the prose rhythm; the toggle sits one prose gap under the last line */
+  .split-media__more {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wp--custom--stack--sm);
+  }
+  .split-media__more[hidden] {
+    display: none;
+  }
+  .split-media__more-toggle {
+    align-self: flex-start;
+  }
   @media (max-width: 899px) {
     .split-media__beside > :is(.eyebrow, .split-media__title, .split-media__body) {
       grid-column: 1 / -1;
@@ -815,3 +843,18 @@ const rootClass = [joined && 'split-media--joined', stackDesktop && 'split-media
     padding-top: 0;
   }
 </style>
+
+<script>
+  // Read more (Beside): show or hide the rest of the text. Find-in-page opens it too (beforematch).
+  document.querySelectorAll<HTMLButtonElement>('[data-split-more]').forEach((toggle) => {
+    const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+    if (!panel) return;
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      if (open) panel.setAttribute('hidden', 'until-found');
+      else panel.removeAttribute('hidden');
+    });
+    panel.addEventListener('beforematch', () => toggle.setAttribute('aria-expanded', 'true'));
+  });
+</script>

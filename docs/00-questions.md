@@ -14,6 +14,16 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q184. Reach Remote 3 & 4: background, project summary and coordinator (11 Nov 2026)
+
+Ross pasted three texts for the page, to go after "The build so far": the grant, investment and order (four paragraphs), the Innovation Fund's project summary (four long paragraphs) and the coordinator's contact details, and asked whether to show the first paragraph with a Read more.
+
+- [x] **Background: own section, all shown** (recommended was folding the new points into the facts and milestones, as most of it repeats them). Split media Beside, white: eyebrow "Background", "From EU grant to vessel order", the four paragraphs.
+- [x] **Project summary: first paragraph + Read more** (recommended). Split media Beside, tint: eyebrow "EU Innovation Fund", "Project summary", the first paragraph, then "Read the full summary" (Expand link, plus/minus) reveals the other three. Word for word, as the EU publishes it.
+- [x] **Coordinator: own section** (recommended was the CTA panel's contact card). Split media Beside, H3, `joined` to the summary on the same tint: Christer Hollekim, Norway, email.
+
+**Answer:** Ross, 11 Nov 2026. Split media Beside gains `more` and `moreLabel`: the hidden part is `hidden="until-found"`, so it is in the page for search engines and find-in-page opens it; the label doesn't change, so only the revealed text moves (measured: nothing above it moves; closing restores every position). One edit: the em dash in "capabilities—integrating" is a comma. Open: the text says about NOK 620 million "after EU funding", the facts table NOK 622.7 million (Q2 report, project total), and "second half of 2027" against the page's "2027, expected"; both left as given. Checked at 1440, 1100, 800 and 375, closed and open; production build passes. *Figma: the Read more on the Beside variant, after Ross's review.*
+
 ### Q183. Reach Remote hero launch: the TMS stops, the ROV flies down on a straight tether (11 Nov 2026)
 
 Ross: "Have you updated the tms and tethers on the Reach Remote page hero section?" (after the client's comments on the 3D World, its v146-v150), then "Yes, update it".
