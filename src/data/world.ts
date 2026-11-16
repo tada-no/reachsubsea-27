@@ -12,7 +12,7 @@ export const worldLabel = 'Explore Reach in interactive 3D';
 // strip, footer, overview links) go here; its Launch button and zone cards open the world.
 export const worldPagePath = '/3d-world/';
 // Careers route (20 Sep 2026, reach-world v45–v48): `?careers=1` opens the world's home panel on "From ship to
-// seabed" (the five-stop route, and "Fly a survey line"). The Careers banner loads the scene with it in place, and
+// seabed" (the five-stop route; its "Fly a survey line" game is parked since v144, and Pilot mode since v182). The Careers banner loads the scene with it in place, and
 // its full-screen link opens the in-site page with it.
 export const worldCareersUrl = `${worldSceneUrl}?careers=1`;
 export const worldCareersPath = `${worldPath}?careers=1`;

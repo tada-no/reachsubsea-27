@@ -14,6 +14,17 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q186. Explore 3D World: Pilot mode out of How it works (16 Nov 2026)
+
+Ross: "We are hiding the ROV/DRONE option in the Reach 3D world, so will need to make a sweep of the site that refers to this", then "Yes, replace it". The world parks Pilot mode (the mini-ROV / drone) for launch in reach-world v182; it may come back later.
+
+- [x] **Sweep:** the only visitor-facing mention was How it works card 3, "Take the controls" ("Press Pilot to fly an ROV yourself… steer through the hoops"), on this site and on the new live WordPress site (reachsubsea27.wpenginepowered.com/3d-world/). Careers (text and poster), the 3D World FAQs, search and the zone cards were already clean. In the world, the careers tour's survey-line text sits behind the `game` switch, so it is hidden too (closes the open point in Q185).
+- [x] **Card 3 now "Follow the careers route":** "Open From ship to seabed from the welcome panel: five stops, about two minutes, each a Reach asset at work with the people behind it." Image `world-step-tour.jpg`: the tour's stop 2 (Surveyors), captured at v182 with `pipeline/pageshot.mjs` (careers=1, 1310 × 873, scaled to 1200 × 800 like the other two). `world-step-pilot.jpg` removed.
+- [ ] **WordPress:** the client's live site needs the same card change (text, image, alt).
+- [ ] **World:** the scene on Vercel is still v181 (Pilot shown) until v182 is published.
+
+**Answer:** Ross, 16 Nov 2026. Checked at 1440, 1100, 800 and 375 and the production build.
+
 ### Q185. Careers 3D World banner without the survey-line game (11 Nov 2026)
 
 Ross: "this section needs to be updated, image and text as we've removed the pilot feature" (Careers overview, "From ship to seabed"). The world parked "Fly a survey line" (the mini-ROV hoop run) in v144; the five-stop careers tour stays.
