@@ -77,7 +77,7 @@ export const checklistPageLink = (entry: string) => {
 
 export const checklistEmail = 'ross@tada.no';
 /** The date the statuses were last checked against the inbox. */
-export const checklistUpdated = '2026-10-22';
+export const checklistUpdated = '2026-11-10';
 
 export const checklistGroups: ChecklistGroup[] = [
   {
@@ -99,7 +99,7 @@ export const checklistGroups: ChecklistGroup[] = [
       { n: 7, subject: 'Service descriptions', text: "Are the service descriptions, scope lists and project-lifecycle stages right?", pages: ['Services#service-lines', 'Subsea#what-we-do', 'Survey#what-we-do', 'Monitoring#what-we-do', 'Technology & Innovation#investing'], status: 'open' },
       { n: 8, subject: 'Leave no one behind', text: 'Can we use "Leave no one behind" as the short form of your value "never leave anyone behind"?', pages: ['Careers#values'], status: 'open' },
       { n: 9, subject: 'HOP principles', text: "Does Reach work by the five Human and Organisational Performance (HOP) principles, and should they stay on Our culture? The design lists them, but they're the industry's standard principles, not a Reach programme.", pages: ['Our culture#hop'], status: 'open' },
-      { n: 10, subject: 'Offices and countries', text: 'Is "8 offices in 4 countries" right? The design said "nine countries", which is where you have worked.', pages: ['Our culture', 'Why work with us#reasons'], status: 'open' },
+      { n: 10, subject: 'Offices and countries', text: 'Is "8 offices in 4 countries" right? The design said "nine countries", which is where you have worked.', pages: ['Our culture', 'Why work with us#reasons'], status: 'progress' },
       { n: 11, subject: 'Life at Reach details', text: "Are the Life at Reach details right: the Husøy technical base, the workshop location and how rotations work?", pages: ['Life at Reach#where-you-work'], status: 'open' },
       { n: 12, subject: '3D World zones', text: "Are the 3D World zone descriptions and the careers stops right?", pages: ['Explore 3D World', 'Careers#try-it-in-3d'], status: 'open' },
       { n: 13, subject: 'Research publications', text: "Is the grouping of the research publications by topic right, and are there 48 or 49 of them?", pages: ['Research & Publications#library'], status: 'open' },
