@@ -53,7 +53,7 @@ export const worldZones: WorldZone[] = [
     label: 'Oil Field Operations',
     blurb: 'A steel jacket platform at the end of the pipeline. An uncrewed surface vessel flies an electric ROV at one of the jacket legs.',
     assets: ['Reach Remote 1', 'ZeeROV 1'],
-    image: { src: 'images/world-zone-2.jpg', alt: 'A ZeeROV and its tether cage beside a leg of a steel jacket platform' },
+    image: { src: 'images/world-zone-2.jpg', alt: 'A ZeeROV on its tether beside a leg of a steel jacket platform' },
   },
   {
     slug: 'wind',

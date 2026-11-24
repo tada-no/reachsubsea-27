@@ -14,6 +14,17 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q188. 3D World stills re-rendered from v195 (24 Nov 2026)
+
+Ross: "re-render the 3D World stills too", after the films (Q187). All ten site images taken from the World are made again from v195 at the same sizes.
+
+- [x] Explore 3D World zone cards (1200 × 675): `world-zone-1` (Vigor shot at 27.4 s), `world-zone-2` (launch shot at 31.1 s; the TMS now waits higher up, so the ZeeROV is alone at the jacket leg and the alt text says so), `world-zone-3` (wind shot at 10 s), `world-zone-4` (gWatch shot at 7 s)
+- [x] Explore 3D World How it works (1200 × 800): `world-step-zones` (welcome panel), `world-step-panel` (Reach Remote 1's drawer), `world-step-tour` (careers route, stop 2 Surveyors), captured with `pipeline/pageshot.mjs` at 1440 × 876, cropped 1314 × 876 from the right
+- [x] Explore 3D World hero (`world-hero`, 1920 × 1080): Reach Remote 1 on the right with the v183 rig behind it (the old still showed the rig model v183 replaced). Focal point 0.6 → 0.72 so the vessel stays whole on phones
+- [x] Services 3D World banner (`3d-world-poster`, 1920 × 1080): the Surveyor on its pipeline from behind and above, now with its camera arms and scan, above the zone list
+- [x] Careers 3D World banner (`3d-world-careers-poster`, 1920 × 1080): the careers route's Surveyors stop, interface hidden, 3200 wide cropped from x 480 so the ROV sits clear of the copy
+- [ ] WordPress: replace these ten files in the Media Library (same names), change the Zone 2 alt text and the Explore 3D World hero focal point
+
 ### Q187. Site films re-rendered from the signed-off 3D World v195 (24 Nov 2026)
 
 Reach signed off the 3D World as it stands (v195). Ross: "Just got the go ahead to re render the video files for the web". The two films made from the World were re-rendered from v195 with the same shots, cut, sizes and timing, and their posters were made again to match.
