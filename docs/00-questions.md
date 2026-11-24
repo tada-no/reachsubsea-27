@@ -14,6 +14,15 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q187. Site films re-rendered from the signed-off 3D World v195 (24 Nov 2026)
+
+Reach signed off the 3D World as it stands (v195). Ross: "Just got the go ahead to re render the video files for the web". The two films made from the World were re-rendered from v195 with the same shots, cut, sizes and timing, and their posters were made again to match.
+
+- [x] Home hero film: `video/promo.mp4` (1280 × 720), `video/promo-1080.mp4` (1920 × 1080, for screens 1024 px and wider) and `images/promo-poster.jpg` (the frame at 1 s, where the loop starts). 56.7 s, loop 1 to 54.5 s, unchanged. Re-rendered with `node pipeline/film.mjs vigor reach-remote launch surveyor gwatch wind --size 1920x1080`, then cut with `python3 pipeline/film_promo.py`. The "Watch the film" links on Services and Technology & Innovation use the same `promo.mp4`.
+- [x] Services overview, "One partner, two ways to reach the seabed": `video/routes-crewed.mp4` + `images/routes-crewed-poster.jpg` (Viking Vigor) and `video/routes-uncrewed.mp4` + `images/routes-uncrewed-poster.jpg` (Reach Remote 1). 1280 × 800, 12 s at 30 fps, still in step. Re-rendered with `node pipeline/film.mjs vigor-deploy rr-deploy --size 1600x1000`; posters are the first frames at 1280 × 800.
+- [ ] WordPress: replace these seven files in the Media Library, keeping the same file names.
+- [ ] Not re-rendered here (they are stills): the 3D World zone cards, How it works screenshots, and the Services and Careers 3D World banners.
+
 ### Q186. Explore 3D World: Pilot mode out of How it works (16 Nov 2026)
 
 Ross: "We are hiding the ROV/DRONE option in the Reach 3D world, so will need to make a sweep of the site that refers to this", then "Yes, replace it". The world parks Pilot mode (the mini-ROV / drone) for launch in reach-world v182; it may come back later.
