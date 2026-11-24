@@ -523,7 +523,7 @@ export function mountStage(stage: HTMLElement) {
       launchLoaded = true;
       if (T === 0) poseStack(); // parked in the moonpool until the launch
       stack.visible = true;
-      if (status && launchShown) status.textContent = 'ZeeROV 1,159 KB · TMS 588 KB';
+      if (status && launchShown) status.textContent = 'ZeeROV 1,307 KB · TMS 588 KB';
       stage.classList.remove('is-loading');
     })();
     return launchLoading;

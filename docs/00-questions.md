@@ -14,6 +14,10 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q189. Every 3D World image swept; the Reach Remote launch gets the current ZeeROV (24 Nov 2026)
+
+Ross: "please update all images in git that use the 3d world", with a screenshot of the Zone 2 card still showing the old still (ZeeROV under its TMS cage). The repo and the GitHub Pages build already had the new one (d8ade16, same 61,844 bytes), so the screenshot was a cached copy or the WordPress site. The sweep found every World still and film in git already from v195. The Reach Remote page's eight hero stills (reach-remote-stage-poster-*) are not World renders: they are stills of that page's own stage, and its vessel and eTMS models are byte-identical to the World's, so they stay. What was behind: the stage's ZeeROV model (public/models/rov-zeerov.glb), a copy from before World v157, which took the sloping front tray off and seated the arms on the skid. Now the World's current rov_zeerov.glb (1,307 KB, was 1,159; the loading readout says so). Checked the launch at 1440: the ROV sits under the cage with the new arms, no console errors. For WordPress: replace models/rov-zeerov.glb.
+
 ### Q188. 3D World stills re-rendered from v195 (24 Nov 2026)
 
 Ross: "re-render the 3D World stills too", after the films (Q187). All ten site images taken from the World are made again from v195 at the same sizes.
