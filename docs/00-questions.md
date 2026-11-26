@@ -14,6 +14,14 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q190. Photos of vessels no longer in the fleet (26 Nov 2026)
+
+Client: "check photos on website to remove any feature photos showing vessels that we do not have in fleet anymore". A sweep of all 260 WordPress pages against the fleet on Assets (Deep Cygnus, Offshore Surveyor, Olympic Taurus, Go Electra, Olympic Triton, Havila Subsea, Normand Jarstein, Viking Vigor, Viking Vire, Reach Remote). Ross: project pages keep their vessels ("relevant at the time to that project"), news posts are a separate call for the client. Swapped in the prototype ("Yes, swap Olympic Zeus and Northern Maria in the prototype"):
+- **Olympic Zeus** (`vessel-olympic-zeus.jpg`): Company story → Deep Cygnus; Services "Crewed vessels" card → Normand Jarstein (`project-black-sea-jarstein.jpg`); Investors "Why invest" card and the Press & media "Vessels" set → Olympic Triton.
+- **Northern Maria**: `hero-leadership.jpg` is now Normand Jarstein and `hero-monitoring.jpg` Reach Remote 1, each with the sea and sky extended to the left so the vessel sits right of the title (same file names, so WordPress only replaces the files). The Survey page's Northern Maria fleet card is now Havila Subsea with a new photo in Havila's own livery (`vessel-havila-subsea.jpg`); the live site dropped that card instead.
+
+Still open with the client: the unnamed red and white vessel in `hero-sustainability.jpg` and `windfarm-turbine-install.jpg` (Why invest, nav menu); `asset-havila-subsea.jpg` still shows the old Subsea 7 livery (Assets, Services › Subsea). The prototype's `assets.ts` still lists Northern Maria in service. Checked at 1440, 1100, 800 and 375 and the production build.
+
 ### Q189. Every 3D World image swept; the Reach Remote launch gets the current ZeeROV (24 Nov 2026)
 
 Ross: "please update all images in git that use the 3d world", with a screenshot of the Zone 2 card still showing the old still (ZeeROV under its TMS cage). The repo and the GitHub Pages build already had the new one (d8ade16, same 61,844 bytes), so the screenshot was a cached copy or the WordPress site. The sweep found every World still and film in git already from v195. The Reach Remote page's eight hero stills (reach-remote-stage-poster-*) are not World renders: they are stills of that page's own stage, and its vessel and eTMS models are byte-identical to the World's, so they stay. What was behind: the stage's ZeeROV model (public/models/rov-zeerov.glb), a copy from before World v157, which took the sloping front tray off and seated the arms on the skid. Now the World's current rov_zeerov.glb (1,307 KB, was 1,159; the loading readout says so). Checked the launch at 1440: the ROV sits under the cage with the new arms, no console errors. For WordPress: replace models/rov-zeerov.glb.

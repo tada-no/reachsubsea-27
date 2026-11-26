@@ -142,7 +142,7 @@ export const pressPhotos = {
     {
       title: 'Vessels',
       format: 'High-resolution JPG',
-      image: { file: 'vessel-olympic-zeus.jpg', alt: 'Olympic Zeus, a Reach Subsea construction support vessel, at sea', focalPoint: { x: 0.35, y: 0.55 } },
+      image: { file: 'vessel-olympic-triton.jpg', alt: 'Olympic Triton, a Reach Subsea construction vessel with a helideck, at sea', focalPoint: { x: 0.45, y: 0.5 } },
     },
     {
       title: 'ROVs & operations',
