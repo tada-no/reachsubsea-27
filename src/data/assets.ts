@@ -419,7 +419,7 @@ export const assets: Asset[] = [
     kind: 'Sensors and instrumentation',
     summary: 'Multibeam echosounders, sub-bottom profilers and positioning carried by the vessels and USVs, and the gWatch family of monitoring systems.',
     specs: {},
-    image: { src: `${base}images/rov-zeerov-gwatch.jpg`, alt: 'A gWatch seabed monitoring unit being placed by an ROV', focalPoint: { x: 0.5, y: 0.5 } },
+    image: { src: `${base}images/gWatch2020-REACH-web.jpg`, alt: 'A gWatch seabed monitoring unit being placed by an ROV', focalPoint: { x: 0.5, y: 0.5 } },
     url: '/assets/survey-monitoring-equipment/',
     source: 'PDF p20 (Survey & monitoring assets: EM2040, Topas PS120, gWatch / DepthWatch / WellWatch / DrillWatch); DEV Reach Remote and Northern Maria intros (EM 2040, Innomar SBP, HiPAP 502). Neither site has an equipment post type.',
   },

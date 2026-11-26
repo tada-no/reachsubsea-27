@@ -16,7 +16,7 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ### Q191. gWatch ROV photo without the Octio logo (26 Nov 2026)
 
-Ross sent a new photo to replace `rov-zeerov-gwatch.jpg` ("the old/current one has an Octio logo on it"): a Supporter WROV carrying a Reach-branded gWatch unit just above the sea, 2000 × 1289, saved at 1240 × 799 under the same name so WordPress only replaces the file. Used on the Monitoring intro, the ASUMO project (its page, the Projects list, related cards such as DIGIMON), the Survey & monitoring equipment asset and a Home LinkedIn post. Checked at 1440, 1100, 800 and 375 and the production build. Still showing Octio: `project-ormen-lange.jpg` (Ormen Lange gravimetry project).
+Ross sent a new photo to replace `rov-zeerov-gwatch.jpg` ("the old/current one has an Octio logo on it"): a Supporter WROV carrying a Reach-branded gWatch unit just above the sea, 2000 × 1289, saved at 1240 × 799 under the same name so WordPress only replaces the file. Used on the Monitoring intro, the ASUMO project (its page, the Projects list, related cards such as DIGIMON), the Survey & monitoring equipment asset and a Home LinkedIn post. Checked at 1440, 1100, 800 and 375 and the production build. Still showing Octio: `project-ormen-lange.jpg` (Ormen Lange gravimetry project). Later the same day the file was renamed `gWatch2020-REACH-web.jpg` to match the WordPress upload (Ross: "Update the git site with the new gWatch image name"); the live site serves it as `gWatch2020-REACH-web-scaled-e1795693403553.jpg`, slightly tighter crop.
 
 ### Q190. Photos of vessels no longer in the fleet (26 Nov 2026)
 

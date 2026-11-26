@@ -202,7 +202,7 @@ const entries: ProjectRef[] = [
     work: 'Research',
     year: 2022,
     field: 'With JAMSTEC and the University of Bergen',
-    image: { src: `${base}images/rov-zeerov-gwatch.jpg`, alt: 'A gWatch seabed monitoring unit carried by an ROV', focalPoint: { x: 0.5, y: 0.5 }, width: 1240, height: 820 },
+    image: { src: `${base}images/gWatch2020-REACH-web.jpg`, alt: 'A gWatch seabed monitoring unit carried by an ROV', focalPoint: { x: 0.5, y: 0.5 }, width: 1240, height: 820 },
     url: '/projects/asumo/',
   },
   // Survey (5 Oct 2026): the three real projects the client PDF p10 names, read from the dev site. The
