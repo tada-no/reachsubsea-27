@@ -14,6 +14,10 @@ Context: Ross: the EU label on Reach Remote 3 & 4 should be "Funded by the Europ
 
 ## Answered log
 
+### Q191. gWatch ROV photo without the Octio logo (26 Nov 2026)
+
+Ross sent a new photo to replace `rov-zeerov-gwatch.jpg` ("the old/current one has an Octio logo on it"): a Supporter WROV carrying a Reach-branded gWatch unit just above the sea, 2000 × 1289, saved at 1240 × 799 under the same name so WordPress only replaces the file. Used on the Monitoring intro, the ASUMO project (its page, the Projects list, related cards such as DIGIMON), the Survey & monitoring equipment asset and a Home LinkedIn post. Checked at 1440, 1100, 800 and 375 and the production build. Still showing Octio: `project-ormen-lange.jpg` (Ormen Lange gravimetry project).
+
 ### Q190. Photos of vessels no longer in the fleet (26 Nov 2026)
 
 Client: "check photos on website to remove any feature photos showing vessels that we do not have in fleet anymore". A sweep of all 260 WordPress pages against the fleet on Assets (Deep Cygnus, Offshore Surveyor, Olympic Taurus, Go Electra, Olympic Triton, Havila Subsea, Normand Jarstein, Viking Vigor, Viking Vire, Reach Remote). Ross: project pages keep their vessels ("relevant at the time to that project"), news posts are a separate call for the client. Swapped in the prototype ("Yes, swap Olympic Zeus and Northern Maria in the prototype"):
