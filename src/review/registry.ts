@@ -14,7 +14,7 @@ export interface BlockEntry {
 export const blocks: BlockEntry[] = [
   { slug: 'page-hero', name: 'Page hero', component: 'PageHero', spec: '§2.1', figma: '141:827', variants: 'Style Text · Photo' },
   { slug: 'card-grid', name: 'Card grid', component: 'CardGrid', spec: '§2.2', figma: '148:1288', variants: 'Layout 2 columns · 3 columns · 4 columns · Featured first' },
-  { slug: 'card-bento', name: 'Card bento', component: 'CardBento', spec: '§2.2b', figma: '', variants: 'Pattern lead-quad · lead-tall-wide · lead-tall-trio-a · lead-tall-trio-b · trio-wide' },
+  { slug: 'card-bento', name: 'Card bento', component: 'CardBento', spec: '§2.2b', figma: '', variants: 'Pattern lead-quad · lead-tall · lead-tall-wide · lead-tall-trio-a · lead-tall-trio-b · trio-wide' },
   { slug: 'feed-grid', name: 'Feed grid', component: 'FeedGrid', spec: '§2.3', figma: '156:2012', variants: 'Filters Off · On; sources incl. Latest; empty state' },
   { slug: 'split-media', name: 'Split media', component: 'SplitMedia', spec: '§2.4', figma: '166:2339', variants: 'Media Image · Video · Spec table · Numbered list × Position End · Start' },
   { slug: 'figures', name: 'Figures', component: 'Figures', spec: '§2.4b', figma: '', variants: 'Layout Sticky · Cards' },

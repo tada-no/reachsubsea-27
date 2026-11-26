@@ -45,29 +45,21 @@ const capabilityCards: CardField[] = (line.capabilities ?? []).map((cap) => ({
   action: cap.link && { ...cap.link, action: 'page', context: cap.title },
 }));
 
-// What we survey with: a crewed survey vessel, the survey ROV, the uncrewed vessels (the PDF's "2 modes")
-// and the two PDF figures. 12 columns as on Subsea. In WP: an Assets query picked on the Service.
-const [people, countries] = pickFigures(['people', 'countries']);
+// What we survey with: the survey ROV, the people figure and the uncrewed vessels (the PDF's "2 modes"),
+// as on the live site (26 Nov 2026, Q190: the crewed vessel card and the countries figure dropped).
+// 12 columns, pattern lead-tall. In WP: an Assets query picked on the Service.
+const [people] = pickFigures(['people']);
 const fleetCards: CardField[] = [
   {
     media: 'image-bg',
     size: 'featured',
-    image: { src: `${base}images/vessel-havila-subsea.jpg`, alt: 'Havila Subsea, a green-hulled DP2 subsea vessel, on calm water under a clear sky', focalPoint: { x: 0.5, y: 0.6 } },
-    eyebrow: 'Survey, IMR & construction vessel',
-    title: 'Havila Subsea',
-    description: 'DP2 vessel with two HD work-class ROVs and a Surveyor Interceptor for fast pipeline survey.',
-    action: { label: 'View vessel', url: '/assets/#vessels', context: 'Havila Subsea' },
-  },
-  { media: 'stat', surface: 'navy', statValue: people.value, title: people.label },
-  {
-    media: 'image-bg',
     image: { src: `${base}images/rov-surveyor-launch.jpg`, alt: 'A Surveyor Interceptor survey ROV launched from a vessel side', focalPoint: { x: 0.5, y: 0.5 } },
     eyebrow: 'Survey ROV',
     title: 'Surveyor Interceptor',
     description: 'A sensor carrier for fast, stable survey.',
     action: { label: 'View ROV', url: '/assets/#rovs', context: 'Surveyor Interceptor' },
   },
-  { media: 'stat', surface: 'white', statValue: countries.value, title: countries.label },
+  { media: 'stat', surface: 'navy', statValue: people.value, title: people.label },
   {
     media: 'image-bg',
     image: { src: `${base}images/usv-drix-wind.jpg`, alt: 'A red DriX uncrewed survey vessel passing an offshore wind turbine', focalPoint: { x: 0.55, y: 0.55 } },
@@ -161,7 +153,7 @@ const subnavItems = [
 
     <CardBento
       anchor="fleet"
-      pattern="lead-tall-wide"
+      pattern="lead-tall"
       background="tint"
       sectionHeader={{
         title: 'Vessels and vehicles for survey',

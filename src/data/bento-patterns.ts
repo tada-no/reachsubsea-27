@@ -5,7 +5,7 @@
 // WordPress: a `pattern` select on the block (with a small preview of each), and a card repeater whose
 // min and max rows equal the pattern's cell count.
 
-export type BentoPatternId = 'lead-quad' | 'lead-tall-wide' | 'lead-tall-trio-a' | 'lead-tall-trio-b' | 'trio-wide';
+export type BentoPatternId = 'lead-quad' | 'lead-tall' | 'lead-tall-wide' | 'lead-tall-trio-a' | 'lead-tall-trio-b' | 'trio-wide';
 
 export interface BentoCell {
   cols: 3 | 4 | 5 | 6 | 8;
@@ -27,6 +27,12 @@ export const bentoPatterns: Record<BentoPatternId, BentoPattern> = {
     label: 'Lead and four tiles',
     usedOn: 'Investors overview',
     cells: [c(6, 2), c(3), c(3), c(3), c(3)],
+  },
+  // Lead (6×2), a small tile, a tall tile (3×2) and a small tile: the top of the lead-tall patterns alone.
+  'lead-tall': {
+    label: 'Lead and tall tile',
+    usedOn: 'Survey',
+    cells: [c(6, 2), c(3), c(3, 2), c(3)],
   },
   // Lead (6×2), a small tile, a tall tile (3×2), a small tile, then two half-width tiles.
   'lead-tall-wide': {
